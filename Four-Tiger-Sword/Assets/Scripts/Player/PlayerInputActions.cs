@@ -127,6 +127,60 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""57586545-60b9-4a07-82c7-40612ad224b7"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Form1"",
+                    ""type"": ""Button"",
+                    ""id"": ""52cec07b-c6a4-413e-a569-2dd4d49bb590"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Form2"",
+                    ""type"": ""Button"",
+                    ""id"": ""2ce2cb3c-0cdd-4678-b929-8135ebeaf3e6"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Form3"",
+                    ""type"": ""Button"",
+                    ""id"": ""d5d7f4ef-2b73-49ba-b287-6da4b3823ab1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Form4"",
+                    ""type"": ""Button"",
+                    ""id"": ""e85b037f-6ff4-41a9-b492-f81eb165b81b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Form5"",
+                    ""type"": ""Button"",
+                    ""id"": ""4277232a-1f02-47ba-8f24-fa228abcf39b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -228,6 +282,72 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""58038eb7-d894-4e64-a30e-31af591e9d71"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cbf8a947-79ec-4421-94d2-18ed36f8b4fc"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Form1"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dba0c992-928d-4ccf-a0da-ac081064a644"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Form2"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bcaa2b6f-1d13-4717-b518-b2eb85d02d9d"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Form3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e30656ea-0d3f-4c92-bd47-fb2fa67f5a23"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Form4"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2ffa67aa-746f-49e6-b809-4be09661a94f"",
+                    ""path"": ""<Keyboard>/5"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Form5"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -240,6 +360,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
+        m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
+        m_Player_Form1 = m_Player.FindAction("Form1", throwIfNotFound: true);
+        m_Player_Form2 = m_Player.FindAction("Form2", throwIfNotFound: true);
+        m_Player_Form3 = m_Player.FindAction("Form3", throwIfNotFound: true);
+        m_Player_Form4 = m_Player.FindAction("Form4", throwIfNotFound: true);
+        m_Player_Form5 = m_Player.FindAction("Form5", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -324,6 +450,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Look;
+    private readonly InputAction m_Player_Attack;
+    private readonly InputAction m_Player_Form1;
+    private readonly InputAction m_Player_Form2;
+    private readonly InputAction m_Player_Form3;
+    private readonly InputAction m_Player_Form4;
+    private readonly InputAction m_Player_Form5;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -351,6 +483,30 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Look".
         /// </summary>
         public InputAction @Look => m_Wrapper.m_Player_Look;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Attack".
+        /// </summary>
+        public InputAction @Attack => m_Wrapper.m_Player_Attack;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Form1".
+        /// </summary>
+        public InputAction @Form1 => m_Wrapper.m_Player_Form1;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Form2".
+        /// </summary>
+        public InputAction @Form2 => m_Wrapper.m_Player_Form2;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Form3".
+        /// </summary>
+        public InputAction @Form3 => m_Wrapper.m_Player_Form3;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Form4".
+        /// </summary>
+        public InputAction @Form4 => m_Wrapper.m_Player_Form4;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Form5".
+        /// </summary>
+        public InputAction @Form5 => m_Wrapper.m_Player_Form5;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -389,6 +545,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
+            @Attack.started += instance.OnAttack;
+            @Attack.performed += instance.OnAttack;
+            @Attack.canceled += instance.OnAttack;
+            @Form1.started += instance.OnForm1;
+            @Form1.performed += instance.OnForm1;
+            @Form1.canceled += instance.OnForm1;
+            @Form2.started += instance.OnForm2;
+            @Form2.performed += instance.OnForm2;
+            @Form2.canceled += instance.OnForm2;
+            @Form3.started += instance.OnForm3;
+            @Form3.performed += instance.OnForm3;
+            @Form3.canceled += instance.OnForm3;
+            @Form4.started += instance.OnForm4;
+            @Form4.performed += instance.OnForm4;
+            @Form4.canceled += instance.OnForm4;
+            @Form5.started += instance.OnForm5;
+            @Form5.performed += instance.OnForm5;
+            @Form5.canceled += instance.OnForm5;
         }
 
         /// <summary>
@@ -412,6 +586,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
+            @Attack.started -= instance.OnAttack;
+            @Attack.performed -= instance.OnAttack;
+            @Attack.canceled -= instance.OnAttack;
+            @Form1.started -= instance.OnForm1;
+            @Form1.performed -= instance.OnForm1;
+            @Form1.canceled -= instance.OnForm1;
+            @Form2.started -= instance.OnForm2;
+            @Form2.performed -= instance.OnForm2;
+            @Form2.canceled -= instance.OnForm2;
+            @Form3.started -= instance.OnForm3;
+            @Form3.performed -= instance.OnForm3;
+            @Form3.canceled -= instance.OnForm3;
+            @Form4.started -= instance.OnForm4;
+            @Form4.performed -= instance.OnForm4;
+            @Form4.canceled -= instance.OnForm4;
+            @Form5.started -= instance.OnForm5;
+            @Form5.performed -= instance.OnForm5;
+            @Form5.canceled -= instance.OnForm5;
         }
 
         /// <summary>
@@ -480,5 +672,47 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLook(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Attack" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAttack(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Form1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnForm1(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Form2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnForm2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Form3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnForm3(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Form4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnForm4(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Form5" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnForm5(InputAction.CallbackContext context);
     }
 }

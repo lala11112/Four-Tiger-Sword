@@ -1,8 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
 public class PlayerInput : MonoBehaviour
 {
+    public event Action<int> OnFormChange;
     // ──────────────────────────────────────────────
     // Serialized Fields
     // ──────────────────────────────────────────────
@@ -21,6 +23,9 @@ public class PlayerInput : MonoBehaviour
     /// <summary>이번 프레임에 점프 버튼이 눌렸는지</summary>
     public bool    JumpPressed        { get; private set; }
 
+    /// <summary>이번 프레임에 마우스 왼쪽 버튼이 눌렸는지 (공격 입력)</summary>
+    public bool    AttackPressed      { get; private set; }
+
     /// <summary>이번 프레임의 마우스/스틱 Look 입력 델타 (픽셀 단위)</summary>
     public Vector2 LookDelta          { get; private set; }
 
@@ -35,6 +40,10 @@ public class PlayerInput : MonoBehaviour
 
     /// <summary>대시 트리거 플래그 — PlayerMovement가 소비 후 ConsumeDash() 호출 필요</summary>
     public bool    DashTriggered      { get; private set; }
+
+    public int FormIndex { get; private set; }
+
+    public bool FormChangePressed { get; private set; }
 
     // ──────────────────────────────────────────────
     // Input Actions Asset (에디터에서 바인딩 관리)
@@ -51,6 +60,11 @@ public class PlayerInput : MonoBehaviour
         actions = new PlayerInputActions();
         actions.Player.Sprint.started  += OnSprintStarted;
         actions.Player.Sprint.canceled += OnSprintCanceled;
+        actions.Player.Form1.performed += context => OnFormChange?.Invoke(0);
+        actions.Player.Form2.performed += context => OnFormChange?.Invoke(1);
+        actions.Player.Form3.performed += context => OnFormChange?.Invoke(2);
+        actions.Player.Form4.performed += context => OnFormChange?.Invoke(3);
+        actions.Player.Form5.performed += context => OnFormChange?.Invoke(4);
     }
 
     private void OnEnable()  => actions.Player.Enable();
@@ -69,6 +83,8 @@ public class PlayerInput : MonoBehaviour
         MoveDirection = new Vector3(raw.x, 0f, raw.y).normalized;
         JumpPressed   = actions.Player.Jump.WasPressedThisFrame();
         LookDelta     = actions.Player.Look.ReadValue<Vector2>();
+        AttackPressed = actions.Player.Attack.WasPressedThisFrame();
+        
     }
 
     // ──────────────────────────────────────────────
