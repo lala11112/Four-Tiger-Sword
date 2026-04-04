@@ -1,25 +1,22 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerStatusHUD : MonoBehaviour
+public class StageResultUI : MonoBehaviour
 {
-    [Header("Bars")]
-    [SerializeField] private Slider hpBar;  // HP 슬라이더
-    [SerializeField] private Slider spBar;  // SP 슬라이더
-
-    private PlayerStatManager statManager;
+    [Header("Result Panel")]
+    [SerializeField] private GameObject resultPanel;
+    [SerializeField] private Text resultText;
+    [SerializeField] private Button retryButton;
+    [SerializeField] private Button menuButton;
 
     private void Start()
-    {        // 씬에서 PlayerStatManager 찾기
-        statManager = FindFirstObjectByType<PlayerStatManager>();
+    {
+        resultPanel.SetActive(false);
     }
 
-    private void Update()
+    public void ShowResult(bool isClear)
     {
-        if (statManager == null) return;
-
-        // 0~1 비율로 바 업데이트
-        hpBar.value = statManager.CurrentHP / statManager.MaxHP;
-        spBar.value = statManager.CurrentSP / statManager.MaxSP;
+        resultPanel.SetActive(true);
+        resultText.text = isClear ? "Stage Clear!" : "Game Over...";
     }
 }
