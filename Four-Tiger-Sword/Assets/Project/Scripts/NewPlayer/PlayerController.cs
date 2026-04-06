@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Player Settings")]
     public float MoveSpeed = 5.0f;
+    public float RunSpeed = 7.0f;
     public float DashSpeed = 10.0f;
     public float JumpForce = 2.0f;
     public float Gravity = -9.81f;

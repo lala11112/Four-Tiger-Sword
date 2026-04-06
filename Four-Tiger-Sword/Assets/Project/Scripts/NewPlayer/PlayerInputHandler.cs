@@ -12,6 +12,7 @@ public class PlayerInputHandler : MonoBehaviour
     [SerializeField] private InputActionReference _form2Action;
 
     public Vector2 MoveInput { get; private set; }
+    public bool IsDashHeld { get; private set; }
     public bool IsForm1Pressed { get; private set; }
     public bool IsForm2Pressed { get; private set; }
     
@@ -42,6 +43,7 @@ public class PlayerInputHandler : MonoBehaviour
     private void Update()
     {
         MoveInput = _moveAction.action.ReadValue<Vector2>();
+        IsDashHeld = _dashAction.action.IsPressed();
         IsForm1Pressed = _form1Action.action.WasPressedThisFrame();
         IsForm2Pressed = _form2Action.action.WasPressedThisFrame();
 
