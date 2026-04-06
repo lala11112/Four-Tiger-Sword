@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6958ed5f106d2834fa69c4f7432303d3, type: 3}
+  m_Name: FireFormAction
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponActionDataSO
+  WeaponName: Fire
+  ComboSteps:
+  - AnimationName: Fire1
+    Duration: 1.2
+    ComboTransitionTime: 1
+    Damage: 10
+    ForwardThrust: 1
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+  - AnimationName: Fire2
+    Duration: 1.1
+    ComboTransitionTime: 1
+    Damage: 10
+    ForwardThrust: 3
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+  - AnimationName: Fire3
+    Duration: 1
+    ComboTransitionTime: 0.5
+    Damage: 30
+    ForwardThrust: 4
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
