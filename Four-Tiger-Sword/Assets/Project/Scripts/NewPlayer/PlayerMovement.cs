@@ -59,6 +59,11 @@ public class PlayerMovement : MonoBehaviour
         Vector3 velocity = moveDir * _playerController.MoveSpeed;
         velocity.y = _playerController.VerticalVelocity;
 
-        _playerController.Controller.Move(velocity * Time.deltaTime);
+        CollisionFlags flags = _playerController.Controller.Move(velocity * Time.deltaTime);
+        if(flags == CollisionFlags.Above)
+        {
+            _playerController.VerticalVelocity = -2f;
+        }
     }
+    
 }
