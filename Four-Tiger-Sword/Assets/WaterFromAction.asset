@@ -17,14 +17,28 @@ MonoBehaviour:
   - AnimationName: Water1
     Duration: 1
     ComboTransitionTime: 1
-    Damage: 1
+    Damage: 30
+    HitStartTime: 0.1
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 0, z: 1.5}
+    HitBoxShape: 1
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 3, y: 0.5, z: 1}
+    HitBoxHeight: 2
     ForwardThrust: 1
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
   - AnimationName: Water2
-    Duration: 1
+    Duration: 25
     ComboTransitionTime: 1
-    Damage: 1
+    Damage: 46
+    HitStartTime: 0.1
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 0, z: 1}
+    HitBoxShape: 0
+    HitBoxRadius: 10
+    HitBoxSize: {x: 1, y: 1, z: 1}
+    HitBoxHeight: 2
     ForwardThrust: 1
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -32,6 +46,13 @@ MonoBehaviour:
     Duration: 1
     ComboTransitionTime: 1
     Damage: 1
+    HitStartTime: 0.1
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 0, z: 1}
+    HitBoxShape: 0
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 1, y: 1, z: 1}
+    HitBoxHeight: 2
     ForwardThrust: 1
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -39,6 +60,13 @@ MonoBehaviour:
     Duration: 1
     ComboTransitionTime: 1
     Damage: 1
+    HitStartTime: 0.1
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 0, z: 1}
+    HitBoxShape: 0
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 1, y: 1, z: 1}
+    HitBoxHeight: 2
     ForwardThrust: 1
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
