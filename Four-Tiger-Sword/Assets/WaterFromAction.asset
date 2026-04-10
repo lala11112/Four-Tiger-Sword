@@ -15,23 +15,37 @@ MonoBehaviour:
   WeaponName: 
   ComboSteps:
   - AnimationName: Water1
-    Duration: 1
-    ComboTransitionTime: 1
+    Duration: 0.7
+    ComboTransitionTime: 0.5
     Damage: 30
+    CriticalChance: 0.6
+    CriticalMultiplier: 1.5
     HitStartTime: 0.1
     HitDuration: 0.1
     HitBoxOffset: {x: 0, y: 0, z: 1.5}
-    HitBoxShape: 1
+    HitBoxShape: 0
     HitBoxRadius: 1.5
     HitBoxSize: {x: 3, y: 0.5, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 1
+    HitEvents:
+    - StartTime: 0.1
+      Duration: 0.05
+      Damage: 50
+    - StartTime: 0.3
+      Duration: 0.05
+      Damage: 52
+    - StartTime: 0.5
+      Duration: 0.05
+      Damage: 55
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
   - AnimationName: Water2
     Duration: 25
     ComboTransitionTime: 1
     Damage: 46
+    CriticalChance: 0.1
+    CriticalMultiplier: 1.5
     HitStartTime: 0.1
     HitDuration: 0.1
     HitBoxOffset: {x: 0, y: 0, z: 1}
@@ -40,12 +54,15 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 1
+    HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
   - AnimationName: Water3
     Duration: 1
     ComboTransitionTime: 1
     Damage: 1
+    CriticalChance: 0.1
+    CriticalMultiplier: 1.5
     HitStartTime: 0.1
     HitDuration: 0.1
     HitBoxOffset: {x: 0, y: 0, z: 1}
@@ -54,12 +71,15 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 1
+    HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
   - AnimationName: Water4
     Duration: 1
     ComboTransitionTime: 1
     Damage: 1
+    CriticalChance: 0.1
+    CriticalMultiplier: 1.5
     HitStartTime: 0.1
     HitDuration: 0.1
     HitBoxOffset: {x: 0, y: 0, z: 1}
@@ -68,5 +88,60 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 1
+    HitEvents: []
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+  AirAttackStep:
+    AnimationName: 
+    Duration: 0.5
+    ComboTransitionTime: 0.3
+    Damage: 10
+    CriticalChance: 1
+    CriticalMultiplier: 1.5
+    HitStartTime: 0.1
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 0, z: 1}
+    HitBoxShape: 0
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 1, y: 1, z: 1}
+    HitBoxHeight: 2
+    ForwardThrust: 2
+    HitEvents: []
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+  SkillStep:
+    AnimationName: 
+    Duration: 0.5
+    ComboTransitionTime: 0.3
+    Damage: 10
+    CriticalChance: 0.1
+    CriticalMultiplier: 1.5
+    HitStartTime: 0.1
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 0, z: 1}
+    HitBoxShape: 0
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 1, y: 1, z: 1}
+    HitBoxHeight: 2
+    ForwardThrust: 2
+    HitEvents: []
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+  UltimateStep:
+    AnimationName: 
+    Duration: 0.5
+    ComboTransitionTime: 0.3
+    Damage: 10
+    CriticalChance: 0.1
+    CriticalMultiplier: 1.5
+    HitStartTime: 0.1
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 0, z: 1}
+    HitBoxShape: 0
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 1, y: 1, z: 1}
+    HitBoxHeight: 2
+    ForwardThrust: 2
+    HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}

@@ -14,7 +14,7 @@ public class PlayerMoveState : IPlayerState
 
         Vector3 moveDir = _playerController.Movement.GetMoveDirection();
 
-        if(_playerController.Controller.isGrounded)
+        if(_playerController.IsGround())
         {
             moveDir = _playerController.Movement.GetDirectionSlope(moveDir);
         }

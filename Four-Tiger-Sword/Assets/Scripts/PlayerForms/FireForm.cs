@@ -1,8 +1,10 @@
 using UnityEngine;
 
-public class WaterForm : BaseForm
+public class FireForm : BaseForm
 {
-    public WaterForm(WeaponActionDataSO weaponActionData) : base(weaponActionData){}
+    protected override DamageType FormElement => DamageType.Fire;
+
+    public FireForm(WeaponActionDataSO weaponActionData) : base(weaponActionData){}
 
     public override void UpdateAttack(out bool isComplete)
     {
@@ -17,7 +19,7 @@ public class WaterForm : BaseForm
         _timer += Time.deltaTime;
         WeaponActionData currentStep = _weaponActionData.ComboSteps[_comboStep];
 
-        ProcessHit();
+        ProcessHit(currentStep);
 
         Vector3 moveVelocity = _playerController.transform.forward * currentStep.ForwardThrust;
         moveVelocity.y = _playerController.VerticalVelocity;

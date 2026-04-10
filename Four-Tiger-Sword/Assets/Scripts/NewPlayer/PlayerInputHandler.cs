@@ -10,15 +10,19 @@ public class PlayerInputHandler : MonoBehaviour
     [SerializeField] private InputActionReference _attackAction;
     [SerializeField] private InputActionReference _form1Action;
     [SerializeField] private InputActionReference _form2Action;
+    [SerializeField] private InputActionReference _skillAction;
+    [SerializeField] private InputActionReference _ultimateAction;
 
     public Vector2 MoveInput { get; private set; }
     public bool IsDashHeld { get; private set; }
     public bool IsForm1Pressed { get; private set; }
     public bool IsForm2Pressed { get; private set; }
-    
+
     public InputBuffer JumpBuffer;
     public InputBuffer AttackBuffer;
     public InputBuffer DashBuffer;
+    public InputBuffer SkillBuffer;
+    public InputBuffer UltimateBuffer;
 
     private void OnEnable()
     {
@@ -28,6 +32,8 @@ public class PlayerInputHandler : MonoBehaviour
         _attackAction.action.Enable();
         _form1Action.action.Enable();
         _form2Action.action.Enable();
+        _skillAction.action.Enable();
+        _ultimateAction.action.Enable();
     }
 
     private void OnDisable()
@@ -38,6 +44,8 @@ public class PlayerInputHandler : MonoBehaviour
         _attackAction.action.Disable();
         _form1Action.action.Disable();
         _form2Action.action.Disable();
+        _skillAction.action.Disable();
+        _ultimateAction.action.Disable();
     }
 
     private void Update()
@@ -50,20 +58,22 @@ public class PlayerInputHandler : MonoBehaviour
         JumpBuffer.Update(Time.deltaTime);
         AttackBuffer.Update(Time.deltaTime);
         DashBuffer.Update(Time.deltaTime);
+        SkillBuffer.Update(Time.deltaTime);
+        UltimateBuffer.Update(Time.deltaTime);
 
         if(_jumpAction.action.WasPressedThisFrame())
-        {
             JumpBuffer.Set();
-        }
 
         if(_attackAction.action.WasPressedThisFrame())
-        {
             AttackBuffer.Set(0.5f);
-        }
 
         if(_dashAction.action.WasPressedThisFrame())
-        {
             DashBuffer.Set();
-        }
+
+        if(_skillAction.action.WasPressedThisFrame())
+            SkillBuffer.Set();
+
+        if(_ultimateAction.action.WasPressedThisFrame())
+            UltimateBuffer.Set();
     }
 }

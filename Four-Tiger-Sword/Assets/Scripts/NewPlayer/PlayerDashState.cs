@@ -15,6 +15,7 @@ public class PlayerDashState : IPlayerState
     {
         IsDashComplete = false;
         _dashTimer = 0;
+        _playerController.Input.DashBuffer.Consume();
 
         if(_playerController.Input.MoveInput.sqrMagnitude > 0.01f)
         {
@@ -36,12 +37,17 @@ public class PlayerDashState : IPlayerState
         {
             IsDashComplete = true;
         }
-
         else
         {
-            _playerController.Controller.Move(_dashDirection * _playerController.DashSpeed * Time.deltaTime);
+            _playerController.Movement.ApplyGravity();
+            Vector3 dashVelocity = _dashDirection * _playerController.DashSpeed;
+            dashVelocity.y = _playerController.VerticalVelocity;
+            _playerController.Controller.Move(dashVelocity * Time.deltaTime);
         }
     }
 
-    public void Exit(){}
+    public void Exit()
+    {
+        _playerController.StartDashCooldown();
+    }
 }

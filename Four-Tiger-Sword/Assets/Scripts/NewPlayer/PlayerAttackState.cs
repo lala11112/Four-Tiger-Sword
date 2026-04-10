@@ -15,6 +15,12 @@ public class PlayerAttackState : IPlayerState
 
     public void Update()
     {
+        if (!_playerController.IsGround())
+        {
+            _playerController.Movement.ApplyGravity();
+            _playerController.Controller.Move(new Vector3(0f, _playerController.VerticalVelocity, 0f) * Time.deltaTime);
+        }
+
         _playerController.FormManager.CurrentForm.UpdateAttack(out bool isComplete);
         IsAttackComplete = isComplete;
     }

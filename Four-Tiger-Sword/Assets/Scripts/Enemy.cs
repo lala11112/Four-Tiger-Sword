@@ -17,10 +17,10 @@ public class Enemy : MonoBehaviour, IDamageable
         
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false)
     {
         hp -= damage;
         Debug.Log($"{name} took {damage} damage. HP: {hp}");
-        DamageTextManager.Instance.ShowDamageText(damage, transform.position);
+        DamageTextManager.Instance.ShowDamageText(damage, transform.position, damageType, isCritical);
     }
 }

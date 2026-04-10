@@ -56,3 +56,48 @@ MonoBehaviour:
     ForwardThrust: 4
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
+  AirAttackStep:
+    AnimationName: FireAirAttack
+    Duration: 0.5
+    ComboTransitionTime: 0.3
+    Damage: 37
+    HitStartTime: 0.1
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 0, z: 0}
+    HitBoxShape: 0
+    HitBoxRadius: 3
+    HitBoxSize: {x: 1, y: 1, z: 1}
+    HitBoxHeight: 2
+    ForwardThrust: 0
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+  SkillStep:
+    AnimationName: 
+    Duration: 0.5
+    ComboTransitionTime: 0.3
+    Damage: 10
+    HitStartTime: 0.1
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 0, z: 1}
+    HitBoxShape: 0
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 1, y: 1, z: 1}
+    HitBoxHeight: 2
+    ForwardThrust: 2
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+  UltimateStep:
+    AnimationName: 
+    Duration: 0.5
+    ComboTransitionTime: 0.3
+    Damage: 1000
+    HitStartTime: 0.1
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 0, z: 0}
+    HitBoxShape: 1
+    HitBoxRadius: 0
+    HitBoxSize: {x: 5, y: 1, z: 2}
+    HitBoxHeight: 2
+    ForwardThrust: 0
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}

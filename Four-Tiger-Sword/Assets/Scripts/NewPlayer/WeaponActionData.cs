@@ -10,6 +10,19 @@ public enum HitBoxShape
 }
 
 [Serializable]
+public class HitEvent
+{
+    [Tooltip("이 히트가 발동되는 시작 시점 (초)")]
+    public float StartTime = 0.1f;
+
+    [Tooltip("판정 지속 시간 (초)")]
+    public float Duration = 0.05f;
+
+    [Tooltip("이 히트의 데미지 (0이면 WeaponActionData의 기본 Damage 사용)")]
+    public int Damage = 0;
+}
+
+[Serializable]
 public class WeaponActionData
 {
     [Header("Animation & Timing")]
@@ -25,6 +38,13 @@ public class WeaponActionData
     [Header("Combat & Physics")]
     [Tooltip("이 타수의 데미지")]
     public int Damage = 10;
+
+    [Tooltip("치명타 발생 확률 (0 ~ 1)")]
+    [Range(0f, 1f)]
+    public float CriticalChance = 0.1f;
+
+    [Tooltip("치명타 데미지 배율")]
+    public float CriticalMultiplier = 1.5f;
 
     [Tooltip("이 타수의 선딜레이")]
     public float HitStartTime = 0.1f;
@@ -49,6 +69,10 @@ public class WeaponActionData
     
     [Tooltip("공격 시 앞으로 살짝 전진하는 힘 (타격감 상승)")]
     public float ForwardThrust = 2f;
+
+    [Header("Multi-Hit (선택사항)")]
+    [Tooltip("여러 번 히트시키려면 여기에 추가하세요. 비어있으면 위의 HitStartTime/HitDuration/Damage를 사용합니다.")]
+    public List<HitEvent> HitEvents = new List<HitEvent>();
 
     [Header("Effects (선택사항)")]
     [Tooltip("검기 또는 타격 이펙트 프리팹")]

@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void ApplyGravity()
     {
-        if(_playerController.Controller.isGrounded && _playerController.VerticalVelocity < 0)
+        if(_playerController.IsGround() && _playerController.VerticalVelocity < 0)
         {
             _playerController.VerticalVelocity = -2f;
             

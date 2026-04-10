@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class StateMachine
 {
@@ -26,7 +25,6 @@ public class StateMachine
         CurrentState?.Exit();
         CurrentState = state;
         CurrentState?.Enter();
-        Debug.Log(CurrentState.GetType().ToString());
     }
 
     public void AddTransition(IPlayerState from, IPlayerState to, Func<bool> condition)
