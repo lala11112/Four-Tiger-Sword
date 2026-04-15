@@ -21,7 +21,7 @@ public class PlayerStateMachineSetup
         GroundTransitions(stateMachine, idle, move, jump, fall, dash, attack);
         AirTransitions(stateMachine, idle, move, jump, fall, run);
         DashTransitions(stateMachine, idle, move, dash, run);
-        AttackTransitions(stateMachine, idle, move, attack);
+        AttackTransitions(stateMachine, idle, move, jump, attack);
         AirAttackTransitions(stateMachine, idle, move, jump, fall, airAttack);
         SkillTransitions(stateMachine, idle, move, skill);
         UltimateTransitions(stateMachine, idle, move, ultimate);
@@ -56,7 +56,7 @@ public class PlayerStateMachineSetup
         stateMachine.AddTransition(jump, idle, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(jump, move, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
 
-        stateMachine.AddTransition(fall, run, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude > 0.01f && _playerController.Input.IsDashHeld);
+        stateMachine.AddTransition(fall, run, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude > 0.01f && _playerController.Input.IsDashHeld && _playerController.CanRun);
         stateMachine.AddTransition(fall, idle, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(fall, move, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
@@ -66,16 +66,19 @@ public class PlayerStateMachineSetup
     {
         stateMachine.AddTransition(idle, dash, () => _playerController.Input.DashBuffer.IsActive && _playerController.CanDash);
         stateMachine.AddTransition(move, dash, () => _playerController.Input.DashBuffer.IsActive && _playerController.CanDash);
-        // 달리기 전환: 대시 완료 후 대쉬 키 홀드 + 방향 입력 시
-        stateMachine.AddTransition(dash, run, () => dash.IsDashComplete && _playerController.Input.IsDashHeld && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
+        // 달리기 전환: 대시 완료 후 대쉬 키 홀드 + 방향 입력 + 스테미나 있을 시
+        stateMachine.AddTransition(dash, run, () => dash.IsDashComplete && _playerController.Input.IsDashHeld && _playerController.Input.MoveInput.sqrMagnitude > 0.01f && _playerController.CanRun);
         stateMachine.AddTransition(dash, idle, () => dash.IsDashComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(dash, move, () => dash.IsDashComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
 
-    private void AttackTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerMoveState move, PlayerAttackState attack)
+    private void AttackTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerMoveState move, PlayerJumpState jump, PlayerAttackState attack)
     {
         stateMachine.AddTransition(idle, attack, () => _playerController.Input.AttackBuffer.IsActive);
         stateMachine.AddTransition(move, attack, () => _playerController.Input.AttackBuffer.IsActive);
+
+        // 공격 도중 점프 캔슬
+        stateMachine.AddTransition(attack, jump, () => _playerController.Input.JumpBuffer.IsActive && _playerController.CanJump());
 
         stateMachine.AddTransition(attack, idle, () => attack.IsAttackComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(attack, move, () => attack.IsAttackComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
@@ -113,7 +116,7 @@ public class PlayerStateMachineSetup
     {
         stateMachine.AddTransition(run, dash, () => _playerController.Input.DashBuffer.IsActive && _playerController.CanDash);
         stateMachine.AddTransition(run, attack, () => _playerController.Input.AttackBuffer.IsActive);
-        stateMachine.AddTransition(run, move, () => !_playerController.Input.IsDashHeld && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
-        stateMachine.AddTransition(run, idle, () => _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
+        stateMachine.AddTransition(run, move, () => (!_playerController.Input.IsDashHeld || !_playerController.CanRun) && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
+        stateMachine.AddTransition(run, idle, () => _playerController.Input.MoveInput.sqrMagnitude <= 0.01f || !_playerController.CanRun);
     }
 }

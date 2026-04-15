@@ -14,6 +14,7 @@ public class PlayerRunState : IPlayerState
     public void Update()
     {
         _playerController.Movement.ApplyGravity();
+        _playerController.ConsumeStaminaForRun();
 
         Vector3 moveDir = _playerController.Movement.GetMoveDirection();
 

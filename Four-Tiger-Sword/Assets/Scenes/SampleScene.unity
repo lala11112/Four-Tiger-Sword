@@ -661,7 +661,7 @@ GameObject:
   - component: {fileID: 612233484}
   - component: {fileID: 612233483}
   - component: {fileID: 612233482}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -824,6 +824,10 @@ GameObject:
   - component: {fileID: 1028050088}
   - component: {fileID: 1028050087}
   - component: {fileID: 1028050086}
+  - component: {fileID: 1028050091}
+  - component: {fileID: 1028050094}
+  - component: {fileID: 1028050093}
+  - component: {fileID: 1028050092}
   m_Layer: 8
   m_Name: Boss
   m_TagString: Untagged
@@ -843,7 +847,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c0a5e2dcf368248b761277f4d330cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  hp: 500
+  _maxHp: 10000
 --- !u!136 &1028050087
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -933,12 +937,67 @@ Transform:
   m_GameObject: {fileID: 1028050085}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.71, y: 1, z: -17.72}
+  m_LocalPosition: {x: 2.19, y: 1, z: -19.85}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1028050091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1028050085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1639b6795f9edf04abbf676ed4a6a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStackManager
+  RegisteredStacks:
+  - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
+  - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
+--- !u!114 &1028050092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1028050085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07486f66421238241ac89771d5297126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PoiseHandler
+  _maxPoise: 100
+  _poiseRegen: 20
+  _breakDuration: 2
+--- !u!114 &1028050093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1028050085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e90ecd80d5124e488cfbcce5f2c172f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStatHandler
+  _baseDef: 0
+--- !u!114 &1028050094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1028050085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90c4c26786f864949be1470312a217dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectHandler
 --- !u!1 &1075582818
 GameObject:
   m_ObjectHideFlags: 0
@@ -1357,6 +1416,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1c8edca7ee37ec44ad34ab1b9779774, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  CameraTransform: {fileID: 0}
   MoveSpeed: 5
   RunSpeed: 7
   DashSpeed: 20
@@ -1367,11 +1427,19 @@ MonoBehaviour:
   CoyoteTime: 0.15
   AirAttackDescentSpeed: 25
   DashCooldown: 1
-  SkillCooldown: 5
-  UltimateCooldown: 30
+  MaxStamina: 100
+  DashStaminaCost: 25
+  RunStaminaCostPerSecond: 10
+  StaminaRegenDelay: 2
+  StaminaRegenRate: 20
+  MaxSP: 1000
+  SpRegenRate: 50
+  SpRegenDelay: 2
   _FireFormActionData: {fileID: 11400000, guid: ddfdcb1b3fb44274a8bbf37f6fe3a95b, type: 2}
   _WaterFormActionData: {fileID: 11400000, guid: 4b73531aafb753149bfae2eb4ee665f6, type: 2}
-  CameraTransform: {fileID: 0}
+  _WoodFormActionData: {fileID: 11400000, guid: 0fc8f1af7750ac34394d988c88544241, type: 2}
+  _IronFormActionData: {fileID: 11400000, guid: 2683427b7c96c4a41b61d59b3550b749, type: 2}
+  _EarthFormActionData: {fileID: 11400000, guid: 79fab81d8ff7bfe48bf22f17fd7f8b88, type: 2}
 --- !u!114 &1285247858
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1390,6 +1458,9 @@ MonoBehaviour:
   _attackAction: {fileID: -3828059745520383013, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
   _form1Action: {fileID: 177115342652265613, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
   _form2Action: {fileID: 4269647657108721610, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
+  _form3Action: {fileID: -7914897281182168221, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
+  _form4Action: {fileID: 452383186390997642, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
+  _form5Action: {fileID: -4072410270721710992, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
   _skillAction: {fileID: -4816719396555062990, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
   _ultimateAction: {fileID: -5091557946504675416, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
 --- !u!114 &1285247859
@@ -1629,6 +1700,7 @@ GameObject:
   - component: {fileID: 1378051477}
   - component: {fileID: 1378051476}
   - component: {fileID: 1378051480}
+  - component: {fileID: 1378051481}
   m_Layer: 8
   m_Name: Enemy
   m_TagString: Untagged
@@ -1743,7 +1815,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c0a5e2dcf368248b761277f4d330cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
-  hp: 100
+  _maxHp: 100
+--- !u!114 &1378051481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1378051475}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1639b6795f9edf04abbf676ed4a6a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStackManager
+  RegisteredStacks:
+  - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
+  - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
 --- !u!1 &1575248360
 GameObject:
   m_ObjectHideFlags: 0
@@ -2149,7 +2236,7 @@ GameObject:
   - component: {fileID: 2132206204}
   - component: {fileID: 2132206203}
   - component: {fileID: 2132206202}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wall (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

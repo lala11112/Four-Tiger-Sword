@@ -15,10 +15,10 @@ public class WeaponActionDataSO : ScriptableObject
     public WeaponActionData AirAttackStep;
 
     [Header("Skill (E)")]
-    [Tooltip("스킬 공격 데이터")]
-    public WeaponActionData SkillStep;
+    [Tooltip("스킬 공격 데이터 (여러 단계 가능)")]
+    public List<WeaponActionData> SkillSteps;
 
     [Header("Ultimate (R)")]
-    [Tooltip("궁극기 공격 데이터")]
-    public WeaponActionData UltimateStep;
+    [Tooltip("궁극기 공격 데이터 (여러 단계 가능)")]
+    public List<WeaponActionData> UltimateSteps;
 }

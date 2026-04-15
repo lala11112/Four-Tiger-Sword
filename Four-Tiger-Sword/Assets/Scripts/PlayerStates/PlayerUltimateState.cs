@@ -25,6 +25,6 @@ public class PlayerUltimateState : IPlayerState
     public void Exit()
     {
         _playerController.FormManager.CurrentForm.EndUltimate();
-        _playerController.StartUltimateCooldown();
+        // 쿨타임은 BaseForm.EndUltimate() 내부에서 처리됩니다.
     }
 }

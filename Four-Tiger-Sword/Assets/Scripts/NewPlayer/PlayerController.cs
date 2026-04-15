@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour
     public PlayerInputHandler Input { get; private set; }
     public PlayerMovement Movement { get; private set; }
     public FormManager FormManager { get; private set; }
+    public StateMachine StateMachine { get; private set; }
+    public Transform CameraTransform;
 
     [Header("Player Settings")]
     public float MoveSpeed = 5.0f;
@@ -25,27 +27,37 @@ public class PlayerController : MonoBehaviour
     [Header("Dash Settings")]
     public float DashCooldown = 1.0f;
     private float _dashCooldownTimer;
-    public bool CanDash => _dashCooldownTimer <= 0f;
+    public bool CanDash => _dashCooldownTimer <= 0f && HasEnoughStaminaForDash;
 
-    [Header("Skill Settings")]
-    public float SkillCooldown = 5.0f;
-    private float _skillCooldownTimer;
-    public bool CanSkill => _skillCooldownTimer <= 0f;
+    [Header("Stamina Settings")]
+    public float MaxStamina = 100f;
+    public float DashStaminaCost = 25f;
+    public float RunStaminaCostPerSecond = 10f;
+    public float StaminaRegenDelay = 2f;
+    public float StaminaRegenRate = 20f;
+    private float _currentStamina;
+    private float _staminaRegenTimer;
 
-    [Header("Ultimate Settings")]
-    public float UltimateCooldown = 30.0f;
-    private float _ultimateCooldownTimer;
-    public bool CanUltimate => _ultimateCooldownTimer <= 0f;
+    public float CurrentStamina => _currentStamina;
+    public bool HasEnoughStaminaForDash => _currentStamina >= DashStaminaCost;
+    public bool CanRun => _currentStamina > 0f;
+
+    // CanSkill / CanUltimate 는 현재 폼의 쿨타임과 SP를 함께 검사합니다.
+    public bool CanSkill    => FormManager?.CurrentForm?.CanSkill    ?? false;
+    public bool CanUltimate => FormManager?.CurrentForm?.CanUltimate ?? false;
+
+    [Header("SP Settings")]
+    public float MaxSP           = 1000f;
+    public float SpRegenRate     = 50f;   // 초당 회복량
+    public float SpRegenDelay    = 2f;    // 소모 후 회복 대기 시간(초)
+    public PlayerStat Stat       { get; private set; }
 
     [Header("CombatData")]
     [SerializeField] private WeaponActionDataSO _FireFormActionData;
     [SerializeField] private WeaponActionDataSO _WaterFormActionData;
-
-    public StateMachine StateMachine { get; private set; }
-
-    private FormManager _formManager;
-
-    public Transform CameraTransform;
+    [SerializeField] private WeaponActionDataSO _WoodFormActionData;
+    [SerializeField] private WeaponActionDataSO _IronFormActionData;
+    [SerializeField] private WeaponActionDataSO _EarthFormActionData;
 
     private void Awake()
     {
@@ -54,6 +66,8 @@ public class PlayerController : MonoBehaviour
         CameraTransform = Camera.main.transform;
         Movement = GetComponent<PlayerMovement>();
         Movement.Initialize(this);
+        _currentStamina = MaxStamina;
+        Stat = new PlayerStat(maxHp: 1000f, maxSp: MaxSP, spRegenRate: SpRegenRate, spRegenDelay: SpRegenDelay);
 
         StateMachine = new StateMachine();
         var stateMachineSetup = new PlayerStateMachineSetup(this);
@@ -68,8 +82,8 @@ public class PlayerController : MonoBehaviour
     {
         UpdateCoyoteTimer();
         UpdateDashCooldown();
-        UpdateSkillCooldown();
-        UpdateUltimateCooldown();
+        UpdateStamina();
+        Stat.UpdateSpRegen(Time.deltaTime);
         StateMachine.Update();
         FormManager.Update();
     }
@@ -88,26 +102,48 @@ public class PlayerController : MonoBehaviour
             _dashCooldownTimer -= Time.deltaTime;
     }
 
-    private void UpdateSkillCooldown()
+    private void UpdateStamina()
     {
-        if (_skillCooldownTimer > 0f)
-            _skillCooldownTimer -= Time.deltaTime;
+        if (_staminaRegenTimer > 0f)
+        {
+            _staminaRegenTimer -= Time.deltaTime;
+            return;
+        }
+
+        if (_currentStamina < MaxStamina)
+            _currentStamina = Mathf.Min(_currentStamina + StaminaRegenRate * Time.deltaTime, MaxStamina);
     }
 
-    private void UpdateUltimateCooldown()
+    public void ConsumeStaminaForDash()
     {
-        if (_ultimateCooldownTimer > 0f)
-            _ultimateCooldownTimer -= Time.deltaTime;
+        _currentStamina = Mathf.Max(0f, _currentStamina - DashStaminaCost);
+        _staminaRegenTimer = StaminaRegenDelay;
+    }
+
+    public void ConsumeStaminaForRun()
+    {
+        _currentStamina = Mathf.Max(0f, _currentStamina - RunStaminaCostPerSecond * Time.deltaTime);
+        _staminaRegenTimer = StaminaRegenDelay;
     }
 
     private void FormManagerSetup()
     {
-        var fireForm = new FireForm(_FireFormActionData);
+        var fireForm  = new FireForm(_FireFormActionData);
         var waterForm = new WaterForm(_WaterFormActionData);
+        var woodForm  = new WoodForm(_WoodFormActionData);
+        var ironForm  = new IronForm(_IronFormActionData);
+        var earthForm = new EarthForm(_EarthFormActionData);
 
-        FormManager.CanTransition = () => StateMachine.CurrentState is PlayerIdleState || StateMachine.CurrentState is PlayerMoveState;
-        FormManager.AddTransition(fireForm, () => Input.IsForm1Pressed);
+        FormManager.CanTransition = () =>
+            StateMachine.CurrentState is PlayerIdleState ||
+            StateMachine.CurrentState is PlayerMoveState;
+
+        FormManager.AddTransition(fireForm,  () => Input.IsForm1Pressed);
         FormManager.AddTransition(waterForm, () => Input.IsForm2Pressed);
+        FormManager.AddTransition(woodForm,  () => Input.IsForm3Pressed);
+        FormManager.AddTransition(ironForm,  () => Input.IsForm4Pressed);
+        FormManager.AddTransition(earthForm, () => Input.IsForm5Pressed);
+
         FormManager.ChangeForm(fireForm);
     }
 
@@ -123,8 +159,6 @@ public class PlayerController : MonoBehaviour
     public bool CanJump() => IsGround() || _coyoteTimer > 0f;
     public void ConsumeCoyote() => _coyoteTimer = 0f;
     public void StartDashCooldown() => _dashCooldownTimer = DashCooldown;
-    public void StartSkillCooldown() => _skillCooldownTimer = SkillCooldown;
-    public void StartUltimateCooldown() => _ultimateCooldownTimer = UltimateCooldown;
 
     public bool IsGround()
     {

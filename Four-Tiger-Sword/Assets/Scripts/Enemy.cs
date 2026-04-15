@@ -1,26 +1,39 @@
 using UnityEngine;
+using System;
 
 public class Enemy : MonoBehaviour, IDamageable
 {
-    [SerializeField] int hp = 100;
+    [SerializeField] private int _maxHp = 100;
+    private int _currentHp;
 
-    public int Hp { get { return hp; } set { hp = value; } }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public int CurrentHp => _currentHp;
 
-    // Update is called once per frame
-    void Update()
+    public event Action<int, DamageType, bool> OnDamaged;
+    public event Action OnDied;
+
+    private void Start()
     {
-        
+        _currentHp = _maxHp;
+        DamageTextManager.Instance?.Register(this);
     }
 
     public void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false)
     {
-        hp -= damage;
-        Debug.Log($"{name} took {damage} damage. HP: {hp}");
-        DamageTextManager.Instance.ShowDamageText(damage, transform.position, damageType, isCritical);
+        if (_currentHp <= 0) return;
+
+        _currentHp = Mathf.Max(0, _currentHp - damage);
+        OnDamaged?.Invoke(damage, damageType, isCritical);
+
+        if (_currentHp <= 0)
+        {
+            OnDied?.Invoke();
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        Debug.Log($"{name} 사망");
+        Destroy(gameObject);
     }
 }

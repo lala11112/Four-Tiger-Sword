@@ -10,6 +10,9 @@ public class PlayerInputHandler : MonoBehaviour
     [SerializeField] private InputActionReference _attackAction;
     [SerializeField] private InputActionReference _form1Action;
     [SerializeField] private InputActionReference _form2Action;
+    [SerializeField] private InputActionReference _form3Action;
+    [SerializeField] private InputActionReference _form4Action;
+    [SerializeField] private InputActionReference _form5Action;
     [SerializeField] private InputActionReference _skillAction;
     [SerializeField] private InputActionReference _ultimateAction;
 
@@ -17,6 +20,9 @@ public class PlayerInputHandler : MonoBehaviour
     public bool IsDashHeld { get; private set; }
     public bool IsForm1Pressed { get; private set; }
     public bool IsForm2Pressed { get; private set; }
+    public bool IsForm3Pressed { get; private set; }
+    public bool IsForm4Pressed { get; private set; }
+    public bool IsForm5Pressed { get; private set; }
 
     public InputBuffer JumpBuffer;
     public InputBuffer AttackBuffer;
@@ -32,6 +38,9 @@ public class PlayerInputHandler : MonoBehaviour
         _attackAction.action.Enable();
         _form1Action.action.Enable();
         _form2Action.action.Enable();
+        _form3Action?.action.Enable();
+        _form4Action?.action.Enable();
+        _form5Action?.action.Enable();
         _skillAction.action.Enable();
         _ultimateAction.action.Enable();
     }
@@ -44,6 +53,9 @@ public class PlayerInputHandler : MonoBehaviour
         _attackAction.action.Disable();
         _form1Action.action.Disable();
         _form2Action.action.Disable();
+        _form3Action?.action.Disable();
+        _form4Action?.action.Disable();
+        _form5Action?.action.Disable();
         _skillAction.action.Disable();
         _ultimateAction.action.Disable();
     }
@@ -54,6 +66,9 @@ public class PlayerInputHandler : MonoBehaviour
         IsDashHeld = _dashAction.action.IsPressed();
         IsForm1Pressed = _form1Action.action.WasPressedThisFrame();
         IsForm2Pressed = _form2Action.action.WasPressedThisFrame();
+        IsForm3Pressed = _form3Action != null && _form3Action.action.WasPressedThisFrame();
+        IsForm4Pressed = _form4Action != null && _form4Action.action.WasPressedThisFrame();
+        IsForm5Pressed = _form5Action != null && _form5Action.action.WasPressedThisFrame();
 
         JumpBuffer.Update(Time.deltaTime);
         AttackBuffer.Update(Time.deltaTime);

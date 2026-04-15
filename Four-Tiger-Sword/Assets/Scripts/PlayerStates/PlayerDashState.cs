@@ -16,6 +16,7 @@ public class PlayerDashState : IPlayerState
         IsDashComplete = false;
         _dashTimer = 0;
         _playerController.Input.DashBuffer.Consume();
+        _playerController.ConsumeStaminaForDash();
 
         if(_playerController.Input.MoveInput.sqrMagnitude > 0.01f)
         {

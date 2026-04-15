@@ -12,6 +12,7 @@ public class DamageTextManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -19,9 +20,15 @@ public class DamageTextManager : MonoBehaviour
         }
     }
 
+    public void Register(Enemy enemy)
+    {
+        enemy.OnDamaged += (damage, damageType, isCritical) =>
+            ShowDamageText(damage, enemy.transform.position, damageType, isCritical);
+    }
+
     public void ShowDamageText(int damage, Vector3 worldPosition, DamageType damageType = DamageType.Normal, bool isCritical = false)
     {
-        Vector3 offset = new Vector3(Random.Range(-0.5f, 0.5f), 1f, Random.Range(-0.5f, 0.5f));
+        Vector3 offset = new Vector3(Random.Range(-0.5f, 0.5f), 1.5f, Random.Range(-0.5f, 0.5f));
         GameObject obj = Instantiate(damageTextPrefab, worldPosition + offset, Quaternion.identity, worldSpaceCanvas.transform);
         DamageText damageText = obj.GetComponent<DamageText>();
         damageText.Init(damage, damageType, isCritical);

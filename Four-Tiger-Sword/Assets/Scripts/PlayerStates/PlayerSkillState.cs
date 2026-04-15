@@ -25,6 +25,6 @@ public class PlayerSkillState : IPlayerState
     public void Exit()
     {
         _playerController.FormManager.CurrentForm.EndSkill();
-        _playerController.StartSkillCooldown();
+        // 쿨타임은 BaseForm.EndSkill() 내부에서 처리됩니다.
     }
 }

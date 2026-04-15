@@ -5,7 +5,7 @@ using System.Collections;
 public class DamageText : MonoBehaviour
 {
     public TextMeshProUGUI textMesh;
-    public float speed = 0.5f;
+    public float speed = 0.05f;
     public float fadeSpeed = 1.5f;
     public float lifeTime = 0.7f;
 
@@ -46,7 +46,7 @@ public class DamageText : MonoBehaviour
 
             transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward);
 
-            transform.position += Vector3.up * speed * Time.deltaTime;
+            transform.position += Vector3.down * speed * Time.deltaTime;
             float alpha = Mathf.Lerp(1f, 0f, elapsed / lifeTime);
             textMesh.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
 

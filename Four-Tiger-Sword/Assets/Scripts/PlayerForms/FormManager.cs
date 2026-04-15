@@ -16,6 +16,9 @@ public class FormManager
 
     public void Update()
     {
+        foreach (var transition in _transitions)
+            transition.TargetForm.UpdateCooldowns();
+
         if(CanTransition != null && !CanTransition.Invoke())
         {
             return;
