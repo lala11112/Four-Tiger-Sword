@@ -56,7 +56,7 @@ public abstract partial class BaseForm
         _timer += Time.deltaTime;
         WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
         ProcessHit(step);
-        MoveForward(step.ForwardThrust);
+        MoveForward(step);
 
         if (_timer >= step.Duration)
         {
@@ -90,7 +90,7 @@ public abstract partial class BaseForm
         _timer += Time.deltaTime;
         WeaponActionData step = _weaponActionData.UltimateSteps[_ultimateStep];
         ProcessHit(step);
-        MoveForward(step.ForwardThrust);
+        MoveForward(step);
 
         if (_timer >= step.Duration)
         {
@@ -108,9 +108,18 @@ public abstract partial class BaseForm
 
     // ── 공통 이동 헬퍼 ────────────────────────────────────────────────────────
 
-    private void MoveForward(float thrust)
+    protected void MoveForward(WeaponActionData step)
     {
-        Vector3 vel = _playerController.transform.forward * thrust;
+        if (step.Duration <= 0f) return;
+
+        // 1. 현재 애니메이션이 몇 % 진행되었는지 구함 (0.0 ~ 1.0)
+        float normalizedTime = Mathf.Clamp01(_timer / step.Duration);
+
+        // 2. 커브에서 현재 %에 해당하는 값을 빼와서 Multiplier를 곱함
+        float currentThrust = step.ThrustCurve.Evaluate(normalizedTime) * step.ThrustMultiplier;
+
+        // 3. 이동 적용
+        Vector3 vel = _playerController.transform.forward * currentThrust;
         vel.y = _playerController.VerticalVelocity;
         _playerController.Controller.Move(vel * Time.deltaTime);
     }

@@ -27,7 +27,7 @@ public class PlayerDashState : IPlayerState
 
         else
         {
-            _dashDirection = _playerController.transform.forward;
+            _dashDirection = _playerController.transform.forward * -1f;
         }
     }
 

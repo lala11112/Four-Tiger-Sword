@@ -80,4 +80,10 @@ public class WeaponActionData
     
     [Tooltip("휘두르는 사운드")]
     public AudioClip SwingSound;
+
+    [Tooltip("시간에 따른 전진 속도 그래프 (X축: 0~1 진행도, Y축: 속도 비율)")]
+    public AnimationCurve ThrustCurve = AnimationCurve.Constant(0, 1, 0); // 기본값: 0
+    
+    [Tooltip("커브 값에 곱해줄 최대 속도")]
+    public float ThrustMultiplier = 10f; 
 }

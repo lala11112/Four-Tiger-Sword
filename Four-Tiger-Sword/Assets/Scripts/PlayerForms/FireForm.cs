@@ -7,7 +7,7 @@ public class FireForm : BaseForm
     public override float SkillSpCost      => 200f;
     public override float SkillCooldown    => 8f;
     public override float UltimateSpCost   => 500f;
-    public override float UltimateCooldown => 30f;
+    public override float UltimateCooldown => 15f;
 
     private bool _explosionSpawned = false;
 
@@ -28,9 +28,7 @@ public class FireForm : BaseForm
 
         ProcessHit(currentStep);
 
-        Vector3 moveVelocity = _playerController.transform.forward * currentStep.ForwardThrust;
-        moveVelocity.y = _playerController.VerticalVelocity;
-        _playerController.Controller.Move(moveVelocity * Time.deltaTime);
+        MoveForward(currentStep);
 
         if (_timer >= currentStep.ComboTransitionTime &&
             _playerController.Input.AttackBuffer.IsActive &&
@@ -50,7 +48,7 @@ public class FireForm : BaseForm
     {
         _explosionSpawned = false;
         base.BeginSkill();
-        PlayStepSound(_weaponActionData.SkillSteps, 0);
+        //PlayStepSound(_weaponActionData.SkillSteps, 0);
     }
 
     public override void UpdateSkill(out bool isComplete)
@@ -61,8 +59,8 @@ public class FireForm : BaseForm
         if (_skillStep == 1 && prevStep == 0 && !_explosionSpawned)
         {
             _explosionSpawned = true;
-            SpawnStepVFX(_weaponActionData.SkillSteps, 1);
-            PlayStepSound(_weaponActionData.SkillSteps, 1);
+            //SpawnStepVFX(_weaponActionData.SkillSteps, 1);
+            //PlayStepSound(_weaponActionData.SkillSteps, 1);
         }
     }
 
@@ -80,8 +78,8 @@ public class FireForm : BaseForm
 
         if (_ultimateStep != prevStep)
         {
-            SpawnStepVFX(_weaponActionData.UltimateSteps, _ultimateStep);
-            PlayStepSound(_weaponActionData.UltimateSteps, _ultimateStep);
+            //SpawnStepVFX(_weaponActionData.UltimateSteps, _ultimateStep);
+            //PlayStepSound(_weaponActionData.UltimateSteps, _ultimateStep);
         }
     }
 }

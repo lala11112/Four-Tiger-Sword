@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
     public float DashCooldown = 1.0f;
     private float _dashCooldownTimer;
     public bool CanDash => _dashCooldownTimer <= 0f && HasEnoughStaminaForDash;
+    public bool IsDashing => StateMachine.CurrentState is PlayerDashState; //대쉬중일 때는 무적
 
     [Header("Stamina Settings")]
     public float MaxStamina = 100f;
@@ -67,7 +68,7 @@ public class PlayerController : MonoBehaviour
         Movement = GetComponent<PlayerMovement>();
         Movement.Initialize(this);
         _currentStamina = MaxStamina;
-        Stat = new PlayerStat(maxHp: 1000f, maxSp: MaxSP, spRegenRate: SpRegenRate, spRegenDelay: SpRegenDelay);
+        Stat = new PlayerStat(maxHp: 1000f, maxSp: MaxSP, spRegenRate: SpRegenRate, spRegenDelay: SpRegenDelay, playerController: this);
 
         StateMachine = new StateMachine();
         var stateMachineSetup = new PlayerStateMachineSetup(this);
@@ -165,4 +166,6 @@ public class PlayerController : MonoBehaviour
         Vector3 sphereCenter = transform.position + Controller.center + Vector3.down * (Controller.height / 2f - Controller.radius);
         return Physics.CheckSphere(sphereCenter, Controller.radius + 0.1f, LayerMask.GetMask("Ground"));
     }
+
+    
 }

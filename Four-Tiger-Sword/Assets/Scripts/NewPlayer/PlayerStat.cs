@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PlayerStat : IDamageable
 {
+    private PlayerController _playerController;
     // ── HP ───────────────────────────────────────────────────────────────────
     public float MaxHp      { get; private set; }
     public float CurrentHp  { get; private set; }
@@ -32,8 +33,9 @@ public class PlayerStat : IDamageable
     public float KnockbackRes { get; private set; }
 
     // ── 생성자 ────────────────────────────────────────────────────────────────
-    public PlayerStat(float maxHp, float maxSp, float spRegenRate = 50f, float spRegenDelay = 2f)
+    public PlayerStat(float maxHp, float maxSp, PlayerController playerController, float spRegenRate = 50f, float spRegenDelay = 2f)
     {
+        _playerController = playerController;
         MaxHp        = maxHp;
         CurrentHp    = maxHp;
         MaxSp        = maxSp;
@@ -83,6 +85,7 @@ public class PlayerStat : IDamageable
 
     public void TakeDamage(int damage, DamageType damageType, bool isCritical)
     {
+        if (_playerController.IsDashing) return;
         CurrentHp = Mathf.Max(0f, CurrentHp - damage);
         OnDamageTaken?.Invoke(damage);
     }
