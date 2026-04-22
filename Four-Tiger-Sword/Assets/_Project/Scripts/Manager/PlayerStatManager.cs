@@ -131,4 +131,11 @@ public class PlayerStatManager : MonoBehaviour
     {
         return baseValues.GetValueOrDefault(stat, 0f);
     }
+
+    // HUD에서 편하게 접근하기 위한 단축 속성 (Properties)
+    public float CurrentHP => GetStat(StatType.ST_HP);
+    public float MaxHP => baseData != null ? baseData.baseHP : 100f;
+
+    public float CurrentSP => GetStat(StatType.ST_SP);
+    public float MaxSP => baseData != null ? baseData.baseSP : 100f;
 }

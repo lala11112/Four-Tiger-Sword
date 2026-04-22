@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerStatusHUD : MonoBehaviour
+public class PlayerStatusHUD : PlayerStatManager
 {
     [Header("Bars")]
     [SerializeField] private Slider hpBar;
