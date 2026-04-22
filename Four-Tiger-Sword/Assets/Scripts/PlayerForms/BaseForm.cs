@@ -12,6 +12,11 @@ public abstract partial class BaseForm : IForm
 
     protected LayerMask _enemyLayer;
 
+    protected Transform _softTarget;
+    private const float SoftTargetSearchRadius = 10f;
+    private const float SoftTargetAngle        = 90f;
+    private const float SoftTargetRotationSpeed = 540f; // degrees/sec
+
     protected virtual DamageType FormElement => DamageType.Normal;
 
     protected enum ActionType { Attack, AirAttack, Skill, Ultimate }

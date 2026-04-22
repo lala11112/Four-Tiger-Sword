@@ -6,6 +6,7 @@ public abstract partial class BaseForm
     {
         _currentAction = ActionType.Attack;
         _comboStep = 0;
+        FindSoftTarget();
         PlayCombo();
     }
 
@@ -14,6 +15,7 @@ public abstract partial class BaseForm
     public virtual void EndAttack()
     {
         _comboStep = 0;
+        _softTarget = null;
         ClearHitTargets();
     }
 
@@ -23,6 +25,7 @@ public abstract partial class BaseForm
     {
         _currentAction = ActionType.AirAttack;
         _timer = 0;
+        FindSoftTarget();
         ClearHitTargets();
     }
 
@@ -32,11 +35,16 @@ public abstract partial class BaseForm
         if (_weaponActionData == null || _weaponActionData.AirAttackStep == null) { isComplete = true; return; }
 
         _timer += Time.deltaTime;
+        RotateTowardSoftTarget();
         ProcessHit(_weaponActionData.AirAttackStep);
         isComplete = _timer >= _weaponActionData.AirAttackStep.Duration;
     }
 
-    public virtual void EndAirAttack() => ClearHitTargets();
+    public virtual void EndAirAttack()
+    {
+        _softTarget = null;
+        ClearHitTargets();
+    }
 
     // ── 스킬 ─────────────────────────────────────────────────────────────────
 
@@ -45,6 +53,7 @@ public abstract partial class BaseForm
         _currentAction = ActionType.Skill;
         _playerController.Stat.TryConsumeSp(SkillSpCost);
         _skillStep = 0;
+        FindSoftTarget();
         PlaySkillStep();
     }
 
@@ -68,6 +77,7 @@ public abstract partial class BaseForm
     public virtual void EndSkill()
     {
         _skillStep = 0;
+        _softTarget = null;
         ClearHitTargets();
         _skillCooldownTimer = SkillCooldown;
     }
@@ -79,6 +89,7 @@ public abstract partial class BaseForm
         _currentAction = ActionType.Ultimate;
         _playerController.Stat.TryConsumeSp(UltimateSpCost);
         _ultimateStep = 0;
+        FindSoftTarget();
         PlayUltimateStep();
     }
 
@@ -102,6 +113,7 @@ public abstract partial class BaseForm
     public virtual void EndUltimate()
     {
         _ultimateStep = 0;
+        _softTarget = null;
         ClearHitTargets();
         _ultimateCooldownTimer = UltimateCooldown;
     }
@@ -111,6 +123,8 @@ public abstract partial class BaseForm
     protected void MoveForward(WeaponActionData step)
     {
         if (step.Duration <= 0f) return;
+
+        RotateTowardSoftTarget();
 
         // 1. 현재 애니메이션이 몇 % 진행되었는지 구함 (0.0 ~ 1.0)
         float normalizedTime = Mathf.Clamp01(_timer / step.Duration);

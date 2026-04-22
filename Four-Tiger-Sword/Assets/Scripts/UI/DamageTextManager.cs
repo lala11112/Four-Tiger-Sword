@@ -26,6 +26,12 @@ public class DamageTextManager : MonoBehaviour
             ShowDamageText(damage, enemy.transform.position, damageType, isCritical);
     }
 
+    public void Register(PlayerController player)
+    {
+        player.Stat.OnDamageTaken += (damage, damageType, isCritical) =>
+            ShowDamageText(damage, player.transform.position, damageType, isCritical);
+    }
+
     public void ShowDamageText(int damage, Vector3 worldPosition, DamageType damageType = DamageType.Normal, bool isCritical = false)
     {
         Vector3 offset = new Vector3(Random.Range(-0.5f, 0.5f), 1.5f, Random.Range(-0.5f, 0.5f));

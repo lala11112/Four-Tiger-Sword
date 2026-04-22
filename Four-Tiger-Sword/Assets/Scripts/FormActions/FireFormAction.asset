@@ -28,6 +28,7 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 1.5
+    KnockbackForce: 11
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -44,10 +45,10 @@ MonoBehaviour:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.20679973
-        value: 0.0013219491
-        inSlope: -4.8389435
-        outSlope: -0.00871696
+        time: 0.29568982
+        value: 0.0029698983
+        inSlope: -3.37869
+        outSlope: -0.012156922
         tangentMode: 69
         weightedMode: 0
         inWeight: 0.33333334
@@ -64,7 +65,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 15
+    ThrustMultiplier: 11
   - AnimationName: Fire2
     Duration: 0.9
     ComboTransitionTime: 0.55
@@ -79,6 +80,7 @@ MonoBehaviour:
     HitBoxSize: {x: 2.5, y: 1.5, z: 2.5}
     HitBoxHeight: 2
     ForwardThrust: 1.5
+    KnockbackForce: 13
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -115,7 +117,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 18
+    ThrustMultiplier: 13
   - AnimationName: Fire3
     Duration: 1.2
     ComboTransitionTime: 0
@@ -130,6 +132,7 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 2.5
+    KnockbackForce: 15
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -166,7 +169,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 20
+    ThrustMultiplier: 15
   AirAttackStep:
     AnimationName: FireAirAttack
     Duration: 0.5
@@ -182,6 +185,7 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 0
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -225,6 +229,7 @@ MonoBehaviour:
     HitBoxSize: {x: 5, y: 1, z: 2}
     HitBoxHeight: 0
     ForwardThrust: 3
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -263,12 +268,12 @@ MonoBehaviour:
       m_RotationOrder: 4
     ThrustMultiplier: 25
   - AnimationName: FireSkill2
-    Duration: 0.6
+    Duration: 1.6
     ComboTransitionTime: 0
     Damage: 300
     CriticalChance: 1
     CriticalMultiplier: 1.7
-    HitStartTime: 0
+    HitStartTime: 1
     HitDuration: 0.5
     HitBoxOffset: {x: 0, y: 0, z: 0}
     HitBoxShape: 0
@@ -276,6 +281,7 @@ MonoBehaviour:
     HitBoxSize: {x: 0, y: 0, z: 0}
     HitBoxHeight: 0
     ForwardThrust: 0
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -303,7 +309,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 10
+    ThrustMultiplier: 0
   UltimateSteps:
   - AnimationName: FireUlt
     Duration: 2
@@ -319,6 +325,7 @@ MonoBehaviour:
     HitBoxSize: {x: 5, y: 1, z: 5}
     HitBoxHeight: 0
     ForwardThrust: 3
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}

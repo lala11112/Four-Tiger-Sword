@@ -17,16 +17,17 @@ public class PlayerStateMachineSetup
         var airAttack = new PlayerAirAttackState(_playerController);
         var skill = new PlayerSkillState(_playerController);
         var ultimate = new PlayerUltimateState(_playerController);
+        var die = new PlayerDieState(_playerController);
 
         GroundTransitions(stateMachine, idle, move, jump, fall, dash, attack);
         AirTransitions(stateMachine, idle, move, jump, fall, run);
         DashTransitions(stateMachine, idle, move, dash, run);
         AttackTransitions(stateMachine, idle, move, jump, attack);
         AirAttackTransitions(stateMachine, idle, move, jump, fall, airAttack);
-        SkillTransitions(stateMachine, idle, move, skill);
+        SkillTransitions(stateMachine, idle, move, skill, jump);
         UltimateTransitions(stateMachine, idle, move, ultimate);
         RunTransitions(stateMachine, idle, move, run, dash, attack);
-
+        AnyTransitions(stateMachine, die);
         stateMachine.ChangeState(idle);
         return stateMachine;    
     }
@@ -93,10 +94,12 @@ public class PlayerStateMachineSetup
         stateMachine.AddTransition(airAttack, move, () => airAttack.IsComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
 
-    private void SkillTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerMoveState move, PlayerSkillState skill)
+    private void SkillTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerMoveState move, PlayerSkillState skill, PlayerJumpState jump)
     {
         stateMachine.AddTransition(idle, skill, () => _playerController.Input.SkillBuffer.IsActive && _playerController.CanSkill);
         stateMachine.AddTransition(move, skill, () => _playerController.Input.SkillBuffer.IsActive && _playerController.CanSkill);
+
+        stateMachine.AddTransition(skill, jump, () => _playerController.Input.JumpBuffer.IsActive && _playerController.CanJump());
 
         stateMachine.AddTransition(skill, idle, () => skill.IsComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(skill, move, () => skill.IsComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
@@ -118,5 +121,10 @@ public class PlayerStateMachineSetup
         stateMachine.AddTransition(run, attack, () => _playerController.Input.AttackBuffer.IsActive);
         stateMachine.AddTransition(run, move, () => (!_playerController.Input.IsDashHeld || !_playerController.CanRun) && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
         stateMachine.AddTransition(run, idle, () => _playerController.Input.MoveInput.sqrMagnitude <= 0.01f || !_playerController.CanRun);
+    }
+
+    private void AnyTransitions(StateMachine stateMachine, PlayerDieState die)
+    {
+        stateMachine.AddAnyTransition(die, () => _playerController.Stat.CurrentHp <= 0);
     }
 }

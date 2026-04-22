@@ -2,28 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum HitBoxShape
-{
-    Sphere,
-    Box,
-    Capsule
-}
-
 [Serializable]
-public class HitEvent
-{
-    [Tooltip("이 히트가 발동되는 시작 시점 (초)")]
-    public float StartTime = 0.1f;
-
-    [Tooltip("판정 지속 시간 (초)")]
-    public float Duration = 0.05f;
-
-    [Tooltip("이 히트의 데미지 (0이면 WeaponActionData의 기본 Damage 사용)")]
-    public int Damage = 0;
-}
-
-[Serializable]
-public class WeaponActionData
+public class MonsterSkillData
 {
     [Header("Animation & Timing")]
     [Tooltip("애니메이터에 재생할 트리거 또는 State 이름")]
@@ -31,9 +11,9 @@ public class WeaponActionData
     
     [Tooltip("이 공격 애니메이션의 총 지속 시간")]
     public float Duration = 0.5f;
-    
-    [Tooltip("다음 콤보 입력을 받아들이기 시작하는 시간 (이 시간 이후에 공격을 누르면 콤보 발동)")]
-    public float ComboTransitionTime = 0.3f;
+
+    [Tooltip("이 공격의 가중치")]
+    public float Weight = 30f;
 
     [Header("Combat & Physics")]
     [Tooltip("이 타수의 데미지")]
@@ -41,10 +21,10 @@ public class WeaponActionData
 
     [Tooltip("치명타 발생 확률 (0 ~ 1)")]
     [Range(0f, 1f)]
-    public float CriticalChance = 0.1f;
+    public float CriticalChance = 0.1f; //나중에 몬스터 스텟 안으로 따로 뺄 예정 
 
     [Tooltip("치명타 데미지 배율")]
-    public float CriticalMultiplier = 1.5f;
+    public float CriticalMultiplier = 1.5f; //치명타 확율과 동일 
 
     [Tooltip("이 타수의 선딜레이")]
     public float HitStartTime = 0.1f;
@@ -68,10 +48,7 @@ public class WeaponActionData
     public float HitBoxHeight = 2f;
     
     [Tooltip("공격 시 앞으로 살짝 전진하는 힘 (타격감 상승)")]
-    public float ForwardThrust = 2f;
-
-    [Tooltip("적에게 가하는 넉백 힘 (단위: 유닛/초). 값이 클수록 멀리 밀림")]
-    public float KnockbackForce = 8f;
+    public float ForwardThrust = 2f; //일단 해봄 
 
     [Header("Multi-Hit (선택사항)")]
     [Tooltip("여러 번 히트시키려면 여기에 추가하세요. 비어있으면 위의 HitStartTime/HitDuration/Damage를 사용합니다.")]
@@ -89,4 +66,15 @@ public class WeaponActionData
     
     [Tooltip("커브 값에 곱해줄 최대 속도")]
     public float ThrustMultiplier = 10f; 
+
+    public float MaxDistance = 5f;
+    public float MinDistance = 1f;
+    public float Cooldown = 1f;
+
+    public bool CanUse(float currentDistance, float lastUseTime, float currentTime)
+    {
+        bool inRange = currentDistance >= MinDistance && currentDistance <= MaxDistance;
+        bool isCoolDownFinished = currentTime >= Cooldown + lastUseTime;
+        return inRange && isCoolDownFinished;
+    }
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController), typeof(PlayerInputHandler), typeof(PlayerMovement))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageable
 {
     public CharacterController Controller { get; private set; }
     public PlayerInputHandler Input { get; private set; }
@@ -74,9 +74,14 @@ public class PlayerController : MonoBehaviour
         var stateMachineSetup = new PlayerStateMachineSetup(this);
         StateMachine = stateMachineSetup.Build();
 
-        FormManager = new FormManager(this);
-        FormManagerSetup();
+        var formManagerSetup = new FormManagerSetup(this);
+        FormManager = formManagerSetup.Build(_FireFormActionData, _WaterFormActionData, _WoodFormActionData, _IronFormActionData, _EarthFormActionData);
 
+    }
+
+    private void Start()
+    {
+        DamageTextManager.Instance?.Register(this);
     }
 
     private void Update()
@@ -87,6 +92,7 @@ public class PlayerController : MonoBehaviour
         Stat.UpdateSpRegen(Time.deltaTime);
         StateMachine.Update();
         FormManager.Update();
+        //Debug.Log(Stat.CurrentHp);
     }
 
     private void UpdateCoyoteTimer()
@@ -127,26 +133,7 @@ public class PlayerController : MonoBehaviour
         _staminaRegenTimer = StaminaRegenDelay;
     }
 
-    private void FormManagerSetup()
-    {
-        var fireForm  = new FireForm(_FireFormActionData);
-        var waterForm = new WaterForm(_WaterFormActionData);
-        var woodForm  = new WoodForm(_WoodFormActionData);
-        var ironForm  = new IronForm(_IronFormActionData);
-        var earthForm = new EarthForm(_EarthFormActionData);
-
-        FormManager.CanTransition = () =>
-            StateMachine.CurrentState is PlayerIdleState ||
-            StateMachine.CurrentState is PlayerMoveState;
-
-        FormManager.AddTransition(fireForm,  () => Input.IsForm1Pressed);
-        FormManager.AddTransition(waterForm, () => Input.IsForm2Pressed);
-        FormManager.AddTransition(woodForm,  () => Input.IsForm3Pressed);
-        FormManager.AddTransition(ironForm,  () => Input.IsForm4Pressed);
-        FormManager.AddTransition(earthForm, () => Input.IsForm5Pressed);
-
-        FormManager.ChangeForm(fireForm);
-    }
+    
 
     private void OnDrawGizmos()
     {
@@ -167,5 +154,9 @@ public class PlayerController : MonoBehaviour
         return Physics.CheckSphere(sphereCenter, Controller.radius + 0.1f, LayerMask.GetMask("Ground"));
     }
 
-    
+    public void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false, Vector3 power = default)
+    {
+        Debug.Log("플레이어 피격!");
+        Stat.TakeDamage(damage, damageType, isCritical, power);
+    }
 }

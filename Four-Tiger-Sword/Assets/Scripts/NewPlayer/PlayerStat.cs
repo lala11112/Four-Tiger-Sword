@@ -81,12 +81,12 @@ public class PlayerStat : IDamageable
     // ── IDamageable ───────────────────────────────────────────────────────────
 
     /// <summary>피해를 받을 때마다 발생합니다. EarthForm의 흡수 스탯이 구독합니다.</summary>
-    public event System.Action<int> OnDamageTaken;
+    public event System.Action<int, DamageType, bool> OnDamageTaken;
 
-    public void TakeDamage(int damage, DamageType damageType, bool isCritical)
+    public void TakeDamage(int damage, DamageType damageType, bool isCritical, Vector3 power = default)
     {
         if (_playerController.IsDashing) return;
         CurrentHp = Mathf.Max(0f, CurrentHp - damage);
-        OnDamageTaken?.Invoke(damage);
+        OnDamageTaken?.Invoke(damage, damageType, isCritical);
     }
 }

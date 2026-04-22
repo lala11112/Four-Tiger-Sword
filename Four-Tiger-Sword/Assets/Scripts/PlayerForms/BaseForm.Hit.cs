@@ -40,8 +40,11 @@ public abstract partial class BaseForm
             if (!hit.TryGetComponent<IDamageable>(out var damageable)) continue;
 
             hitTargets.Add(hit);
+            float attackMult = 1f + _playerController.Stat.Attack * 0.01f;
+            Vector3 knockbackDir = (hit.transform.position - _playerController.transform.position).normalized;
+            Vector3 knockback = knockbackDir * step.KnockbackForce * attackMult;
             DamageManager.Apply(
-                new HitInfo(damage, FormElement, step.CriticalChance, step.CriticalMultiplier),
+                new HitInfo(damage, FormElement, step.CriticalChance, step.CriticalMultiplier, power: knockback),
                 damageable, hit.gameObject);
 
             OnHitEnemy(hit.gameObject);

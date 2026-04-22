@@ -1,3 +1,4 @@
+using UnityEngine;
 public readonly struct HitInfo
 {
     public readonly int   BaseDamage;
@@ -11,10 +12,12 @@ public readonly struct HitInfo
     /// <summary>true일 경우 적의 방어력(DEF)을 완전히 무시합니다. (금: 15% 확률)</summary>
     public readonly bool ArmorPierce;
 
+    public readonly Vector3 Power;
+
     public HitInfo(int damage, DamageType element,
                    float critChance, float critMultiplier,
                    float poiseDamageMultiplier = 1f,
-                   bool  armorPierce = false)
+                   bool  armorPierce = false, Vector3 power = default)
     {
         BaseDamage            = damage;
         Element               = element;
@@ -22,5 +25,6 @@ public readonly struct HitInfo
         CriticalMultiplier    = critMultiplier;
         PoiseDamageMultiplier = poiseDamageMultiplier;
         ArmorPierce           = armorPierce;
+        Power                 = power;
     }
 }
