@@ -28,6 +28,7 @@ MonoBehaviour:
     HitBoxSize: {x: 3, y: 0.5, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 1
+    KnockbackForce: 8
     HitEvents:
     - StartTime: 0.1
       Duration: 0.05
@@ -45,13 +46,22 @@ MonoBehaviour:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0
+        value: 0.051467896
         inSlope: 0
         outSlope: 0
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
         outWeight: 0
+      - serializedVersion: 3
+        time: 0.37662253
+        value: 0.00037237257
+        inSlope: -0.13566773
+        outSlope: -0.00059734687
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
         value: 0
@@ -79,6 +89,7 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 1
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -121,6 +132,7 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 1
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -163,6 +175,7 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 1
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -206,6 +219,7 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 2
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -249,6 +263,7 @@ MonoBehaviour:
     HitBoxSize: {x: 0, y: 0, z: 0}
     HitBoxHeight: 0
     ForwardThrust: 0
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -292,6 +307,7 @@ MonoBehaviour:
     HitBoxSize: {x: 0, y: 0, z: 0}
     HitBoxHeight: 0
     ForwardThrust: 0
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}

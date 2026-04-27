@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerStat : IDamageable
@@ -81,7 +82,7 @@ public class PlayerStat : IDamageable
     // ── IDamageable ───────────────────────────────────────────────────────────
 
     /// <summary>피해를 받을 때마다 발생합니다. EarthForm의 흡수 스탯이 구독합니다.</summary>
-    public event System.Action<int, DamageType, bool> OnDamageTaken;
+    public event Action<int, DamageType, bool> OnDamageTaken;
 
     public void TakeDamage(int damage, DamageType damageType, bool isCritical, Vector3 power = default)
     {

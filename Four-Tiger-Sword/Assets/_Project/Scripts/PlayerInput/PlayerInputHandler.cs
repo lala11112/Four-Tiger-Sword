@@ -13,6 +13,7 @@ public class PlayerInputHandler : MonoBehaviour
     [SerializeField] private InputActionReference _form3Action;
     [SerializeField] private InputActionReference _form4Action;
     [SerializeField] private InputActionReference _form5Action;
+    [SerializeField] private InputActionReference _fastFormAction;
     [SerializeField] private InputActionReference _skillAction;
     [SerializeField] private InputActionReference _ultimateAction;
 
@@ -23,7 +24,7 @@ public class PlayerInputHandler : MonoBehaviour
     public bool IsForm3Pressed { get; private set; }
     public bool IsForm4Pressed { get; private set; }
     public bool IsForm5Pressed { get; private set; }
-
+    public bool IsFastFormPressed { get; private set; }
     public InputBuffer JumpBuffer;
     public InputBuffer AttackBuffer;
     public InputBuffer DashBuffer;
@@ -41,6 +42,7 @@ public class PlayerInputHandler : MonoBehaviour
         _form3Action?.action.Enable();
         _form4Action?.action.Enable();
         _form5Action?.action.Enable();
+        _fastFormAction.action.Enable();
         _skillAction.action.Enable();
         _ultimateAction.action.Enable();
     }
@@ -56,6 +58,7 @@ public class PlayerInputHandler : MonoBehaviour
         _form3Action?.action.Disable();
         _form4Action?.action.Disable();
         _form5Action?.action.Disable();
+        _fastFormAction.action.Disable();
         _skillAction.action.Disable();
         _ultimateAction.action.Disable();
     }
@@ -69,6 +72,7 @@ public class PlayerInputHandler : MonoBehaviour
         IsForm3Pressed = _form3Action != null && _form3Action.action.WasPressedThisFrame();
         IsForm4Pressed = _form4Action != null && _form4Action.action.WasPressedThisFrame();
         IsForm5Pressed = _form5Action != null && _form5Action.action.WasPressedThisFrame();
+        IsFastFormPressed = _fastFormAction.action.WasPressedThisFrame();
 
         JumpBuffer.Update(Time.deltaTime);
         AttackBuffer.Update(Time.deltaTime);

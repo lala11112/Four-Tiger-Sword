@@ -33,7 +33,7 @@ public class FanVisionSensor : MonoBehaviour, IEnemySensor
             }
         }
 
-        DetectedTarget = null;
+        //DetectedTarget = null;
         return false;
     }
 

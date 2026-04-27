@@ -199,6 +199,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FastFormChange"",
+                    ""type"": ""Button"",
+                    ""id"": ""5af432ae-bc25-45cd-9459-0f1eea533f9a"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -388,6 +397,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Ultimate"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c05e66af-e78f-4dc2-8d7f-7e4dc4476389"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FastFormChange"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -408,6 +428,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Form5 = m_Player.FindAction("Form5", throwIfNotFound: true);
         m_Player_Skill = m_Player.FindAction("Skill", throwIfNotFound: true);
         m_Player_Ultimate = m_Player.FindAction("Ultimate", throwIfNotFound: true);
+        m_Player_FastFormChange = m_Player.FindAction("FastFormChange", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -500,6 +521,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Form5;
     private readonly InputAction m_Player_Skill;
     private readonly InputAction m_Player_Ultimate;
+    private readonly InputAction m_Player_FastFormChange;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -559,6 +581,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Ultimate".
         /// </summary>
         public InputAction @Ultimate => m_Wrapper.m_Player_Ultimate;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/FastFormChange".
+        /// </summary>
+        public InputAction @FastFormChange => m_Wrapper.m_Player_FastFormChange;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -621,6 +647,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Ultimate.started += instance.OnUltimate;
             @Ultimate.performed += instance.OnUltimate;
             @Ultimate.canceled += instance.OnUltimate;
+            @FastFormChange.started += instance.OnFastFormChange;
+            @FastFormChange.performed += instance.OnFastFormChange;
+            @FastFormChange.canceled += instance.OnFastFormChange;
         }
 
         /// <summary>
@@ -668,6 +697,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Ultimate.started -= instance.OnUltimate;
             @Ultimate.performed -= instance.OnUltimate;
             @Ultimate.canceled -= instance.OnUltimate;
+            @FastFormChange.started -= instance.OnFastFormChange;
+            @FastFormChange.performed -= instance.OnFastFormChange;
+            @FastFormChange.canceled -= instance.OnFastFormChange;
         }
 
         /// <summary>
@@ -792,5 +824,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnUltimate(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "FastFormChange" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFastFormChange(InputAction.CallbackContext context);
     }
 }

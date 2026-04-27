@@ -23,6 +23,12 @@ public class FormManagerSetup
         formManager.AddTransition(ironForm,  () => _playerController.Input.IsForm4Pressed);
         formManager.AddTransition(earthForm, () => _playerController.Input.IsForm5Pressed);
 
+        formManager.AddFastTransition(fireForm, waterForm, () => _playerController.Input.IsFastFormPressed);
+        formManager.AddFastTransition(waterForm, woodForm, () => _playerController.Input.IsFastFormPressed);
+        formManager.AddFastTransition(woodForm, ironForm, () => _playerController.Input.IsFastFormPressed);
+        formManager.AddFastTransition(ironForm, earthForm, () => _playerController.Input.IsFastFormPressed);
+        formManager.AddFastTransition(earthForm, fireForm, () => _playerController.Input.IsFastFormPressed);
+
         formManager.ChangeForm(fireForm);
         return formManager;
     }

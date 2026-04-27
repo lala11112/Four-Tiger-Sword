@@ -13,7 +13,32 @@ MonoBehaviour:
   m_Name: IronFormAction
   m_EditorClassIdentifier: Assembly-CSharp::WeaponActionDataSO
   WeaponName: 
-  ComboSteps: []
+  ComboSteps:
+  - AnimationName: 
+    Duration: 0
+    ComboTransitionTime: 0
+    Damage: 0
+    CriticalChance: 0
+    CriticalMultiplier: 0
+    HitStartTime: 0
+    HitDuration: 0
+    HitBoxOffset: {x: 0, y: 0, z: 0}
+    HitBoxShape: 0
+    HitBoxRadius: 0
+    HitBoxSize: {x: 0, y: 0, z: 0}
+    HitBoxHeight: 0
+    ForwardThrust: 0
+    KnockbackForce: 0
+    HitEvents: []
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+    ThrustCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    ThrustMultiplier: 0
   AirAttackStep:
     AnimationName: 
     Duration: 0.5
@@ -29,6 +54,7 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 2
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -72,6 +98,7 @@ MonoBehaviour:
     HitBoxSize: {x: 0, y: 0, z: 0}
     HitBoxHeight: 0
     ForwardThrust: 0
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -115,6 +142,7 @@ MonoBehaviour:
     HitBoxSize: {x: 0, y: 0, z: 0}
     HitBoxHeight: 0
     ForwardThrust: 0
+    KnockbackForce: 8
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
