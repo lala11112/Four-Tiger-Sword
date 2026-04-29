@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(CharacterController), typeof(PlayerInputHandler), typeof(PlayerMovement))]
 public class PlayerController : MonoBehaviour, IDamageable
@@ -44,14 +45,14 @@ public class PlayerController : MonoBehaviour, IDamageable
     public bool CanRun => _currentStamina > 0f;
 
     // CanSkill / CanUltimate 는 현재 폼의 쿨타임과 SP를 함께 검사합니다.
-    public bool CanSkill    => FormManager?.CurrentForm?.CanSkill    ?? false;
+    public bool CanSkill => FormManager?.CurrentForm?.CanSkill ?? false;
     public bool CanUltimate => FormManager?.CurrentForm?.CanUltimate ?? false;
 
     [Header("SP Settings")]
-    public float MaxSP           = 1000f;
-    public float SpRegenRate     = 50f;   // 초당 회복량
-    public float SpRegenDelay    = 2f;    // 소모 후 회복 대기 시간(초)
-    public PlayerStat Stat       { get; private set; }
+    public float MaxSP = 1000f;
+    public float SpRegenRate = 50f;   // 초당 회복량
+    public float SpRegenDelay = 2f;    // 소모 후 회복 대기 시간(초)
+    public PlayerStat Stat { get; private set; }
 
     [Header("CombatData")]
     [SerializeField] private WeaponActionDataSO _FireFormActionData;
@@ -60,8 +61,19 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private WeaponActionDataSO _IronFormActionData;
     [SerializeField] private WeaponActionDataSO _EarthFormActionData;
 
+    [Tooltip("넉백 저항값. 이 값보다 작은 힘은 밀리지 않음")]
+    [SerializeField] private float _knockbackResistance = 3f;
+    [Tooltip("넉백 지속 시간 (초)")]
+    [SerializeField] private float _knockbackDuration = 0.25f;
+    private Coroutine _knockbackCoroutine;
+
+    public Animator Animator { get; private set; }
+
+
     private void Awake()
     {
+        Animator = gameObject.GetComponentInChildren<Animator>();
+
         Controller = GetComponent<CharacterController>();
         Input = GetComponent<PlayerInputHandler>();
         CameraTransform = Camera.main.transform;
@@ -133,7 +145,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         _staminaRegenTimer = StaminaRegenDelay;
     }
 
-    
+
 
     private void OnDrawGizmos()
     {
@@ -158,5 +170,44 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         Debug.Log("플레이어 피격!");
         Stat.TakeDamage(damage, damageType, isCritical, power);
+        ApplyKnockback(power);
+    }
+
+    private void ApplyKnockback(Vector3 power)
+    {
+        float effectiveForce = power.magnitude - _knockbackResistance;
+        if (effectiveForce <= 0f) return;
+
+        Vector3 velocity = power.normalized * effectiveForce;
+
+        if (_knockbackCoroutine != null)
+            StopCoroutine(_knockbackCoroutine);
+
+        _knockbackCoroutine = StartCoroutine(KnockbackRoutine(velocity));
+    }
+
+    /// <summary>
+    /// 초기 속도에서 0으로 감속하며 NavMesh 위에서 적을 밀어냅니다.
+    /// </summary>
+    private IEnumerator KnockbackRoutine(Vector3 initialVelocity)
+    {
+        // y를 제거하되 원래 속력(magnitude)은 XZ 평면에서 그대로 유지
+        float magnitude = initialVelocity.magnitude;
+        initialVelocity.y = 0f;
+        if (initialVelocity != Vector3.zero)
+            initialVelocity = initialVelocity.normalized * magnitude;
+
+        float elapsed = 0f;
+        while (elapsed < _knockbackDuration)
+        {
+            float t = 1f - (elapsed / _knockbackDuration); // 선형 감속
+            Vector3 delta = initialVelocity * t * Time.deltaTime;
+            transform.position += delta;
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        _knockbackCoroutine = null;
     }
 }

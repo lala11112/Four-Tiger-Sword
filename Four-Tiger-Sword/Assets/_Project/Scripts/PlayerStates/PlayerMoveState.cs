@@ -6,7 +6,9 @@ public class PlayerMoveState : IPlayerState
 
     public PlayerMoveState(PlayerController playerController) {_playerController = playerController;}
 
-    public void Enter(){}
+    public void Enter(){
+        _playerController.Animator.SetTrigger("Walk");
+    }
 
     public void Update()
     {

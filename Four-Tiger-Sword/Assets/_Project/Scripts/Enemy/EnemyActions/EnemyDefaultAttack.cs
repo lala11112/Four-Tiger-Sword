@@ -4,32 +4,26 @@ using System.Collections.Generic;
 public class EnemyDefaultAttack : EnemyAction
 {
     private readonly MonsterDefaultAttackSO _data;
-    private readonly Enemy _enemy;
-    private readonly LayerMask _playerLayer;
     private readonly HashSet<Collider> _hitTargets = new HashSet<Collider>();
-    private float _timer;
     private bool _hasHit;
 
     public EnemyDefaultAttack(MonsterDefaultAttackSO data, Enemy enemy)
+        : base(data, enemy)
     {
-        SkillData = data;
         _data = data;
-        _enemy = enemy;
-        _playerLayer = LayerMask.GetMask("Player");
     }
 
     public override void Enter()
     {
-        _timer = 0f;
+        base.Enter();
         _hasHit = false;
-        IsFinished = false;
         _hitTargets.Clear();
         // TODO: _enemy.Animator?.SetTrigger(_data.animName);
     }
 
     public override void Update()
     {
-        _timer += UnityEngine.Time.deltaTime;
+        base.Update();
 
         if (!_hasHit && _timer >= _data.hitStartTime && _timer <= _data.hitStartTime + _data.hitDuration)
         {
@@ -41,12 +35,9 @@ public class EnemyDefaultAttack : EnemyAction
             IsFinished = true;
     }
 
-    public override void Exit() { }
-
     private void ExecuteHit()
     {
-        Vector3 center = _enemy.transform.position
-                       + _enemy.transform.rotation * _data.hitBoxOffset;
+        Vector3 center = GetHitCenter(_data.hitBoxOffset);
 
         foreach (var col in GetOverlap(center))
         {
@@ -54,10 +45,9 @@ public class EnemyDefaultAttack : EnemyAction
             if (!col.TryGetComponent<IDamageable>(out var damageable)) continue;
 
             _hitTargets.Add(col);
-            Vector3 knockbackDir = (col.transform.position - _enemy.transform.position).normalized;
             DamageManager.Apply(
                 new HitInfo(_data.damage, DamageType.Normal, _data.criticalChance,
-                            _data.criticalMultiplier, power: knockbackDir * _data.knockbackForce),
+                            _data.criticalMultiplier, power: GetKnockbackDirection(col) * _data.knockbackForce),
                 damageable, col.gameObject);
         }
     }

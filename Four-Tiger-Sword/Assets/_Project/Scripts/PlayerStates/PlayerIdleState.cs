@@ -7,7 +7,7 @@ public class PlayerIdleState : IPlayerState
     public PlayerIdleState(PlayerController playerController) {_playerController = playerController;}
     public void Enter()
     {
-
+        _playerController.Animator.SetTrigger("Idle");
     }
 
     public void Update()

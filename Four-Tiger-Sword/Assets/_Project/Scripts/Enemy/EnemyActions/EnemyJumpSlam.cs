@@ -1,0 +1,160 @@
+using UnityEngine;
+using UnityEngine.AI;
+using System.Collections.Generic;
+
+/// <summary>
+/// 점프 내리찍기 공격 실행 로직.
+/// Startup(선딜) → Jump(포물선 이동) → Slam(착지 충격 판정) → Recovery(후딜) 순으로 진행된다.
+/// 도약 중에는 NavMeshAgent를 비활성화하고 transform을 직접 제어한다.
+/// 착지 시 Warp로 NavMesh에 복귀한다.
+/// </summary>
+public class EnemyJumpSlam : EnemyAction
+{
+    private enum Phase { Startup, Jump, Slam, Recovery }
+
+    private readonly MonsterJumpSlamSO _data;
+    private readonly NavMeshAgent _nav;
+    private readonly HashSet<Collider> _hitTargets = new HashSet<Collider>();
+
+    private Phase _phase;
+    private Vector3 _jumpStartPos;
+    private Vector3 _jumpTargetPos;
+
+    public EnemyJumpSlam(MonsterJumpSlamSO data, Enemy enemy)
+        : base(data, enemy)
+    {
+        _data = data;
+        _nav = enemy.GetComponent<NavMeshAgent>();
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+        _phase = Phase.Startup;
+        _hitTargets.Clear();
+
+        _nav.ResetPath();
+        _nav.isStopped = true;
+        // TODO: _enemy.Animator?.SetTrigger(_data.animName);
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        switch (_phase)
+        {
+            case Phase.Startup:
+                FaceTarget();
+                if (_timer >= _data.startupTime)
+                {
+                    BeginJump();
+                    _timer = 0f;
+                    _phase = Phase.Jump;
+                }
+                break;
+
+            case Phase.Jump:
+                PerformJump();
+                if (_timer >= _data.jumpDuration)
+                {
+                    Land();
+                    _timer = 0f;
+                    _phase = Phase.Recovery;
+                }
+                break;
+
+            case Phase.Recovery:
+                if (_timer >= _data.recoveryTime)
+                    IsFinished = true;
+                break;
+        }
+    }
+
+    public override void Exit()
+    {
+        // 상태가 중단될 경우에도 NavMeshAgent 복구
+        if (!_nav.enabled)
+        {
+            _nav.enabled = true;
+            if (_nav.isOnNavMesh)
+                _nav.Warp(_enemy.transform.position);
+        }
+        _nav.isStopped = false;
+    }
+
+    // ── 도약 시작 ────────────────────────────────────────────────────────────
+
+    private void BeginJump()
+    {
+        _jumpStartPos = _enemy.transform.position;
+
+        // 도약 시점의 플레이어 위치를 목표로 고정 (이후 플레이어가 움직여도 방향 불변)
+        if (_enemy.DetectedTarget != null)
+        {
+            Vector3 t = _enemy.DetectedTarget.position;
+            _jumpTargetPos = new Vector3(t.x, _jumpStartPos.y, t.z);
+        }
+        else
+        {
+            _jumpTargetPos = _jumpStartPos + _enemy.transform.forward * 3f;
+        }
+
+        // 공중 이동 중 NavMesh 간섭 차단
+        _nav.enabled = false;
+    }
+
+    // ── 포물선 이동 ──────────────────────────────────────────────────────────
+
+    private void PerformJump()
+    {
+        float t = Mathf.Clamp01(_timer / _data.jumpDuration);
+
+        // 수평: 선형 보간 / 수직: sin 포물선
+        Vector3 flat = Vector3.Lerp(_jumpStartPos, _jumpTargetPos, t);
+        float height = _data.jumpHeight * Mathf.Sin(t * Mathf.PI);
+
+        _enemy.transform.position = new Vector3(flat.x, _jumpStartPos.y + height, flat.z);
+
+        // 낙하 방향으로 적 회전 (선택)
+        Vector3 moveDir = (_jumpTargetPos - _jumpStartPos).normalized;
+        if (moveDir != Vector3.zero)
+            _enemy.transform.rotation = Quaternion.LookRotation(moveDir);
+    }
+
+    // ── 착지 + 충격 판정 ────────────────────────────────────────────────────
+
+    private void Land()
+    {
+        _enemy.transform.position = _jumpTargetPos;
+
+        // NavMeshAgent 복구 — Warp가 가장 가까운 NavMesh 지점으로 스냅
+        _nav.enabled = true;
+        if (_nav.isOnNavMesh)
+            _nav.Warp(_jumpTargetPos);
+
+        _nav.isStopped = false;
+
+        ExecuteSlam();
+    }
+
+    private void ExecuteSlam()
+    {
+        Vector3 center = GetHitCenter(_data.hitBoxOffset);
+
+        foreach (var col in Physics.OverlapSphere(center, _data.slamRadius, _playerLayer))
+        {
+            if (_hitTargets.Contains(col)) continue;
+            if (!col.TryGetComponent<IDamageable>(out var damageable)) continue;
+
+            _hitTargets.Add(col);
+
+            // 착지 충격은 외부로 퍼지는 방향이 아닌 위→아래 방향 넉백 포함
+            Vector3 knockback = GetKnockbackDirection(col) * _data.knockbackForce;
+            DamageManager.Apply(
+                new HitInfo(_data.damage, DamageType.Normal, _data.criticalChance,
+                            _data.criticalMultiplier, power: knockback),
+                damageable, col.gameObject);
+        }
+    }
+}

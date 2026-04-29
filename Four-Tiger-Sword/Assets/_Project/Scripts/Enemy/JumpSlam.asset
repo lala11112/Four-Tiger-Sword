@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 413496db1c52303498b3ded9206dbb98, type: 3}
+  m_Name: JumpSlam
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterJumpSlamSO
+  animName: 
+  engageRange: 30
+  excuteRange: 25
+  weight: 10
+  damage: 100
+  criticalChance: 0.5
+  criticalMultiplier: 1.7
+  knockbackForce: 100
+  telegraphDuration: 0.8
+  startupTime: 0.3
+  jumpDuration: 1
+  recoveryTime: 0.7
+  jumpHeight: 5
+  hitBoxOffset: {x: 0, y: 0, z: 0}
+  slamRadius: 5
