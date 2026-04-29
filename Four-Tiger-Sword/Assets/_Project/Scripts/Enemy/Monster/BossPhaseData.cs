@@ -15,8 +15,12 @@ public class BossPhaseData : ScriptableObject
     public float defMultiplier = 1.0f; // 방어력 배율
 
     [Header("패턴 & BGM")]
-    public string patternSetId; // 이 페이즈에서 사용할 공격 패턴 세트 ID
-    public string bgmId; // 이 페이즈 전용 BGM ID (페이즈마다 음악 바뀔 때)
+    public string patternSetId;
+    public string bgmId;
+
+    [Header("스킬셋")]
+    [Tooltip("이 페이즈에서 사용할 스킬 목록. null이면 이전 페이즈 스킬셋을 유지합니다.")]
+    public MonsterSkillDataSO skillSet;
 
     [Header("비고")]
     public string note; // 메모/비고 (개발용 노트)

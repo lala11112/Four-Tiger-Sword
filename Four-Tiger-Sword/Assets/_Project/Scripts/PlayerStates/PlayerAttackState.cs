@@ -8,6 +8,7 @@ public class PlayerAttackState : IPlayerState
 
     public void Enter()
     {
+        _playerController.Animator.SetTrigger("Attack");
         _playerController.Input.AttackBuffer.Consume();
         IsAttackComplete = false;
         _playerController.FormManager.CurrentForm.BeginAttack();

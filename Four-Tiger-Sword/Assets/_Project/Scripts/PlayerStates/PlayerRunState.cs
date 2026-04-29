@@ -9,7 +9,10 @@ public class PlayerRunState : IPlayerState
         _playerController = playerController;
     }
 
-    public void Enter(){}
+    public void Enter()
+    {
+        _playerController.Animator.SetTrigger("Run");
+    }
 
     public void Update()
     {

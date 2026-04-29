@@ -6,9 +6,10 @@ using System.Collections;
 public class Enemy : MonoBehaviour, IDamageable
 {
     public string stateName; 
-    [SerializeField] private int _maxHp = 100; //테스트용
-    private int _currentHp;//테스트용
-    public int CurrentHp => _currentHp;//테스트용
+    [SerializeField] private int _maxHp = 100;
+    private int _currentHp;
+    public int MaxHp     => _maxHp;
+    public int CurrentHp => _currentHp;
 
     [Tooltip("플레이어가 이 거리 이내로 들어오면 전투(CombatIdle) 상태가 됨")]
     public float CombatRange = 6f;
@@ -49,7 +50,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public bool CanAttack => _attackCooldownTimer <= 0f;
     public bool IsAttackFinished => CurrentAction?.IsFinished ?? false;
-    private void Start()
+    protected virtual void Start()
     {
         _currentHp = _maxHp;
         _sensor = GetComponent<IEnemySensor>();
@@ -96,7 +97,7 @@ public class Enemy : MonoBehaviour, IDamageable
         _stateMachine.ChangeState(idleState);
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         _isTargetFound = _sensor?.DetectTarget() ?? false;
         stateName = _stateMachine.CurrentState.GetType().ToString();
@@ -104,7 +105,7 @@ public class Enemy : MonoBehaviour, IDamageable
         UpdateAttackCooldown();
     }
 
-    public void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false, Vector3 power = default)
+    public virtual void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false, Vector3 power = default)
     {
         if (_currentHp <= 0) return;
 
@@ -182,4 +183,8 @@ public class Enemy : MonoBehaviour, IDamageable
         _attackCooldownTimer = _attackCooldown;
     }
 
+    protected void ResetAttackCooldown()
+    {
+        _attackCooldownTimer = 0f;
+    }
 }

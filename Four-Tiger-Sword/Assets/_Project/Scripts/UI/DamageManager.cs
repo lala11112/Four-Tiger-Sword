@@ -2,10 +2,6 @@ using UnityEngine;
 
 public static class DamageManager
 {
-    /// <summary>
-    /// HitInfo를 기반으로 대상에게 데미지를 적용합니다.
-    /// targetGO를 통해 WeakPoint, ArmorPierce 등의 상태를 검사합니다. (DIP: IDamageable 추상화 의존)
-    /// </summary>
     public static void Apply(HitInfo info, IDamageable target, GameObject targetGO)
     {
         //var statHandler = targetGO.GetComponent<EnemyStatHandler>();
