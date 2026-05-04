@@ -6,7 +6,7 @@ public class EnemyIdleState : IPlayerState
 
     public void Enter()
     {
-        
+        _enemy.Animator.CrossFade("Idle", 0.1f);
     }
 
     public void Update()

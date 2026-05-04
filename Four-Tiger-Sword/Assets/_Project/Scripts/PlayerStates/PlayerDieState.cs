@@ -11,6 +11,8 @@ public class PlayerDieState : MonoBehaviour, IPlayerState
 
     public void Enter()
     {
+        _playerController.Animator.applyRootMotion = true;
+        _playerController.Animator.CrossFade("Die", 0.1f);
         _playerController.Controller.enabled = false;
         _playerController.Input.enabled = false;
         _playerController.Movement.enabled = false;

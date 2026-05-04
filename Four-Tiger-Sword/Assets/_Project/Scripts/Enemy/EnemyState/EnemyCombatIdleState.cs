@@ -19,6 +19,7 @@ public class EnemyCombatIdleState : IPlayerState
     public void Enter()
     {
         _nav = _enemy.GetComponent<NavMeshAgent>();
+        _enemy.Animator.CrossFade("Run", 0.1f);
         _enemy.HasSelectedAttack = false;
         _enemy.CurrentAction = null;
         _roamTimer = RoamInterval; // 진입 즉시 배회 시작

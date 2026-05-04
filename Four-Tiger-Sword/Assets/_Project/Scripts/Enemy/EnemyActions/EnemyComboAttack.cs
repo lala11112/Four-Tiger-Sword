@@ -25,6 +25,8 @@ public class EnemyComboAttack : EnemyAction
         for (int i = 0; i < _data.hits.Count; i++)
             _hitTargets.Add(new HashSet<Collider>());
 
+        _enemy.Animator?.CrossFade(_data.animName, 0.1f);
+
         // TODO: _enemy.Animator?.SetTrigger(_data.animName);
     }
 

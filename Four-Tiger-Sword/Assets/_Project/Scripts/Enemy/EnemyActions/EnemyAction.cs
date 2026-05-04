@@ -28,6 +28,7 @@ public abstract class EnemyAction
     }
 
     public virtual void Exit() { }
+    
 
     // ── 공통 헬퍼 ────────────────────────────────────────────────────────────
 

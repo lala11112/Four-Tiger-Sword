@@ -43,6 +43,7 @@ public class PoiseHandler : MonoBehaviour
     {
         _currentPoise = 0f;
         _breakTimer   = _breakDuration;
+        GetComponent<Enemy>().IsGroggy = true;
         OnPoiseBreak?.Invoke();
         Debug.Log($"<color=yellow>[경직] {name} 자세 붕괴! ({_breakDuration}초)</color>");
     }

@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponActionDataSO
   WeaponName: Fire
   ComboSteps:
-  - AnimationName: Fire1
-    Duration: 0.9
+  - AnimationName: Punching
+    Duration: 0.983
     ComboTransitionTime: 0.55
     Damage: 120
     CriticalChance: 0.1
     CriticalMultiplier: 1.5
-    HitStartTime: 0.4
+    HitStartTime: 0.3
     HitDuration: 0.15
     HitBoxOffset: {x: 0, y: 0, z: 1.2}
     HitBoxShape: 0
@@ -66,13 +66,13 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 11
-  - AnimationName: Fire2
-    Duration: 0.9
+  - AnimationName: Punching2
+    Duration: 1.033
     ComboTransitionTime: 0.55
     Damage: 150
     CriticalChance: 0.1
     CriticalMultiplier: 1.5
-    HitStartTime: 0.35
+    HitStartTime: 0.33
     HitDuration: 0.15
     HitBoxOffset: {x: 0, y: 0, z: 1}
     HitBoxShape: 1
@@ -118,13 +118,13 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 13
-  - AnimationName: Fire3
-    Duration: 1.2
+  - AnimationName: Punshing3
+    Duration: 2
     ComboTransitionTime: 0
     Damage: 220
     CriticalChance: 0.1
     CriticalMultiplier: 1.5
-    HitStartTime: 0.5
+    HitStartTime: 1.06
     HitDuration: 0.2
     HitBoxOffset: {x: 0, y: 0, z: 1.5}
     HitBoxShape: 0

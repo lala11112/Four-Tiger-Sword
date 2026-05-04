@@ -11,7 +11,7 @@ public class PlayerRunState : IPlayerState
 
     public void Enter()
     {
-        _playerController.Animator.SetTrigger("Run");
+        _playerController.Animator.CrossFade("Run", 0.1f);
     }
 
     public void Update()

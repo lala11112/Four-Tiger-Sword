@@ -7,7 +7,7 @@ public class PlayerMoveState : IPlayerState
     public PlayerMoveState(PlayerController playerController) {_playerController = playerController;}
 
     public void Enter(){
-        _playerController.Animator.SetTrigger("Walk");
+        _playerController.Animator.CrossFade("Walk", 0.01f);
     }
 
     public void Update()

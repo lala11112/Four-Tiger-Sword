@@ -8,6 +8,7 @@ public class PlayerJumpState : IPlayerState
 
     public void Enter()
     {
+        _playerController.Animator.CrossFade("Jump", 0.1f);
         _playerController.Input.JumpBuffer.Consume();
         _playerController.ConsumeCoyote();
         _playerController.VerticalVelocity = Mathf.Sqrt(_playerController.JumpForce * -2f * _playerController.Gravity);

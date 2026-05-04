@@ -5,10 +5,10 @@ using System.Collections;
 
 public class Enemy : MonoBehaviour, IDamageable
 {
-    public string stateName; 
+    public string stateName;
     [SerializeField] private int _maxHp = 100;
     private int _currentHp;
-    public int MaxHp     => _maxHp;
+    public int MaxHp => _maxHp;
     public int CurrentHp => _currentHp;
 
     [Tooltip("플레이어가 이 거리 이내로 들어오면 전투(CombatIdle) 상태가 됨")]
@@ -50,8 +50,23 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public bool CanAttack => _attackCooldownTimer <= 0f;
     public bool IsAttackFinished => CurrentAction?.IsFinished ?? false;
+
+    public Animator Animator { get; private set; }
+
+    public float GroggyDuration = 1f;
+
+    public bool IsGroggy = false;
+
+
     protected virtual void Start()
     {
+        Animator = GetComponentInChildren<Animator>();
+        if (Animator == null)
+        {
+            Debug.LogError("Animator is null");
+            return;
+        }
+
         _currentHp = _maxHp;
         _sensor = GetComponent<IEnemySensor>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
@@ -62,13 +77,14 @@ public class Enemy : MonoBehaviour, IDamageable
 
         _stateMachine = new StateMachine();
 
-        var idleState       = new EnemyIdleState(this);
-        var traceState      = new EnemyTraceState(this);
+        var idleState = new EnemyIdleState(this);
+        var traceState = new EnemyTraceState(this);
         var combatIdleState = new EnemyCombatIdleState(this);
-        var approachState   = new EnemyApproachState(this);
-        var attackState     = new EnemyAttackState(this);
-        var hurtState       = new EnemyHurtState(this);
-        var dieState        = new EnemyDieState(this);
+        var approachState = new EnemyApproachState(this);
+        var attackState = new EnemyAttackState(this);
+        var hurtState = new EnemyHurtState(this);
+        var dieState = new EnemyDieState(this);
+        var groggyState = new EnemyGroggyState(this);
 
         // Idle → Trace: 플레이어 감지
         _stateMachine.AddTransition(idleState, traceState, () => _isTargetFound);
@@ -91,10 +107,14 @@ public class Enemy : MonoBehaviour, IDamageable
 
         // Hurt → Trace 복귀
         _stateMachine.AddTransition(hurtState, traceState, () => !IsHurt);
+        _stateMachine.AddTransition(groggyState, traceState, () => !IsGroggy);
 
         _stateMachine.AddAnyTransition(dieState, () => _isDie);
         _stateMachine.AddAnyTransition(hurtState, () => IsHurt);
+        _stateMachine.AddAnyTransition(groggyState, () => IsGroggy);
+
         _stateMachine.ChangeState(idleState);
+
     }
 
     protected virtual void Update()
@@ -102,6 +122,10 @@ public class Enemy : MonoBehaviour, IDamageable
         _isTargetFound = _sensor?.DetectTarget() ?? false;
         stateName = _stateMachine.CurrentState.GetType().ToString();
         _stateMachine.Update();
+
+        Vector3 dir = _navMeshAgent.velocity;
+        Animator.SetFloat("DirY", dir.z);
+        Animator.SetFloat("DirX", dir.x);
         UpdateAttackCooldown();
     }
 
@@ -172,7 +196,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public void UpdateAttackCooldown()
     {
-        if(_attackCooldownTimer > 0f)
+        if (_attackCooldownTimer > 0f)
         {
             _attackCooldownTimer -= Time.deltaTime;
         }

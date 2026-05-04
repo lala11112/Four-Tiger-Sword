@@ -57,6 +57,7 @@ public class EnemyAttackState : IPlayerState
         if (_actionStarted)
             _enemy.CurrentAction?.Exit();
 
+        _enemy.Animator.CrossFade("Move", 0.1f);
         _enemy.StartAttackCooldown();
         _enemy.HasSelectedAttack = false;
         _enemy.CurrentAction = null;

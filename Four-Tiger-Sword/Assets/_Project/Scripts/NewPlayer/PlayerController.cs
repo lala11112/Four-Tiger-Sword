@@ -69,6 +69,16 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public Animator Animator { get; private set; }
 
+    public void SetAnimatorTrigger(string triggerName)
+    {
+        foreach (var param in Animator.parameters)
+        {
+            if (param.type == AnimatorControllerParameterType.Trigger)
+                Animator.ResetTrigger(param.name);
+        }
+        Animator.SetTrigger(triggerName);
+    }
+
 
     private void Awake()
     {
@@ -104,7 +114,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         Stat.UpdateSpRegen(Time.deltaTime);
         StateMachine.Update();
         FormManager.Update();
-        //Debug.Log(Stat.CurrentHp);
+        Debug.Log(StateMachine.CurrentState.GetType().Name);
     }
 
     private void UpdateCoyoteTimer()
