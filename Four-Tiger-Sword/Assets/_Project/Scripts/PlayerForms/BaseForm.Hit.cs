@@ -17,7 +17,7 @@ public abstract partial class BaseForm
                 if (_timer < e.StartTime || _timer > e.StartTime + e.Duration) continue;
 
                 if (!_hitEventTargets.ContainsKey(i)) _hitEventTargets[i] = new HashSet<Collider>();
-                ExecuteHit(step, e.Damage > 0 ? e.Damage : step.Damage, _hitEventTargets[i]);
+                ExecuteHit(step, e.Damage > 0 ? e.Damage : step.Damage, e.PoiseDamage > 0 ? e.PoiseDamage : step.PoiseDamage, _hitEventTargets[i]);
             }
         }
         else
@@ -25,11 +25,11 @@ public abstract partial class BaseForm
             if (_timer < step.HitStartTime || _timer > step.HitStartTime + step.HitDuration) return;
 
             if (!_hitEventTargets.ContainsKey(-1)) _hitEventTargets[-1] = new HashSet<Collider>();
-            ExecuteHit(step, step.Damage, _hitEventTargets[-1]);
+            ExecuteHit(step, step.Damage, step.PoiseDamage, _hitEventTargets[-1]);
         }
     }
 
-    private void ExecuteHit(WeaponActionData step, int damage, HashSet<Collider> hitTargets)
+    private void ExecuteHit(WeaponActionData step, int damage, float poiseDamage, HashSet<Collider> hitTargets)
     {
         Vector3 center = _playerController.transform.position
                        + _playerController.transform.rotation * step.HitBoxOffset;
@@ -44,7 +44,7 @@ public abstract partial class BaseForm
             Vector3 knockbackDir = (hit.transform.position - _playerController.transform.position).normalized;
             Vector3 knockback = knockbackDir * step.KnockbackForce * attackMult;
             DamageManager.Apply(
-                new HitInfo(damage, FormElement, step.CriticalChance, step.CriticalMultiplier, power: knockback),
+                new HitInfo(damage, FormElement, step.CriticalChance, step.CriticalMultiplier, power: knockback, poiseDamage: poiseDamage),
                 damageable, hit.gameObject);
 
             OnHitEnemy(hit.gameObject);

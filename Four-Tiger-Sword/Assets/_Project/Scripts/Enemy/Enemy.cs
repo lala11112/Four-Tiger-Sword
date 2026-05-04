@@ -42,10 +42,10 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool IsInExecuteRange => CurrentAction != null && DetectedTarget != null
         && Vector3.Distance(transform.position, DetectedTarget.position) <= CurrentAction.SkillData.excuteRange;
     public Transform DetectedTarget => _sensor?.DetectedTarget;
-    private bool _isHurt = false;
     private float _attackCooldown = 10f;
     private float _attackCooldownTimer = 0f;
-    public bool IsHurt { get => _isHurt; set => _isHurt = value; }
+    public bool IsHurt = false;
+    public bool PendingGroggy = false;
     private bool _isDie = false;
 
     public bool CanAttack => _attackCooldownTimer <= 0f;
@@ -53,7 +53,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public Animator Animator { get; private set; }
 
-    public float GroggyDuration = 1f;
+    public float GroggyDuration = 5f;
 
     public bool IsGroggy = false;
 
@@ -110,7 +110,7 @@ public class Enemy : MonoBehaviour, IDamageable
         _stateMachine.AddTransition(groggyState, traceState, () => !IsGroggy);
 
         _stateMachine.AddAnyTransition(dieState, () => _isDie);
-        _stateMachine.AddAnyTransition(hurtState, () => IsHurt);
+        _stateMachine.AddAnyTransition(hurtState, () => IsHurt && !IsGroggy);
         _stateMachine.AddAnyTransition(groggyState, () => IsGroggy);
 
         _stateMachine.ChangeState(idleState);
@@ -123,19 +123,24 @@ public class Enemy : MonoBehaviour, IDamageable
         stateName = _stateMachine.CurrentState.GetType().ToString();
         _stateMachine.Update();
 
-        Vector3 dir = _navMeshAgent.velocity;
-        Animator.SetFloat("DirY", dir.z);
-        Animator.SetFloat("DirX", dir.x);
+        Vector3 worldVelocity = _navMeshAgent.velocity;
+        Vector3 localVelocity = transform.InverseTransformDirection(worldVelocity);
+        Animator.SetFloat("DirY", localVelocity.z);
+        Animator.SetFloat("DirX", localVelocity.x);
         UpdateAttackCooldown();
+
+        
     }
 
-    public virtual void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false, Vector3 power = default)
+    public virtual void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false, Vector3 power = default, float poiseDamage = 100f)
     {
         if (_currentHp <= 0) return;
 
+        GetComponent<PoiseHandler>()?.TakePoiseDamage(poiseDamage);
+
         IsHurt = true;
         _currentHp = Mathf.Max(0, _currentHp - damage);
-        OnDamaged?.Invoke(damage, damageType, isCritical);
+        OnDamaged?.Invoke(damage, damageType, isCritical);      
 
         if (power != Vector3.zero)
             ApplyKnockback(power);

@@ -114,7 +114,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         Stat.UpdateSpRegen(Time.deltaTime);
         StateMachine.Update();
         FormManager.Update();
-        Debug.Log(StateMachine.CurrentState.GetType().Name);
+        //Debug.Log(StateMachine.CurrentState.GetType().Name);
     }
 
     private void UpdateCoyoteTimer()
@@ -176,10 +176,10 @@ public class PlayerController : MonoBehaviour, IDamageable
         return Physics.CheckSphere(sphereCenter, Controller.radius + 0.1f, LayerMask.GetMask("Ground"));
     }
 
-    public void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false, Vector3 power = default)
+    public void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f)
     {
         Debug.Log("플레이어 피격!");
-        Stat.TakeDamage(damage, damageType, isCritical, power);
+        Stat.TakeDamage(damage, damageType, isCritical, power, poiseDamage);
         ApplyKnockback(power);
     }
 

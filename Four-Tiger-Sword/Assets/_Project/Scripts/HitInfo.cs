@@ -14,10 +14,12 @@ public readonly struct HitInfo
 
     public readonly Vector3 Power;
 
+    public readonly float PoiseDamage;
+
     public HitInfo(int damage, DamageType element,
                    float critChance, float critMultiplier,
                    float poiseDamageMultiplier = 1f,
-                   bool  armorPierce = false, Vector3 power = default)
+                   bool  armorPierce = false, Vector3 power = default, float poiseDamage = 0f)
     {
         BaseDamage            = damage;
         Element               = element;
@@ -26,5 +28,6 @@ public readonly struct HitInfo
         PoiseDamageMultiplier = poiseDamageMultiplier;
         ArmorPierce           = armorPierce;
         Power                 = power;
+        PoiseDamage           = poiseDamage;
     }
 }

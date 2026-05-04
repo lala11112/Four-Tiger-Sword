@@ -979,7 +979,9 @@ MonoBehaviour:
   _knockbackResistance: 3
   _knockbackDuration: 0.25
   MonsterSkillData: {fileID: 11400000, guid: 0f665f6b04e0bf149aebb177dd5812bb, type: 2}
-  GroggyDuration: 1
+  IsHurt: 0
+  PendingGroggy: 0
+  GroggyDuration: 5
   IsGroggy: 0
 --- !u!195 &647727191
 NavMeshAgent:
@@ -1207,6 +1209,8 @@ MonoBehaviour:
   _knockbackResistance: 3
   _knockbackDuration: 0.25
   MonsterSkillData: {fileID: 11400000, guid: 2b19c3500b4664d479cff3957aa68d7b, type: 2}
+  IsHurt: 0
+  PendingGroggy: 0
   GroggyDuration: 1
   IsGroggy: 0
 --- !u!136 &1028050087
