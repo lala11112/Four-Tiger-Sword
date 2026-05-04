@@ -18,7 +18,8 @@ public class EnemyApproachState : IPlayerState
     public void Enter()
     {
         _nav = _enemy.GetComponent<NavMeshAgent>();
-        _enemy.Animator.CrossFade("Move", 0.1f);
+        if (!_enemy.Animator.GetCurrentAnimatorStateInfo(0).IsName("Move"))
+            _enemy.Animator.CrossFade("Move", 0.1f);
     }
 
     public void Update()

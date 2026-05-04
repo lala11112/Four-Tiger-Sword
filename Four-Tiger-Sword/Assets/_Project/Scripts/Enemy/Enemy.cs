@@ -13,6 +13,8 @@ public class Enemy : MonoBehaviour, IDamageable
 
     [Tooltip("플레이어가 이 거리 이내로 들어오면 전투(CombatIdle) 상태가 됨")]
     public float CombatRange = 6f;
+    [Tooltip("전투 상태에서 이 거리 밖으로 나가야 Trace로 복귀 (CombatRange보다 크게 설정)")]
+    public float CombatExitRange = 8f;
 
     [Header("넉백 설정")]
     [Tooltip("넉백 저항값. 이 값보다 작은 힘은 밀리지 않음")]
@@ -38,6 +40,8 @@ public class Enemy : MonoBehaviour, IDamageable
     private bool _isTargetFound = false;
     private bool _isTargetInCombatRange => DetectedTarget != null
         && Vector3.Distance(transform.position, DetectedTarget.position) <= CombatRange;
+    private bool _isTargetOutOfCombatRange => DetectedTarget == null
+        || Vector3.Distance(transform.position, DetectedTarget.position) > CombatExitRange;
     // 현재 선택한 공격의 실행 사거리(excuteRange) 안에 플레이어가 들어왔는지
     public bool IsInExecuteRange => CurrentAction != null && DetectedTarget != null
         && Vector3.Distance(transform.position, DetectedTarget.position) <= CurrentAction.SkillData.excuteRange;
@@ -92,15 +96,15 @@ public class Enemy : MonoBehaviour, IDamageable
         // Trace → CombatIdle: 플레이어가 전투 범위 안
         _stateMachine.AddTransition(traceState, combatIdleState, () => _isTargetInCombatRange);
 
-        // CombatIdle → Trace: 플레이어가 전투 범위 밖
-        _stateMachine.AddTransition(combatIdleState, traceState, () => !_isTargetInCombatRange);
+        // CombatIdle → Trace: 플레이어가 이탈 범위 밖
+        _stateMachine.AddTransition(combatIdleState, traceState, () => _isTargetOutOfCombatRange);
         // CombatIdle → Approach: 공격 선택 완료
         _stateMachine.AddTransition(combatIdleState, approachState, () => HasSelectedAttack);
 
         // Approach → Attack: 실행 사거리 안에 플레이어 진입
         _stateMachine.AddTransition(approachState, attackState, () => IsInExecuteRange);
-        // Approach → Trace: 플레이어가 전투 범위 밖으로 이탈
-        _stateMachine.AddTransition(approachState, traceState, () => !_isTargetInCombatRange);
+        // Approach → Trace: 플레이어가 이탈 범위 밖으로 이탈
+        _stateMachine.AddTransition(approachState, traceState, () => _isTargetOutOfCombatRange);
 
         // Attack → CombatIdle: 공격 완료 (쿨타임 + 배회)
         _stateMachine.AddTransition(attackState, combatIdleState, () => IsAttackFinished);

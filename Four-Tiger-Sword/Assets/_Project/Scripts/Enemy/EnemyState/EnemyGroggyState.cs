@@ -24,7 +24,8 @@ public class EnemyGroggyState : IPlayerState
 
     public void Exit()
     {
-        _enemy.GetComponent<NavMeshAgent>().isStopped = true;
+        _enemy.GetComponent<NavMeshAgent>().isStopped = false;
+        _enemy.StopAllCoroutines();
     }
     private IEnumerator GroggyRoutine()
     {
