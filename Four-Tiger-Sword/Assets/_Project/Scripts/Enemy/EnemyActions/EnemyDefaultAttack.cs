@@ -18,7 +18,7 @@ public class EnemyDefaultAttack : EnemyAction
         base.Enter();
         _hasHit = false;
         _hitTargets.Clear();
-        _enemy.Animator?.CrossFade(_data.animName, 0.1f);
+        _enemy.Animator?.CrossFade(_data.animName, 0.01f);
 
         // TODO: _enemy.Animator?.SetTrigger(_data.animName);
     }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.AI;
 
 public class EnemyHurtState : MonoBehaviour, IPlayerState
 {
@@ -10,6 +11,8 @@ public class EnemyHurtState : MonoBehaviour, IPlayerState
     public void Enter()
     {
         //피격 애니메이션 재생
+        _enemy.Animator.CrossFade("Hit", 0.1f);
+        _enemy.GetComponent<NavMeshAgent>().isStopped = true;
         _enemy.StartCoroutine(HurtRoutine());
     }
 
@@ -21,7 +24,16 @@ public class EnemyHurtState : MonoBehaviour, IPlayerState
 
     public void Exit()
     {
+        Debug.Log("EnemyHurtState Exit");
+        _enemy.GetComponent<NavMeshAgent>().isStopped = false;
+        _enemy.IsHurt = false;
+        _enemy.StopAllCoroutines();
 
+        if (_enemy.PendingGroggy)
+        {
+            _enemy.PendingGroggy = false;
+            _enemy.IsGroggy = true;
+        }
     }
 
     private IEnumerator HurtRoutine()

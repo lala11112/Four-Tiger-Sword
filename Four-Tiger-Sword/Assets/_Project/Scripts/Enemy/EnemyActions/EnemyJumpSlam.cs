@@ -35,6 +35,7 @@ public class EnemyJumpSlam : EnemyAction
 
         _nav.ResetPath();
         _nav.isStopped = true;
+        _enemy.Animator?.CrossFade(_data.animName, 0.01f);
         // TODO: _enemy.Animator?.SetTrigger(_data.animName);
     }
 

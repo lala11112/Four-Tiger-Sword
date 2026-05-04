@@ -20,6 +20,8 @@ public class HitEvent
 
     [Tooltip("이 히트의 데미지 (0이면 WeaponActionData의 기본 Damage 사용)")]
     public int Damage = 0;
+    [Tooltip("이 히트의 강인도 데미지 (0이면 WeaponActionData의 기본 PoiseDamage 사용)")]
+    public float PoiseDamage = 10f;
 }
 
 [Serializable]
@@ -38,6 +40,9 @@ public class WeaponActionData
     [Header("Combat & Physics")]
     [Tooltip("이 타수의 데미지")]
     public int Damage = 10;
+
+    [Tooltip("이 타수의 강인도 데미지")]
+    public float PoiseDamage = 10f;
 
     [Tooltip("치명타 발생 확률 (0 ~ 1)")]
     [Range(0f, 1f)]

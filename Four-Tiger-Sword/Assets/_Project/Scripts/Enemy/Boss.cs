@@ -90,7 +90,7 @@ public abstract class Boss : Enemy
     /// 4. 페이즈 전환 체크
     /// </summary>
     public override void TakeDamage(int damage, DamageType damageType = DamageType.Normal,
-                                    bool isCritical = false, Vector3 power = default)
+                                    bool isCritical = false, Vector3 power = default, float poiseDamage = 20f)
     {
         int modified = CurrentPhase?.ModifyIncomingDamage(damage, this) ?? damage;
         modified = Shield.Absorb(modified);

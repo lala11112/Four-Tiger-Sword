@@ -22,6 +22,6 @@ public static class DamageManager
         //    rawDamage += Mathf.RoundToInt(statHandler.EffectiveDef);
         //}
 
-        target.TakeDamage(rawDamage, info.Element, isCritical, info.Power);
+        target.TakeDamage(rawDamage, info.Element, isCritical, info.Power, info.PoiseDamage);
     }
 }
