@@ -18,6 +18,7 @@ public abstract partial class BaseForm
         _timer = 0;
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
+        _playerController.Animator.CrossFade(step.AnimationName, 0.01f);
         Debug.Log($"스킬 단계 : {step.AnimationName} ({_skillStep})");
     }
 
@@ -26,6 +27,7 @@ public abstract partial class BaseForm
         _timer = 0;
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.UltimateSteps[_ultimateStep];
+        _playerController.Animator.CrossFade(step.AnimationName, 0.01f);
         Debug.Log($"궁극기 단계 : {step.AnimationName} ({_ultimateStep})");
     }
 

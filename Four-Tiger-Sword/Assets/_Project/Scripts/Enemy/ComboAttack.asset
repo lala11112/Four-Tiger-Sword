@@ -12,28 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a75a612f4dec2a148bd73586789dc3eb, type: 3}
   m_Name: ComboAttack
   m_EditorClassIdentifier: Assembly-CSharp::MonsterComboAttackSO
-  animName: "3\uB2E8 \uBCA0\uAE30"
+  animName: Combo Attack
   engageRange: 5
-  excuteRange: 1
-  weight: 20
+  excuteRange: 2
+  weight: 1000
   baseDamage: 70
   criticalChance: 0.6
   criticalMultiplier: 2
   knockbackForce: 4.6
   telegraphDuration: 0.5
-  attackDuration: 1.8
+  attackDuration: 3.6
   hitBoxShape: 0
-  hitBoxRadius: 1.2
+  hitBoxRadius: 2
   hits:
-  - hitStartTime: 0.2
+  - hitStartTime: 0.51
     hitDuration: 0.05
     damage: 0
-    hitBoxOffset: {x: 0, y: 0, z: 0}
-  - hitStartTime: 0.7
+    hitBoxOffset: {x: 0, y: 0, z: 1}
+  - hitStartTime: 1.28
     hitDuration: 0.05
     damage: 0
-    hitBoxOffset: {x: 0, y: 0, z: 0}
-  - hitStartTime: 1.2
+    hitBoxOffset: {x: 0, y: 0, z: 1}
+  - hitStartTime: 2.26
     hitDuration: 0.05
     damage: 0
-    hitBoxOffset: {x: 0, y: 0, z: 0}
+    hitBoxOffset: {x: 0, y: 0, z: 1}

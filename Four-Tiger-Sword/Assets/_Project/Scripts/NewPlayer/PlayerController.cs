@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         Movement = GetComponent<PlayerMovement>();
         Movement.Initialize(this);
         _currentStamina = MaxStamina;
-        Stat = new PlayerStat(maxHp: 1000f, maxSp: MaxSP, spRegenRate: SpRegenRate, spRegenDelay: SpRegenDelay, playerController: this);
+        Stat = new PlayerStat(maxHp: 100000f, maxSp: MaxSP, spRegenRate: SpRegenRate, spRegenDelay: SpRegenDelay, playerController: this);
 
         StateMachine = new StateMachine();
         var stateMachineSetup = new PlayerStateMachineSetup(this);
