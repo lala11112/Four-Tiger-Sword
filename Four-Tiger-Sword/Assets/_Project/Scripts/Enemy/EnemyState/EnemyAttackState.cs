@@ -29,7 +29,7 @@ public class EnemyAttackState : IPlayerState
         // 플레이어 방향 고정
         FaceTarget();
         Debug.Log("공격 시작!");
-        _enemy.GetComponent<Renderer>().material.color = Color.red;
+        //_enemy.GetComponent<Renderer>().material.color = Color.red;
 
         // TODO: 번쩍임 이펙트 재생 (예: Outline, DOTween 깜빡임 등)
     }
@@ -61,7 +61,7 @@ public class EnemyAttackState : IPlayerState
         _enemy.StartAttackCooldown();
         _enemy.HasSelectedAttack = false;
         _enemy.CurrentAction = null;
-        _enemy.GetComponent<Renderer>().material.color = Color.gray;
+        //_enemy.GetComponent<Renderer>().material.color = Color.gray;
     }
 
     // ── 헬퍼 ────────────────────────────────────────────────────────────────

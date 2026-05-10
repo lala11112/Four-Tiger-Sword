@@ -18,7 +18,7 @@ public class EarthAbsorptionStat
         Debug.Log("<color=brown>[방어 누적] 피해 흡수 시작</color>");
     }
 
-    /// <summary>PlayerStat.OnDamageTaken 이벤트에서 호출됩니다.</summary>
+    /// <summary>PlayerStatManager.OnDamageTaken 이벤트에서 호출됩니다.</summary>
     public void Absorb(int damage)
     {
         if (!IsAbsorbing) return;

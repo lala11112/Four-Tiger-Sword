@@ -9,7 +9,7 @@ public abstract partial class BaseForm
         _playerController.Input.AttackBuffer.Consume();
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.ComboSteps[_comboStep];
-        _playerController.Animator.CrossFade(step.AnimationName, 0.01f);
+        _playerController.Animator.CrossFade(step.AnimationName, 0.1f);
         Debug.Log($"공격이름 : {step.AnimationName}  타수 : {_comboStep}");
     }
 

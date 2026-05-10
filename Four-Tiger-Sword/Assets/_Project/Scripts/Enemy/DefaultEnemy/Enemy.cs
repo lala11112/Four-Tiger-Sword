@@ -22,6 +22,9 @@ public class Enemy : MonoBehaviour, IDamageable
     [Tooltip("넉백 지속 시간 (초)")]
     [SerializeField] private float _knockbackDuration = 0.25f;
 
+    [SerializeField] private float _attackCooldown = 10f;
+    
+
     public event Action<int, DamageType, bool> OnDamaged;
     public event Action OnDied;
 
@@ -46,7 +49,6 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool IsInExecuteRange => CurrentAction != null && DetectedTarget != null
         && Vector3.Distance(transform.position, DetectedTarget.position) <= CurrentAction.SkillData.excuteRange;
     public Transform DetectedTarget => _sensor?.DetectedTarget;
-    private float _attackCooldown = 10f;
     private float _attackCooldownTimer = 0f;
     public bool IsHurt = false;
     public bool PendingGroggy = false;
@@ -133,7 +135,7 @@ public class Enemy : MonoBehaviour, IDamageable
         Animator.SetFloat("DirX", localVelocity.x);
         UpdateAttackCooldown();
 
-        
+
     }
 
     public virtual void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false, Vector3 power = default, float poiseDamage = 100f)
@@ -144,7 +146,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
         IsHurt = true;
         _currentHp = Mathf.Max(0, _currentHp - damage);
-        OnDamaged?.Invoke(damage, damageType, isCritical);      
+        OnDamaged?.Invoke(damage, damageType, isCritical);
 
         if (power != Vector3.zero)
             ApplyKnockback(power);
@@ -177,7 +179,7 @@ public class Enemy : MonoBehaviour, IDamageable
     /// </summary>
     private IEnumerator KnockbackRoutine(Vector3 initialVelocity)
     {
-        if (_navMeshAgent != null)
+        if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh)
             _navMeshAgent.ResetPath();
 
         float elapsed = 0f;

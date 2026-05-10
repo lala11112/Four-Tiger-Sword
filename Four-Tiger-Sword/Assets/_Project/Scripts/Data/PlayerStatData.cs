@@ -10,8 +10,18 @@ public class PlayerStatData : ScriptableObject
     public float baseSP = 50f;
     [Tooltip("대쉬·회피 전용 자원(스테미나). 소진 시 대쉬/회피 불가.")]
     public float baseSTM = 100f;
+    [Tooltip("대쉬 1회 소모 스테미나.")]
+    public float dashStaminaCost = 25f;
+    [Tooltip("달리기 중 초당 소모 스테미나.")]
+    public float runStaminaCostPerSecond = 10f;
+    [Tooltip("스테미나 소모 후 회복이 시작될 때까지 대기 시간(초).")]
+    public float staminaRegenDelay = 2f;
+    [Tooltip("스테미나 초당 자동 회복량.")]
+    public float staminaRegenRate = 20f;
     [Tooltip("영력(SP) 초당 자동 회복량.")]
-    public float baseSpRegen = 1f;
+    public float baseSpRegen = 50f;
+    [Tooltip("영력(SP) 소모 후 회복이 시작될 때까지 대기 시간(초).")]
+    public float baseSpRegenDelay = 2f;
 
     [Header("② 핵심 전투")]
     [Tooltip("기본 물리 공격력. 데미지 계산의 기반 수치입니다.")]

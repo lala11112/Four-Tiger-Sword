@@ -23,7 +23,7 @@ public class EnemyTraceState : IPlayerState
     public void Update()
     {
         _navMeshAgent.SetDestination(_target.position);
-        //플레이어를 추적하는 로직
+        //플레이어를 추적하는 로직  
     }
 
     public void Exit()

@@ -11,7 +11,7 @@ public class EnemyDieState : MonoBehaviour, IPlayerState
         //죽음
         Debug.Log($"{_enemy.name} 사망");
         _enemy.Animator.CrossFade("Die", 0.1f);
-        Destroy(_enemy.gameObject);
+        //Destroy(_enemy.gameObject);
     }
 
     public void Update()

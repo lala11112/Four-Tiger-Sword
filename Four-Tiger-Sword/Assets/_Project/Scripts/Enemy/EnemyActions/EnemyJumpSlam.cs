@@ -81,6 +81,8 @@ public class EnemyJumpSlam : EnemyAction
             if (_nav.isOnNavMesh)
                 _nav.Warp(_enemy.transform.position);
         }
+        _enemy.gameObject.transform.rotation = Quaternion.Euler(0f, _enemy.gameObject.transform.rotation.y, 0f);
+
         _nav.isStopped = false;
     }
 
@@ -135,7 +137,7 @@ public class EnemyJumpSlam : EnemyAction
             _nav.Warp(_jumpTargetPos);
 
         _nav.isStopped = false;
-
+        _enemy.gameObject.transform.rotation = Quaternion.Euler(0f, _enemy.gameObject.transform.rotation.y, 0f);
         ExecuteSlam();
     }
 

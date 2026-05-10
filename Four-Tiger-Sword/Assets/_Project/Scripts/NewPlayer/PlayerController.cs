@@ -1,7 +1,9 @@
 using UnityEngine;
 using System.Collections;
+using Unity.Cinemachine;
 
 [RequireComponent(typeof(CharacterController), typeof(PlayerInputHandler), typeof(PlayerMovement))]
+[RequireComponent(typeof(PlayerStatManager))]
 public class PlayerController : MonoBehaviour, IDamageable
 {
     public CharacterController Controller { get; private set; }
@@ -9,6 +11,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     public PlayerMovement Movement { get; private set; }
     public FormManager FormManager { get; private set; }
     public StateMachine StateMachine { get; private set; }
+    public PlayerStatManager StatManager { get; private set; }
     public Transform CameraTransform;
 
     [Header("Player Settings")]
@@ -28,31 +31,16 @@ public class PlayerController : MonoBehaviour, IDamageable
     [Header("Dash Settings")]
     public float DashCooldown = 1.0f;
     private float _dashCooldownTimer;
-    public bool CanDash => _dashCooldownTimer <= 0f && HasEnoughStaminaForDash;
+    public bool CanDash => _dashCooldownTimer <= 0f && StatManager.HasEnoughStaminaForDash;
     public bool IsDashing => StateMachine.CurrentState is PlayerDashState; //대쉬중일 때는 무적
 
-    [Header("Stamina Settings")]
-    public float MaxStamina = 100f;
-    public float DashStaminaCost = 25f;
-    public float RunStaminaCostPerSecond = 10f;
-    public float StaminaRegenDelay = 2f;
-    public float StaminaRegenRate = 20f;
-    private float _currentStamina;
-    private float _staminaRegenTimer;
-
-    public float CurrentStamina => _currentStamina;
-    public bool HasEnoughStaminaForDash => _currentStamina >= DashStaminaCost;
-    public bool CanRun => _currentStamina > 0f;
+    public float CurrentStamina          => StatManager.CurrentStamina;
+    public bool  HasEnoughStaminaForDash => StatManager.HasEnoughStaminaForDash;
+    public bool  CanRun                  => StatManager.CanRun;
 
     // CanSkill / CanUltimate 는 현재 폼의 쿨타임과 SP를 함께 검사합니다.
     public bool CanSkill => FormManager?.CurrentForm?.CanSkill ?? false;
     public bool CanUltimate => FormManager?.CurrentForm?.CanUltimate ?? false;
-
-    [Header("SP Settings")]
-    public float MaxSP = 1000f;
-    public float SpRegenRate = 50f;   // 초당 회복량
-    public float SpRegenDelay = 2f;    // 소모 후 회복 대기 시간(초)
-    public PlayerStat Stat { get; private set; }
 
     [Header("CombatData")]
     [SerializeField] private WeaponActionDataSO _FireFormActionData;
@@ -66,6 +54,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     [Tooltip("넉백 지속 시간 (초)")]
     [SerializeField] private float _knockbackDuration = 0.25f;
     private Coroutine _knockbackCoroutine;
+
+    public CinemachineImpulseSource ImpulseSource;
 
     public Animator Animator { get; private set; }
 
@@ -82,15 +72,14 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void Awake()
     {
+        StatManager = GetComponent<PlayerStatManager>();
         Animator = gameObject.GetComponentInChildren<Animator>();
-
+        ImpulseSource = GetComponent<CinemachineImpulseSource>();
         Controller = GetComponent<CharacterController>();
         Input = GetComponent<PlayerInputHandler>();
         CameraTransform = Camera.main.transform;
         Movement = GetComponent<PlayerMovement>();
         Movement.Initialize(this);
-        _currentStamina = MaxStamina;
-        Stat = new PlayerStat(maxHp: 100000f, maxSp: MaxSP, spRegenRate: SpRegenRate, spRegenDelay: SpRegenDelay, playerController: this);
 
         StateMachine = new StateMachine();
         var stateMachineSetup = new PlayerStateMachineSetup(this);
@@ -110,8 +99,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     {
         UpdateCoyoteTimer();
         UpdateDashCooldown();
-        UpdateStamina();
-        Stat.UpdateSpRegen(Time.deltaTime);
+        StatManager.UpdateStamina(Time.deltaTime);
+        StatManager.UpdateSpRegen(Time.deltaTime);
         StateMachine.Update();
         FormManager.Update();
         //Debug.Log(StateMachine.CurrentState.GetType().Name);
@@ -131,29 +120,8 @@ public class PlayerController : MonoBehaviour, IDamageable
             _dashCooldownTimer -= Time.deltaTime;
     }
 
-    private void UpdateStamina()
-    {
-        if (_staminaRegenTimer > 0f)
-        {
-            _staminaRegenTimer -= Time.deltaTime;
-            return;
-        }
-
-        if (_currentStamina < MaxStamina)
-            _currentStamina = Mathf.Min(_currentStamina + StaminaRegenRate * Time.deltaTime, MaxStamina);
-    }
-
-    public void ConsumeStaminaForDash()
-    {
-        _currentStamina = Mathf.Max(0f, _currentStamina - DashStaminaCost);
-        _staminaRegenTimer = StaminaRegenDelay;
-    }
-
-    public void ConsumeStaminaForRun()
-    {
-        _currentStamina = Mathf.Max(0f, _currentStamina - RunStaminaCostPerSecond * Time.deltaTime);
-        _staminaRegenTimer = StaminaRegenDelay;
-    }
+    public void ConsumeStaminaForDash() => StatManager.ConsumeStaminaForDash();
+    public void ConsumeStaminaForRun()  => StatManager.ConsumeStaminaForRun(Time.deltaTime);
 
 
 
@@ -178,8 +146,9 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f)
     {
+        if (IsDashing) return;
         Debug.Log("플레이어 피격!");
-        Stat.TakeDamage(damage, damageType, isCritical, power, poiseDamage);
+        StatManager.TakeDamage(damage, damageType, isCritical);
         ApplyKnockback(power);
     }
 

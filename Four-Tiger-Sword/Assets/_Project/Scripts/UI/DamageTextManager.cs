@@ -28,7 +28,7 @@ public class DamageTextManager : MonoBehaviour
 
     public void Register(PlayerController player)
     {
-        player.Stat.OnDamageTaken += (damage, damageType, isCritical) =>
+        player.StatManager.OnDamageTaken += (damage, damageType, isCritical) =>
             ShowDamageText(damage, player.transform.position, damageType, isCritical);
     }
 

@@ -53,7 +53,7 @@ public class EnemyDashAttack : EnemyAction
                 break;
 
             case Phase.Dash:
-                _enemy.GetComponent<Collider>().enabled = false;
+                _enemy.GetComponent<Collider>().enabled = false; //???
                 PerformDash();
                 CheckHit();
                 if (_timer >= _data.dashDuration)

@@ -19,7 +19,7 @@ public class HitEvent
     public float Duration = 0.05f;
 
     [Tooltip("이 히트의 데미지 (0이면 WeaponActionData의 기본 Damage 사용)")]
-    public int Damage = 0;
+    public float Damage = 0;
     [Tooltip("이 히트의 강인도 데미지 (0이면 WeaponActionData의 기본 PoiseDamage 사용)")]
     public float PoiseDamage = 10f;
 }
@@ -39,7 +39,7 @@ public class WeaponActionData
 
     [Header("Combat & Physics")]
     [Tooltip("이 타수의 데미지")]
-    public int Damage = 10;
+    public float Damage = 10;
 
     [Tooltip("이 타수의 강인도 데미지")]
     public float PoiseDamage = 10f;

@@ -14,7 +14,7 @@ public abstract partial class BaseForm : IForm
 
     protected Transform _softTarget;
     private const float SoftTargetSearchRadius = 10f;
-    private const float SoftTargetAngle        = 90f;
+    private const float SoftTargetAngle        = 180f;
     private const float SoftTargetRotationSpeed = 540f; // degrees/sec
 
     protected virtual DamageType FormElement => DamageType.Normal;
@@ -31,8 +31,8 @@ public abstract partial class BaseForm : IForm
     private float _skillCooldownTimer    = 0f;
     private float _ultimateCooldownTimer = 0f;
 
-    public bool CanSkill    => _skillCooldownTimer    <= 0f && _playerController.Stat.HasEnoughSp(SkillSpCost);
-    public bool CanUltimate => _ultimateCooldownTimer <= 0f && _playerController.Stat.HasEnoughSp(UltimateSpCost);
+    public bool CanSkill    => _skillCooldownTimer    <= 0f && _playerController.StatManager.HasEnoughSp(SkillSpCost);
+    public bool CanUltimate => _ultimateCooldownTimer <= 0f && _playerController.StatManager.HasEnoughSp(UltimateSpCost);
 
     public BaseForm(WeaponActionDataSO weaponActionData) => _weaponActionData = weaponActionData;
 

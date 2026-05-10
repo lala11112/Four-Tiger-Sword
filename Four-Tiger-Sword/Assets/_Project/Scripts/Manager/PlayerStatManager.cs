@@ -14,6 +14,25 @@ public class PlayerStatManager : MonoBehaviour
 
     public event Action OnStatsChanged; // 스탯 바뀔 때 UI 등에 알려주는 이벤트
 
+    // ── 런타임 HP/SP 상태 ────────────────────────────────────────────────────────
+    private float _currentHp;
+    private float _currentSp;
+    private float _spRegenTimer;
+
+    public float CurrentHp => _currentHp;
+    public float CurrentSp => _currentSp;
+
+    // ── 런타임 스테미나 상태 ──────────────────────────────────────────────────────
+    private float _currentStamina;
+    private float _staminaRegenTimer;
+
+    public float CurrentStamina       => _currentStamina;
+    public bool  HasEnoughStaminaForDash => _currentStamina >= (baseData != null ? baseData.dashStaminaCost : 25f);
+    public bool  CanRun               => _currentStamina > 0f;
+
+    /// <summary>피해를 받을 때마다 발생합니다. EarthForm 흡수 스탯 등이 구독합니다.</summary>
+    public event Action<int, DamageType, bool> OnDamageTaken;
+
     private void Awake()
     {
         InitializeFromData(); // SO 데이터로 초기화
@@ -53,6 +72,10 @@ public class PlayerStatManager : MonoBehaviour
         }
 
         RecalculateAll();   // 전체 스탯 한번 계산
+
+        _currentHp       = GetStat(StatType.ST_HP);
+        _currentSp       = GetStat(StatType.ST_SP);
+        _currentStamina  = GetStat(StatType.ST_STM);
     }
 
 
@@ -132,10 +155,85 @@ public class PlayerStatManager : MonoBehaviour
         return baseValues.GetValueOrDefault(stat, 0f);
     }
 
-    // HUD에서 편하게 접근하기 위한 단축 속성 (Properties)
-    public float CurrentHP => GetStat(StatType.ST_HP);
-    public float MaxHP => baseData != null ? baseData.baseHP : 100f;
+    // ── HP / TakeDamage ──────────────────────────────────────────────────────────
 
-    public float CurrentSP => GetStat(StatType.ST_SP);
-    public float MaxSP => baseData != null ? baseData.baseSP : 100f;
+    /// <summary>피해를 적용합니다. PlayerController.TakeDamage에서 호출됩니다.</summary>
+    public void TakeDamage(int damage, DamageType damageType, bool isCritical)
+    {
+        _currentHp = Mathf.Max(0f, _currentHp - damage);
+        OnDamageTaken?.Invoke(damage, damageType, isCritical);
+    }
+
+    // ── SP 메서드 ────────────────────────────────────────────────────────────────
+
+    /// <summary>SP를 소모합니다. 부족하면 false를 반환하고 소모하지 않습니다.</summary>
+    public bool TryConsumeSp(float amount)
+    {
+        if (_currentSp < amount) return false;
+        _currentSp = Mathf.Max(0f, _currentSp - amount);
+        _spRegenTimer = baseData != null ? baseData.baseSpRegenDelay : 2f;
+        return true;
+    }
+
+    /// <summary>SP를 외부에서 직접 추가합니다 (아이템, 보조 스킬 등).</summary>
+    public void AddSp(float amount)
+    {
+        _currentSp = Mathf.Min(_currentSp + amount, GetStat(StatType.ST_SP));
+    }
+
+    /// <summary>현재 SP가 요구량 이상인지 확인합니다.</summary>
+    public bool HasEnoughSp(float amount) => _currentSp >= amount;
+
+    /// <summary>PlayerController.Update()에서 매 프레임 호출. SP 자동 회복을 처리합니다.</summary>
+    public void UpdateSpRegen(float deltaTime)
+    {
+        if (_spRegenTimer > 0f)
+        {
+            _spRegenTimer -= deltaTime;
+            return;
+        }
+
+        float maxSp = GetStat(StatType.ST_SP);
+        if (_currentSp < maxSp)
+            _currentSp = Mathf.Min(_currentSp + GetStat(StatType.ST_SP_REGEN) * deltaTime, maxSp);
+    }
+
+    // ── 스테미나 메서드 ──────────────────────────────────────────────────────────
+
+    /// <summary>PlayerController.Update()에서 매 프레임 호출. 스테미나 자동 회복을 처리합니다.</summary>
+    public void UpdateStamina(float deltaTime)
+    {
+        if (_staminaRegenTimer > 0f)
+        {
+            _staminaRegenTimer -= deltaTime;
+            return;
+        }
+
+        float maxStamina = GetStat(StatType.ST_STM);
+        if (_currentStamina < maxStamina)
+            _currentStamina = Mathf.Min(_currentStamina + (baseData != null ? baseData.staminaRegenRate : 20f) * deltaTime, maxStamina);
+    }
+
+    /// <summary>대쉬 1회 시 PlayerDashState에서 호출됩니다.</summary>
+    public void ConsumeStaminaForDash()
+    {
+        float cost = baseData != null ? baseData.dashStaminaCost : 25f;
+        _currentStamina    = Mathf.Max(0f, _currentStamina - cost);
+        _staminaRegenTimer = baseData != null ? baseData.staminaRegenDelay : 2f;
+    }
+
+    /// <summary>달리기 중 매 프레임 PlayerRunState에서 호출됩니다.</summary>
+    public void ConsumeStaminaForRun(float deltaTime)
+    {
+        float costPerSec   = baseData != null ? baseData.runStaminaCostPerSecond : 10f;
+        _currentStamina    = Mathf.Max(0f, _currentStamina - costPerSec * deltaTime);
+        _staminaRegenTimer = baseData != null ? baseData.staminaRegenDelay : 2f;
+    }
+
+    // ── HUD 단축 속성 ────────────────────────────────────────────────────────────
+    public float CurrentHP => _currentHp;
+    public float MaxHP => GetStat(StatType.ST_HP);
+
+    public float CurrentSP => _currentSp;
+    public float MaxSP => GetStat(StatType.ST_SP);
 }

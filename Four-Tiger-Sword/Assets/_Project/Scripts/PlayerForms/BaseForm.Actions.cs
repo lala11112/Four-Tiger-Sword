@@ -51,7 +51,7 @@ public abstract partial class BaseForm
     public virtual void BeginSkill()
     {
         _currentAction = ActionType.Skill;
-        _playerController.Stat.TryConsumeSp(SkillSpCost);
+        _playerController.StatManager.TryConsumeSp(SkillSpCost);
         _skillStep = 0;
         FindSoftTarget();
         PlaySkillStep();
@@ -87,7 +87,7 @@ public abstract partial class BaseForm
     public virtual void BeginUltimate()
     {
         _currentAction = ActionType.Ultimate;
-        _playerController.Stat.TryConsumeSp(UltimateSpCost);
+        _playerController.StatManager.TryConsumeSp(UltimateSpCost);
         _ultimateStep = 0;
         FindSoftTarget();
         PlayUltimateStep();

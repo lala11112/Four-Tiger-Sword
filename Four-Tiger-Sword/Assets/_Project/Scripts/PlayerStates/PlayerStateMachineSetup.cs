@@ -125,6 +125,6 @@ public class PlayerStateMachineSetup
 
     private void AnyTransitions(StateMachine stateMachine, PlayerDieState die)
     {
-        stateMachine.AddAnyTransition(die, () => _playerController.Stat.CurrentHp <= 0);
+        stateMachine.AddAnyTransition(die, () => _playerController.StatManager.CurrentHp <= 0);
     }
 }
