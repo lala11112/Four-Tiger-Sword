@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyStats : MonoBehaviour
 {
     public string DisPlayName { get; private set; }
-    public DamageType DamageType { get; private set; }
+    public ElementType Element { get; private set; }
     
 
     public int MaxHp { get; private set; }

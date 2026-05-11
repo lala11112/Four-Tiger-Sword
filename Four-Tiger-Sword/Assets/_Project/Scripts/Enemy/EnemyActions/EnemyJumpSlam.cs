@@ -155,7 +155,7 @@ public class EnemyJumpSlam : EnemyAction
             // 착지 충격은 외부로 퍼지는 방향이 아닌 위→아래 방향 넉백 포함
             Vector3 knockback = GetKnockbackDirection(col) * _data.knockbackForce;
             DamageManager.Apply(
-                new HitInfo(_data.damage, DamageType.Normal, _data.criticalChance,
+                new HitInfo(_data.damage, ElementType.ELEMENT_NONE, _data.criticalChance,
                             _data.criticalMultiplier, power: knockback),
                 damageable, col.gameObject);
         }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class EarthForm : BaseForm
 {
-    protected override DamageType FormElement => DamageType.Earth;
+    public override ElementType Element => ElementType.ELEMENT_EARTH;
 
     public override float SkillSpCost      => 150f;
     public override float SkillCooldown    => 8f;

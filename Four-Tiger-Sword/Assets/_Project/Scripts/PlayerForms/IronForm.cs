@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class IronForm : BaseForm
 {
-    protected override DamageType FormElement => DamageType.Iron;
+    public override ElementType Element => ElementType.ELEMENT_GOLD;
 
     public override float SkillSpCost      => 200f;
     public override float SkillCooldown    => 10f;

@@ -2,7 +2,7 @@ using UnityEngine;
 public readonly struct HitInfo
 {
     public readonly int   BaseDamage;
-    public readonly DamageType Element;
+    public readonly ElementType Element;
     public readonly float CriticalChance;
     public readonly float CriticalMultiplier;
 
@@ -16,7 +16,7 @@ public readonly struct HitInfo
 
     public readonly float PoiseDamage;
 
-    public HitInfo(int damage, DamageType element,
+    public HitInfo(int damage, ElementType element,
                    float critChance, float critMultiplier,
                    float poiseDamageMultiplier = 1f,
                    bool  armorPierce = false, Vector3 power = default, float poiseDamage = 0f)

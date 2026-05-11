@@ -14,7 +14,7 @@ public class DamageText : MonoBehaviour
 
     private Color originalColor;
 
-    public void Init(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false)
+    public void Init(int damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false)
     {
         textMesh.text = isCritical ? $"!{damage}!" : damage.ToString();
         textMesh.fontSize = isCritical ? criticalFontSize : normalFontSize;
@@ -23,15 +23,15 @@ public class DamageText : MonoBehaviour
         StartCoroutine(AnimateText());
     }
 
-    private Color GetDamageColor(DamageType damageType)
+    private Color GetDamageColor(ElementType damageType)
     {
         return damageType switch
         {
-            DamageType.Fire  => new Color(1f, 0.35f, 0f),
-            DamageType.Water => new Color(0.2f, 0.6f, 1f),
-            DamageType.Wood  => new Color(0.2f, 0.85f, 0.2f),
-            DamageType.Earth => new Color(0.85f, 0.65f, 0.15f),
-            DamageType.Iron  => new Color(0.75f, 0.75f, 0.85f),
+            ElementType.ELEMENT_FIRE  => new Color(1f, 0.35f, 0f),
+            ElementType.ELEMENT_WATER => new Color(0.2f, 0.6f, 1f),
+            ElementType.ELEMENT_WOOD  => new Color(0.2f, 0.85f, 0.2f),
+            ElementType.ELEMENT_EARTH => new Color(0.85f, 0.65f, 0.15f),
+            ElementType.ELEMENT_GOLD  => new Color(0.75f, 0.75f, 0.85f),
             _                => Color.white,
         };
     }

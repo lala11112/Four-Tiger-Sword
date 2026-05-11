@@ -29,7 +29,7 @@ public class PlayerMoveState : IPlayerState
         if(moveDir != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(new Vector3(moveDir.x, 0, moveDir.z));
-            _playerController.transform.rotation = Quaternion.Slerp(_playerController.transform.rotation, targetRotation, _playerController.RotateSpeed); //_playerController.ratateSpeed 추가 가능
+            _playerController.transform.rotation = Quaternion.Slerp(_playerController.transform.rotation, targetRotation, _playerController.RotateSpeed);
         }
     }
 

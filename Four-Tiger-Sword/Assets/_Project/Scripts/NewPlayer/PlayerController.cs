@@ -54,6 +54,11 @@ public class PlayerController : MonoBehaviour, IDamageable
     [Tooltip("넉백 지속 시간 (초)")]
     [SerializeField] private float _knockbackDuration = 0.25f;
     private Coroutine _knockbackCoroutine;
+    private Coroutine _hitStopCoroutine;
+
+    [Header("Hit Stop Settings")]
+    [SerializeField] private float _hitStopDuration  = 0.08f;
+    [SerializeField] private float _hitStopTimeScale = 0.05f;
 
     public CinemachineImpulseSource ImpulseSource;
 
@@ -68,6 +73,8 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
         Animator.SetTrigger(triggerName);
     }
+
+    public ElementType Element => FormManager?.CurrentForm?.Element ?? ElementType.ELEMENT_NONE;
 
 
     private void Awake()
@@ -144,7 +151,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         return Physics.CheckSphere(sphereCenter, Controller.radius + 0.1f, LayerMask.GetMask("Ground"));
     }
 
-    public void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f)
+    public void TakeDamage(int damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f)
     {
         if (IsDashing) return;
         Debug.Log("플레이어 피격!");
@@ -168,6 +175,20 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>
     /// 초기 속도에서 0으로 감속하며 NavMesh 위에서 적을 밀어냅니다.
     /// </summary>
+    public void StartHitStop()
+    {
+        if (_hitStopCoroutine != null) StopCoroutine(_hitStopCoroutine);
+        _hitStopCoroutine = StartCoroutine(HitStopRoutine());
+    }
+
+    private IEnumerator HitStopRoutine()
+    {
+        Time.timeScale = _hitStopTimeScale;
+        yield return new WaitForSecondsRealtime(_hitStopDuration);
+        Time.timeScale = 1f;
+        _hitStopCoroutine = null;
+    }
+
     private IEnumerator KnockbackRoutine(Vector3 initialVelocity)
     {
         // y를 제거하되 원래 속력(magnitude)은 XZ 평면에서 그대로 유지

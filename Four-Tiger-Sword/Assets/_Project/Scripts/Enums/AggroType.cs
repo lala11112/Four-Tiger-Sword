@@ -1,4 +1,4 @@
-public enum AggroType
+public enum AggroType //사용하려나?
 {
     //선공형
     AGGRESSIVE,

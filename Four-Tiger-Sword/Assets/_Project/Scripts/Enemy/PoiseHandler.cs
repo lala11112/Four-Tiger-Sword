@@ -31,7 +31,7 @@ public class PoiseHandler : MonoBehaviour
             TriggerBreak();
     }
 
-    /// <summary>금(金) 철쇄 격파: 경직 수치에 관계없이 즉시 자세를 붕괴시킵니다.</summary>
+    //현재 경직 수치와 상관 없이 그로기에 들어가게 할때 사용용
     public void ForceBreak()
     {
         if (IsPoiseBreaking) return;
@@ -46,7 +46,6 @@ public class PoiseHandler : MonoBehaviour
         Debug.Log("작동중");
         GetComponent<Enemy>().PendingGroggy = true;
         //OnPoiseBreak?.Invoke();
-        Debug.Log($"<color=yellow>[경직] {name} 자세 붕괴! ({_breakDuration}초)</color>");
     }
 
     private void Update()

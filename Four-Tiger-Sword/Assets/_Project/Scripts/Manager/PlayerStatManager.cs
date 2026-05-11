@@ -31,7 +31,7 @@ public class PlayerStatManager : MonoBehaviour
     public bool  CanRun               => _currentStamina > 0f;
 
     /// <summary>피해를 받을 때마다 발생합니다. EarthForm 흡수 스탯 등이 구독합니다.</summary>
-    public event Action<int, DamageType, bool> OnDamageTaken;
+    public event Action<int, ElementType, bool> OnDamageTaken;
 
     private void Awake()
     {
@@ -158,7 +158,7 @@ public class PlayerStatManager : MonoBehaviour
     // ── HP / TakeDamage ──────────────────────────────────────────────────────────
 
     /// <summary>피해를 적용합니다. PlayerController.TakeDamage에서 호출됩니다.</summary>
-    public void TakeDamage(int damage, DamageType damageType, bool isCritical)
+    public void TakeDamage(int damage, ElementType damageType, bool isCritical)
     {
         _currentHp = Mathf.Max(0f, _currentHp - damage);
         OnDamageTaken?.Invoke(damage, damageType, isCritical);

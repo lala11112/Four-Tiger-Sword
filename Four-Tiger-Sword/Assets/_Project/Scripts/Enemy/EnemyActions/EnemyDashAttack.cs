@@ -99,7 +99,7 @@ public class EnemyDashAttack : EnemyAction
 
             _hitTargets.Add(col);
             DamageManager.Apply(
-                new HitInfo(_data.damage, DamageType.Normal, _data.criticalChance,
+                new HitInfo(_data.damage, ElementType.ELEMENT_NONE, _data.criticalChance,
                             _data.criticalMultiplier, power: _dashDirection * _data.knockbackForce),
                 damageable, col.gameObject);
         }

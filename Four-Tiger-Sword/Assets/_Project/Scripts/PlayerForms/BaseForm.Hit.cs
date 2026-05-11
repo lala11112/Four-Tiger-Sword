@@ -34,10 +34,17 @@ public abstract partial class BaseForm
         Vector3 center = _playerController.transform.position
                        + _playerController.transform.rotation * step.HitBoxOffset;
 
+        bool firstHit = true;
         foreach (var hit in GetOverlap(step, center))
         {
             if (hitTargets.Contains(hit)) continue;
             if (!hit.TryGetComponent<IDamageable>(out var damageable)) continue;
+
+            if (firstHit)
+            {
+                _playerController.StartHitStop();
+                firstHit = false;
+            }
 
             _playerController.ImpulseSource.GenerateImpulse();
             hitTargets.Add(hit);
@@ -45,7 +52,7 @@ public abstract partial class BaseForm
             Vector3 knockbackDir = (hit.transform.position - _playerController.transform.position).normalized;
             Vector3 knockback = knockbackDir * step.KnockbackForce * attackMult;
             DamageManager.Apply(
-                new HitInfo((int)(baseDamage * step.Damage), FormElement, step.CriticalChance, step.CriticalMultiplier, power: knockback, poiseDamage: poiseDamage),
+                new HitInfo((int)(baseDamage * step.Damage), Element, step.CriticalChance, step.CriticalMultiplier, power: knockback, poiseDamage: poiseDamage),
                 damageable, hit.gameObject);
 
             OnHitEnemy(hit.gameObject);

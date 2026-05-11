@@ -6,6 +6,7 @@ using System.Collections;
 public class Enemy : MonoBehaviour, IDamageable
 {
     public string stateName;
+    public ElementType Element;
     [SerializeField] private int _maxHp = 100;
     private int _currentHp;
     public int MaxHp => _maxHp;
@@ -25,7 +26,7 @@ public class Enemy : MonoBehaviour, IDamageable
     [SerializeField] private float _attackCooldown = 10f;
     
 
-    public event Action<int, DamageType, bool> OnDamaged;
+    public event Action<int, ElementType, bool> OnDamaged;
     public event Action OnDied;
 
     public MonsterSkillDataSO MonsterSkillData;
@@ -135,10 +136,12 @@ public class Enemy : MonoBehaviour, IDamageable
         Animator.SetFloat("DirX", localVelocity.x);
         UpdateAttackCooldown();
 
+        Debug.Log(_stateMachine.CurrentState.GetType().ToString());
+
 
     }
 
-    public virtual void TakeDamage(int damage, DamageType damageType = DamageType.Normal, bool isCritical = false, Vector3 power = default, float poiseDamage = 100f)
+    public virtual void TakeDamage(int damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 100f)
     {
         if (_currentHp <= 0) return;
 

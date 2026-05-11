@@ -16,7 +16,6 @@ public class EnemyTraceState : IPlayerState
         _navMeshAgent = _enemy.GetComponent<NavMeshAgent>();
         _target = GameObject.FindGameObjectWithTag("Player").transform;
         _navMeshAgent.SetDestination(_target.position);
-        if (!_enemy.Animator.GetCurrentAnimatorStateInfo(0).IsName("Move"))
             _enemy.Animator.CrossFade("Move", 0.1f);
     }
 

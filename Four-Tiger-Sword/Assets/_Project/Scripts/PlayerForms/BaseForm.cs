@@ -17,7 +17,7 @@ public abstract partial class BaseForm : IForm
     private const float SoftTargetAngle        = 180f;
     private const float SoftTargetRotationSpeed = 540f; // degrees/sec
 
-    protected virtual DamageType FormElement => DamageType.Normal;
+    public virtual ElementType Element => ElementType.ELEMENT_NONE;
 
     protected enum ActionType { Attack, AirAttack, Skill, Ultimate }
     protected ActionType _currentAction = ActionType.Attack;

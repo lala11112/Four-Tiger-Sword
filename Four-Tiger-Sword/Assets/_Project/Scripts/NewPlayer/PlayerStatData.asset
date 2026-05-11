@@ -12,11 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff5f875c3e9ac5345a3dc23ac6c8e8ec, type: 3}
   m_Name: PlayerStatData
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatData
-  baseHP: 100
+  baseHP: 1000
   baseSP: 50
   baseSTM: 100
+  dashStaminaCost: 25
+  runStaminaCostPerSecond: 10
+  staminaRegenDelay: 2
+  staminaRegenRate: 20
   baseSpRegen: 1
-  baseATK: 10
+  baseSpRegenDelay: 2
+  baseATK: 100
   baseDEF: 5
   baseCRT: 5
   baseCRTD: 150

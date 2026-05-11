@@ -89,7 +89,7 @@ public abstract class Boss : Enemy
     /// 3. 실제 HP 차감 (base.TakeDamage)
     /// 4. 페이즈 전환 체크
     /// </summary>
-    public override void TakeDamage(int damage, DamageType damageType = DamageType.Normal,
+    public override void TakeDamage(int damage, ElementType damageType = ElementType.ELEMENT_NONE,
                                     bool isCritical = false, Vector3 power = default, float poiseDamage = 20f)
     {
         int modified = CurrentPhase?.ModifyIncomingDamage(damage, this) ?? damage;

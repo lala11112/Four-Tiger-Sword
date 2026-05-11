@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class WaterForm : BaseForm
 {
-    protected override DamageType FormElement => DamageType.Water;
+    public override ElementType Element => ElementType.ELEMENT_WATER;
 
     public override float SkillSpCost      => 150f;
     public override float SkillCooldown    => 6f;

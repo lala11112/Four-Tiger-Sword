@@ -16,6 +16,6 @@ public class StackDataSO : ScriptableObject
     public virtual void OnExplosion(GameObject target)
     {
         target.GetComponent<IDamageable>()
-              ?.TakeDamage((int)explosionDamage, DamageType.Normal, false);
+              ?.TakeDamage((int)explosionDamage, ElementType.ELEMENT_NONE, false);
     }
 }

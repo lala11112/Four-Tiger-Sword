@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class FireForm : BaseForm
 {
-    protected override DamageType FormElement => DamageType.Fire;
+    public override ElementType Element => ElementType.ELEMENT_FIRE;
 
     public override float SkillSpCost      => 200f;
     public override float SkillCooldown    => 8f;

@@ -57,7 +57,7 @@ public class EnemyComboAttack : EnemyAction
 
             _hitTargets[index].Add(col);
             DamageManager.Apply(
-                new HitInfo(damage, DamageType.Fire, _data.criticalChance,
+                new HitInfo(damage, ElementType.ELEMENT_FIRE, _data.criticalChance,
                             _data.criticalMultiplier, power: GetKnockbackDirection(col) * _data.knockbackForce),
                 damageable, col.gameObject);
         }
