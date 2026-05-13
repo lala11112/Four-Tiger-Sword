@@ -63,6 +63,7 @@ public class PlayerStatManager : MonoBehaviour
         baseValues[StatType.ST_SPD] = baseData.baseSPD; // 이동속도
         baseValues[StatType.DEF_POISE] = baseData.baseDefPoise; // 방어 강인도      
         baseValues[StatType.KNOCKBACK_RESIST] = baseData.baseKnockbackResist; // 넉백 저항
+        baseValues[StatType.ST_ATK_SPD] = baseData.baseAtkSpd; // 공격 속도 배율
 
         // Add/Mult 초기화
         foreach (StatType stat in Enum.GetValues(typeof(StatType)))
@@ -139,6 +140,7 @@ public class PlayerStatManager : MonoBehaviour
             StatType.ST_SPD => Mathf.Max(value, 2f), // 이동속도 최소 2 (너무 느려지면 안됨)
             StatType.ST_CRT => Mathf.Clamp(value, 0f, 100f), // 치명타율 0~100%
             StatType.KNOCKBACK_RESIST => Mathf.Clamp(value, 0f, 1f), // 넉백저항 0~1
+            StatType.ST_ATK_SPD => Mathf.Max(value, 0.1f), // 공격속도 최소 0.1 (0 이하 방지)
             _ => value   // 나머지는 제한 없음
         };
     }

@@ -16,29 +16,32 @@ MonoBehaviour:
   ComboSteps:
   - AnimationName: Water1
     Duration: 0.7
-    ComboTransitionTime: 0.5
-    Damage: 30
-    CriticalChance: 0.6
-    CriticalMultiplier: 1.5
-    HitStartTime: 0.1
-    HitDuration: 0.1
-    HitBoxOffset: {x: 0, y: 0, z: 1.5}
+    ComboTransitionTime: 0
+    Damage: 0
+    PoiseDamage: 0
+    CriticalChance: 0
+    CriticalMultiplier: 0
+    HitStartTime: 0
+    HitDuration: 0
+    HitBoxOffset: {x: 0, y: 0, z: 0.6}
     HitBoxShape: 0
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 3, y: 0.5, z: 1}
-    HitBoxHeight: 2
-    ForwardThrust: 1
-    KnockbackForce: 8
+    HitBoxRadius: 1
+    HitBoxSize: {x: 0, y: 0, z: 0}
+    HitBoxHeight: 0
+    ForwardThrust: 0
+    KnockbackForce: 0
+    StaggerResistLevel: 0
     HitEvents:
-    - StartTime: 0.1
-      Duration: 0.05
-      Damage: 50
     - StartTime: 0.3
       Duration: 0.05
-      Damage: 52
-    - StartTime: 0.5
+      Damage: 1
+      PoiseDamage: 20
+      StaggerResistLevel: 3
+    - StartTime: 0.6
       Duration: 0.05
-      Damage: 55
+      Damage: 1
+      PoiseDamage: 20
+      StaggerResistLevel: 3
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
     ThrustCurve:
@@ -46,169 +49,32 @@ MonoBehaviour:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.051467896
+        value: 1
         inSlope: 0
         outSlope: 0
-        tangentMode: 0
+        tangentMode: 34
         weightedMode: 0
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.37662253
-        value: 0.00037237257
-        inSlope: -0.13566773
-        outSlope: -0.00059734687
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
         time: 1
-        value: 0
+        value: 1
         inSlope: 0
         outSlope: 0
-        tangentMode: 0
+        tangentMode: 34
         weightedMode: 0
         inWeight: 0
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 10
-  - AnimationName: Water2
-    Duration: 25
-    ComboTransitionTime: 1
-    Damage: 46
-    CriticalChance: 0.1
-    CriticalMultiplier: 1.5
-    HitStartTime: 0.1
-    HitDuration: 0.1
-    HitBoxOffset: {x: 0, y: 0, z: 1}
-    HitBoxShape: 0
-    HitBoxRadius: 10
-    HitBoxSize: {x: 1, y: 1, z: 1}
-    HitBoxHeight: 2
-    ForwardThrust: 1
-    KnockbackForce: 8
-    HitEvents: []
-    SlashVFX: {fileID: 0}
-    SwingSound: {fileID: 0}
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 10
-  - AnimationName: Water3
-    Duration: 1
-    ComboTransitionTime: 1
-    Damage: 1
-    CriticalChance: 0.1
-    CriticalMultiplier: 1.5
-    HitStartTime: 0.1
-    HitDuration: 0.1
-    HitBoxOffset: {x: 0, y: 0, z: 1}
-    HitBoxShape: 0
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 1, y: 1, z: 1}
-    HitBoxHeight: 2
-    ForwardThrust: 1
-    KnockbackForce: 8
-    HitEvents: []
-    SlashVFX: {fileID: 0}
-    SwingSound: {fileID: 0}
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 10
-  - AnimationName: Water4
-    Duration: 1
-    ComboTransitionTime: 1
-    Damage: 1
-    CriticalChance: 0.1
-    CriticalMultiplier: 1.5
-    HitStartTime: 0.1
-    HitDuration: 0.1
-    HitBoxOffset: {x: 0, y: 0, z: 1}
-    HitBoxShape: 0
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 1, y: 1, z: 1}
-    HitBoxHeight: 2
-    ForwardThrust: 1
-    KnockbackForce: 8
-    HitEvents: []
-    SlashVFX: {fileID: 0}
-    SwingSound: {fileID: 0}
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 10
+    ThrustMultiplier: 0
   AirAttackStep:
     AnimationName: 
     Duration: 0.5
     ComboTransitionTime: 0.3
     Damage: 10
+    PoiseDamage: 10
     CriticalChance: 1
     CriticalMultiplier: 1.5
     HitStartTime: 0.1
@@ -220,6 +86,7 @@ MonoBehaviour:
     HitBoxHeight: 2
     ForwardThrust: 2
     KnockbackForce: 8
+    StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -253,6 +120,7 @@ MonoBehaviour:
     Duration: 0
     ComboTransitionTime: 0
     Damage: 0
+    PoiseDamage: 10
     CriticalChance: 0
     CriticalMultiplier: 0
     HitStartTime: 0
@@ -264,6 +132,7 @@ MonoBehaviour:
     HitBoxHeight: 0
     ForwardThrust: 0
     KnockbackForce: 8
+    StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -297,6 +166,7 @@ MonoBehaviour:
     Duration: 0
     ComboTransitionTime: 0
     Damage: 0
+    PoiseDamage: 10
     CriticalChance: 0
     CriticalMultiplier: 0
     HitStartTime: 0
@@ -308,6 +178,7 @@ MonoBehaviour:
     HitBoxHeight: 0
     ForwardThrust: 0
     KnockbackForce: 8
+    StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}

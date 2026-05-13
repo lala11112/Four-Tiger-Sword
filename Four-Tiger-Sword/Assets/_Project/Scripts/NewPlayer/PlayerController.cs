@@ -148,14 +148,21 @@ public class PlayerController : MonoBehaviour, IDamageable
     public bool IsGround()
     {
         Vector3 sphereCenter = transform.position + Controller.center + Vector3.down * (Controller.height / 2f - Controller.radius);
-        return Physics.CheckSphere(sphereCenter, Controller.radius + 0.1f, LayerMask.GetMask("Ground"));
+        RaycastHit[] hits = Physics.SphereCastAll(sphereCenter, Controller.radius, Vector3.down, 0.1f, LayerMask.GetMask("Ground"));
+
+        foreach (var hit in hits)
+        {
+            if (Vector3.Angle(hit.normal, Vector3.up) <= 45f)
+                return true;
+        }
+        return false;
     }
 
-    public void TakeDamage(int damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f)
+    public void TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE)
     {
         if (IsDashing) return;
         Debug.Log("플레이어 피격!");
-        StatManager.TakeDamage(damage, damageType, isCritical);
+        StatManager.TakeDamage((int)damage, damageType, isCritical);
         ApplyKnockback(power);
     }
 

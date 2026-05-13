@@ -1,7 +1,7 @@
 using UnityEngine;
 public readonly struct HitInfo
 {
-    public readonly int   BaseDamage;
+    public readonly float   BaseDamage;
     public readonly ElementType Element;
     public readonly float CriticalChance;
     public readonly float CriticalMultiplier;
@@ -16,10 +16,12 @@ public readonly struct HitInfo
 
     public readonly float PoiseDamage;
 
-    public HitInfo(int damage, ElementType element,
+    public readonly StaggerResistLevel StaggerResistLevel;
+
+    public HitInfo(float damage, ElementType element,
                    float critChance, float critMultiplier,
                    float poiseDamageMultiplier = 1f,
-                   bool  armorPierce = false, Vector3 power = default, float poiseDamage = 0f)
+                   bool  armorPierce = false, Vector3 power = default, float poiseDamage = 0f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE)
     {
         BaseDamage            = damage;
         Element               = element;
@@ -29,5 +31,6 @@ public readonly struct HitInfo
         ArmorPierce           = armorPierce;
         Power                 = power;
         PoiseDamage           = poiseDamage;
+        StaggerResistLevel    = staggerResistLevel;
     }
 }

@@ -33,11 +33,11 @@ public class DamageTextManager : MonoBehaviour
             ShowDamageText(damage, player.transform.position, damageType, isCritical);
     }
 
-    public void ShowDamageText(int damage, Vector3 worldPosition, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false)
+    public void ShowDamageText(float damage, Vector3 worldPosition, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false)
     {
         Vector3 offset = new Vector3(Random.Range(-0.5f, 0.5f), 1.5f, Random.Range(-0.5f, 0.5f));
         GameObject obj = Instantiate(damageTextPrefab, worldPosition + offset, Quaternion.identity, worldSpaceCanvas.transform);
         DamageText damageText = obj.GetComponent<DamageText>();
-        damageText.Init(damage, damageType, isCritical);
+        damageText.Init((int)damage, damageType, isCritical);
     }
 }

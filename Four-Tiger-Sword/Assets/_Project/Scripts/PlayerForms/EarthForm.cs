@@ -20,7 +20,7 @@ public class EarthForm : BaseForm
             return;
         }
 
-        _timer += Time.deltaTime;
+        _timer += Time.deltaTime * AttackSpeed;
         WeaponActionData currentStep = _weaponActionData.ComboSteps[_comboStep];
 
         ProcessHit(currentStep);

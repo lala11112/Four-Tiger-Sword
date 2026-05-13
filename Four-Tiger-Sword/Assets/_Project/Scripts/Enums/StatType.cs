@@ -28,5 +28,8 @@ public enum StatType
     // ⑤ 물리 제어
     ST_SPD,          // 이동 속도
     DEF_POISE,       // 방어 강인도
-    KNOCKBACK_RESIST // 넉백 저항율 (0.0~1.0)
+    KNOCKBACK_RESIST, // 넉백 저항율 (0.0~1.0)
+
+    // ⑥ 공격 속도
+    ST_ATK_SPD,      // 공격 속도 배율 (1.0 = 기본, 2.0 = 2배 빠름)
 }

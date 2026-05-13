@@ -89,17 +89,21 @@ public abstract class Boss : Enemy
     /// 3. 실제 HP 차감 (base.TakeDamage)
     /// 4. 페이즈 전환 체크
     /// </summary>
-    public override void TakeDamage(int damage, ElementType damageType = ElementType.ELEMENT_NONE,
-                                    bool isCritical = false, Vector3 power = default, float poiseDamage = 20f)
+    ///
+    /// 
+    /*
+    public override void TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE,
+                                    bool isCritical = false, Vector3 power = default, float poiseDamage = 20f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE)
     {
-        int modified = CurrentPhase?.ModifyIncomingDamage(damage, this) ?? damage;
+        float modified = CurrentPhase?.ModifyIncomingDamage(damage, this) ?? damage;
         modified = Shield.Absorb(modified);
 
         if (modified > 0)
-            base.TakeDamage(modified, damageType, isCritical, power);
+            base.TakeDamage((int)modified, damageType, isCritical, power);
 
         CheckPhaseTransition();
     }
+    */
 
     // ── 연계 공격 요청 ────────────────────────────────────────────────────────
 

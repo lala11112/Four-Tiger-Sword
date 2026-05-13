@@ -34,6 +34,9 @@ public abstract partial class BaseForm : IForm
     public bool CanSkill    => _skillCooldownTimer    <= 0f && _playerController.StatManager.HasEnoughSp(SkillSpCost);
     public bool CanUltimate => _ultimateCooldownTimer <= 0f && _playerController.StatManager.HasEnoughSp(UltimateSpCost);
 
+    /// <summary>공격 속도 배율. 1.0 = 기본, 2.0 = 2배 빠름. 스탯 시스템에서 읽어옵니다.</summary>
+    protected float AttackSpeed => _playerController?.StatManager?.GetStat(StatType.ST_ATK_SPD) ?? 1f;
+
     public BaseForm(WeaponActionDataSO weaponActionData) => _weaponActionData = weaponActionData;
 
     public virtual void Equip(PlayerController playerController)

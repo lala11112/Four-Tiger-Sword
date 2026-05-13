@@ -25,7 +25,7 @@ public abstract partial class BaseForm
             if (_timer < step.HitStartTime || _timer > step.HitStartTime + step.HitDuration) return;
 
             if (!_hitEventTargets.ContainsKey(-1)) _hitEventTargets[-1] = new HashSet<Collider>();
-            ExecuteHit(step, _playerController.StatManager.GetStat(StatType.ST_ATK), step.PoiseDamage, _hitEventTargets[-1]);
+            ExecuteHit(step, step.Damage, step.PoiseDamage, _hitEventTargets[-1]);
         }
     }
 
@@ -52,7 +52,7 @@ public abstract partial class BaseForm
             Vector3 knockbackDir = (hit.transform.position - _playerController.transform.position).normalized;
             Vector3 knockback = knockbackDir * step.KnockbackForce * attackMult;
             DamageManager.Apply(
-                new HitInfo((int)(baseDamage * step.Damage), Element, step.CriticalChance, step.CriticalMultiplier, power: knockback, poiseDamage: poiseDamage),
+                new HitInfo(baseDamage * _playerController.StatManager.GetStat(StatType.ST_ATK), Element, step.CriticalChance, step.CriticalMultiplier, power: knockback, poiseDamage: poiseDamage, staggerResistLevel: step.StaggerResistLevel),
                 damageable, hit.gameObject);
 
             OnHitEnemy(hit.gameObject);

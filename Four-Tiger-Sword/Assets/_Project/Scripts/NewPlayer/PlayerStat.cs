@@ -84,10 +84,14 @@ public class PlayerStat : IDamageable //스읍... 이게 필요 할까?
     /// <summary>피해를 받을 때마다 발생합니다. EarthForm의 흡수 스탯이 구독합니다.</summary>
     public event Action<int, ElementType, bool> OnDamageTaken;
 
-    public void TakeDamage(int damage, ElementType damageType, bool isCritical, Vector3 power = default, float poiseDamage = 20f)
+    public void TakeDamage(float damage, ElementType damageType, bool isCritical, Vector3 power = default, float poiseDamage = 20f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE)
     {
         if (_playerController.IsDashing) return;
         CurrentHp = Mathf.Max(0f, CurrentHp - damage);
-        OnDamageTaken?.Invoke(damage, damageType, isCritical);
+        if (staggerResistLevel >=  StaggerResistLevel.NONE)
+        {
+            //_playerController.IsHurt = true;
+        }
+        //OnDamageTaken?.Invoke(damage, damageType, isCritical);
     }
 }

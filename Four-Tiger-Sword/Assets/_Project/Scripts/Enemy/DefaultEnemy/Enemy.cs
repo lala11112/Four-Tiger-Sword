@@ -26,7 +26,7 @@ public class Enemy : MonoBehaviour, IDamageable
     [SerializeField] private float _attackCooldown = 10f;
     
 
-    public event Action<int, ElementType, bool> OnDamaged;
+    public event Action<float, ElementType, bool> OnDamaged;
     public event Action OnDied;
 
     public MonsterSkillDataSO MonsterSkillData;
@@ -63,6 +63,8 @@ public class Enemy : MonoBehaviour, IDamageable
     public float GroggyDuration = 5f;
 
     public bool IsGroggy = false;
+
+    public StaggerResistLevel StaggerResistLevel;
 
 
     protected virtual void Start()
@@ -141,14 +143,17 @@ public class Enemy : MonoBehaviour, IDamageable
 
     }
 
-    public virtual void TakeDamage(int damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 100f)
+    public virtual void TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 100f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE)
     {
         if (_currentHp <= 0) return;
 
         GetComponent<PoiseHandler>()?.TakePoiseDamage(poiseDamage);
 
-        IsHurt = true;
-        _currentHp = Mathf.Max(0, _currentHp - damage);
+        if (staggerResistLevel >=  StaggerResistLevel || PendingGroggy)
+        {
+            IsHurt = true;
+        }
+        _currentHp = (int)Mathf.Max(0, _currentHp - damage);
         OnDamaged?.Invoke(damage, damageType, isCritical);
 
         if (power != Vector3.zero)

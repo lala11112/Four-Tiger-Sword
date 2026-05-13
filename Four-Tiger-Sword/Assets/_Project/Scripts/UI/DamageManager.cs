@@ -11,11 +11,11 @@ public static class DamageManager
             _elementEffectiveManager.Initialize();
         }
 
-        int finalDamage = info.BaseDamage;
+        float finalDamage = info.BaseDamage;
         ElementType attackType = info.Element;
         ElementType defenseType = targetGO.GetComponent<Enemy>()?.Element ?? targetGO.GetComponent<PlayerController>()?.Element ?? ElementType.ELEMENT_NONE;
         float effective = _elementEffectiveManager.GetElementEffective(attackType, defenseType);
-        finalDamage = Mathf.RoundToInt(finalDamage * effective);
+        finalDamage = finalDamage * effective;
 
 
         //var statHandler = targetGO.GetComponent<EnemyStatHandler>();
@@ -36,6 +36,6 @@ public static class DamageManager
         //    rawDamage += Mathf.RoundToInt(statHandler.EffectiveDef);
         //}
 
-        target.TakeDamage(finalDamage, attackType, isCritical, info.Power, info.PoiseDamage);
+        target.TakeDamage(finalDamage, attackType, isCritical, info.Power, info.PoiseDamage, info.StaggerResistLevel);
     }
 }

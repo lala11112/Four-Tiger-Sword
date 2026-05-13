@@ -7,6 +7,7 @@ public abstract partial class BaseForm
         _currentAction = ActionType.Attack;
         _comboStep = 0;
         FindSoftTarget();
+        _playerController.Animator.speed = AttackSpeed;
         PlayCombo();
     }
 
@@ -17,6 +18,7 @@ public abstract partial class BaseForm
         _comboStep = 0;
         _softTarget = null;
         ClearHitTargets();
+        _playerController.Animator.speed = 1f;
     }
 
     // ── 공중 공격 ─────────────────────────────────────────────────────────────
@@ -27,6 +29,7 @@ public abstract partial class BaseForm
         _timer = 0;
         FindSoftTarget();
         ClearHitTargets();
+        _playerController.Animator.speed = AttackSpeed;
     }
 
     public virtual void UpdateAirAttack(out bool isComplete)
@@ -34,7 +37,7 @@ public abstract partial class BaseForm
         isComplete = false;
         if (_weaponActionData == null || _weaponActionData.AirAttackStep == null) { isComplete = true; return; }
 
-        _timer += Time.deltaTime;
+        _timer += Time.deltaTime * AttackSpeed;
         RotateTowardSoftTarget();
         ProcessHit(_weaponActionData.AirAttackStep);
         isComplete = _timer >= _weaponActionData.AirAttackStep.Duration;
@@ -44,6 +47,7 @@ public abstract partial class BaseForm
     {
         _softTarget = null;
         ClearHitTargets();
+        _playerController.Animator.speed = 1f;
     }
 
     // ── 스킬 ─────────────────────────────────────────────────────────────────
@@ -54,6 +58,7 @@ public abstract partial class BaseForm
         _playerController.StatManager.TryConsumeSp(SkillSpCost);
         _skillStep = 0;
         FindSoftTarget();
+        _playerController.Animator.speed = AttackSpeed;
         PlaySkillStep();
     }
 
@@ -62,7 +67,7 @@ public abstract partial class BaseForm
         isComplete = false;
         if (_weaponActionData == null || _weaponActionData.SkillSteps == null || _weaponActionData.SkillSteps.Count == 0) { isComplete = true; return; }
 
-        _timer += Time.deltaTime;
+        _timer += Time.deltaTime * AttackSpeed;
         WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
         ProcessHit(step);
         MoveForward(step);
@@ -80,6 +85,7 @@ public abstract partial class BaseForm
         _softTarget = null;
         ClearHitTargets();
         _skillCooldownTimer = SkillCooldown;
+        _playerController.Animator.speed = 1f;
     }
 
     // ── 궁극기 ───────────────────────────────────────────────────────────────
@@ -90,6 +96,7 @@ public abstract partial class BaseForm
         _playerController.StatManager.TryConsumeSp(UltimateSpCost);
         _ultimateStep = 0;
         FindSoftTarget();
+        _playerController.Animator.speed = AttackSpeed;
         PlayUltimateStep();
     }
 
@@ -98,7 +105,7 @@ public abstract partial class BaseForm
         isComplete = false;
         if (_weaponActionData == null || _weaponActionData.UltimateSteps == null || _weaponActionData.UltimateSteps.Count == 0) { isComplete = true; return; }
 
-        _timer += Time.deltaTime;
+        _timer += Time.deltaTime * AttackSpeed;
         WeaponActionData step = _weaponActionData.UltimateSteps[_ultimateStep];
         ProcessHit(step);
         MoveForward(step);
@@ -116,6 +123,7 @@ public abstract partial class BaseForm
         _softTarget = null;
         ClearHitTargets();
         _ultimateCooldownTimer = UltimateCooldown;
+        _playerController.Animator.speed = 1f;
     }
 
     // ── 공통 이동 헬퍼 ────────────────────────────────────────────────────────

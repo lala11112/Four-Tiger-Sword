@@ -22,6 +22,9 @@ public class HitEvent
     public float Damage = 0;
     [Tooltip("이 히트의 강인도 데미지 (0이면 WeaponActionData의 기본 PoiseDamage 사용)")]
     public float PoiseDamage = 10f;
+    
+    [Tooltip("이 히트의 경직 저항 값")]
+    public StaggerResistLevel StaggerResistLevel = StaggerResistLevel.NONE;
 }
 
 [Serializable]
@@ -77,6 +80,9 @@ public class WeaponActionData
 
     [Tooltip("적에게 가하는 넉백 힘 (단위: 유닛/초). 값이 클수록 멀리 밀림")]
     public float KnockbackForce = 8f;
+
+    [Tooltip("경직 저항 값")]
+    public StaggerResistLevel StaggerResistLevel = StaggerResistLevel.NONE;
 
     [Header("Multi-Hit (선택사항)")]
     [Tooltip("여러 번 히트시키려면 여기에 추가하세요. 비어있으면 위의 HitStartTime/HitDuration/Damage를 사용합니다.")]

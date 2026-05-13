@@ -13,12 +13,48 @@ MonoBehaviour:
   m_Name: ElementEffectiveManager
   m_EditorClassIdentifier: Assembly-CSharp::ElementEffectiveManager
   elementEffectiveList:
+  - AttackType: 1
+    DefenseType: 3
+    multiplier: 1.5
+  - AttackType: 1
+    DefenseType: 2
+    multiplier: 0.8
+  - AttackType: 1
+    DefenseType: 4
+    multiplier: 0.8
   - AttackType: 2
-    DefenseType: 1
-    multiplier: 2
+    DefenseType: 3
+    multiplier: 0.8
+  - AttackType: 2
+    DefenseType: 4
+    multiplier: 1.5
   - AttackType: 2
     DefenseType: 5
-    multiplier: 0.5
-  - AttackType: 2
+    multiplier: 0.8
+  - AttackType: 3
+    DefenseType: 1
+    multiplier: 0.8
+  - AttackType: 3
+    DefenseType: 4
+    multiplier: 0.8
+  - AttackType: 3
+    DefenseType: 5
+    multiplier: 1.5
+  - AttackType: 4
+    DefenseType: 1
+    multiplier: 1.5
+  - AttackType: 4
     DefenseType: 2
-    multiplier: 0.5
+    multiplier: 0.8
+  - AttackType: 4
+    DefenseType: 5
+    multiplier: 0.8
+  - AttackType: 5
+    DefenseType: 1
+    multiplier: 0.8
+  - AttackType: 5
+    DefenseType: 2
+    multiplier: 1.5
+  - AttackType: 5
+    DefenseType: 3
+    multiplier: 0.8

@@ -62,4 +62,8 @@ public class PlayerStatData : ScriptableObject
     public float baseDefPoise = 50f;
     [Tooltip("넉백 저항율. 0.0 = 완전히 날아감 / 1.0 = 전혀 밀리지 않음.")]
     public float baseKnockbackResist = 0.2f;
+
+    [Header("⑥ 공격 속도")]
+    [Tooltip("공격 속도 배율. 1.0 = 기본, 2.0 = 2배 빠름. 최솟값 0.1로 고정됩니다.")]
+    public float baseAtkSpd = 1f;
 }
