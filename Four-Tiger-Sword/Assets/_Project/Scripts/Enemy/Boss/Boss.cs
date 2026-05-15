@@ -39,7 +39,7 @@ public abstract class Boss : Enemy
     protected BossShield Shield { get; private set; }
 
     /// <summary>현재 HP 비율 (0.0 ~ 1.0).</summary>
-    public float HpPercent => MaxHp > 0 ? (float)CurrentHp / MaxHp : 0f;
+    public float HpPercent => EnemyStat.MaxHp > 0 ? (float)EnemyStat.CurrentHp / EnemyStat.MaxHp : 0f;
 
     // ── 이벤트 ───────────────────────────────────────────────────────────────
 

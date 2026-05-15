@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!136 &6173139
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -193,6 +193,7 @@ MonoBehaviour:
   _range: 20
   _halfAngle: 45
   _rayCount: 7
+  _heightOffset: 0.5
 --- !u!114 &6173142
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,14 +206,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c0a5e2dcf368248b761277f4d330cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  EnemyStat: {fileID: 0}
   stateName: 
-  Element: 1
-  _maxHp: 2000
-  CombatRange: 6
-  CombatExitRange: 8
-  _knockbackResistance: 3
-  _knockbackDuration: 0.25
-  _attackCooldown: 4
   MonsterSkillData: {fileID: 11400000, guid: 0f665f6b04e0bf149aebb177dd5812bb, type: 2}
   IsHurt: 0
   PendingGroggy: 0
@@ -340,6 +335,7 @@ GameObject:
   - component: {fileID: 202858499}
   - component: {fileID: 202858498}
   - component: {fileID: 202858503}
+  - component: {fileID: 202858504}
   m_Layer: 8
   m_Name: Monster
   m_TagString: Untagged
@@ -362,6 +358,7 @@ MonoBehaviour:
   _range: 20
   _halfAngle: 45
   _rayCount: 7
+  _heightOffset: 0.5
 --- !u!114 &202858499
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374,14 +371,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c0a5e2dcf368248b761277f4d330cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  EnemyStat: {fileID: 0}
   stateName: 
-  Element: 2
-  _maxHp: 2000
-  CombatRange: 6
-  CombatExitRange: 8
-  _knockbackResistance: 3
-  _knockbackDuration: 0.25
-  _attackCooldown: 3
   MonsterSkillData: {fileID: 11400000, guid: fe89308e8b5707147aa28bf93f886f3e, type: 2}
   IsHurt: 0
   PendingGroggy: 0
@@ -464,6 +455,20 @@ MonoBehaviour:
   _maxPoise: 100
   _poiseRegen: 20
   _breakDuration: 2
+--- !u!114 &202858504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 202858497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbd03746187b3414bbfec06f96dc2198, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStat
+  baseData: {fileID: 11400000, guid: f48b84512e34d1144aebce88b11661cc, type: 2}
+  CurrentHp: 0
 --- !u!1 &326243545
 GameObject:
   m_ObjectHideFlags: 0
@@ -479,12 +484,12 @@ GameObject:
   - component: {fileID: 326243547}
   - component: {fileID: 326243546}
   m_Layer: 8
-  m_Name: RealBoss (2)
+  m_Name: JSB
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!136 &326243546
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -504,10 +509,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
+  m_Radius: 3
+  m_Height: 1
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &326243547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -538,6 +543,7 @@ MonoBehaviour:
   _range: 20
   _halfAngle: 45
   _rayCount: 7
+  _heightOffset: 0.5
 --- !u!114 &326243549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -550,15 +556,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c0a5e2dcf368248b761277f4d330cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  EnemyStat: {fileID: 0}
   stateName: 
-  Element: 1
-  _maxHp: 2000
-  CombatRange: 6
-  CombatExitRange: 8
-  _knockbackResistance: 3
-  _knockbackDuration: 0.25
-  _attackCooldown: 4
-  MonsterSkillData: {fileID: 11400000, guid: 0f665f6b04e0bf149aebb177dd5812bb, type: 2}
+  MonsterSkillData: {fileID: 11400000, guid: 7e9542f3013bcc54fbc247dc0a05cb9f, type: 2}
   IsHurt: 0
   PendingGroggy: 0
   GroggyDuration: 5
@@ -573,7 +573,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 326243545}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 3
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 1
@@ -582,7 +582,7 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 2
+  m_Height: 5
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
@@ -1257,7 +1257,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &647727189
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1273,6 +1273,7 @@ MonoBehaviour:
   _range: 20
   _halfAngle: 45
   _rayCount: 7
+  _heightOffset: 0.5
 --- !u!114 &647727190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1285,14 +1286,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c0a5e2dcf368248b761277f4d330cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  EnemyStat: {fileID: 0}
   stateName: 
-  Element: 1
-  _maxHp: 2000
-  CombatRange: 6
-  CombatExitRange: 8
-  _knockbackResistance: 3
-  _knockbackDuration: 0.25
-  _attackCooldown: 4
   MonsterSkillData: {fileID: 11400000, guid: 0f665f6b04e0bf149aebb177dd5812bb, type: 2}
   IsHurt: 0
   PendingGroggy: 0
@@ -1405,7 +1400,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!136 &711020543
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1459,6 +1454,7 @@ MonoBehaviour:
   _range: 20
   _halfAngle: 45
   _rayCount: 7
+  _heightOffset: 0.5
 --- !u!114 &711020546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1471,14 +1467,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c0a5e2dcf368248b761277f4d330cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  EnemyStat: {fileID: 0}
   stateName: 
-  Element: 1
-  _maxHp: 2000
-  CombatRange: 6
-  CombatExitRange: 8
-  _knockbackResistance: 3
-  _knockbackDuration: 0.25
-  _attackCooldown: 4
   MonsterSkillData: {fileID: 11400000, guid: 0f665f6b04e0bf149aebb177dd5812bb, type: 2}
   IsHurt: 0
   PendingGroggy: 0
@@ -1906,14 +1896,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c0a5e2dcf368248b761277f4d330cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  EnemyStat: {fileID: 0}
   stateName: 
-  Element: 0
-  _maxHp: 5000
-  CombatRange: 5
-  CombatExitRange: 8
-  _knockbackResistance: 3
-  _knockbackDuration: 0.25
-  _attackCooldown: 10
   MonsterSkillData: {fileID: 11400000, guid: 2b19c3500b4664d479cff3957aa68d7b, type: 2}
   IsHurt: 0
   PendingGroggy: 0
@@ -2107,6 +2091,7 @@ MonoBehaviour:
   _range: 20
   _halfAngle: 45
   _rayCount: 7
+  _heightOffset: 0.5
 --- !u!4 &1040597600 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a91273c436038704bbf415e403faeeef, type: 3}
@@ -2484,6 +2469,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: "\uBC94\uB3C4\uC9C4 \uB9AC\uAE45"
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4fe5c6cfa71c4ff4b885b3ea3726b4af, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 4fe5c6cfa71c4ff4b885b3ea3726b4af, type: 3}
       propertyPath: m_Controller
       value: 
@@ -2520,7 +2509,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1272881854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2551,6 +2540,7 @@ MonoBehaviour:
   _range: 20
   _halfAngle: 45
   _rayCount: 7
+  _heightOffset: 0.5
 --- !u!114 &1272881856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2563,14 +2553,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c0a5e2dcf368248b761277f4d330cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  EnemyStat: {fileID: 0}
   stateName: 
-  Element: 1
-  _maxHp: 2000
-  CombatRange: 6
-  CombatExitRange: 8
-  _knockbackResistance: 3
-  _knockbackDuration: 0.25
-  _attackCooldown: 3
   MonsterSkillData: {fileID: 11400000, guid: fe89308e8b5707147aa28bf93f886f3e, type: 2}
   IsHurt: 0
   PendingGroggy: 0
@@ -2734,7 +2718,7 @@ MonoBehaviour:
   _knockbackResistance: 3
   _knockbackDuration: 0.25
   _hitStopDuration: 0.1
-  _hitStopTimeScale: 0.05
+  _hitStopTimeScale: 0.01
   ImpulseSource: {fileID: 0}
 --- !u!114 &1285247858
 MonoBehaviour:
@@ -3194,7 +3178,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a91273c436038704bbf415e403faeeef, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.1
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: a91273c436038704bbf415e403faeeef, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3378,12 +3362,24 @@ PrefabInstance:
     m_TransformParent: {fileID: 326243551}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 999ff6379f1ca914699867aac2af4501, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 999ff6379f1ca914699867aac2af4501, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 999ff6379f1ca914699867aac2af4501, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 999ff6379f1ca914699867aac2af4501, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 999ff6379f1ca914699867aac2af4501, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.20000005
+      value: 1.7
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 999ff6379f1ca914699867aac2af4501, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3596,7 +3592,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 84c3d61af37819d44ad8ab547e263525, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 84c3d61af37819d44ad8ab547e263525, type: 3}
       propertyPath: m_Controller
@@ -3700,7 +3696,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!136 &1965145157
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -3754,6 +3750,7 @@ MonoBehaviour:
   _range: 20
   _halfAngle: 45
   _rayCount: 7
+  _heightOffset: -1
 --- !u!114 &1965145160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3766,14 +3763,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c0a5e2dcf368248b761277f4d330cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  EnemyStat: {fileID: 0}
   stateName: 
-  Element: 5
-  _maxHp: 2000
-  CombatRange: 6
-  CombatExitRange: 8
-  _knockbackResistance: 3
-  _knockbackDuration: 0.25
-  _attackCooldown: 4
   MonsterSkillData: {fileID: 11400000, guid: 0f665f6b04e0bf149aebb177dd5812bb, type: 2}
   IsHurt: 0
   PendingGroggy: 0
@@ -3811,8 +3802,8 @@ Transform:
   m_GameObject: {fileID: 1965145156}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.67, y: 1.2, z: -27.12}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 5.67, y: 2, z: -27.12}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 997029496}

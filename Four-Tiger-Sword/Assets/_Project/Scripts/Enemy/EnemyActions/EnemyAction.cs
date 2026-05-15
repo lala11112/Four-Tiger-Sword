@@ -20,14 +20,21 @@ public abstract class EnemyAction
     {
         _timer = 0f;
         IsFinished = false;
+        if (_enemy.Animator != null)
+            _enemy.Animator.speed = SkillData.attackSpeed;
     }
 
     public virtual void Update()
     {
-        _timer += Time.deltaTime;
+        // attackSpeed 배율만큼 타이머를 빠르게 진행 → 모든 판정 타이밍이 비례해서 당겨짐
+        _timer += Time.deltaTime * SkillData.attackSpeed;
     }
 
-    public virtual void Exit() { }
+    public virtual void Exit()
+    {
+        if (_enemy.Animator != null)
+            _enemy.Animator.speed = 1f;
+    }
     
 
     // ── 공통 헬퍼 ────────────────────────────────────────────────────────────

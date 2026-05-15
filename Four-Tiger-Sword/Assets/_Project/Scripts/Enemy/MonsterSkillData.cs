@@ -14,5 +14,10 @@ public abstract class MonsterSkillData : ScriptableObject
     [Tooltip("공격 선택 가중치. 낮을수록 드물게 선택됨")]
     public float weight = 10f;
 
+    [Header("공격 속도")]
+    [Tooltip("공격 애니메이션 재생 속도 및 피격 판정 타이밍 배율. 1.0 = 기본, 2.0 = 2배 빠름")]
+    [Min(0.01f)]
+    public float attackSpeed = 1.0f;
+
     public abstract EnemyAction CreateAction(Enemy enemy);
 }

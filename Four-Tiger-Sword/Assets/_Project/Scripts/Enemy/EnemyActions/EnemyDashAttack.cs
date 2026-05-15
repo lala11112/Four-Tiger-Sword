@@ -81,7 +81,9 @@ public class EnemyDashAttack : EnemyAction
 
     private void PerformDash()
     {
-        Vector3 delta = _dashDirection * _data.dashSpeed * Time.deltaTime;
+        // 타이머가 attackSpeed 배율로 빠르게 진행되므로, 실제 이동 거리를 유지하려면
+        // 프레임당 이동량도 attackSpeed만큼 곱해야 한다.
+        Vector3 delta = _dashDirection * _data.dashSpeed * _data.attackSpeed * Time.deltaTime;
         if (_nav.isOnNavMesh)
             _nav.Move(delta);
         else

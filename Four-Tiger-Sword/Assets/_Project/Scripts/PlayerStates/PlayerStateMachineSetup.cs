@@ -48,13 +48,13 @@ public class PlayerStateMachineSetup
         stateMachine.AddTransition(run, jump, () => _playerController.Input.JumpBuffer.IsActive && _playerController.CanJump());
         stateMachine.AddTransition(fall, jump, () => _playerController.Input.JumpBuffer.IsActive && _playerController.CanJump());
 
-        stateMachine.AddTransition(idle, fall, () => !_playerController.IsGround());
+        stateMachine.AddTransition(idle, fall, () => !_playerController.IsGround() && _playerController.VerticalVelocity < 0f);
         stateMachine.AddTransition(move, fall, () => !_playerController.IsGround());
         stateMachine.AddTransition(run, fall, () => !_playerController.IsGround());
         stateMachine.AddTransition(jump, fall, () => _playerController.VerticalVelocity < 0f);
 
         // 점프 중 착지 (올라가다 바닥에 닿는 엣지케이스)
-        stateMachine.AddTransition(jump, idle, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
+        //stateMachine.AddTransition(jump, idle, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(jump, move, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
 
         stateMachine.AddTransition(fall, run, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude > 0.01f && _playerController.Input.IsDashHeld && _playerController.CanRun);

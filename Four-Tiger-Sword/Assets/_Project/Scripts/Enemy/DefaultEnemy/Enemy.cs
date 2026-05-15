@@ -5,26 +5,19 @@ using System.Collections;
 
 public class Enemy : MonoBehaviour, IDamageable
 {
+    public EnemyStat EnemyStat;
     public string stateName;
-    public ElementType Element;
-    [SerializeField] private int _maxHp = 100;
-    private int _currentHp;
-    public int MaxHp => _maxHp;
-    public int CurrentHp => _currentHp;
-
-    [Tooltip("플레이어가 이 거리 이내로 들어오면 전투(CombatIdle) 상태가 됨")]
-    public float CombatRange = 6f;
-    [Tooltip("전투 상태에서 이 거리 밖으로 나가야 Trace로 복귀 (CombatRange보다 크게 설정)")]
-    public float CombatExitRange = 8f;
+    public ElementType Element => EnemyStat.ElementType;
+    public float CombatRange => EnemyStat.GetStat(EnemyStatType.CombatRange);
+    public float CombatExitRange => EnemyStat.GetStat(EnemyStatType.CombatExitRange);
 
     [Header("넉백 설정")]
     [Tooltip("넉백 저항값. 이 값보다 작은 힘은 밀리지 않음")]
-    [SerializeField] private float _knockbackResistance = 3f;
+    public float KnockbackResistance => EnemyStat.GetStat(EnemyStatType.KnockbackResistance);
     [Tooltip("넉백 지속 시간 (초)")]
-    [SerializeField] private float _knockbackDuration = 0.25f;
+    public float KnockbackDuration => EnemyStat.GetStat(EnemyStatType.KnockbackDuration);
 
-    [SerializeField] private float _attackCooldown = 10f;
-    
+    public float AttackCooldown => EnemyStat.GetStat(EnemyStatType.AttackCooldown);
 
     public event Action<float, ElementType, bool> OnDamaged;
     public event Action OnDied;
@@ -69,6 +62,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     protected virtual void Start()
     {
+        EnemyStat = GetComponent<EnemyStat>();
         Animator = GetComponentInChildren<Animator>();
         if (Animator == null)
         {
@@ -76,13 +70,10 @@ public class Enemy : MonoBehaviour, IDamageable
             return;
         }
 
-        _currentHp = _maxHp;
         _sensor = GetComponent<IEnemySensor>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
 
         DamageTextManager.Instance?.Register(this);
-
-        //_enemyStats = GetComponent<EnemyStats>();
 
         _stateMachine = new StateMachine();
 
@@ -145,7 +136,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public virtual void TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 100f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE)
     {
-        if (_currentHp <= 0) return;
+        if (EnemyStat.CurrentHp <= 0) return;
 
         GetComponent<PoiseHandler>()?.TakePoiseDamage(poiseDamage);
 
@@ -153,13 +144,13 @@ public class Enemy : MonoBehaviour, IDamageable
         {
             IsHurt = true;
         }
-        _currentHp = (int)Mathf.Max(0, _currentHp - damage);
+        EnemyStat.CurrentHp = (int)Mathf.Max(0, EnemyStat.CurrentHp - damage);
         OnDamaged?.Invoke(damage, damageType, isCritical);
 
         if (power != Vector3.zero)
             ApplyKnockback(power);
 
-        if (_currentHp <= 0)
+        if (EnemyStat.CurrentHp <= 0)
         {
             OnDied?.Invoke();
             Die();
@@ -171,7 +162,7 @@ public class Enemy : MonoBehaviour, IDamageable
     /// </summary>
     private void ApplyKnockback(Vector3 power)
     {
-        float effectiveForce = power.magnitude - _knockbackResistance;
+        float effectiveForce = power.magnitude - EnemyStat.GetStat(EnemyStatType.KnockbackResistance);
         if (effectiveForce <= 0f) return;
 
         Vector3 velocity = power.normalized * effectiveForce;
@@ -191,9 +182,9 @@ public class Enemy : MonoBehaviour, IDamageable
             _navMeshAgent.ResetPath();
 
         float elapsed = 0f;
-        while (elapsed < _knockbackDuration)
+        while (elapsed < EnemyStat.GetStat(EnemyStatType.KnockbackDuration))
         {
-            float t = 1f - (elapsed / _knockbackDuration); // 선형 감속
+            float t = 1f - (elapsed / EnemyStat.GetStat(EnemyStatType.KnockbackDuration)); // 선형 감속
             Vector3 delta = initialVelocity * t * Time.deltaTime;
 
             if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh)
@@ -223,7 +214,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public void StartAttackCooldown()
     {
-        _attackCooldownTimer = _attackCooldown;
+        _attackCooldownTimer = EnemyStat.GetStat(EnemyStatType.AttackCooldown);
     }
 
     protected void ResetAttackCooldown()

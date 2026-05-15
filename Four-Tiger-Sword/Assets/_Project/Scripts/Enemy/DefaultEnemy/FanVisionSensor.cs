@@ -10,6 +10,7 @@ public class FanVisionSensor : MonoBehaviour, IEnemySensor
     [SerializeField] private float _range = 20f;
     [SerializeField, Range(1f, 180f)] private float _halfAngle = 45f;
     [SerializeField, Min(1)] private int _rayCount = 7;
+    [SerializeField] private float _heightOffset = 0.5f;
 
     public Transform DetectedTarget { get; private set; }
 
@@ -23,7 +24,7 @@ public class FanVisionSensor : MonoBehaviour, IEnemySensor
             float angle = -_halfAngle + step * i;
             Vector3 direction = Quaternion.Euler(0f, angle, 0f) * transform.forward;
 
-            if (Physics.Raycast(transform.position, direction, out RaycastHit hit, _range))
+            if (Physics.Raycast(transform.position + Vector3.up * _heightOffset, direction, out RaycastHit hit, _range))
             {
                 if (hit.collider.CompareTag("Player"))
                 {
@@ -48,15 +49,15 @@ public class FanVisionSensor : MonoBehaviour, IEnemySensor
             float angle = -_halfAngle + step * i;
             Vector3 direction = Quaternion.Euler(0f, angle, 0f) * transform.forward;
             Gizmos.color = Color.yellow;
-            Gizmos.DrawRay(transform.position, direction * _range);
+            Gizmos.DrawRay(transform.position + Vector3.up * _heightOffset, direction * _range);
         }
 
         // 부채꼴 양쪽 경계선
         Gizmos.color = Color.red;
         Vector3 leftBound  = Quaternion.Euler(0f, -_halfAngle, 0f) * transform.forward;
         Vector3 rightBound = Quaternion.Euler(0f,  _halfAngle, 0f) * transform.forward;
-        Gizmos.DrawRay(transform.position, leftBound  * _range);
-        Gizmos.DrawRay(transform.position, rightBound * _range);
+        Gizmos.DrawRay(transform.position + Vector3.up * _heightOffset, leftBound  * _range);
+        Gizmos.DrawRay(transform.position + Vector3.up * _heightOffset, rightBound * _range);
     }
 #endif
 }
