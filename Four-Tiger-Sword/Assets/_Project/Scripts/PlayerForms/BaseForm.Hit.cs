@@ -51,8 +51,10 @@ public abstract partial class BaseForm
             float attackMult = 1f + _playerController.StatManager.GetStat(StatType.ST_ATK) * 0.01f;
             Vector3 knockbackDir = (hit.transform.position - _playerController.transform.position).normalized;
             Vector3 knockback = knockbackDir * step.KnockbackForce * attackMult;
+            float critChance = _playerController.StatManager.GetStat(StatType.ST_CRT)/100f;
+            float critMultiplier = _playerController.StatManager.GetStat(StatType.ST_CRTD)/100f;
             DamageManager.Apply(
-                new HitInfo(baseDamage * _playerController.StatManager.GetStat(StatType.ST_ATK), Element, step.CriticalChance, step.CriticalMultiplier, power: knockback, poiseDamage: poiseDamage, staggerResistLevel: step.StaggerResistLevel),
+                new HitInfo(baseDamage * _playerController.StatManager.GetStat(StatType.ST_ATK), Element, critChance, critMultiplier, power: knockback, poiseDamage: poiseDamage, staggerResistLevel: step.StaggerResistLevel),
                 damageable, hit.gameObject);
 
             OnHitEnemy(hit.gameObject);

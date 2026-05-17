@@ -20,6 +20,9 @@ public class DamageText : MonoBehaviour
         textMesh.fontSize = isCritical ? criticalFontSize : normalFontSize;
         textMesh.color = GetDamageColor(damageType);
         originalColor = textMesh.color;
+
+        textMesh.fontMaterial.SetFloat("_ZTestMode", (float)UnityEngine.Rendering.CompareFunction.Always);
+
         StartCoroutine(AnimateText());
     }
 

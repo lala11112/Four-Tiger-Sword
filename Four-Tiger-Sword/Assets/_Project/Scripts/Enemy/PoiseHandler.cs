@@ -43,9 +43,14 @@ public class PoiseHandler : MonoBehaviour
     {
         _currentPoise = 0f;
         _breakTimer   = _breakDuration;
-        Debug.Log("작동중");
         GetComponent<Enemy>().PendingGroggy = true;
         //OnPoiseBreak?.Invoke();
+    }
+
+    public void ResetPoise()
+    {
+        _currentPoise = _maxPoise;
+        _breakTimer = 0f;
     }
 
     private void Update()

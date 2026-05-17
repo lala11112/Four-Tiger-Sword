@@ -27,10 +27,12 @@ public class MonsterData : ScriptableObject
     [Header("AI 인지")]
     public float detectRange; // 플레이어 감지 범위
     public float atkRange; // 공격 사거리
-    public AggroType aggroType; // 어그로 타입 (선공형, 비선공형, 도주형)
+
+    //나중에 활용예정
+    //public AggroType aggroType; // 어그로 타입 (선공형, 비선공형, 도주형)
 
     [Header("리소스 연동")]
-    public string modelId; // 3D 모델 ID (프리팹 연결용)
+    public string modelId; // 3D 모델 ID (프리팹 연결용) 이걸 굳이 사용해야하나?
     public string animSetId; // 애니메이션 세트 ID
 
     [Header("보상")]

@@ -47,13 +47,6 @@ public class WeaponActionData
     [Tooltip("이 타수의 강인도 데미지")]
     public float PoiseDamage = 10f;
 
-    [Tooltip("치명타 발생 확률 (0 ~ 1)")]
-    [Range(0f, 1f)]
-    public float CriticalChance = 0.1f;
-
-    [Tooltip("치명타 데미지 배율")]
-    public float CriticalMultiplier = 1.5f;
-
     [Tooltip("이 타수의 선딜레이")]
     public float HitStartTime = 0.1f;
 

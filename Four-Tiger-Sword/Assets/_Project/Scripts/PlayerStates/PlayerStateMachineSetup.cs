@@ -55,7 +55,7 @@ public class PlayerStateMachineSetup
 
         // 점프 중 착지 (올라가다 바닥에 닿는 엣지케이스)
         //stateMachine.AddTransition(jump, idle, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
-        stateMachine.AddTransition(jump, move, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
+        //ㅉstateMachine.AddTransition(jump, move, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
 
         stateMachine.AddTransition(fall, run, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude > 0.01f && _playerController.Input.IsDashHeld && _playerController.CanRun);
         stateMachine.AddTransition(fall, idle, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);

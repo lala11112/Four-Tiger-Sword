@@ -3,6 +3,8 @@ using UnityEngine.AI;
 using System;
 using System.Collections;
 
+[RequireComponent(typeof(EnemyStat), typeof(PoiseHandler))]
+
 public class Enemy : MonoBehaviour, IDamageable
 {
     public EnemyStat EnemyStat;

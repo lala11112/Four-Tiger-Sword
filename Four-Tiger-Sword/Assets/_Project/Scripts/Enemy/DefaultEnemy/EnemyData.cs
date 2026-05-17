@@ -14,4 +14,5 @@ public class EnemyData : ScriptableObject
     public float attackCooldown; //공격 쿨타임
     public MonsterSkillDataSO monsterSkillData; //몬스터 스킬 데이터
     public StaggerResistLevel staggerResistLevel; //경직 저항 등급
+    
 }

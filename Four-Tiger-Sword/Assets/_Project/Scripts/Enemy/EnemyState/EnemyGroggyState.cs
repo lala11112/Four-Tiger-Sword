@@ -26,6 +26,8 @@ public class EnemyGroggyState : IPlayerState
     {
         _enemy.GetComponent<NavMeshAgent>().isStopped = false;
         _enemy.StopAllCoroutines();
+        //강인도 초기화. 
+        _enemy.GetComponent<PoiseHandler>().ResetPoise();
     }
     private IEnumerator GroggyRoutine()
     {

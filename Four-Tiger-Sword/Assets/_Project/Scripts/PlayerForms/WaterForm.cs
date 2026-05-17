@@ -11,7 +11,7 @@ public class WaterForm : BaseForm
 
     // ── 워터 게이지 설정 ─────────────────────────────────────────────────────
     public float MaxWaterGauge      = 100f;
-    public float GaugePerHit        = 20f;  // 적 타격 1회당 게이지 충전량
+    public float GaugePerHit        = 12f;  // 적 타격 1회당 게이지 충전량
     public float GaugeDrainRate     = 5f;   // 초당 게이지 감소량
     public float BuffThreshold      = 50f;  // 버프 발동 임계값
 
@@ -31,6 +31,7 @@ public class WaterForm : BaseForm
         base.Equip(playerController);
         _baseMoveSpeed = playerController.MoveSpeed;
         _baseRunSpeed  = playerController.RunSpeed;
+        //여기서 물속성 폼 전용 UI를 켤 거임.
     }
 
     public override void Unequip(PlayerController playerController)
@@ -39,6 +40,7 @@ public class WaterForm : BaseForm
             DeactivateBuff();
 
         WaterGauge = 0f;
+        //여기서 물속성 폼 전용 UI를 끌 거임.
     }
 
     // ── 게이지 충전: 적 타격 시 호출 ─────────────────────────────────────────
@@ -71,6 +73,7 @@ public class WaterForm : BaseForm
     {
         IsBuffActive = true;
         _playerController.StatManager.AddModifier(StatType.ST_ATK_SPD, 0f, AtkSpdBonus);
+        _playerController.StatManager.AddModifier(StatType.ST_ATK, 0f, 100);
         _playerController.MoveSpeed = _baseMoveSpeed * MoveSpdMultiplier;
         _playerController.RunSpeed  = _baseRunSpeed  * MoveSpdMultiplier;
     }
