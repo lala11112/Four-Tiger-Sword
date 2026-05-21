@@ -19,8 +19,6 @@ MonoBehaviour:
     ComboTransitionTime: 0
     Damage: 0
     PoiseDamage: 0
-    CriticalChance: 0
-    CriticalMultiplier: 0
     HitStartTime: 0
     HitDuration: 0
     HitBoxOffset: {x: 0, y: 0, z: 0.6}
@@ -75,8 +73,6 @@ MonoBehaviour:
     ComboTransitionTime: 0.3
     Damage: 10
     PoiseDamage: 10
-    CriticalChance: 1
-    CriticalMultiplier: 1.5
     HitStartTime: 0.1
     HitDuration: 0.1
     HitBoxOffset: {x: 0, y: 0, z: 1}
@@ -85,7 +81,7 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 2
-    KnockbackForce: 8
+    KnockbackForce: 1
     StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
@@ -116,23 +112,21 @@ MonoBehaviour:
       m_RotationOrder: 4
     ThrustMultiplier: 10
   SkillSteps:
-  - AnimationName: 
-    Duration: 0
+  - AnimationName: WaterSkill
+    Duration: 1.2
     ComboTransitionTime: 0
-    Damage: 0
+    Damage: 2
     PoiseDamage: 10
-    CriticalChance: 0
-    CriticalMultiplier: 0
-    HitStartTime: 0
-    HitDuration: 0
+    HitStartTime: 0.15
+    HitDuration: 1.7
     HitBoxOffset: {x: 0, y: 0, z: 0}
-    HitBoxShape: 0
+    HitBoxShape: 1
     HitBoxRadius: 0
-    HitBoxSize: {x: 0, y: 0, z: 0}
+    HitBoxSize: {x: 2, y: 1, z: 2}
     HitBoxHeight: 0
     ForwardThrust: 0
-    KnockbackForce: 8
-    StaggerResistLevel: 0
+    KnockbackForce: 3
+    StaggerResistLevel: 2
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -140,35 +134,42 @@ MonoBehaviour:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0
-        value: 0
+        time: 0.009780884
+        value: 1.9762268
         inSlope: 0
         outSlope: 0
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0
+        inWeight: 0.33333334
         outWeight: 0
       - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
+        time: 0.6568793
+        value: 0.018660307
+        inSlope: -3.0251448
+        outSlope: 0.014901131
+        tangentMode: 69
         weightedMode: 0
-        inWeight: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0.023773193
+        inSlope: 0.014901131
+        outSlope: 0.014901131
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 10
+    ThrustMultiplier: 20
   UltimateSteps:
   - AnimationName: 
     Duration: 0
     ComboTransitionTime: 0
     Damage: 0
     PoiseDamage: 10
-    CriticalChance: 0
-    CriticalMultiplier: 0
     HitStartTime: 0
     HitDuration: 0
     HitBoxOffset: {x: 0, y: 0, z: 0}

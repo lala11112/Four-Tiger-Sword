@@ -13,6 +13,18 @@ public class FireForm : BaseForm
 
     public FireForm(WeaponActionDataSO weaponActionData) : base(weaponActionData) {}
 
+    public override void Equip(PlayerController playerController)
+    {
+        base.Equip(playerController);
+        playerController.UIManager.FireElement.SetActive(false);
+    }
+
+    public override void Unequip(PlayerController playerController)
+    {
+        base.Unequip(playerController);
+        playerController.UIManager.FireElement.SetActive(true);
+    }
+
     public override void UpdateAttack(out bool isComplete)
     {
         isComplete = false;

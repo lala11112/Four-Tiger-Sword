@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerStatManager : MonoBehaviour
 {
@@ -33,8 +34,11 @@ public class PlayerStatManager : MonoBehaviour
     /// <summary>피해를 받을 때마다 발생합니다. EarthForm 흡수 스탯 등이 구독합니다.</summary>
     public event Action<int, ElementType, bool> OnDamageTaken;
 
+    private PlayerController _playerController;
+
     private void Awake()
     {
+        _playerController = GetComponent<PlayerController>();
         InitializeFromData(); // SO 데이터로 초기화
     }
 
@@ -164,6 +168,7 @@ public class PlayerStatManager : MonoBehaviour
     {
         _currentHp = Mathf.Max(0f, _currentHp - damage);
         OnDamageTaken?.Invoke(damage, damageType, isCritical);
+        _playerController.UIManager.HpBar.GetComponent<Image>().fillAmount = _currentHp / GetStat(StatType.ST_HP);
     }
 
     // ── SP 메서드 ────────────────────────────────────────────────────────────────

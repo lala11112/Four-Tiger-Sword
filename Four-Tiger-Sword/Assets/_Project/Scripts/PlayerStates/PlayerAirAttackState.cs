@@ -18,6 +18,8 @@ public class PlayerAirAttackState : IPlayerState
         _isDescending = true;
         _playerController.Input.AttackBuffer.Consume();
         _playerController.VerticalVelocity = -_playerController.AirAttackDescentSpeed;
+        _playerController.Controller.excludeLayers |= 1 << LayerMask.NameToLayer("Enemy");
+
     }
 
     public void Update()
@@ -43,5 +45,7 @@ public class PlayerAirAttackState : IPlayerState
     public void Exit()
     {
         _playerController.FormManager.CurrentForm.EndAirAttack();
+        _playerController.Controller.excludeLayers &= ~(1 << LayerMask.NameToLayer("Enemy"));
+
     }
 }

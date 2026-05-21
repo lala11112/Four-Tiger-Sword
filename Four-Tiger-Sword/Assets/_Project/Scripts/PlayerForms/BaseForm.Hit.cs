@@ -7,7 +7,7 @@ public abstract partial class BaseForm
 
     private void ClearHitTargets() => _hitEventTargets.Clear();
 
-    protected void ProcessHit(WeaponActionData step)
+    protected virtual void ProcessHit(WeaponActionData step)
     {
         if (step.HitEvents != null && step.HitEvents.Count > 0)
         {
@@ -29,7 +29,7 @@ public abstract partial class BaseForm
         }
     }
 
-    private void ExecuteHit(WeaponActionData step, float baseDamage, float poiseDamage, HashSet<Collider> hitTargets)
+    protected virtual void ExecuteHit(WeaponActionData step, float baseDamage, float poiseDamage, HashSet<Collider> hitTargets)
     {
         Vector3 center = _playerController.transform.position
                        + _playerController.transform.rotation * step.HitBoxOffset;

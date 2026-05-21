@@ -1,3 +1,5 @@
+/*
+
 using System;
 using UnityEngine;
 
@@ -95,3 +97,4 @@ public class PlayerStat : IDamageable //스읍... 이게 필요 할까?
         //OnDamageTaken?.Invoke(damage, damageType, isCritical);
     }
 }
+*/

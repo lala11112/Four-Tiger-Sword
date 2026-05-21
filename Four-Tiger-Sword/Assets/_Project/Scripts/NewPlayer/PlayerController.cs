@@ -76,6 +76,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public ElementType Element => FormManager?.CurrentForm?.Element ?? ElementType.ELEMENT_NONE;
 
+    public PlayerUIManager UIManager { get; private set; }
 
     private void Awake()
     {
@@ -87,7 +88,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         CameraTransform = Camera.main.transform;
         Movement = GetComponent<PlayerMovement>();
         Movement.Initialize(this);
-
+        UIManager = GetComponent<PlayerUIManager>();
         StateMachine = new StateMachine();
         var stateMachineSetup = new PlayerStateMachineSetup(this);
         StateMachine = stateMachineSetup.Build();

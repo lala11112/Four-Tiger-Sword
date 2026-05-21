@@ -19,8 +19,6 @@ MonoBehaviour:
     ComboTransitionTime: 0.55
     Damage: 1.2
     PoiseDamage: 20
-    CriticalChance: 0.1
-    CriticalMultiplier: 1.5
     HitStartTime: 0.3
     HitDuration: 0.15
     HitBoxOffset: {x: 0, y: 0, z: 1.2}
@@ -73,8 +71,6 @@ MonoBehaviour:
     ComboTransitionTime: 0.55
     Damage: 1.5
     PoiseDamage: 1000
-    CriticalChance: 0.1
-    CriticalMultiplier: 1.5
     HitStartTime: 0.4
     HitDuration: 0.15
     HitBoxOffset: {x: 0, y: 0, z: 1}
@@ -127,8 +123,6 @@ MonoBehaviour:
     ComboTransitionTime: 0
     Damage: 2.2
     PoiseDamage: 20
-    CriticalChance: 0.1
-    CriticalMultiplier: 1.5
     HitStartTime: 1.06
     HitDuration: 0.2
     HitBoxOffset: {x: 0, y: 0, z: 1.5}
@@ -182,8 +176,6 @@ MonoBehaviour:
     ComboTransitionTime: 0.3
     Damage: 37
     PoiseDamage: 10
-    CriticalChance: 1
-    CriticalMultiplier: 1.5
     HitStartTime: 0.1
     HitDuration: 0.1
     HitBoxOffset: {x: 0, y: 0, z: 0}
@@ -223,13 +215,11 @@ MonoBehaviour:
       m_RotationOrder: 4
     ThrustMultiplier: 10
   SkillSteps:
-  - AnimationName: 
+  - AnimationName: FireSkill1
     Duration: 0.5
     ComboTransitionTime: 0
     Damage: 150
     PoiseDamage: 10
-    CriticalChance: 0.5
-    CriticalMultiplier: 1.7
     HitStartTime: 0.15
     HitDuration: 0.12
     HitBoxOffset: {x: 0, y: 0, z: 2}
@@ -239,7 +229,7 @@ MonoBehaviour:
     HitBoxHeight: 0
     ForwardThrust: 3
     KnockbackForce: 8
-    StaggerResistLevel: 0
+    StaggerResistLevel: 3
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -282,8 +272,6 @@ MonoBehaviour:
     ComboTransitionTime: 0
     Damage: 300
     PoiseDamage: 10
-    CriticalChance: 1
-    CriticalMultiplier: 1.7
     HitStartTime: 1
     HitDuration: 0.5
     HitBoxOffset: {x: 0, y: 0, z: 0}
@@ -293,7 +281,7 @@ MonoBehaviour:
     HitBoxHeight: 0
     ForwardThrust: 0
     KnockbackForce: 8
-    StaggerResistLevel: 0
+    StaggerResistLevel: 4
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -328,8 +316,6 @@ MonoBehaviour:
     ComboTransitionTime: 0
     Damage: 10
     PoiseDamage: 10
-    CriticalChance: 1
-    CriticalMultiplier: 10
     HitStartTime: 1
     HitDuration: 0.5
     HitBoxOffset: {x: 0, y: 0, z: 1}
