@@ -111,7 +111,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         StatManager.UpdateSpRegen(Time.deltaTime);
         StateMachine.Update();
         FormManager.Update();
-        Debug.Log(StateMachine.CurrentState.GetType().Name);
+//        Debug.Log(StateMachine.CurrentState.GetType().Name);
     }
 
     private void UpdateCoyoteTimer()

@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using UnityEngine.AI;
 
 public class EnemyGroggyState : IPlayerState
 {
@@ -13,7 +12,7 @@ public class EnemyGroggyState : IPlayerState
     public void Enter()
     {
         _enemy.Animator.CrossFade("Groggy", 0.1f);
-        _enemy.GetComponent<NavMeshAgent>().isStopped = true;
+        _enemy.LockMovement();
         _enemy.StartCoroutine(GroggyRoutine());
     }
 
@@ -24,7 +23,7 @@ public class EnemyGroggyState : IPlayerState
 
     public void Exit()
     {
-        _enemy.GetComponent<NavMeshAgent>().isStopped = false;
+        _enemy.UnlockMovement();
         _enemy.StopAllCoroutines();
         //강인도 초기화. 
         _enemy.GetComponent<PoiseHandler>().ResetPoise();

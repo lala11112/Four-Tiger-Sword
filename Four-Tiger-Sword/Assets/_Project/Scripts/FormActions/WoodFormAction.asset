@@ -18,8 +18,7 @@ MonoBehaviour:
     Duration: 1
     ComboTransitionTime: 0.6
     Damage: 100
-    CriticalChance: 0.7
-    CriticalMultiplier: 1.5
+    PoiseDamage: 10
     HitStartTime: 0.3
     HitDuration: 0.05
     HitBoxOffset: {x: 0, y: 0, z: 1}
@@ -28,6 +27,112 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 3}
     HitBoxHeight: 0
     ForwardThrust: 0
+    KnockbackForce: 8
+    StaggerResistLevel: 0
+    HitEvents: []
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+    ThrustCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.9951172
+        inSlope: -2.5820014
+        outSlope: -2.5820014
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.2027778
+      - serializedVersion: 3
+        time: 0.13659681
+        value: 0.014024675
+        inSlope: -7.182397
+        outSlope: -0.0069139414
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.988893
+        value: 0.008131949
+        inSlope: -0.0069139414
+        outSlope: -0.0069139414
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ThrustMultiplier: 0
+  - AnimationName: Wood1
+    Duration: 1
+    ComboTransitionTime: 0.6
+    Damage: 100
+    PoiseDamage: 10
+    HitStartTime: 0.3
+    HitDuration: 0.05
+    HitBoxOffset: {x: 0, y: 0, z: 1}
+    HitBoxShape: 1
+    HitBoxRadius: 0
+    HitBoxSize: {x: 1, y: 1, z: 3}
+    HitBoxHeight: 0
+    ForwardThrust: 0
+    KnockbackForce: 8
+    StaggerResistLevel: 0
+    HitEvents: []
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+    ThrustCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.9951172
+        inSlope: -2.5820014
+        outSlope: -2.5820014
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.2027778
+      - serializedVersion: 3
+        time: 0.13659681
+        value: 0.014024675
+        inSlope: -7.182397
+        outSlope: -0.0069139414
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.988893
+        value: 0.008131949
+        inSlope: -0.0069139414
+        outSlope: -0.0069139414
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ThrustMultiplier: 0
+  - AnimationName: Wood1
+    Duration: 1
+    ComboTransitionTime: 0.6
+    Damage: 100
+    PoiseDamage: 10
+    HitStartTime: 0.3
+    HitDuration: 0.05
+    HitBoxOffset: {x: 0, y: 0, z: 1}
+    HitBoxShape: 1
+    HitBoxRadius: 0
+    HitBoxSize: {x: 1, y: 1, z: 3}
+    HitBoxHeight: 0
+    ForwardThrust: 0
+    KnockbackForce: 8
+    StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -70,8 +175,7 @@ MonoBehaviour:
     Duration: 0.5
     ComboTransitionTime: 0.3
     Damage: 10
-    CriticalChance: 0.1
-    CriticalMultiplier: 1.5
+    PoiseDamage: 10
     HitStartTime: 0.1
     HitDuration: 0.1
     HitBoxOffset: {x: 0, y: 0, z: 1}
@@ -80,6 +184,8 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     ForwardThrust: 2
+    KnockbackForce: 8
+    StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -113,8 +219,7 @@ MonoBehaviour:
     Duration: 0
     ComboTransitionTime: 0
     Damage: 0
-    CriticalChance: 0
-    CriticalMultiplier: 0
+    PoiseDamage: 10
     HitStartTime: 0
     HitDuration: 0
     HitBoxOffset: {x: 0, y: 0, z: 0}
@@ -123,6 +228,8 @@ MonoBehaviour:
     HitBoxSize: {x: 0, y: 0, z: 0}
     HitBoxHeight: 0
     ForwardThrust: 0
+    KnockbackForce: 8
+    StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -156,8 +263,7 @@ MonoBehaviour:
     Duration: 0
     ComboTransitionTime: 0
     Damage: 0
-    CriticalChance: 0
-    CriticalMultiplier: 0
+    PoiseDamage: 10
     HitStartTime: 0
     HitDuration: 0
     HitBoxOffset: {x: 0, y: 0, z: 0}
@@ -166,6 +272,8 @@ MonoBehaviour:
     HitBoxSize: {x: 0, y: 0, z: 0}
     HitBoxHeight: 0
     ForwardThrust: 0
+    KnockbackForce: 8
+    StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}

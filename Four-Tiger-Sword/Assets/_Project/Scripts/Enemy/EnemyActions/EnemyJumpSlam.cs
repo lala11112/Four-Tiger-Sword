@@ -19,6 +19,7 @@ public class EnemyJumpSlam : EnemyAction
     private Phase _phase;
     private Vector3 _jumpStartPos;
     private Vector3 _jumpTargetPos;
+    private bool _movementUnlocked;
 
     public EnemyJumpSlam(MonsterJumpSlamSO data, Enemy enemy)
         : base(data, enemy)
@@ -32,9 +33,10 @@ public class EnemyJumpSlam : EnemyAction
         base.Enter();
         _phase = Phase.Startup;
         _hitTargets.Clear();
+        _movementUnlocked = false;
 
         _nav.ResetPath();
-        _nav.isStopped = true;
+        _enemy.LockMovement();
         _enemy.Animator?.CrossFade(_data.animName, 0.01f);
         // TODO: _enemy.Animator?.SetTrigger(_data.animName);
     }
@@ -83,7 +85,12 @@ public class EnemyJumpSlam : EnemyAction
         }
         _enemy.gameObject.transform.rotation = Quaternion.Euler(0f, _enemy.gameObject.transform.rotation.y, 0f);
 
-        _nav.isStopped = false;
+        if (!_movementUnlocked)
+        {
+            _enemy.UnlockMovement();
+            _movementUnlocked = true;
+        }
+        _enemy.SyncMovementLock();
     }
 
     // ── 도약 시작 ────────────────────────────────────────────────────────────
@@ -136,7 +143,12 @@ public class EnemyJumpSlam : EnemyAction
         if (_nav.isOnNavMesh)
             _nav.Warp(_jumpTargetPos);
 
-        _nav.isStopped = false;
+        if (!_movementUnlocked)
+        {
+            _enemy.UnlockMovement();
+            _movementUnlocked = true;
+        }
+        _enemy.SyncMovementLock();
         _enemy.gameObject.transform.rotation = Quaternion.Euler(0f, _enemy.gameObject.transform.rotation.y, 0f);
         ExecuteSlam();
     }

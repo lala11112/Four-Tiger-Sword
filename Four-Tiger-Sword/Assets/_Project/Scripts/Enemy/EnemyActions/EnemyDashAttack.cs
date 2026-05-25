@@ -16,6 +16,7 @@ public class EnemyDashAttack : EnemyAction
 
     private Phase _phase;
     private Vector3 _dashDirection;
+    private bool _movementUnlocked;
 
     public EnemyDashAttack(MonsterDashAttackSO data, Enemy enemy)
         : base(data, enemy)
@@ -29,9 +30,10 @@ public class EnemyDashAttack : EnemyAction
         base.Enter();
         _phase = Phase.Startup;
         _hitTargets.Clear();
+        _movementUnlocked = false;
 
         _nav.ResetPath();
-        _nav.isStopped = true;
+        _enemy.LockMovement();
         // TODO: _enemy.Animator?.SetTrigger(_data.animName);
     }
 
@@ -58,7 +60,8 @@ public class EnemyDashAttack : EnemyAction
                 CheckHit();
                 if (_timer >= _data.dashDuration)
                 {
-                    _nav.isStopped = false;
+                    _enemy.UnlockMovement();
+                    _movementUnlocked = true;
                     _timer = 0f;
                     _phase = Phase.Recovery;
                 }
@@ -76,7 +79,11 @@ public class EnemyDashAttack : EnemyAction
 
     public override void Exit()
     {
-        _nav.isStopped = false;
+        if (!_movementUnlocked)
+        {
+            _enemy.UnlockMovement();
+            _movementUnlocked = true;
+        }
     }
 
     private void PerformDash()

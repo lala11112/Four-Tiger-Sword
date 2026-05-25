@@ -35,6 +35,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private IEnemySensor _sensor;
     private NavMeshAgent _navMeshAgent;
     private Coroutine _knockbackCoroutine;
+    private int _moveLockCount = 0;
 
     private bool _isTargetFound = false;
     private bool _isTargetInCombatRange => DetectedTarget != null
@@ -60,6 +61,9 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool IsGroggy = false;
 
     public StaggerResistLevel StaggerResistLevel;
+
+    public float RootDuration = 1f;
+    public bool IsRoot = false;
 
 
     protected virtual void Start()
@@ -87,7 +91,7 @@ public class Enemy : MonoBehaviour, IDamageable
         var hurtState = new EnemyHurtState(this);
         var dieState = new EnemyDieState(this);
         var groggyState = new EnemyGroggyState(this);
-
+        var rootState = new EnemyRootState(this);
         // Idle → Trace: 플레이어 감지
         _stateMachine.AddTransition(idleState, traceState, () => _isTargetFound);
 
@@ -107,6 +111,8 @@ public class Enemy : MonoBehaviour, IDamageable
         // Attack → CombatIdle: 공격 완료 (쿨타임 + 배회)
         _stateMachine.AddTransition(attackState, combatIdleState, () => IsAttackFinished);
 
+        _stateMachine.AddTransition(rootState, traceState, () => !IsRoot);
+
         // Hurt → Trace 복귀
         _stateMachine.AddTransition(hurtState, traceState, () => !IsHurt);
         _stateMachine.AddTransition(groggyState, traceState, () => !IsGroggy);
@@ -114,6 +120,7 @@ public class Enemy : MonoBehaviour, IDamageable
         _stateMachine.AddAnyTransition(dieState, () => _isDie);
         _stateMachine.AddAnyTransition(hurtState, () => IsHurt && !IsGroggy);
         _stateMachine.AddAnyTransition(groggyState, () => IsGroggy);
+        _stateMachine.AddAnyTransition(rootState, () => IsRoot);
 
         _stateMachine.ChangeState(idleState);
 
@@ -131,7 +138,7 @@ public class Enemy : MonoBehaviour, IDamageable
         Animator.SetFloat("DirX", localVelocity.x);
         UpdateAttackCooldown();
 
-        Debug.Log(_stateMachine.CurrentState.GetType().ToString());
+        //Debug.Log(_stateMachine.CurrentState.GetType().ToString());
 
 
     }
@@ -217,6 +224,27 @@ public class Enemy : MonoBehaviour, IDamageable
     public void StartAttackCooldown()
     {
         _attackCooldownTimer = EnemyStat.GetStat(EnemyStatType.AttackCooldown);
+    }
+
+    public void LockMovement()
+    {
+        _moveLockCount++;
+        if (_navMeshAgent != null && _navMeshAgent.enabled)
+            _navMeshAgent.isStopped = true;
+    }
+
+    public void UnlockMovement()
+    {
+        _moveLockCount = Mathf.Max(0, _moveLockCount - 1);
+        if (_moveLockCount == 0 && _navMeshAgent != null && _navMeshAgent.enabled)
+            _navMeshAgent.isStopped = false;
+    }
+
+    /// <summary>NavMeshAgent 재활성화 직후 등 isStopped 상태를 현재 잠금 수에 맞게 동기화합니다.</summary>
+    public void SyncMovementLock()
+    {
+        if (_navMeshAgent != null && _navMeshAgent.enabled)
+            _navMeshAgent.isStopped = _moveLockCount > 0;
     }
 
     protected void ResetAttackCooldown()

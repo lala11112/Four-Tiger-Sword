@@ -21,6 +21,8 @@ public class EnemyStackManager : MonoBehaviour
 
             stackDict[data.stackType] = new StackEntry(data);
         }
+
+        Debug.Log("스택매니저 Awake 작동");
     }
 
     void Update()
@@ -40,6 +42,8 @@ public class EnemyStackManager : MonoBehaviour
     public void AddStack(StackType type)
     {
         if(!stackDict.TryGetValue(type, out var entry)) return;
+
+        Debug.Log("스택매니저 AddStack 작동");
 
         entry.CurrentStack++;
         entry.Timer = 0f;

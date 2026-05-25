@@ -134,6 +134,8 @@ GameObject:
   - component: {fileID: 6173140}
   - component: {fileID: 6173139}
   - component: {fileID: 6173145}
+  - component: {fileID: 6173146}
+  - component: {fileID: 6173147}
   m_Layer: 8
   m_Name: RealBoss (4)
   m_TagString: Untagged
@@ -267,6 +269,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStat
   baseData: {fileID: 0}
   CurrentHp: 0
+--- !u!114 &6173146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6173138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90c4c26786f864949be1470312a217dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectHandler
+--- !u!114 &6173147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6173138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1639b6795f9edf04abbf676ed4a6a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStackManager
+  RegisteredStacks:
+  - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
+  - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
 --- !u!1001 &35332985
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -536,6 +565,8 @@ GameObject:
   - component: {fileID: 202858498}
   - component: {fileID: 202858503}
   - component: {fileID: 202858504}
+  - component: {fileID: 202858505}
+  - component: {fileID: 202858506}
   m_Layer: 8
   m_Name: Monster
   m_TagString: Untagged
@@ -669,6 +700,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStat
   baseData: {fileID: 11400000, guid: f48b84512e34d1144aebce88b11661cc, type: 2}
   CurrentHp: 0
+--- !u!114 &202858505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 202858497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90c4c26786f864949be1470312a217dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectHandler
+--- !u!114 &202858506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 202858497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1639b6795f9edf04abbf676ed4a6a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStackManager
+  RegisteredStacks:
+  - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
+  - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
 --- !u!1 &326243545
 GameObject:
   m_ObjectHideFlags: 0
@@ -1613,6 +1671,8 @@ GameObject:
   - component: {fileID: 647727197}
   - component: {fileID: 647727198}
   - component: {fileID: 647727199}
+  - component: {fileID: 647727200}
+  - component: {fileID: 647727201}
   m_Layer: 8
   m_Name: RealBoss
   m_TagString: Untagged
@@ -1758,6 +1818,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90c4c26786f864949be1470312a217dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StatusEffectHandler
+--- !u!114 &647727200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 647727188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90c4c26786f864949be1470312a217dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectHandler
+--- !u!114 &647727201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 647727188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1639b6795f9edf04abbf676ed4a6a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStackManager
+  RegisteredStacks:
+  - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
+  - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
 --- !u!1 &673056346
 GameObject:
   m_ObjectHideFlags: 0
@@ -1858,6 +1945,8 @@ GameObject:
   - component: {fileID: 711020544}
   - component: {fileID: 711020543}
   - component: {fileID: 711020549}
+  - component: {fileID: 711020550}
+  - component: {fileID: 711020551}
   m_Layer: 8
   m_Name: RealBoss (3)
   m_TagString: Untagged
@@ -1991,6 +2080,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStat
   baseData: {fileID: 0}
   CurrentHp: 0
+--- !u!114 &711020550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 711020542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90c4c26786f864949be1470312a217dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectHandler
+--- !u!114 &711020551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 711020542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1639b6795f9edf04abbf676ed4a6a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStackManager
+  RegisteredStacks:
+  - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
+  - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
 --- !u!1001 &773558482
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3349,118 +3465,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a91273c436038704bbf415e403faeeef, type: 3}
---- !u!1 &1248648280
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1248648284}
-  - component: {fileID: 1248648283}
-  - component: {fileID: 1248648282}
-  - component: {fileID: 1248648281}
-  m_Layer: 0
-  m_Name: Test
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!65 &1248648281
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1248648280}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &1248648282
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1248648280}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1248648283
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1248648280}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &1248648284
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1248648280}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.37, y: 3.059, z: 4.37}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1272881853
 GameObject:
   m_ObjectHideFlags: 0
@@ -3476,6 +3480,8 @@ GameObject:
   - component: {fileID: 1272881855}
   - component: {fileID: 1272881854}
   - component: {fileID: 1272881860}
+  - component: {fileID: 1272881861}
+  - component: {fileID: 1272881862}
   m_Layer: 8
   m_Name: Monster (1)
   m_TagString: Untagged
@@ -3609,6 +3615,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStat
   baseData: {fileID: 0}
   CurrentHp: 0
+--- !u!114 &1272881861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272881853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90c4c26786f864949be1470312a217dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectHandler
+--- !u!114 &1272881862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272881853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1639b6795f9edf04abbf676ed4a6a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStackManager
+  RegisteredStacks:
+  - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
+  - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
 --- !u!1 &1285247846
 GameObject:
   m_ObjectHideFlags: 0
@@ -4554,6 +4587,8 @@ GameObject:
   - component: {fileID: 1616071838}
   - component: {fileID: 1616071837}
   - component: {fileID: 1616071836}
+  - component: {fileID: 1616071843}
+  - component: {fileID: 1616071844}
   m_Layer: 8
   m_Name: RealBoss (7)
   m_TagString: Untagged
@@ -4687,6 +4722,33 @@ Transform:
   - {fileID: 1541011205}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1616071843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1616071835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90c4c26786f864949be1470312a217dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectHandler
+--- !u!114 &1616071844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1616071835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1639b6795f9edf04abbf676ed4a6a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStackManager
+  RegisteredStacks:
+  - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
+  - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
 --- !u!4 &1652162316 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a91273c436038704bbf415e403faeeef, type: 3}
@@ -4966,6 +5028,8 @@ GameObject:
   - component: {fileID: 1840816311}
   - component: {fileID: 1840816310}
   - component: {fileID: 1840816309}
+  - component: {fileID: 1840816316}
+  - component: {fileID: 1840816317}
   m_Layer: 8
   m_Name: RealBoss (6)
   m_TagString: Untagged
@@ -5099,6 +5163,33 @@ Transform:
   - {fileID: 837850513}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1840816316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1840816308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90c4c26786f864949be1470312a217dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectHandler
+--- !u!114 &1840816317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1840816308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1639b6795f9edf04abbf676ed4a6a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStackManager
+  RegisteredStacks:
+  - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
+  - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
 --- !u!1 &1846826554
 GameObject:
   m_ObjectHideFlags: 0
@@ -5114,6 +5205,8 @@ GameObject:
   - component: {fileID: 1846826557}
   - component: {fileID: 1846826556}
   - component: {fileID: 1846826555}
+  - component: {fileID: 1846826562}
+  - component: {fileID: 1846826563}
   m_Layer: 8
   m_Name: RealBoss (5)
   m_TagString: Untagged
@@ -5247,6 +5340,33 @@ Transform:
   - {fileID: 968792007}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1846826562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1846826554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90c4c26786f864949be1470312a217dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectHandler
+--- !u!114 &1846826563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1846826554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1639b6795f9edf04abbf676ed4a6a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStackManager
+  RegisteredStacks:
+  - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
+  - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
 --- !u!1001 &1898497625
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5331,6 +5451,8 @@ GameObject:
   - component: {fileID: 1965145158}
   - component: {fileID: 1965145157}
   - component: {fileID: 1965145163}
+  - component: {fileID: 1965145164}
+  - component: {fileID: 1965145165}
   m_Layer: 8
   m_Name: RealBoss (1)
   m_TagString: Untagged
@@ -5464,6 +5586,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyStat
   baseData: {fileID: 11400000, guid: 6affd27a80a9c4845be04ed160eb3f66, type: 2}
   CurrentHp: 0
+--- !u!114 &1965145164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1965145156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90c4c26786f864949be1470312a217dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectHandler
+--- !u!114 &1965145165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1965145156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1639b6795f9edf04abbf676ed4a6a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStackManager
+  RegisteredStacks:
+  - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
+  - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
 --- !u!1 &2006030911
 GameObject:
   m_ObjectHideFlags: 0
@@ -6025,6 +6174,8 @@ GameObject:
   - component: {fileID: 2118532814}
   - component: {fileID: 2118532813}
   - component: {fileID: 2118532812}
+  - component: {fileID: 2118532819}
+  - component: {fileID: 2118532820}
   m_Layer: 8
   m_Name: RealBoss (2)
   m_TagString: Untagged
@@ -6158,6 +6309,33 @@ Transform:
   - {fileID: 1652162316}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2118532819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2118532811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90c4c26786f864949be1470312a217dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StatusEffectHandler
+--- !u!114 &2118532820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2118532811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1639b6795f9edf04abbf676ed4a6a175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStackManager
+  RegisteredStacks:
+  - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
+  - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
 --- !u!1 &2132206201
 GameObject:
   m_ObjectHideFlags: 0
@@ -6295,5 +6473,4 @@ SceneRoots:
   - {fileID: 1840816315}
   - {fileID: 1616071842}
   - {fileID: 1322484232}
-  - {fileID: 1248648284}
   - {fileID: 49434480}

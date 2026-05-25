@@ -65,4 +65,9 @@
             base.BeginUltimate();
             SpawnStepVFX(_weaponActionData.UltimateSteps, 0);
         }
+
+        protected override void OnHitEnemy(GameObject enemy)
+        {
+            enemy.GetComponent<EnemyStackManager>().AddStack(StackType.Wood);  
+        }
     }

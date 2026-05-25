@@ -8,7 +8,7 @@ using UnityEngine;
 public class WoodBindStackDataSO : StackDataSO
 {
     [Tooltip("속박 지속 시간 (초)")]
-    public float bindDuration = 1.5f;
+    public float bindDuration = 30f;
 
     // stackType은 반드시 Wood여야 합니다.
     // StackDataSO의 stackType이 기본값(Fire=0)으로 생성되는 것을 방지합니다.
@@ -20,6 +20,6 @@ public class WoodBindStackDataSO : StackDataSO
         var statusHandler = target.GetComponent<StatusEffectHandler>();
         statusHandler?.Apply(new BindEffect(bindDuration));
 
-        Debug.Log($"<color=green>[목 스택] {target.name} {bindDuration}초 속박!</color>");
+        //Debug.Log($"<color=green>[목 스택] {target.name} {bindDuration}초 속박!</color>");
     }
 }

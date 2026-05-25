@@ -58,6 +58,17 @@ public class WaterForm : BaseForm
         WaterGauge = Mathf.Min(WaterGauge + GaugePerHit, MaxWaterGauge);
         _waterGaugeUI.GetComponent<Image>().fillAmount = WaterGauge / MaxWaterGauge;
         EvaluateBuff();
+
+        if(_currentAction != ActionType.Skill) return;
+
+        var handler = enemy.GetComponent<StatusEffectHandler>();
+        if(handler == null) return;
+
+        float atk = _playerController.StatManager.GetStat(StatType.ST_ATK);
+        float critChance = _playerController.StatManager.GetStat(StatType.ST_CRT)/100f;
+        float critMultiplier = _playerController.StatManager.GetStat(StatType.ST_CRTD)/100f;
+        
+        handler.Apply(new WaterDelayedDamageEffect(atk, 1.5f, Element, critChance, critMultiplier));
     }
 
     // ── 매 프레임 게이지 감소 ─────────────────────────────────────────────────
@@ -139,7 +150,7 @@ public class WaterForm : BaseForm
             Vector3 dir = _softTarget.position - _playerController.transform.position;
             dir.y = 0f;
             Quaternion targetRot = Quaternion.LookRotation(dir);
-            _playerController.transform.rotation = targetRot;
+            _playerController.transform.rotation = targetRot;   
         }
         _playerController.Controller.excludeLayers |= 1 << LayerMask.NameToLayer("Enemy");
         PlayStepSound(_weaponActionData.SkillSteps, 0);

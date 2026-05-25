@@ -50,7 +50,7 @@ public abstract partial class BaseForm
             hitTargets.Add(hit);
             float attackMult = 1f + _playerController.StatManager.GetStat(StatType.ST_ATK) * 0.01f;
             Vector3 knockbackDir = (hit.transform.position - _playerController.transform.position).normalized;
-            Vector3 knockback = knockbackDir * step.KnockbackForce * attackMult;
+            Vector3 knockback = knockbackDir * step.KnockbackForce * attackMult; //아아
             float critChance = _playerController.StatManager.GetStat(StatType.ST_CRT)/100f;
             float critMultiplier = _playerController.StatManager.GetStat(StatType.ST_CRTD)/100f;
             DamageManager.Apply(
