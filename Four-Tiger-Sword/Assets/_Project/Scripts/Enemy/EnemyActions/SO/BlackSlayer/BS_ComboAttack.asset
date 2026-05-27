@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a75a612f4dec2a148bd73586789dc3eb, type: 3}
+  m_Name: BS_ComboAttack
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterComboAttackSO
+  animName: ComboAttack
+  engageRange: 5
+  excuteRange: 2
+  weight: 10
+  attackSpeed: 1
+  baseDamage: 10
+  criticalChance: 0.1
+  criticalMultiplier: 1.5
+  knockbackForce: 5
+  telegraphDuration: 0.4
+  attackDuration: 4.2
+  hitBoxShape: 0
+  hitBoxRadius: 1.2
+  hits:
+  - hitStartTime: 1
+    hitDuration: 0.1
+    damage: 50
+    hitBoxOffset: {x: 0, y: 0, z: 1}
+  - hitStartTime: 1.8
+    hitDuration: 0.1
+    damage: 60
+    hitBoxOffset: {x: 0, y: 0, z: 1}
+  - hitStartTime: 2.6
+    hitDuration: 0.1
+    damage: 0
+    hitBoxOffset: {x: 0, y: 0, z: 1}
