@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponActionDataSO
   WeaponName: Fire
   ComboSteps:
-  - AnimationName: Punching
-    Duration: 0.983
-    ComboTransitionTime: 0.55
+  - AnimationName: InSlash
+    Duration: 1.833
+    ComboTransitionTime: 1.6
     Damage: 1.2
     PoiseDamage: 20
-    HitStartTime: 0.3
+    HitStartTime: 1
     HitDuration: 0.15
     HitBoxOffset: {x: 0, y: 0, z: 1.2}
     HitBoxShape: 0
@@ -66,12 +66,12 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 11
-  - AnimationName: Punching2
-    Duration: 1.033
-    ComboTransitionTime: 0.55
+  - AnimationName: OutSlash
+    Duration: 1.267
+    ComboTransitionTime: 1
     Damage: 1.5
-    PoiseDamage: 1000
-    HitStartTime: 0.4
+    PoiseDamage: 100
+    HitStartTime: 0.5
     HitDuration: 0.15
     HitBoxOffset: {x: 0, y: 0, z: 1}
     HitBoxShape: 1

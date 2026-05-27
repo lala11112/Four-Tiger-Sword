@@ -37,6 +37,8 @@ public class PlayerDashState : IPlayerState
         if(_dashTimer >= _dashDuration)
         {
             IsDashComplete = true;
+            _playerController.Movement.ApplyGravity();
+            _playerController.Controller.Move(new Vector3(0, _playerController.VerticalVelocity, 0) * Time.deltaTime);
         }
         else
         {
