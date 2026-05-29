@@ -91,3 +91,19 @@ MemoryCaptures/
 
 # End of https://www.toptal.com/developers/gitignore/api/unity
 
+# --- Third-party asset media excluded to stay within the Git LFS budget ---
+# These are large binaries from purchased/imported Asset Store packages.
+# They remain on disk and Unity works locally; on a fresh clone, re-import
+# the packages from the Asset Store to restore this media.
+Assets/Feel/**/*.png
+Assets/Feel/**/*.wav
+Assets/Feel/**/*.mp4
+Assets/Feel/**/*.zip
+Assets/Plugins/Pixel Crushers/**/*.png
+Assets/Plugins/Pixel Crushers/**/*.wav
+Assets/Plugins/Pixel Crushers/**/*.mp4
+Assets/Plugins/Pixel Crushers/**/*.zip
+Assets/Editor Default Resources/Dialogue System/**/*.png
+Assets/Editor Default Resources/Dialogue System/**/*.wav
+Assets/Gizmos/**/*.png
+
