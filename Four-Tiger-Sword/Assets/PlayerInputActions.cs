@@ -208,6 +208,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Parring"",
+                    ""type"": ""Button"",
+                    ""id"": ""dc27ed8f-db20-4486-85c6-876824209b52"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -408,6 +417,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""FastFormChange"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4303e746-8695-45a9-b657-c6e2b0f1e51f"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Parring"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -429,6 +449,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Skill = m_Player.FindAction("Skill", throwIfNotFound: true);
         m_Player_Ultimate = m_Player.FindAction("Ultimate", throwIfNotFound: true);
         m_Player_FastFormChange = m_Player.FindAction("FastFormChange", throwIfNotFound: true);
+        m_Player_Parring = m_Player.FindAction("Parring", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -522,6 +543,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Skill;
     private readonly InputAction m_Player_Ultimate;
     private readonly InputAction m_Player_FastFormChange;
+    private readonly InputAction m_Player_Parring;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -585,6 +607,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/FastFormChange".
         /// </summary>
         public InputAction @FastFormChange => m_Wrapper.m_Player_FastFormChange;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Parring".
+        /// </summary>
+        public InputAction @Parring => m_Wrapper.m_Player_Parring;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -650,6 +676,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @FastFormChange.started += instance.OnFastFormChange;
             @FastFormChange.performed += instance.OnFastFormChange;
             @FastFormChange.canceled += instance.OnFastFormChange;
+            @Parring.started += instance.OnParring;
+            @Parring.performed += instance.OnParring;
+            @Parring.canceled += instance.OnParring;
         }
 
         /// <summary>
@@ -700,6 +729,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @FastFormChange.started -= instance.OnFastFormChange;
             @FastFormChange.performed -= instance.OnFastFormChange;
             @FastFormChange.canceled -= instance.OnFastFormChange;
+            @Parring.started -= instance.OnParring;
+            @Parring.performed -= instance.OnParring;
+            @Parring.canceled -= instance.OnParring;
         }
 
         /// <summary>
@@ -831,5 +863,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnFastFormChange(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Parring" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnParring(InputAction.CallbackContext context);
     }
 }

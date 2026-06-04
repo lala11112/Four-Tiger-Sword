@@ -39,13 +39,13 @@ public class EnemyCombatIdleState : IPlayerState
 
     private void TrySelectAttack()
     {
-        if (_enemy.DetectedTarget == null || _enemy.MonsterSkillData == null) return;
+        if (_enemy.DetectedTarget == null || _enemy.EnemyStat.MonsterSkillData == null) return;
 
         float dist = Vector3.Distance(_enemy.transform.position, _enemy.DetectedTarget.position);
 
         // 현재 거리에서 선택 가능한 공격 목록 (engageRange 이내)
         var candidates = new List<MonsterSkillData>();
-        foreach (var skill in _enemy.MonsterSkillData.skillData)
+        foreach (var skill in _enemy.EnemyStat.MonsterSkillData.skillData)
         {
             if (dist <= skill.engageRange)
                 candidates.Add(skill);

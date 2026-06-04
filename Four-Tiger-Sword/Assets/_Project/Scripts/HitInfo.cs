@@ -18,10 +18,15 @@ public readonly struct HitInfo
 
     public readonly StaggerResistLevel StaggerResistLevel;
 
+    /// <summary>false로 설정하면 이 공격은 플레이어의 패링으로 막을 수 없습니다.</summary>
+    public readonly bool IsParryable;
+
     public HitInfo(float damage, ElementType element,
                    float critChance, float critMultiplier,
                    float poiseDamageMultiplier = 1f,
-                   bool  armorPierce = false, Vector3 power = default, float poiseDamage = 0f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE)
+                   bool  armorPierce = false, Vector3 power = default, float poiseDamage = 0f,
+                   StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE,
+                   bool isParryable = true)
     {
         BaseDamage            = damage;
         Element               = element;
@@ -32,5 +37,6 @@ public readonly struct HitInfo
         Power                 = power;
         PoiseDamage           = poiseDamage;
         StaggerResistLevel    = staggerResistLevel;
+        IsParryable           = isParryable;
     }
 }

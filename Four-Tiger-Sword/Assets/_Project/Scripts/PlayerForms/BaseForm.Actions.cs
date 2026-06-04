@@ -11,7 +11,35 @@ public abstract partial class BaseForm
         PlayCombo();
     }
 
-    public abstract void UpdateAttack(out bool isComplete);
+    public virtual void UpdateAttack(out bool isComplete)
+    {
+        isComplete = false;
+
+        if (_weaponActionData == null || _weaponActionData.ComboSteps.Count == 0)
+        {
+            isComplete = true;
+            return;
+        }
+
+        _timer += Time.deltaTime * AttackSpeed;
+        WeaponActionData currentStep = _weaponActionData.ComboSteps[_comboStep];
+
+        ProcessHit(currentStep);
+
+        MoveForward(currentStep);
+
+        if (_timer >= currentStep.ComboTransitionTime &&
+            _playerController.Input.AttackBuffer.IsActive &&
+            _comboStep < _weaponActionData.ComboSteps.Count - 1)
+        {
+            _comboStep++;
+            PlayCombo();
+            return;
+        }
+
+        if (_timer >= currentStep.Duration)
+            isComplete = true;
+    }
 
     public virtual void EndAttack()
     {
@@ -93,7 +121,7 @@ public abstract partial class BaseForm
     public virtual void BeginUltimate()
     {
         _currentAction = ActionType.Ultimate;
-        _playerController.StatManager.TryConsumeSp(UltimateSpCost);
+        _playerController.StatManager.ConsumeAllUltimateGauge();
         _ultimateStep = 0;
         FindSoftTarget();
         _playerController.Animator.speed = AttackSpeed;
@@ -122,7 +150,6 @@ public abstract partial class BaseForm
         _ultimateStep = 0;
         _softTarget = null;
         ClearHitTargets();
-        _ultimateCooldownTimer = UltimateCooldown;
         _playerController.Animator.speed = 1f;
     }
 

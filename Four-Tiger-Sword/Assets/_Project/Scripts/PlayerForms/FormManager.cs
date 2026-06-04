@@ -21,6 +21,8 @@ public class FormManager
         foreach (var transition in _transitions)
             transition.TargetForm.UpdateCooldowns();
 
+        (CurrentForm as BaseForm)?.UpdateSkillCooldownUI();
+
         if(CanTransition != null && !CanTransition.Invoke())
         {
             return;
@@ -65,7 +67,6 @@ public class FormManager
             if(transition.Condition.Invoke())
             {
                 return transition;
-                break;
             }
         }
 

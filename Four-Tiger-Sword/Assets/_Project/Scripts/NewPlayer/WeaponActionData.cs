@@ -67,9 +67,6 @@ public class WeaponActionData
 
     [Tooltip("캡슐 히트박스 높이")]
     public float HitBoxHeight = 2f;
-    
-    [Tooltip("공격 시 앞으로 살짝 전진하는 힘 (타격감 상승)")]
-    public float ForwardThrust = 2f;
 
     [Tooltip("적에게 가하는 넉백 힘 (단위: 유닛/초). 값이 클수록 멀리 밀림")]
     public float KnockbackForce = 8f;

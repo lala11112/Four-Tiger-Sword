@@ -66,4 +66,8 @@ public class PlayerStatData : ScriptableObject
     [Header("⑥ 공격 속도")]
     [Tooltip("공격 속도 배율. 1.0 = 기본, 2.0 = 2배 빠름. 최솟값 0.1로 고정됩니다.")]
     public float baseAtkSpd = 1f;
+
+    [Header("⑦ 필살기 게이지")]
+    [Tooltip("필살기 게이지 최대치. 이 값에 도달하면 필살기를 사용할 수 있습니다.")]
+    public float maxUltimateGauge = 100f;
 }

@@ -5,10 +5,8 @@ public class WaterForm : BaseForm
 {
     public override ElementType Element => ElementType.ELEMENT_WATER;
 
-    public override float SkillSpCost => 0f;
+    public override float SkillSpCost   => 0f;
     public override float SkillCooldown => 3f;
-    public override float UltimateSpCost => 400f;
-    public override float UltimateCooldown => 25f;
 
     // ── 워터 게이지 설정 ─────────────────────────────────────────────────────
     public float MaxWaterGauge = 100f;
@@ -24,7 +22,7 @@ public class WaterForm : BaseForm
 
     private float _baseMoveSpeed;
     private float _baseRunSpeed;
-    private GameObject _waterGaugeUI;
+    private Image _waterGaugeUI;
 
     public WaterForm(WeaponActionDataSO weaponActionData) : base(weaponActionData) { }
 
@@ -34,10 +32,10 @@ public class WaterForm : BaseForm
         _baseMoveSpeed = playerController.MoveSpeed;
         _baseRunSpeed = playerController.RunSpeed;
         //여기서 물속성 폼 전용 UI를 켤 거임.
-        playerController.UIManager.WaterGauge.SetActive(true);
-        playerController.UIManager.WaterElement.SetActive(false);
-        _waterGaugeUI = playerController.UIManager.WaterGauge;
-        _waterGaugeUI.GetComponent<Image>().fillAmount = 0f;
+        PlayerUIManager.Instance.WaterGauge.gameObject.SetActive(true);
+        PlayerUIManager.Instance.WaterElement.SetActive(false);
+        _waterGaugeUI = PlayerUIManager.Instance.WaterGauge;
+        _waterGaugeUI.fillAmount = 0f;
     }
 
     public override void Unequip(PlayerController playerController)
@@ -47,14 +45,15 @@ public class WaterForm : BaseForm
 
         WaterGauge = 0f;
         //여기서 물속성 폼 전용 UI를 끌 거임.
-        playerController.UIManager.WaterGauge.SetActive(false);
-        playerController.UIManager.WaterElement.SetActive(true);
-        _waterGaugeUI.GetComponent<Image>().fillAmount = 0f;
+        PlayerUIManager.Instance.WaterGauge.gameObject.SetActive(false);
+        PlayerUIManager.Instance.WaterElement.SetActive(true);
+        _waterGaugeUI.fillAmount = 0f;
     }
 
     // ── 게이지 충전: 적 타격 시 호출 ─────────────────────────────────────────
     protected override void OnHitEnemy(GameObject enemy)
     {
+        base.OnHitEnemy(enemy);
         WaterGauge = Mathf.Min(WaterGauge + GaugePerHit, MaxWaterGauge);
         _waterGaugeUI.GetComponent<Image>().fillAmount = WaterGauge / MaxWaterGauge;
         EvaluateBuff();
@@ -68,7 +67,7 @@ public class WaterForm : BaseForm
         float critChance = _playerController.StatManager.GetStat(StatType.ST_CRT)/100f;
         float critMultiplier = _playerController.StatManager.GetStat(StatType.ST_CRTD)/100f;
         
-        handler.Apply(new WaterDelayedDamageEffect(atk, 1.5f, Element, critChance, critMultiplier));
+        handler.Apply(new WaterDelayedDamageEffect(atk, 1.5f, Element, critChance, critMultiplier, _weaponActionData.DelayedHitVFX));
     }
 
     // ── 매 프레임 게이지 감소 ─────────────────────────────────────────────────
@@ -119,26 +118,7 @@ public class WaterForm : BaseForm
             return;
         }
 
-        _timer += Time.deltaTime * AttackSpeed;
-        WeaponActionData currentStep = _weaponActionData.ComboSteps[_comboStep];
-
-        ProcessHit(currentStep);
-
-        Vector3 moveVelocity = _playerController.transform.forward * currentStep.ForwardThrust;
-        moveVelocity.y = _playerController.VerticalVelocity;
-        _playerController.Controller.Move(moveVelocity * Time.deltaTime);
-
-        if (_timer >= currentStep.ComboTransitionTime &&
-            _playerController.Input.AttackBuffer.IsActive &&
-            _comboStep < _weaponActionData.ComboSteps.Count - 1)
-        {
-            _comboStep++;
-            PlayCombo();
-            return;
-        }
-
-        if (_timer >= currentStep.Duration)
-            isComplete = true;
+        base.UpdateAttack(out isComplete);
     }
 
     public override void BeginSkill()

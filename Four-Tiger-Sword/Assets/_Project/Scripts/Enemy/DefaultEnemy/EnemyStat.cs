@@ -40,6 +40,8 @@ public class EnemyStat : MonoBehaviour
         baseValues[EnemyStatType.HP]                  = baseData.maxHp;
         baseValues[EnemyStatType.ATK]                 = baseData.baseAtk;
         baseValues[EnemyStatType.DEF]                 = baseData.baseDef;
+        baseValues[EnemyStatType.CriticalChance]      = baseData.criticalChance;
+        baseValues[EnemyStatType.CriticalDamage]      = baseData.criticalDamage;
         baseValues[EnemyStatType.CombatRange]         = baseData.combatRange;
         baseValues[EnemyStatType.CombatExitRange]     = baseData.combatExitRange;
         baseValues[EnemyStatType.KnockbackResistance] = baseData.knockbackResistance;

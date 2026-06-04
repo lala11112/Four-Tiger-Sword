@@ -4,10 +4,8 @@ public class FireForm : BaseForm
 {
     public override ElementType Element => ElementType.ELEMENT_FIRE;
 
-    public override float SkillSpCost      => 200f;
-    public override float SkillCooldown    => 8f;
-    public override float UltimateSpCost   => 500f;
-    public override float UltimateCooldown => 15f;
+    public override float SkillSpCost   => 200f;
+    public override float SkillCooldown => 8f;
 
     private bool _explosionSpawned = false;
 
@@ -16,13 +14,15 @@ public class FireForm : BaseForm
     public override void Equip(PlayerController playerController)
     {
         base.Equip(playerController);
-        playerController.UIManager.FireElement.SetActive(false);
+        PlayerUIManager.Instance.FireElement.SetActive(false);
+        playerController.WeaponManager.FireWeapon.SetActive(true);
     }
 
     public override void Unequip(PlayerController playerController)
     {
         base.Unequip(playerController);
-        playerController.UIManager.FireElement.SetActive(true);
+        PlayerUIManager.Instance.FireElement.SetActive(true);
+        playerController.WeaponManager.FireWeapon.SetActive(false);
     }
 
     public override void UpdateAttack(out bool isComplete)

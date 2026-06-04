@@ -10,6 +10,8 @@ public abstract partial class BaseForm
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.ComboSteps[_comboStep];
         _playerController.Animator.CrossFade(step.AnimationName, 0.1f);
+        SpawnStepVFX(_weaponActionData.ComboSteps, _comboStep);
+        PlayStepSound(_weaponActionData.ComboSteps, _comboStep);
         Debug.Log($"공격이름 : {step.AnimationName}  타수 : {_comboStep}");
     }
 
@@ -19,6 +21,8 @@ public abstract partial class BaseForm
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
         _playerController.Animator.CrossFade(step.AnimationName, 0.01f);
+        SpawnStepVFX(_weaponActionData.SkillSteps, _skillStep);
+        PlayStepSound(_weaponActionData.SkillSteps, _skillStep);
         Debug.Log($"스킬 단계 : {step.AnimationName} ({_skillStep})");
     }
 
@@ -28,6 +32,8 @@ public abstract partial class BaseForm
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.UltimateSteps[_ultimateStep];
         _playerController.Animator.CrossFade(step.AnimationName, 0.01f);
+        SpawnStepVFX(_weaponActionData.UltimateSteps, _ultimateStep);
+        PlayStepSound(_weaponActionData.UltimateSteps, _ultimateStep);
         Debug.Log($"궁극기 단계 : {step.AnimationName} ({_ultimateStep})");
     }
 
@@ -40,6 +46,26 @@ public abstract partial class BaseForm
         Vector3 pos = _playerController.transform.position
                     + _playerController.transform.rotation * step.HitBoxOffset;
         Object.Instantiate(step.SlashVFX, pos, _playerController.transform.rotation);
+    }
+
+    protected void SpawnHitVFX(Vector3 position)
+    {
+        if (_weaponActionData?.HitVFX == null) return;
+        Object.Instantiate(_weaponActionData.HitVFX, position, Quaternion.identity);
+    }
+
+    protected void PlayHitSound(Vector3 position)
+    {
+        if (_weaponActionData?.HitSound == null) return;
+
+        AudioClip clip = _weaponActionData.HitSound;
+        if (clip.loadState != AudioDataLoadState.Loaded)
+        {
+            Debug.LogWarning($"[PlayHitSound] '{clip.name}'의 Load Type이 Streaming이거나 아직 로드되지 않아 재생할 수 없습니다. Import Settings에서 Load Type을 'Decompress On Load'로 변경하세요.");
+            return;
+        }
+
+        AudioSource.PlayClipAtPoint(clip, position);
     }
 
     protected void PlayStepSound(List<WeaponActionData> steps, int index)

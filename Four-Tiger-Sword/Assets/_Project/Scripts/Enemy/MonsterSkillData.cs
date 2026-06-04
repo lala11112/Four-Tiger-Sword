@@ -19,5 +19,9 @@ public abstract class MonsterSkillData : ScriptableObject
     [Min(0.01f)]
     public float attackSpeed = 1.0f;
 
+    [Header("패링")]
+    [Tooltip("false로 설정하면 플레이어의 패링으로 이 공격을 막을 수 없습니다.")]
+    public bool isParryable = true;
+
     public abstract EnemyAction CreateAction(Enemy enemy);
 }

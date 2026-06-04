@@ -17,6 +17,7 @@ public class PlayerStateMachineSetup
         var airAttack = new PlayerAirAttackState(_playerController);
         var skill = new PlayerSkillState(_playerController);
         var ultimate = new PlayerUltimateState(_playerController);
+        var parry = new PlayerParryState(_playerController);
         var die = new PlayerDieState(_playerController);
 
         GroundTransitions(stateMachine, idle, move, jump, fall, dash, attack);
@@ -27,6 +28,7 @@ public class PlayerStateMachineSetup
         SkillTransitions(stateMachine, idle, move, skill, jump);
         UltimateTransitions(stateMachine, idle, move, ultimate);
         RunTransitions(stateMachine, idle, move, run, dash, attack);
+        ParryTransitions(stateMachine, idle, move, run, parry, attack);
         AnyTransitions(stateMachine, die);
         stateMachine.ChangeState(idle);
         return stateMachine;    
@@ -121,6 +123,21 @@ public class PlayerStateMachineSetup
         stateMachine.AddTransition(run, attack, () => _playerController.Input.AttackBuffer.IsActive);
         stateMachine.AddTransition(run, move, () => (!_playerController.Input.IsDashHeld || !_playerController.CanRun) && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
         stateMachine.AddTransition(run, idle, () => _playerController.Input.MoveInput.sqrMagnitude <= 0.01f || !_playerController.CanRun);
+    }
+
+    private void ParryTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerMoveState move, PlayerRunState run, PlayerParryState parry, PlayerAttackState attack)
+    {
+        // Idle/Move/Run 에서 패링 진입
+        stateMachine.AddTransition(idle, parry, () => _playerController.Input.ParryBuffer.IsActive && _playerController.CanParry);
+        stateMachine.AddTransition(move, parry, () => _playerController.Input.ParryBuffer.IsActive && _playerController.CanParry);
+        stateMachine.AddTransition(run,  parry, () => _playerController.Input.ParryBuffer.IsActive && _playerController.CanParry);
+
+        // 퍼펙트 패링 반격: 반격 윈도우 중 공격 입력 → 즉시 공격 상태 전환 (idle/move 복귀보다 우선 평가)
+        stateMachine.AddTransition(parry, attack, () => parry.IsCounterWindowActive && _playerController.Input.AttackBuffer.IsActive);
+
+        // 모션 종료 후 복귀
+        stateMachine.AddTransition(parry, idle, () => parry.IsComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
+        stateMachine.AddTransition(parry, move, () => parry.IsComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
 
     private void AnyTransitions(StateMachine stateMachine, PlayerDieState die)

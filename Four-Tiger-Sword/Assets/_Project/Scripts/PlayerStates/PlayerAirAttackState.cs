@@ -14,6 +14,7 @@ public class PlayerAirAttackState : IPlayerState
 
     public void Enter()
     {
+        //_playerController.VerticalVelocity = Mathf.Sqrt(_playerController.JumpForce * -2f * _playerController.Gravity);
         IsComplete = false;
         _isDescending = true;
         _playerController.Input.AttackBuffer.Consume();

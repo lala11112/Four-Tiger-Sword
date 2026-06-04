@@ -32,7 +32,27 @@ public class PlayerController : MonoBehaviour, IDamageable
     public float DashCooldown = 1.0f;
     private float _dashCooldownTimer;
     public bool CanDash => _dashCooldownTimer <= 0f && StatManager.HasEnoughStaminaForDash;
-    public bool IsDashing => StateMachine.CurrentState is PlayerDashState; //대쉬중일 때는 무적
+    public bool IsDashing => StateMachine.CurrentState is PlayerDashState;
+
+    [Header("Parry Settings")]
+    public float ParryCooldown            = 0.8f;
+    [Tooltip("패링 성공 시 필살기 게이지 충전량")]
+    public float ParryUltimateGaugeReward = 30f;
+    [Tooltip("퍼펙트 패링 추가 필살기 게이지 (일반 보상에 더해짐)")]
+    public float PerfectParryUltimateGaugeBonus = 15f;
+    private float _parryCooldownTimer;
+
+    [Header("Perfect Parry Hit Stop")]
+    [Tooltip("퍼펙트 패링 히트스탑 지속 시간 (초)")]
+    [SerializeField] private float _perfectParryHitStopDuration  = 0.35f;
+    [Tooltip("퍼펙트 패링 히트스탑 타임스케일 (0 = 완전 정지)")]
+    [SerializeField] private float _perfectParryHitStopTimeScale = 0f;
+
+    /// <summary>패링 활성 윈도우 내에 있을 때 true. TakeDamage에서 패링 판정에 사용됩니다.</summary>
+    public bool IsParryActive => StateMachine.CurrentState is PlayerParryState ps && ps.IsParryWindowActive;
+
+    /// <summary>쿨타임이 없고 지상에 있을 때만 패링 가능합니다.</summary>
+    public bool CanParry => _parryCooldownTimer <= 0f && IsGround();
 
     public float CurrentStamina          => StatManager.CurrentStamina;
     public bool  HasEnoughStaminaForDash => StatManager.HasEnoughStaminaForDash;
@@ -76,7 +96,9 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public ElementType Element => FormManager?.CurrentForm?.Element ?? ElementType.ELEMENT_NONE;
 
-    public PlayerUIManager UIManager { get; private set; }
+    public WeaponManager WeaponManager { get; private set; }
+
+    private LayerMask _groundLayer;
 
     private void Awake()
     {
@@ -88,7 +110,8 @@ public class PlayerController : MonoBehaviour, IDamageable
         CameraTransform = Camera.main.transform;
         Movement = GetComponent<PlayerMovement>();
         Movement.Initialize(this);
-        UIManager = GetComponent<PlayerUIManager>();
+        WeaponManager = GetComponent<WeaponManager>();
+        
         StateMachine = new StateMachine();
         var stateMachineSetup = new PlayerStateMachineSetup(this);
         StateMachine = stateMachineSetup.Build();
@@ -96,22 +119,25 @@ public class PlayerController : MonoBehaviour, IDamageable
         var formManagerSetup = new FormManagerSetup(this);
         FormManager = formManagerSetup.Build(_FireFormActionData, _WaterFormActionData, _WoodFormActionData, _IronFormActionData, _EarthFormActionData);
 
+        _groundLayer = LayerMask.GetMask("Ground");
     }
 
     private void Start()
     {
         DamageTextManager.Instance?.Register(this);
+        PlayerUIManager.Instance?.Register(this);
     }
 
     private void Update()
     {
         UpdateCoyoteTimer();
         UpdateDashCooldown();
+        UpdateParryCooldown();
         StatManager.UpdateStamina(Time.deltaTime);
         StatManager.UpdateSpRegen(Time.deltaTime);
         StateMachine.Update();
         FormManager.Update();
-        Debug.Log(StateMachine.CurrentState.GetType().Name);
+        //Debug.Log(StateMachine.CurrentState.GetType().Name);
     }
 
     private void UpdateCoyoteTimer()
@@ -128,8 +154,40 @@ public class PlayerController : MonoBehaviour, IDamageable
             _dashCooldownTimer -= Time.deltaTime;
     }
 
+    private void UpdateParryCooldown()
+    {
+        if (_parryCooldownTimer > 0f)
+            _parryCooldownTimer -= Time.deltaTime;
+    }
+
     public void ConsumeStaminaForDash() => StatManager.ConsumeStaminaForDash();
     public void ConsumeStaminaForRun()  => StatManager.ConsumeStaminaForRun(Time.deltaTime);
+
+    public void StartParryCooldown() => _parryCooldownTimer = ParryCooldown;
+
+    /// <summary>
+    /// 패링 성공 시 호출됩니다.
+    /// isPerfect=true(퍼펙트 패링) 일 때는 더 긴 히트스탑, 강한 카메라 흔들림, 추가 게이지를 제공합니다.
+    /// </summary>
+    public void OnParrySuccess(bool isPerfect = false)
+    {
+        if (isPerfect)
+        {
+            Debug.Log("퍼펙트 패링!");
+            StartHitStop(_perfectParryHitStopDuration, _perfectParryHitStopTimeScale);
+            ImpulseSource.GenerateImpulse();
+            ImpulseSource.GenerateImpulse(); // 2중 임펄스로 더 강한 카메라 흔들림
+            StatManager.AddUltimateGauge(ParryUltimateGaugeReward + PerfectParryUltimateGaugeBonus);
+        }
+        else
+        {
+            Debug.Log("패링 성공!");
+            StartHitStop();
+            ImpulseSource.GenerateImpulse();
+            StatManager.AddUltimateGauge(ParryUltimateGaugeReward);
+        }
+        SetAnimatorTrigger("ParrySuccess");
+    }
 
 
 
@@ -149,7 +207,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     public bool IsGround()
     {
         Vector3 sphereCenter = transform.position + Controller.center + Vector3.down * (Controller.height / 2f - Controller.radius);
-        RaycastHit[] hits = Physics.SphereCastAll(sphereCenter, Controller.radius, Vector3.down, 0.1f, LayerMask.GetMask("Ground"));
+        RaycastHit[] hits = Physics.SphereCastAll(sphereCenter, Controller.radius, Vector3.down, 0.1f, _groundLayer);
 
         foreach (var hit in hits)
         {
@@ -159,9 +217,26 @@ public class PlayerController : MonoBehaviour, IDamageable
         return false;
     }
 
-    public void TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE)
+    public void TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE, bool isParryable = true)
     {
         if (IsDashing) return;
+
+        if (isParryable && IsParryActive)
+        {
+            var parryState = StateMachine.CurrentState as PlayerParryState;
+            bool isPerfect = false;
+            if (parryState != null)
+            {
+                bool isFirstHit = parryState.ParriedHitCount == 0;
+                // CurrentAttackSource는 BroadcastHit()으로 ExecuteHit 직전에 설정됨
+                parryState.OnHitParried(ParryEventBus.CurrentAttackSource);
+                // 퍼펙트 연출은 콤보 1타에만 적용 (극적인 히트스탑)
+                isPerfect = parryState.IsPerfectParry && isFirstHit;
+            }
+            OnParrySuccess(isPerfect);
+            return;
+        }
+
         Debug.Log("플레이어 피격!");
         StatManager.TakeDamage((int)damage, damageType, isCritical);
         ApplyKnockback(power);
@@ -183,16 +258,21 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>
     /// 초기 속도에서 0으로 감속하며 NavMesh 위에서 적을 밀어냅니다.
     /// </summary>
+    /// <summary>기본 히트스탑 (Inspector 설정값 사용)</summary>
     public void StartHitStop()
+        => StartHitStop(_hitStopDuration, _hitStopTimeScale);
+
+    /// <summary>히트스탑 지속시간과 타임스케일을 직접 지정합니다. 퍼펙트 패링 등 특수 연출에 사용합니다.</summary>
+    public void StartHitStop(float duration, float timeScale)
     {
         if (_hitStopCoroutine != null) StopCoroutine(_hitStopCoroutine);
-        _hitStopCoroutine = StartCoroutine(HitStopRoutine());
+        _hitStopCoroutine = StartCoroutine(HitStopRoutine(duration, timeScale));
     }
 
-    private IEnumerator HitStopRoutine()
+    private IEnumerator HitStopRoutine(float duration, float timeScale)
     {
-        Time.timeScale = _hitStopTimeScale;
-        yield return new WaitForSecondsRealtime(_hitStopDuration);
+        Time.timeScale = timeScale;
+        yield return new WaitForSecondsRealtime(duration);
         Time.timeScale = 1f;
         _hitStopCoroutine = null;
     }

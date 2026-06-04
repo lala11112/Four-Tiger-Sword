@@ -21,4 +21,15 @@ public class WeaponActionDataSO : ScriptableObject
     [Header("Ultimate (R)")]
     [Tooltip("궁극기 공격 데이터 (여러 단계 가능)")]
     public List<WeaponActionData> UltimateSteps;
+
+    [Header("Hit Effect")]
+    [Tooltip("적을 타격했을 때 적 위치에 스폰할 이펙트 프리팹")]
+    public GameObject HitVFX;
+
+    [Tooltip("적을 타격했을 때 재생할 사운드")]
+    public AudioClip HitSound;
+
+    [Header("Delayed Hit Effect")]
+    [Tooltip("지연 데미지가 터질 때 적 위치에 스폰할 이펙트 프리팹")]
+    public GameObject DelayedHitVFX;
 }

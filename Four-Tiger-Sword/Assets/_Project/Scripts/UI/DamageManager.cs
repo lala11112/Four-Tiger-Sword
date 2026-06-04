@@ -36,6 +36,6 @@ public static class DamageManager
         //    rawDamage += Mathf.RoundToInt(statHandler.EffectiveDef);
         //}
 
-        target.TakeDamage(finalDamage, attackType, isCritical, info.Power, info.PoiseDamage, info.StaggerResistLevel);
+        target.TakeDamage(finalDamage, attackType, isCritical, info.Power, info.PoiseDamage, info.StaggerResistLevel, info.IsParryable);
     }
 }

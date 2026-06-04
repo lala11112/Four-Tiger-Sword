@@ -4,10 +4,7 @@ using UnityEngine;
 public class MonsterJumpSlamSO : MonsterSkillData
 {
     [Header("데미지")]
-    public int damage = 30;
-    [Range(0f, 1f)]
-    public float criticalChance = 0.1f;
-    public float criticalMultiplier = 1.5f;
+    public float damage = 30;
     public float knockbackForce = 18f;
 
     [Header("타이밍")]

@@ -17,7 +17,7 @@ MonoBehaviour:
   - AnimationName: Wood1
     Duration: 1
     ComboTransitionTime: 0.6
-    Damage: 100
+    Damage: 1
     PoiseDamage: 10
     HitStartTime: 0.3
     HitDuration: 0.05
@@ -69,7 +69,7 @@ MonoBehaviour:
   - AnimationName: Wood1
     Duration: 1
     ComboTransitionTime: 0.6
-    Damage: 100
+    Damage: 1
     PoiseDamage: 10
     HitStartTime: 0.3
     HitDuration: 0.05
@@ -121,7 +121,7 @@ MonoBehaviour:
   - AnimationName: Wood1
     Duration: 1
     ComboTransitionTime: 0.6
-    Damage: 100
+    Damage: 1
     PoiseDamage: 10
     HitStartTime: 0.3
     HitDuration: 0.05
@@ -302,3 +302,6 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 10
+  HitVFX: {fileID: 0}
+  HitSound: {fileID: 0}
+  DelayedHitVFX: {fileID: 0}

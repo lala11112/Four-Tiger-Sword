@@ -21,8 +21,8 @@ public abstract class BossPhaseBase : IBossPhase
     /// <summary>스킬셋이 지정돼 있으면 교체하고, 스탯 배율을 적용합니다.</summary>
     public virtual void OnEnter(Boss boss)
     {
-        if (Data.skillSet != null)
-            boss.MonsterSkillData = Data.skillSet;
+        //if (Data.skillSet != null)
+            //boss.MonsterSkillData = Data.skillSet;
     }
 
     public virtual void OnExit(Boss boss) { }

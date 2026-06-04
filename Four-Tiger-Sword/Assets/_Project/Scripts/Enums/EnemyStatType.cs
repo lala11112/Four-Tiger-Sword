@@ -6,6 +6,8 @@ public enum EnemyStatType
     // 전투
     ATK,              // 기본 공격력
     DEF,              // 기본 방어력
+    CriticalChance,   // 크리티컬 확률
+    CriticalDamage,   // 크리티컬 데미지
     AttackCooldown,   // 공격 쿨타임 (초)
 
     // 이동 및 감지

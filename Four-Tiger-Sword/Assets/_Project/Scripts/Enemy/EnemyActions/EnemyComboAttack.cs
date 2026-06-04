@@ -42,13 +42,18 @@ public class EnemyComboAttack : EnemyAction
         }
 
         if (_timer >= _data.attackDuration)
+        {
+            // 콤보가 완전히 끝난 시점에 예고 종료
+            EndTelegraph();
             IsFinished = true;
+        }
     }
 
     private void ExecuteHit(int index, EnemyHitEvent e)
     {
+        BroadcastHit(); // TakeDamage에서 이 액션을 소스로 식별하기 위해
         Vector3 center = GetHitCenter(e.hitBoxOffset);
-        int damage = e.damage > 0 ? e.damage : _data.baseDamage;
+        float damage = e.damage > 0 ? e.damage : _data.baseDamage;
 
         foreach (var col in Physics.OverlapSphere(center, _data.hitBoxRadius, _playerLayer))
         {
@@ -57,8 +62,8 @@ public class EnemyComboAttack : EnemyAction
 
             _hitTargets[index].Add(col);
             DamageManager.Apply(
-                new HitInfo(damage, ElementType.ELEMENT_FIRE, _data.criticalChance,
-                            _data.criticalMultiplier, power: GetKnockbackDirection(col) * _data.knockbackForce),
+                new HitInfo(damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: GetKnockbackDirection(col) * _data.knockbackForce),
                 damageable, col.gameObject);
         }
     }

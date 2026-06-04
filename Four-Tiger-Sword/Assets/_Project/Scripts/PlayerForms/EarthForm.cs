@@ -4,23 +4,21 @@ public class EarthForm : BaseForm
 {
     public override ElementType Element => ElementType.ELEMENT_EARTH;
 
-    public override float SkillSpCost      => 150f;
-    public override float SkillCooldown    => 8f;
-    public override float UltimateSpCost   => 600f;
-    public override float UltimateCooldown => 40f;
+    public override float SkillSpCost   => 150f;
+    public override float SkillCooldown => 8f;
 
     public EarthForm(WeaponActionDataSO weaponActionData) : base(weaponActionData) { }
 
     public override void Equip(PlayerController playerController)
     {
         base.Equip(playerController);
-        playerController.UIManager.EarthElement.SetActive(false);
+        PlayerUIManager.Instance.EarthElement.SetActive(false);
     }
 
     public override void Unequip(PlayerController playerController)
     {
         base.Unequip(playerController);
-        playerController.UIManager.EarthElement.SetActive(true);
+        PlayerUIManager.Instance.EarthElement.SetActive(true);
     }
 
     public override void UpdateAttack(out bool isComplete)
@@ -37,9 +35,7 @@ public class EarthForm : BaseForm
 
         ProcessHit(currentStep);
 
-        Vector3 moveVelocity = _playerController.transform.forward * currentStep.ForwardThrust;
-        moveVelocity.y = _playerController.VerticalVelocity;
-        _playerController.Controller.Move(moveVelocity * Time.deltaTime);
+        MoveForward(currentStep);
 
         if (_timer >= currentStep.ComboTransitionTime &&
             _playerController.Input.AttackBuffer.IsActive &&
@@ -57,13 +53,10 @@ public class EarthForm : BaseForm
     public override void BeginSkill()
     {
         base.BeginSkill();
-        SpawnStepVFX(_weaponActionData.SkillSteps, 0);
-        PlayStepSound(_weaponActionData.SkillSteps, 0);
     }
 
     public override void BeginUltimate()
     {
         base.BeginUltimate();
-        SpawnStepVFX(_weaponActionData.UltimateSteps, 0);
     }
 }

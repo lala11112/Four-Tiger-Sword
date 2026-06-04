@@ -16,6 +16,7 @@ public class PlayerInputHandler : MonoBehaviour
     [SerializeField] private InputActionReference _fastFormAction;
     [SerializeField] private InputActionReference _skillAction;
     [SerializeField] private InputActionReference _ultimateAction;
+    [SerializeField] private InputActionReference _parryAction;
 
     public Vector2 MoveInput { get; private set; }
     public bool IsDashHeld { get; private set; }
@@ -30,6 +31,7 @@ public class PlayerInputHandler : MonoBehaviour
     public InputBuffer DashBuffer;
     public InputBuffer SkillBuffer;
     public InputBuffer UltimateBuffer;
+    public InputBuffer ParryBuffer;
 
     private void OnEnable()
     {
@@ -45,6 +47,7 @@ public class PlayerInputHandler : MonoBehaviour
         _fastFormAction.action.Enable();
         _skillAction.action.Enable();
         _ultimateAction.action.Enable();
+        _parryAction?.action.Enable();
     }
 
     private void OnDisable()
@@ -61,6 +64,7 @@ public class PlayerInputHandler : MonoBehaviour
         _fastFormAction.action.Disable();
         _skillAction.action.Disable();
         _ultimateAction.action.Disable();
+        _parryAction?.action.Disable();
     }
 
     private void Update()
@@ -79,6 +83,7 @@ public class PlayerInputHandler : MonoBehaviour
         DashBuffer.Update(Time.deltaTime);
         SkillBuffer.Update(Time.deltaTime);
         UltimateBuffer.Update(Time.deltaTime);
+        ParryBuffer.Update(Time.deltaTime);
 
         if(_jumpAction.action.WasPressedThisFrame())
             JumpBuffer.Set();
@@ -94,5 +99,8 @@ public class PlayerInputHandler : MonoBehaviour
 
         if(_ultimateAction.action.WasPressedThisFrame())
             UltimateBuffer.Set();
+
+        if(_parryAction != null && _parryAction.action.WasPressedThisFrame())
+            ParryBuffer.Set();
     }
 }

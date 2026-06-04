@@ -17,24 +17,23 @@ MonoBehaviour:
   excuteRange: 2
   weight: 10
   attackSpeed: 1
-  baseDamage: 10
-  criticalChance: 0.1
-  criticalMultiplier: 1.5
+  isParryable: 1
+  baseDamage: 0.7
   knockbackForce: 5
-  telegraphDuration: 0.4
+  telegraphDuration: 0.7
   attackDuration: 4.2
   hitBoxShape: 0
   hitBoxRadius: 1.2
   hits:
   - hitStartTime: 1
     hitDuration: 0.1
-    damage: 50
+    damage: 0.5
     hitBoxOffset: {x: 0, y: 0, z: 1}
   - hitStartTime: 1.8
     hitDuration: 0.1
-    damage: 60
+    damage: 0.6
     hitBoxOffset: {x: 0, y: 0, z: 1}
   - hitStartTime: 2.6
     hitDuration: 0.1
-    damage: 0
+    damage: 1
     hitBoxOffset: {x: 0, y: 0, z: 1}

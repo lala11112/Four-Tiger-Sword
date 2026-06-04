@@ -16,6 +16,9 @@ public abstract partial class BaseForm
                 HitEvent e = step.HitEvents[i];
                 if (_timer < e.StartTime || _timer > e.StartTime + e.Duration) continue;
 
+                //사운드 재생
+                //PlayStepSound();
+
                 if (!_hitEventTargets.ContainsKey(i)) _hitEventTargets[i] = new HashSet<Collider>();
                 ExecuteHit(step, e.Damage > 0 ? e.Damage : step.Damage, e.PoiseDamage > 0 ? e.PoiseDamage : step.PoiseDamage, _hitEventTargets[i]);
             }

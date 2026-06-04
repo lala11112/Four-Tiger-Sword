@@ -76,6 +76,7 @@ public class EnemyJumpSlam : EnemyAction
 
     public override void Exit()
     {
+        base.Exit(); // 예고가 아직 활성 상태라면 여기서 종료
         // 상태가 중단될 경우에도 NavMeshAgent 복구
         if (!_nav.enabled)
         {
@@ -150,6 +151,9 @@ public class EnemyJumpSlam : EnemyAction
         }
         _enemy.SyncMovementLock();
         _enemy.gameObject.transform.rotation = Quaternion.Euler(0f, _enemy.gameObject.transform.rotation.y, 0f);
+        // 착지 충격 직전 예고 종료 — 충격 범위에 들어온 플레이어는 더 이상 패링 불가
+        EndTelegraph();
+        BroadcastHit(); // TakeDamage에서 이 액션을 소스로 식별하기 위해
         ExecuteSlam();
     }
 
@@ -167,8 +171,8 @@ public class EnemyJumpSlam : EnemyAction
             // 착지 충격은 외부로 퍼지는 방향이 아닌 위→아래 방향 넉백 포함
             Vector3 knockback = GetKnockbackDirection(col) * _data.knockbackForce;
             DamageManager.Apply(
-                new HitInfo(_data.damage, ElementType.ELEMENT_NONE, _data.criticalChance,
-                            _data.criticalMultiplier, power: knockback),
+                new HitInfo(_data.damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: knockback),
                 damageable, col.gameObject);
         }
     }

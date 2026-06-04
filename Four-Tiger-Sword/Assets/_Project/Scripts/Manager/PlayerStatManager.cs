@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PlayerStatManager : MonoBehaviour
 {
@@ -23,6 +22,18 @@ public class PlayerStatManager : MonoBehaviour
     public float CurrentHp => _currentHp;
     public float CurrentSp => _currentSp;
 
+    // ── 런타임 필살기 게이지 상태 ─────────────────────────────────────────────────
+    private float _currentUltimateGauge;
+
+    public float CurrentUltimateGauge => _currentUltimateGauge;
+    public float MaxUltimateGauge     => baseData != null ? baseData.maxUltimateGauge : 100f;
+
+    /// <summary>필살기 게이지가 최대치에 도달했을 때 true를 반환합니다.</summary>
+    public bool IsUltimateGaugeReady  => _currentUltimateGauge >= MaxUltimateGauge;
+
+    /// <summary>필살기 게이지가 변경될 때마다 발생합니다. (현재량, 최대량) UI 갱신용.</summary>
+    public event Action<float, float> OnUltimateGaugeChanged;
+
     // ── 런타임 스테미나 상태 ──────────────────────────────────────────────────────
     private float _currentStamina;
     private float _staminaRegenTimer;
@@ -33,6 +44,10 @@ public class PlayerStatManager : MonoBehaviour
 
     /// <summary>피해를 받을 때마다 발생합니다. EarthForm 흡수 스탯 등이 구독합니다.</summary>
     public event Action<int, ElementType, bool> OnDamageTaken;
+
+    /// <summary>HP가 변경될 때마다 발생합니다. (현재HP, 최대HP) UI 갱신용.</summary>
+    public event Action<float, float> OnHpChanged;
+    public event Action<float, float> OnSpChanged;
 
     private PlayerController _playerController;
 
@@ -78,9 +93,10 @@ public class PlayerStatManager : MonoBehaviour
 
         RecalculateAll();   // 전체 스탯 한번 계산
 
-        _currentHp       = GetStat(StatType.ST_HP);
-        _currentSp       = GetStat(StatType.ST_SP);
-        _currentStamina  = GetStat(StatType.ST_STM);
+        _currentHp             = GetStat(StatType.ST_HP);
+        _currentSp             = GetStat(StatType.ST_SP);
+        _currentStamina        = GetStat(StatType.ST_STM);
+        _currentUltimateGauge  = 0f;
     }
 
 
@@ -168,7 +184,7 @@ public class PlayerStatManager : MonoBehaviour
     {
         _currentHp = Mathf.Max(0f, _currentHp - damage);
         OnDamageTaken?.Invoke(damage, damageType, isCritical);
-        _playerController.UIManager.HpBar.GetComponent<Image>().fillAmount = _currentHp / GetStat(StatType.ST_HP);
+        OnHpChanged?.Invoke(_currentHp, GetStat(StatType.ST_HP));
     }
 
     // ── SP 메서드 ────────────────────────────────────────────────────────────────
@@ -179,6 +195,7 @@ public class PlayerStatManager : MonoBehaviour
         if (_currentSp < amount) return false;
         _currentSp = Mathf.Max(0f, _currentSp - amount);
         _spRegenTimer = baseData != null ? baseData.baseSpRegenDelay : 2f;
+        OnSpChanged?.Invoke(_currentSp, GetStat(StatType.ST_SP));
         return true;
     }
 
@@ -186,6 +203,7 @@ public class PlayerStatManager : MonoBehaviour
     public void AddSp(float amount)
     {
         _currentSp = Mathf.Min(_currentSp + amount, GetStat(StatType.ST_SP));
+        OnSpChanged?.Invoke(_currentSp, GetStat(StatType.ST_SP));
     }
 
     /// <summary>현재 SP가 요구량 이상인지 확인합니다.</summary>
@@ -203,6 +221,23 @@ public class PlayerStatManager : MonoBehaviour
         float maxSp = GetStat(StatType.ST_SP);
         if (_currentSp < maxSp)
             _currentSp = Mathf.Min(_currentSp + GetStat(StatType.ST_SP_REGEN) * deltaTime, maxSp);
+        OnSpChanged?.Invoke(_currentSp, GetStat(StatType.ST_SP));
+    }
+
+    // ── 필살기 게이지 메서드 ──────────────────────────────────────────────────────
+
+    /// <summary>필살기 게이지를 지정한 양만큼 충전합니다. 최대치를 초과하지 않습니다.</summary>
+    public void AddUltimateGauge(float amount)
+    {
+        _currentUltimateGauge = Mathf.Min(_currentUltimateGauge + amount, MaxUltimateGauge);
+        OnUltimateGaugeChanged?.Invoke(_currentUltimateGauge, MaxUltimateGauge);
+    }
+
+    /// <summary>필살기 사용 시 호출합니다. 현재 게이지를 전부 소모합니다.</summary>
+    public void ConsumeAllUltimateGauge()
+    {
+        _currentUltimateGauge = 0f;
+        OnUltimateGaugeChanged?.Invoke(_currentUltimateGauge, MaxUltimateGauge);
     }
 
     // ── 스테미나 메서드 ──────────────────────────────────────────────────────────

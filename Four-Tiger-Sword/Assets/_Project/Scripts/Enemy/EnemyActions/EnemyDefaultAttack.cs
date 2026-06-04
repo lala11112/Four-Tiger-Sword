@@ -29,6 +29,9 @@ public class EnemyDefaultAttack : EnemyAction
 
         if (!_hasHit && _timer >= _data.hitStartTime && _timer <= _data.hitStartTime + _data.hitDuration)
         {
+            // 실제 타격이 시작되는 순간 예고 종료 → 플레이어가 반응할 수 없는 구간임을 명확히
+            EndTelegraph();
+            BroadcastHit(); // TakeDamage에서 이 액션을 소스로 식별하기 위해
             ExecuteHit();
             _hasHit = true;
         }
@@ -48,8 +51,8 @@ public class EnemyDefaultAttack : EnemyAction
 
             _hitTargets.Add(col);
             DamageManager.Apply(
-                new HitInfo(_data.damage, ElementType.ELEMENT_NONE, _data.criticalChance,
-                            _data.criticalMultiplier, power: GetKnockbackDirection(col) * _data.knockbackForce),
+                new HitInfo(_data.damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: GetKnockbackDirection(col) * _data.knockbackForce),
                 damageable, col.gameObject);
         }
     }

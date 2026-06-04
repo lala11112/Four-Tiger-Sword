@@ -4,23 +4,21 @@ public class IronForm : BaseForm
 {
     public override ElementType Element => ElementType.ELEMENT_GOLD;
 
-    public override float SkillSpCost      => 200f;
-    public override float SkillCooldown    => 10f;
-    public override float UltimateSpCost   => 500f;
-    public override float UltimateCooldown => 30f;
+    public override float SkillSpCost   => 200f;
+    public override float SkillCooldown => 10f;
 
     public IronForm(WeaponActionDataSO weaponActionData) : base(weaponActionData) { }
 
     public override void Equip(PlayerController playerController)
     {
         base.Equip(playerController);
-        playerController.UIManager.IronElement.SetActive(false);
+        PlayerUIManager.Instance.IronElement.SetActive(false);
     }
 
     public override void Unequip(PlayerController playerController)
     {
         base.Unequip(playerController);
-        playerController.UIManager.IronElement.SetActive(true);
+        PlayerUIManager.Instance.IronElement.SetActive(true);
     }
 
     public override void UpdateAttack(out bool isComplete)
@@ -37,9 +35,7 @@ public class IronForm : BaseForm
 
         ProcessHit(currentStep);
 
-        Vector3 moveVelocity = _playerController.transform.forward * currentStep.ForwardThrust;
-        moveVelocity.y = _playerController.VerticalVelocity;
-        _playerController.Controller.Move(moveVelocity * Time.deltaTime);
+        MoveForward(currentStep);
 
         if (_timer >= currentStep.ComboTransitionTime &&
             _playerController.Input.AttackBuffer.IsActive &&

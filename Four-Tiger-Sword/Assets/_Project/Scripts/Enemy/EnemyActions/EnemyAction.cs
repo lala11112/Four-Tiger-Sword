@@ -9,6 +9,8 @@ public abstract class EnemyAction
     protected readonly LayerMask _playerLayer;
     protected float _timer;
 
+    private bool _telegraphActive = false;
+
     protected EnemyAction(MonsterSkillData data, Enemy enemy)
     {
         SkillData = data;
@@ -20,8 +22,11 @@ public abstract class EnemyAction
     {
         _timer = 0f;
         IsFinished = false;
+        _telegraphActive = false;
         if (_enemy.Animator != null)
             _enemy.Animator.speed = SkillData.attackSpeed;
+
+        StartTelegraph();
     }
 
     public virtual void Update()
@@ -34,6 +39,35 @@ public abstract class EnemyAction
     {
         if (_enemy.Animator != null)
             _enemy.Animator.speed = 1f;
+
+        EndTelegraph();
+    }
+
+    /// <summary>패링 가능한 공격임을 플레이어 패링 시스템에 알립니다. Enter 시 자동 호출됩니다.</summary>
+    protected void StartTelegraph()
+    {
+        if (!SkillData.isParryable || _telegraphActive) return;
+        _telegraphActive = true;
+        ParryEventBus.BroadcastTelegraphStart(this);
+        _enemy.OnTelegraphStart(this);
+    }
+
+    /// <summary>예고 구간을 종료합니다. 실제 타격 직전 또는 Exit 시 호출됩니다.</summary>
+    protected void EndTelegraph()
+    {
+        if (!_telegraphActive) return;
+        _telegraphActive = false;
+        ParryEventBus.BroadcastTelegraphEnd(this);
+        _enemy.OnTelegraphEnd(this);
+    }
+
+    /// <summary>
+    /// ExecuteHit 직전에 호출합니다. PlayerController.TakeDamage에서 이 액션의 소스를 식별하는 데 사용됩니다.
+    /// </summary>
+    protected void BroadcastHit()
+    {
+        if (SkillData.isParryable)
+            ParryEventBus.BroadcastHit(this);
     }
     
 

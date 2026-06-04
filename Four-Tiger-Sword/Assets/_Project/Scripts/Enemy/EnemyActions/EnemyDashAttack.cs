@@ -47,7 +47,8 @@ public class EnemyDashAttack : EnemyAction
                 FaceTarget();
                 if (_timer >= _data.startupTime)
                 {
-                    // 대쉬 방향을 이 시점에 확정 — 이후 플레이어가 움직여도 방향 고정
+                    // 대쉬가 시작되면 예고 종료 — 플레이어가 피해야 하는 구간 시작
+                    EndTelegraph();
                     _dashDirection = GetDirectionToTarget();
                     _timer = 0f;
                     _phase = Phase.Dash;
@@ -79,6 +80,7 @@ public class EnemyDashAttack : EnemyAction
 
     public override void Exit()
     {
+        base.Exit(); // 예고가 아직 활성 상태라면 여기서 종료
         if (!_movementUnlocked)
         {
             _enemy.UnlockMovement();
@@ -99,6 +101,7 @@ public class EnemyDashAttack : EnemyAction
 
     private void CheckHit()
     {
+        BroadcastHit(); // TakeDamage에서 이 액션을 소스로 식별하기 위해
         Vector3 center = GetHitCenter(_data.hitBoxOffset);
 
         foreach (var col in Physics.OverlapSphere(center, _data.hitBoxRadius, _playerLayer))
@@ -108,8 +111,8 @@ public class EnemyDashAttack : EnemyAction
 
             _hitTargets.Add(col);
             DamageManager.Apply(
-                new HitInfo(_data.damage, ElementType.ELEMENT_NONE, _data.criticalChance,
-                            _data.criticalMultiplier, power: _dashDirection * _data.knockbackForce),
+                new HitInfo(_data.damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: _dashDirection * _data.knockbackForce),
                 damageable, col.gameObject);
         }
     }

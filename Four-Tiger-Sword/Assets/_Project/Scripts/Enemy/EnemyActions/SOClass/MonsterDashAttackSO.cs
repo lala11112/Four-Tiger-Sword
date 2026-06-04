@@ -4,10 +4,7 @@ using UnityEngine;
 public class MonsterDashAttackSO : MonsterSkillData
 {
     [Header("데미지")]
-    public int damage = 20;
-    [Range(0f, 1f)]
-    public float criticalChance = 0.05f;
-    public float criticalMultiplier = 1.5f;
+    public float damage = 20;
     public float knockbackForce = 12f;
 
     [Header("타이밍")]

@@ -4,23 +4,21 @@
     {
         public override ElementType Element => ElementType.ELEMENT_WOOD;
 
-        public override float SkillSpCost      => 180f;
-        public override float SkillCooldown    => 12f;
-        public override float UltimateSpCost   => 450f;
-        public override float UltimateCooldown => 35f;
+        public override float SkillSpCost   => 180f;
+        public override float SkillCooldown => 12f;
 
         public WoodForm(WeaponActionDataSO weaponActionData) : base(weaponActionData) { }
 
         public override void Equip(PlayerController playerController)
         {
             base.Equip(playerController);
-            playerController.UIManager.WoodElement.SetActive(false);
+            PlayerUIManager.Instance.WoodElement.SetActive(false);
         }
 
         public override void Unequip(PlayerController playerController)
         {
             base.Unequip(playerController);
-            playerController.UIManager.WoodElement.SetActive(true);
+            PlayerUIManager.Instance.WoodElement.SetActive(true);
         }
 
         public override void UpdateAttack(out bool isComplete)
@@ -37,9 +35,7 @@
 
             ProcessHit(currentStep);
 
-            Vector3 moveVelocity = _playerController.transform.forward * currentStep.ForwardThrust;
-            moveVelocity.y = _playerController.VerticalVelocity;
-            _playerController.Controller.Move(moveVelocity * Time.deltaTime);
+            MoveForward(currentStep);
 
             if (_timer >= currentStep.ComboTransitionTime &&
                 _playerController.Input.AttackBuffer.IsActive &&
@@ -68,6 +64,6 @@
 
         protected override void OnHitEnemy(GameObject enemy)
         {
-            enemy.GetComponent<EnemyStackManager>().AddStack(StackType.Wood);  
+            enemy.GetComponent<EnemyStackManager>()?.AddStack(StackType.Wood);  
         }
     }

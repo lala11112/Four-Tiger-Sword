@@ -4,10 +4,7 @@ using UnityEngine;
 public class MonsterDefaultAttackSO : MonsterSkillData
 {
     [Header("데미지")]
-    public int damage = 10;
-    [Range(0f, 1f)]
-    public float criticalChance = 0.1f;
-    public float criticalMultiplier = 1.5f;
+    public float damage = 10;
     public float knockbackForce = 5f;
 
     [Header("타이밍")]

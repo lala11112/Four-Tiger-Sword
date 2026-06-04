@@ -31,7 +31,7 @@ MonoBehaviour:
     StaggerResistLevel: 1
     HitEvents: []
     SlashVFX: {fileID: 0}
-    SwingSound: {fileID: 0}
+    SwingSound: {fileID: 8300000, guid: 4ee7b1224a6ce024f93e54eadb019e3c, type: 3}
     ThrustCurve:
       serializedVersion: 2
       m_Curve:
@@ -45,10 +45,10 @@ MonoBehaviour:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.20381665
-        value: 0.000040210783
-        inSlope: -4.845986
-        outSlope: -0.00033523163
+        time: 0.29144788
+        value: 0.003275074
+        inSlope: -3.3882544
+        outSlope: -0.0050501833
         tangentMode: 69
         weightedMode: 0
         inWeight: 0.33333334
@@ -65,7 +65,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 11
+    ThrustMultiplier: 15
   - AnimationName: OutSlash
     Duration: 1.267
     ComboTransitionTime: 1
@@ -83,7 +83,7 @@ MonoBehaviour:
     StaggerResistLevel: 1
     HitEvents: []
     SlashVFX: {fileID: 0}
-    SwingSound: {fileID: 0}
+    SwingSound: {fileID: 8300000, guid: 4ee7b1224a6ce024f93e54eadb019e3c, type: 3}
     ThrustCurve:
       serializedVersion: 2
       m_Curve:
@@ -117,8 +117,8 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 13
-  - AnimationName: Punshing3
+    ThrustMultiplier: 20
+  - AnimationName: Fire1
     Duration: 2
     ComboTransitionTime: 0
     Damage: 2.2
@@ -135,7 +135,7 @@ MonoBehaviour:
     StaggerResistLevel: 3
     HitEvents: []
     SlashVFX: {fileID: 0}
-    SwingSound: {fileID: 0}
+    SwingSound: {fileID: 8300000, guid: fe9f380adc1e9574c8d5d58e419d6000, type: 3}
     ThrustCurve:
       serializedVersion: 2
       m_Curve:
@@ -169,7 +169,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 15
+    ThrustMultiplier: 20
   AirAttackStep:
     AnimationName: FireAirAttack
     Duration: 0.5
@@ -215,74 +215,37 @@ MonoBehaviour:
       m_RotationOrder: 4
     ThrustMultiplier: 10
   SkillSteps:
-  - AnimationName: FireSkill1
-    Duration: 0.5
+  - AnimationName: ComboSlash
+    Duration: 2.767
     ComboTransitionTime: 0
-    Damage: 150
-    PoiseDamage: 10
-    HitStartTime: 0.15
-    HitDuration: 0.12
-    HitBoxOffset: {x: 0, y: 0, z: 2}
-    HitBoxShape: 0
-    HitBoxRadius: 1.8
-    HitBoxSize: {x: 5, y: 1, z: 2}
+    Damage: 0
+    PoiseDamage: 0
+    HitStartTime: 0
+    HitDuration: 0
+    HitBoxOffset: {x: 0, y: 0, z: 1.5}
+    HitBoxShape: 1
+    HitBoxRadius: 0
+    HitBoxSize: {x: 1.5, y: 1.5, z: 1.5}
     HitBoxHeight: 0
-    ForwardThrust: 3
-    KnockbackForce: 8
-    StaggerResistLevel: 3
-    HitEvents: []
-    SlashVFX: {fileID: 0}
-    SwingSound: {fileID: 0}
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0.0042458177
-        value: 1.0050553
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 0.19386056
-        value: 0.0015408993
-        inSlope: -5.292386
-        outSlope: -0.001911455
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 25
-  - AnimationName: FireSkill2
-    Duration: 1.6
-    ComboTransitionTime: 0
-    Damage: 300
-    PoiseDamage: 10
-    HitStartTime: 1
-    HitDuration: 0.5
-    HitBoxOffset: {x: 0, y: 0, z: 0}
-    HitBoxShape: 0
-    HitBoxRadius: 3.5
-    HitBoxSize: {x: 0, y: 0, z: 0}
-    HitBoxHeight: 0
-    ForwardThrust: 0
-    KnockbackForce: 8
+    ForwardThrust: 15
+    KnockbackForce: 15
     StaggerResistLevel: 4
-    HitEvents: []
+    HitEvents:
+    - StartTime: 0.8
+      Duration: 0.05
+      Damage: 1.2
+      PoiseDamage: 50
+      StaggerResistLevel: 2
+    - StartTime: 1.5
+      Duration: 0.05
+      Damage: 1.4
+      PoiseDamage: 60
+      StaggerResistLevel: 3
+    - StartTime: 2.2
+      Duration: 0.05
+      Damage: 2
+      PoiseDamage: 80
+      StaggerResistLevel: 4
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
     ThrustCurve:
@@ -290,26 +253,89 @@ MonoBehaviour:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
+        value: 1
+        inSlope: -4.5503025
+        outSlope: -4.5503025
+        tangentMode: 34
         weightedMode: 0
         inWeight: 0
-        outWeight: 0
+        outWeight: 0.33333334
       - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
+        time: 0.21734512
+        value: 0.011013985
+        inSlope: -4.5503025
+        outSlope: -0.008009205
+        tangentMode: 69
         weightedMode: 0
-        inWeight: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.42056814
+        value: 0.00938633
+        inSlope: -0.008009202
+        outSlope: -0.008009202
+        tangentMode: 1
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.4971317
+        value: 0.99359506
+        inSlope: -0.008009201
+        outSlope: -0.008009201
+        tangentMode: 1
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.6304168
+        value: -0.0011614561
+        inSlope: -7.4633737
+        outSlope: 0.020649536
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.68849343
+        value: 0.000037799124
+        inSlope: 0.017115619
+        outSlope: 0.017115619
+        tangentMode: 1
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.81663495
+        value: 0.9952715
+        inSlope: 7.7666764
+        outSlope: -17.261875
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.87429
+        value: 0.00003749132
+        inSlope: -17.261875
+        outSlope: 0.044398177
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.9833374
+        value: 0.004878998
+        inSlope: 0.044398177
+        outSlope: 0.044398177
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 0
+    ThrustMultiplier: 18
   UltimateSteps:
   - AnimationName: FireUlt
     Duration: 2
@@ -354,3 +380,6 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 10
+  HitVFX: {fileID: 1766868900565162, guid: f82a1a892a042c1438f8f4704a37e11b, type: 3}
+  HitSound: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
+  DelayedHitVFX: {fileID: 0}

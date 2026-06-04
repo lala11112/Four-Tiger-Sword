@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27f5a2bfb83f3f047a2cb3bf3cb9a791, type: 3}
   m_Name: BigMonster
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  elementType: 0
+  elementType: 1
   maxHp: 3000
   baseAtk: 150
   baseDef: 150
+  criticalChance: 0.7
+  criticalDamage: 1.5
   combatRange: 5
   combatExitRange: 6
   knockbackResistance: 5

@@ -10,7 +10,7 @@ public class EnemyHitEvent
     [Tooltip("판정 지속 시간")]
     public float hitDuration = 0.1f;
     [Tooltip("이 타격의 데미지 (0이면 baseDamage 사용)")]
-    public int damage = 0;
+    public float damage = 0;
     [Tooltip("히트박스 위치 오프셋 (타격마다 다르게 설정 가능)")]
     public Vector3 hitBoxOffset = new Vector3(0f, 0f, 1f);
 }
@@ -19,10 +19,7 @@ public class EnemyHitEvent
 public class MonsterComboAttackSO : MonsterSkillData
 {
     [Header("공통 데미지")]
-    public int baseDamage = 10;
-    [Range(0f, 1f)]
-    public float criticalChance = 0.1f;
-    public float criticalMultiplier = 1.5f;
+    public float baseDamage = 10;
     public float knockbackForce = 5f;
 
     [Header("타이밍")]
