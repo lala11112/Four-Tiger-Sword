@@ -14,14 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MonsterDefaultAttackSO
   animName: Slash
   engageRange: 5
-  excuteRange: 2
-  weight: 10
+  executeRange: 2
+  weight: 50
   attackSpeed: 1
+  isParryable: 1
+  telegraphDuration: 1
   damage: 1
-  criticalChance: 0.1
-  criticalMultiplier: 1.5
-  knockbackForce: 5
-  telegraphDuration: 0.5
+  knockbackForce: 30
   hitStartTime: 1
   hitDuration: 0.2
   attackDuration: 1.733

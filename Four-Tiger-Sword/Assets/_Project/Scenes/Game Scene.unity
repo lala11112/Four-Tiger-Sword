@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 9851970bf44a63643932bec2fa84f335, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -901,7 +901,7 @@ GameObject:
   - component: {fileID: 328436243}
   - component: {fileID: 328436242}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: DamageTextUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3836,13 +3836,13 @@ MonoBehaviour:
   Radius: 5
   Orbits:
     Top:
-      Radius: 2
+      Radius: 3
       Height: 5
     Center:
-      Radius: 5
+      Radius: 4.5
       Height: 2.25
     Bottom:
-      Radius: 2.5
+      Radius: 2
       Height: 0.1
     SplineCurvature: 0.5
   RecenteringTarget: 3
@@ -3927,8 +3927,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1075582818}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.122183315, y: 0, z: 0, w: 0.9925076}
-  m_LocalPosition: {x: 2.69, y: 2.95, z: -41.68}
+  m_LocalRotation: {x: 0.13505942, y: -1.3725236e-10, z: 1.8754725e-11, w: 0.9908376}
+  m_LocalPosition: {x: 2.69, y: 2.95, z: -41.18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4602,9 +4602,6 @@ MonoBehaviour:
   DashCooldown: 1
   ParryCooldown: 0.8
   ParryUltimateGaugeReward: 30
-  PerfectParryUltimateGaugeBonus: 15
-  _perfectParryHitStopDuration: 0.35
-  _perfectParryHitStopTimeScale: 0
   _FireFormActionData: {fileID: 11400000, guid: ddfdcb1b3fb44274a8bbf37f6fe3a95b, type: 2}
   _WaterFormActionData: {fileID: 11400000, guid: 4b73531aafb753149bfae2eb4ee665f6, type: 2}
   _WoodFormActionData: {fileID: 11400000, guid: 0fc8f1af7750ac34394d988c88544241, type: 2}
@@ -4666,15 +4663,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineImpulseSource
   ImpulseDefinition:
     ImpulseChannel: 1
-    ImpulseShape: 0
+    ImpulseShape: 1
     CustomImpulseShape:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.1962204
-        inSlope: -0.20010784
-        outSlope: -0.20010784
+        value: 0.98296356
+        inSlope: -0.99390996
+        outSlope: -0.99390996
         tangentMode: 34
         weightedMode: 0
         inWeight: 0
@@ -4682,8 +4679,8 @@ MonoBehaviour:
       - serializedVersion: 3
         time: 1
         value: 0.0000033588149
-        inSlope: -0.20010784
-        outSlope: -0.20010784
+        inSlope: -0.99390996
+        outSlope: -0.99390996
         tangentMode: 34
         weightedMode: 0
         inWeight: 0.33333334
@@ -4692,11 +4689,11 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ImpulseDuration: 0.1
-    ImpulseType: 0
+    ImpulseType: 3
     DissipationRate: 0.25
-    RawSignal: {fileID: 0}
-    AmplitudeGain: 1
-    FrequencyGain: 1
+    RawSignal: {fileID: 11400000, guid: bcf6524ce6451f34cb7106d0c00da9a5, type: 2}
+    AmplitudeGain: 4
+    FrequencyGain: 25
     RepeatMode: 0
     Randomize: 1
     TimeEnvelope:
@@ -4712,12 +4709,12 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-      AttackTime: 0
-      SustainTime: 0.2
-      DecayTime: 0.7
+      AttackTime: 0.001
+      SustainTime: 0
+      DecayTime: 0.25
       ScaleWithImpact: 1
       HoldForever: 0
-    ImpactRadius: 100
+    ImpactRadius: 999999
     DirectionMode: 0
     DissipationMode: 2
     DissipationDistance: 100
@@ -5245,8 +5242,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1373635355}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.122183315, y: 0, z: 0, w: 0.9925076}
-  m_LocalPosition: {x: 2.69, y: 2.95, z: -41.68}
+  m_LocalRotation: {x: 0.13505943, y: -1.3724596e-10, z: 1.8707773e-11, w: 0.9908375}
+  m_LocalPosition: {x: 2.69, y: 2.95, z: -41.18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

@@ -36,23 +36,15 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     [Header("Parry Settings")]
     public float ParryCooldown            = 0.8f;
-    [Tooltip("패링 성공 시 필살기 게이지 충전량")]
+    [Tooltip("패링 성공 시 필살기 게이지 충전량 (막은 타격마다 적용)")]
     public float ParryUltimateGaugeReward = 30f;
-    [Tooltip("퍼펙트 패링 추가 필살기 게이지 (일반 보상에 더해짐)")]
-    public float PerfectParryUltimateGaugeBonus = 15f;
     private float _parryCooldownTimer;
-
-    [Header("Perfect Parry Hit Stop")]
-    [Tooltip("퍼펙트 패링 히트스탑 지속 시간 (초)")]
-    [SerializeField] private float _perfectParryHitStopDuration  = 0.35f;
-    [Tooltip("퍼펙트 패링 히트스탑 타임스케일 (0 = 완전 정지)")]
-    [SerializeField] private float _perfectParryHitStopTimeScale = 0f;
 
     /// <summary>패링 활성 윈도우 내에 있을 때 true. TakeDamage에서 패링 판정에 사용됩니다.</summary>
     public bool IsParryActive => StateMachine.CurrentState is PlayerParryState ps && ps.IsParryWindowActive;
 
-    /// <summary>쿨타임이 없고 지상에 있을 때만 패링 가능합니다.</summary>
-    public bool CanParry => _parryCooldownTimer <= 0f && IsGround();
+    /// <summary>쿨타임 없음 + 지상 + 적의 예고가 활성 상태일 때만 패링 가능합니다.</summary>
+    public bool CanParry => _parryCooldownTimer <= 0f && IsGround() && ParryEventBus.IsAnyTelegraphActive;
 
     public float CurrentStamina          => StatManager.CurrentStamina;
     public bool  HasEnoughStaminaForDash => StatManager.HasEnoughStaminaForDash;
@@ -61,6 +53,8 @@ public class PlayerController : MonoBehaviour, IDamageable
     // CanSkill / CanUltimate 는 현재 폼의 쿨타임과 SP를 함께 검사합니다.
     public bool CanSkill => FormManager?.CurrentForm?.CanSkill ?? false;
     public bool CanUltimate => FormManager?.CurrentForm?.CanUltimate ?? false;
+
+    public bool IsKnockbacking => _knockbackCoroutine != null;
 
     [Header("CombatData")]
     [SerializeField] private WeaponActionDataSO _FireFormActionData;
@@ -77,22 +71,12 @@ public class PlayerController : MonoBehaviour, IDamageable
     private Coroutine _hitStopCoroutine;
 
     [Header("Hit Stop Settings")]
-    [SerializeField] private float _hitStopDuration  = 0.08f;
-    [SerializeField] private float _hitStopTimeScale = 0.05f;
+    [SerializeField] private float _hitStopDuration  = 0.25f;
+    [SerializeField] private float _hitStopTimeScale = 0f;
 
     public CinemachineImpulseSource ImpulseSource;
 
     public Animator Animator { get; private set; }
-
-    public void SetAnimatorTrigger(string triggerName)
-    {
-        foreach (var param in Animator.parameters)
-        {
-            if (param.type == AnimatorControllerParameterType.Trigger)
-                Animator.ResetTrigger(param.name);
-        }
-        Animator.SetTrigger(triggerName);
-    }
 
     public ElementType Element => FormManager?.CurrentForm?.Element ?? ElementType.ELEMENT_NONE;
 
@@ -166,27 +150,14 @@ public class PlayerController : MonoBehaviour, IDamageable
     public void StartParryCooldown() => _parryCooldownTimer = ParryCooldown;
 
     /// <summary>
-    /// 패링 성공 시 호출됩니다.
-    /// isPerfect=true(퍼펙트 패링) 일 때는 더 긴 히트스탑, 강한 카메라 흔들림, 추가 게이지를 제공합니다.
+    /// 패링으로 타격을 막을 때마다 호출됩니다.
+    /// 막은 타격 하나하나마다 히트스탑 + 카메라 반응을 줘서 ZZZ Defensive Assist 같은 타격감을 형성합니다.
     /// </summary>
-    public void OnParrySuccess(bool isPerfect = false)
+    public void OnParrySuccess()
     {
-        if (isPerfect)
-        {
-            Debug.Log("퍼펙트 패링!");
-            StartHitStop(_perfectParryHitStopDuration, _perfectParryHitStopTimeScale);
-            ImpulseSource.GenerateImpulse();
-            ImpulseSource.GenerateImpulse(); // 2중 임펄스로 더 강한 카메라 흔들림
-            StatManager.AddUltimateGauge(ParryUltimateGaugeReward + PerfectParryUltimateGaugeBonus);
-        }
-        else
-        {
-            Debug.Log("패링 성공!");
-            StartHitStop();
-            ImpulseSource.GenerateImpulse();
-            StatManager.AddUltimateGauge(ParryUltimateGaugeReward);
-        }
-        SetAnimatorTrigger("ParrySuccess");
+        StartHitStop();
+        ImpulseSource.GenerateImpulse();
+        StatManager.AddUltimateGauge(ParryUltimateGaugeReward);
     }
 
 
@@ -224,16 +195,13 @@ public class PlayerController : MonoBehaviour, IDamageable
         if (isParryable && IsParryActive)
         {
             var parryState = StateMachine.CurrentState as PlayerParryState;
-            bool isPerfect = false;
             if (parryState != null)
-            {
-                bool isFirstHit = parryState.ParriedHitCount == 0;
-                // CurrentAttackSource는 BroadcastHit()으로 ExecuteHit 직전에 설정됨
                 parryState.OnHitParried(ParryEventBus.CurrentAttackSource);
-                // 퍼펙트 연출은 콤보 1타에만 적용 (극적인 히트스탑)
-                isPerfect = parryState.IsPerfectParry && isFirstHit;
-            }
-            OnParrySuccess(isPerfect);
+
+            ApplyKnockback(power);
+            // 막은 타격마다 히트스탑 + 카메라 반응 (ZZZ Defensive Assist 방식)
+            OnParrySuccess();
+            (ParryEventBus.CurrentAttackSource as EnemyAction)?.OnParried();
             return;
         }
 

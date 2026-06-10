@@ -111,13 +111,6 @@ public class WaterForm : BaseForm
     // ── 공격 업데이트 ─────────────────────────────────────────────────────────
     public override void UpdateAttack(out bool isComplete)
     {
-        isComplete = false;
-        if (_weaponActionData == null || _weaponActionData.ComboSteps.Count == 0)
-        {
-            isComplete = true;
-            return;
-        }
-
         base.UpdateAttack(out isComplete);
     }
 

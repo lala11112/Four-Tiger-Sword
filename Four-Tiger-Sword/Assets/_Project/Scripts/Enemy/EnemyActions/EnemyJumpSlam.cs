@@ -151,8 +151,7 @@ public class EnemyJumpSlam : EnemyAction
         }
         _enemy.SyncMovementLock();
         _enemy.gameObject.transform.rotation = Quaternion.Euler(0f, _enemy.gameObject.transform.rotation.y, 0f);
-        // 착지 충격 직전 예고 종료 — 충격 범위에 들어온 플레이어는 더 이상 패링 불가
-        EndTelegraph();
+        // telegraphDuration을 startupTime + jumpDuration으로 설정하면 베이스 클래스가 착지 직전에 자동으로 EndTelegraph() 호출
         BroadcastHit(); // TakeDamage에서 이 액션을 소스로 식별하기 위해
         ExecuteSlam();
     }

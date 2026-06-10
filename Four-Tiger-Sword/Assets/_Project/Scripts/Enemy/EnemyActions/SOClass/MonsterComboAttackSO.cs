@@ -23,8 +23,9 @@ public class MonsterComboAttackSO : MonsterSkillData
     public float knockbackForce = 5f;
 
     [Header("타이밍")]
-    [Tooltip("공격 예고(번쩍임) 지속 시간")]
-    public float telegraphDuration = 0.4f;
+    // telegraphDuration은 부모 MonsterSkillData에서 관리합니다.
+    // 콤보 공격: 첫 번째 타격 전 짧은 번쩍임 시간으로 설정 (hits[0].hitStartTime 이하).
+    // 예고가 끝난 뒤에도 OnHitParried의 타이머 리셋으로 모든 후속 타수를 자동으로 막을 수 있습니다.
     [Tooltip("콤보 전체 지속 시간")]
     public float attackDuration = 1.8f;
 

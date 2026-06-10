@@ -29,8 +29,7 @@ public class EnemyDefaultAttack : EnemyAction
 
         if (!_hasHit && _timer >= _data.hitStartTime && _timer <= _data.hitStartTime + _data.hitDuration)
         {
-            // 실제 타격이 시작되는 순간 예고 종료 → 플레이어가 반응할 수 없는 구간임을 명확히
-            EndTelegraph();
+            // telegraphDuration을 hitStartTime으로 설정하면 베이스 클래스가 이 시점에 자동으로 EndTelegraph() 호출
             BroadcastHit(); // TakeDamage에서 이 액션을 소스로 식별하기 위해
             ExecuteHit();
             _hasHit = true;

@@ -38,13 +38,14 @@ public class Enemy : MonoBehaviour, IDamageable
     private int _moveLockCount = 0;
 
     private bool _isTargetFound = false;
+    private bool _isAggroed = false; // 피격 시 플레이어를 인지하지 못했어도 추적 시작
     private bool _isTargetInCombatRange => DetectedTarget != null
         && Vector3.Distance(transform.position, DetectedTarget.position) <= CombatRange;
     private bool _isTargetOutOfCombatRange => DetectedTarget == null
         || Vector3.Distance(transform.position, DetectedTarget.position) > CombatExitRange;
-    // 현재 선택한 공격의 실행 사거리(excuteRange) 안에 플레이어가 들어왔는지
+    // 현재 선택한 공격의 실행 사거리(executeRange) 안에 플레이어가 들어왔는지
     public bool IsInExecuteRange => CurrentAction != null && DetectedTarget != null
-        && Vector3.Distance(transform.position, DetectedTarget.position) <= CurrentAction.SkillData.excuteRange;
+        && Vector3.Distance(transform.position, DetectedTarget.position) <= CurrentAction.SkillData.executeRange;
     public Transform DetectedTarget => _sensor?.DetectedTarget;
     private float _attackCooldownTimer = 0f;
     public bool IsHurt = false;
@@ -97,8 +98,8 @@ public class Enemy : MonoBehaviour, IDamageable
             var dieState = new EnemyDieState(this);
             var groggyState = new EnemyGroggyState(this);
             var rootState = new EnemyRootState(this);
-            // Idle → Trace: 플레이어 감지
-            _stateMachine.AddTransition(idleState, traceState, () => _isTargetFound);
+            // Idle → Trace: 플레이어 감지 또는 피격 어그로
+            _stateMachine.AddTransition(idleState, traceState, () => _isTargetFound || _isAggroed);
 
             // Trace → CombatIdle: 플레이어가 전투 범위 안
             _stateMachine.AddTransition(traceState, combatIdleState, () => _isTargetInCombatRange);
@@ -155,10 +156,13 @@ public class Enemy : MonoBehaviour, IDamageable
 
         GetComponent<PoiseHandler>()?.TakePoiseDamage(poiseDamage);
 
+        _isAggroed = true;
+
         if (staggerResistLevel >= StaggerResistLevel || PendingGroggy)
         {
             IsHurt = true;
         }
+            
         EnemyStat.CurrentHp = (int)Mathf.Max(0, EnemyStat.CurrentHp - damage);
         OnDamaged?.Invoke(damage, damageType, isCritical);
 

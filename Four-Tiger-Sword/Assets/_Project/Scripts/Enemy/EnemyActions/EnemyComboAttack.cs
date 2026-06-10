@@ -43,8 +43,7 @@ public class EnemyComboAttack : EnemyAction
 
         if (_timer >= _data.attackDuration)
         {
-            // 콤보가 완전히 끝난 시점에 예고 종료
-            EndTelegraph();
+            // telegraphDuration을 attackDuration으로 설정하면 베이스 클래스가 이 시점에 자동으로 EndTelegraph() 호출
             IsFinished = true;
         }
     }

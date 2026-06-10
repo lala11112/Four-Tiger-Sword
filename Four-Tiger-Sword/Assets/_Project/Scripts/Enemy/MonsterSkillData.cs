@@ -9,7 +9,7 @@ public abstract class MonsterSkillData : ScriptableObject
     public float engageRange = 5f;
 
     [Tooltip("공격을 실행하는 거리 (히트박스 사거리)")]
-    public float excuteRange = 2f;
+    public float executeRange = 2f;
 
     [Tooltip("공격 선택 가중치. 낮을수록 드물게 선택됨")]
     public float weight = 10f;
@@ -22,6 +22,10 @@ public abstract class MonsterSkillData : ScriptableObject
     [Header("패링")]
     [Tooltip("false로 설정하면 플레이어의 패링으로 이 공격을 막을 수 없습니다.")]
     public bool isParryable = true;
+
+    [Tooltip("패링 예고 지속 시간 (초, attackSpeed 배율 적용). 이 시간이 지나면 자동으로 예고가 종료됩니다.\n" +
+             "단일 타격 = hitStartTime, 콤보 = attackDuration, 대쉬 = startupTime 등을 참고해 설정하세요.")]
+    public float telegraphDuration = 1.0f;
 
     public abstract EnemyAction CreateAction(Enemy enemy);
 }

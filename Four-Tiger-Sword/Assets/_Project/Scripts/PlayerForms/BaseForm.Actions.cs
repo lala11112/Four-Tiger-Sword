@@ -153,6 +153,45 @@ public abstract partial class BaseForm
         _playerController.Animator.speed = 1f;
     }
 
+    // ── 반격 (패링 반격 윈도우에서만 진입 가능) ───────────────────────────────
+
+    public virtual void BeginCounter()
+    {
+        _currentAction = ActionType.Counter;
+        _timer = 0f;
+        FindSoftTarget();
+        ClearHitTargets();
+        _playerController.Animator.speed = AttackSpeed;
+        // CounterStep이 없으면 첫 번째 콤보 스텝을 폴백으로 사용
+        if (_weaponActionData?.CounterStep != null)
+            _playerController.Animator.CrossFade(_weaponActionData.CounterStep.AnimationName, 0.05f);
+        else if (_weaponActionData?.ComboSteps?.Count > 0)
+            _playerController.Animator.CrossFade(_weaponActionData.ComboSteps[0].AnimationName, 0.05f);
+    }
+
+    public virtual void UpdateCounter(out bool isComplete)
+    {
+        isComplete = false;
+        WeaponActionData step = _weaponActionData?.CounterStep
+                             ?? _weaponActionData?.ComboSteps?[0];
+
+        if (step == null) { isComplete = true; return; }
+
+        _timer += Time.deltaTime * AttackSpeed;
+        ProcessHit(step);
+        MoveForward(step);
+
+        if (_timer >= step.Duration)
+            isComplete = true;
+    }
+
+    public virtual void EndCounter()
+    {
+        _softTarget = null;
+        ClearHitTargets();
+        _playerController.Animator.speed = 1f;
+    }
+
     // ── 공통 이동 헬퍼 ────────────────────────────────────────────────────────
 
     protected void MoveForward(WeaponActionData step)

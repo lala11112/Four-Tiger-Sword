@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System;
 using System.Collections;
 
 public class DamageText : MonoBehaviour
@@ -13,9 +14,12 @@ public class DamageText : MonoBehaviour
     public float criticalFontSize = 54f;
 
     private Color originalColor;
+    private Action _returnToPool;
 
-    public void Init(int damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false)
+    public void Init(int damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Action returnToPool = null)
     {
+        _returnToPool = returnToPool;
+
         textMesh.text = isCritical ? $"!{damage}!" : damage.ToString();
         textMesh.fontSize = isCritical ? criticalFontSize : normalFontSize;
         textMesh.color = GetDamageColor(damageType);
@@ -43,11 +47,9 @@ public class DamageText : MonoBehaviour
     {
         float elapsed = 0f;
 
-        while(elapsed < lifeTime)
+        while (elapsed < lifeTime)
         {
             elapsed += Time.deltaTime;
-
-            transform.LookAt(transform.position + Camera.main.transform.rotation * Vector3.forward);
 
             transform.position += Vector3.down * speed * Time.deltaTime;
             float alpha = Mathf.Lerp(1f, 0f, elapsed / lifeTime);
@@ -56,6 +58,6 @@ public class DamageText : MonoBehaviour
             yield return null;
         }
 
-        Destroy(gameObject);
+        _returnToPool?.Invoke();
     }
 }

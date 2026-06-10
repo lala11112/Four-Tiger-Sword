@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
-/// 공격이 선택된 후, 해당 공격의 실행 사거리(excuteRange)까지 플레이어에게 접근하는 상태.
+/// 공격이 선택된 후, 해당 공격의 실행 사거리(executeRange)까지 플레이어에게 접근하는 상태.
 /// IsInExecuteRange가 true가 되면 EnemyAttackState로 전환된다.
 /// </summary>
 public class EnemyApproachState : IPlayerState

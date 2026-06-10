@@ -15,4 +15,8 @@ public interface IFormActions
     void BeginUltimate();
     void UpdateUltimate(out bool isComplete);
     void EndUltimate();
+
+    void BeginCounter();
+    void UpdateCounter(out bool isComplete);
+    void EndCounter();
 }

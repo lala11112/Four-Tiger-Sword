@@ -8,8 +8,8 @@ public class MonsterJumpSlamSO : MonsterSkillData
     public float knockbackForce = 18f;
 
     [Header("타이밍")]
-    [Tooltip("공격 예고(번쩍임) 지속 시간")]
-    public float telegraphDuration = 0.8f;
+    // telegraphDuration은 부모 MonsterSkillData에서 관리합니다.
+    // 점프 내리찍기: 준비 자세(선딜) 중 번쩍임이므로 startupTime 이하로 설정하세요.
     [Tooltip("도약 전 선딜 (준비 자세)")]
     public float startupTime = 0.3f;
     [Tooltip("공중에서 목표 지점까지 이동하는 시간")]

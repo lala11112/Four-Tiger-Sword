@@ -273,9 +273,6 @@ public class PlayerStatManager : MonoBehaviour
     }
 
     // ── HUD 단축 속성 ────────────────────────────────────────────────────────────
-    public float CurrentHP => _currentHp;
-    public float MaxHP => GetStat(StatType.ST_HP);
-
-    public float CurrentSP => _currentSp;
-    public float MaxSP => GetStat(StatType.ST_SP);
+    public float MaxHp => GetStat(StatType.ST_HP);
+    public float MaxSp => GetStat(StatType.ST_SP);
 }

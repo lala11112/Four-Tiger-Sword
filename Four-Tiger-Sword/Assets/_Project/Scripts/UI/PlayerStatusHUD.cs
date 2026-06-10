@@ -17,7 +17,7 @@ public class PlayerStatusHUD : PlayerStatManager
     private void Update()
     {
         if (statManager == null) return;
-        hpBar.value = statManager.CurrentHP / statManager.MaxHP;
-        spBar.value = statManager.CurrentSP / statManager.MaxSP;
+        hpBar.value = statManager.CurrentHp / statManager.MaxHp;
+        spBar.value = statManager.CurrentSp / statManager.MaxSp;
     }
 }   

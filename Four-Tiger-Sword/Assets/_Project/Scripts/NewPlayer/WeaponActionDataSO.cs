@@ -14,6 +14,10 @@ public class WeaponActionDataSO : ScriptableObject
     [Tooltip("공중 내려찍기 공격 데이터")]
     public WeaponActionData AirAttackStep;
 
+    [Header("Counter Attack (패링 반격)")]
+    [Tooltip("패링 성공 후 반격 윈도우에서만 사용 가능한 반격 데이터")]
+    public WeaponActionData CounterStep;
+
     [Header("Skill (E)")]
     [Tooltip("스킬 공격 데이터 (여러 단계 가능)")]
     public List<WeaponActionData> SkillSteps;

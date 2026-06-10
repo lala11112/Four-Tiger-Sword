@@ -10,6 +10,8 @@ public abstract class EnemyAction
     protected float _timer;
 
     private bool _telegraphActive = false;
+    // _timer는 서브클래스가 페이즈 전환 시 리셋하므로, 예고 타이밍은 독립 타이머로 관리
+    private float _telegraphTimer = 0f;
 
     protected EnemyAction(MonsterSkillData data, Enemy enemy)
     {
@@ -21,6 +23,7 @@ public abstract class EnemyAction
     public virtual void Enter()
     {
         _timer = 0f;
+        _telegraphTimer = 0f;
         IsFinished = false;
         _telegraphActive = false;
         if (_enemy.Animator != null)
@@ -33,6 +36,14 @@ public abstract class EnemyAction
     {
         // attackSpeed 배율만큼 타이머를 빠르게 진행 → 모든 판정 타이밍이 비례해서 당겨짐
         _timer += Time.deltaTime * SkillData.attackSpeed;
+
+        // 예고 타이밍 자동 관리: _telegraphTimer는 서브클래스의 _timer 리셋과 무관하게 증가
+        if (_telegraphActive && SkillData.isParryable)
+        {
+            _telegraphTimer += Time.deltaTime * SkillData.attackSpeed;
+            if (_telegraphTimer >= SkillData.telegraphDuration)
+                EndTelegraph();
+        }
     }
 
     public virtual void Exit()
@@ -40,7 +51,7 @@ public abstract class EnemyAction
         if (_enemy.Animator != null)
             _enemy.Animator.speed = 1f;
 
-        EndTelegraph();
+        //EndTelegraph();
     }
 
     /// <summary>패링 가능한 공격임을 플레이어 패링 시스템에 알립니다. Enter 시 자동 호출됩니다.</summary>
@@ -92,5 +103,10 @@ public abstract class EnemyAction
         Vector3 dir = GetDirectionToTarget();
         if (dir != Vector3.zero)
             _enemy.transform.rotation = Quaternion.LookRotation(dir);
+    }
+
+    public virtual void OnParried()
+    {
+        //_enemy.IsHurt = true;
     }
 }

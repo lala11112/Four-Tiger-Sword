@@ -19,7 +19,7 @@ public abstract partial class BaseForm : IForm
 
     public virtual ElementType Element => ElementType.ELEMENT_NONE;
 
-    protected enum ActionType { Attack, AirAttack, Skill, Ultimate }
+    protected enum ActionType { Attack, AirAttack, Skill, Ultimate, Counter }
     protected ActionType _currentAction = ActionType.Attack;
 
     // ── SP 비용 & 쿨타임 ─────────────────────────────────────────────────────

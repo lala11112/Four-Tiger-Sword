@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class DamageTextManager : MonoBehaviour
 {
@@ -6,6 +7,11 @@ public class DamageTextManager : MonoBehaviour
 
     [SerializeField] private GameObject damageTextPrefab;
     [SerializeField] private Canvas worldSpaceCanvas;
+
+    [SerializeField] private int defaultPoolCapacity = 10;
+    [SerializeField] private int maxPoolSize = 20;
+
+    private ObjectPool<DamageText> _pool;
 
     private void Awake()
     {
@@ -17,8 +23,24 @@ public class DamageTextManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
 
+        _pool = new ObjectPool<DamageText>(
+            createFunc: CreateDamageText,
+            actionOnGet: dt => dt.gameObject.SetActive(true),
+            actionOnRelease: dt => dt.gameObject.SetActive(false),
+            actionOnDestroy: dt => Destroy(dt.gameObject),
+            collectionCheck: false,
+            defaultCapacity: defaultPoolCapacity,
+            maxSize: maxPoolSize
+        );
+    }
+
+    private DamageText CreateDamageText()
+    {
+        GameObject go = Instantiate(damageTextPrefab, worldSpaceCanvas.transform);
+        return go.GetComponent<DamageText>();
     }
 
     public void Register(Enemy enemy)
@@ -36,8 +58,10 @@ public class DamageTextManager : MonoBehaviour
     public void ShowDamageText(float damage, Vector3 worldPosition, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false)
     {
         Vector3 offset = new Vector3(Random.Range(-0.5f, 0.5f), 1.5f, Random.Range(-0.5f, 0.5f));
-        GameObject obj = Instantiate(damageTextPrefab, worldPosition + offset, Quaternion.identity, worldSpaceCanvas.transform);
-        DamageText damageText = obj.GetComponent<DamageText>();
-        damageText.Init((int)damage, damageType, isCritical);
+
+        DamageText dt = _pool.Get();
+        dt.transform.position = worldPosition + offset;
+
+        dt.Init((int)damage, damageType, isCritical, () => _pool.Release(dt));
     }
 }

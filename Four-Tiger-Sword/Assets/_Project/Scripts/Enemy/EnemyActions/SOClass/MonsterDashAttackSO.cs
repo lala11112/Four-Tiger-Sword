@@ -8,8 +8,8 @@ public class MonsterDashAttackSO : MonsterSkillData
     public float knockbackForce = 12f;
 
     [Header("타이밍")]
-    [Tooltip("공격 예고(번쩍임) 지속 시간 — EnemyAttackState가 사용")]
-    public float telegraphDuration = 0.6f;
+    // telegraphDuration은 부모 MonsterSkillData에서 관리합니다.
+    // 대쉬 공격: 준비 자세(선딜) 중 번쩍임이므로 startupTime 이하로 설정하세요.
     [Tooltip("대쉬 시작 전 선딜 (준비 자세)")]
     public float startupTime = 0.2f;
     [Tooltip("대쉬 지속 시간")]
@@ -31,3 +31,4 @@ public class MonsterDashAttackSO : MonsterSkillData
         return new EnemyDashAttack(this, enemy);
     }
 }
+    

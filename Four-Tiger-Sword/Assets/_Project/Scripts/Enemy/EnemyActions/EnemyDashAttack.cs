@@ -47,8 +47,7 @@ public class EnemyDashAttack : EnemyAction
                 FaceTarget();
                 if (_timer >= _data.startupTime)
                 {
-                    // 대쉬가 시작되면 예고 종료 — 플레이어가 피해야 하는 구간 시작
-                    EndTelegraph();
+                    // telegraphDuration을 startupTime으로 설정하면 베이스 클래스가 이 시점에 자동으로 EndTelegraph() 호출
                     _dashDirection = GetDirectionToTarget();
                     _timer = 0f;
                     _phase = Phase.Dash;

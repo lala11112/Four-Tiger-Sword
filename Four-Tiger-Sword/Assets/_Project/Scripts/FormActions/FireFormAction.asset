@@ -26,7 +26,6 @@ MonoBehaviour:
     HitBoxRadius: 1.8
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
-    ForwardThrust: 1.5
     KnockbackForce: 11
     StaggerResistLevel: 1
     HitEvents: []
@@ -78,7 +77,6 @@ MonoBehaviour:
     HitBoxRadius: 1.5
     HitBoxSize: {x: 2.5, y: 1.5, z: 2.5}
     HitBoxHeight: 2
-    ForwardThrust: 1.5
     KnockbackForce: 13
     StaggerResistLevel: 1
     HitEvents: []
@@ -130,7 +128,6 @@ MonoBehaviour:
     HitBoxRadius: 2.5
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
-    ForwardThrust: 2.5
     KnockbackForce: 15
     StaggerResistLevel: 3
     HitEvents: []
@@ -183,7 +180,6 @@ MonoBehaviour:
     HitBoxRadius: 3
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
-    ForwardThrust: 0
     KnockbackForce: 8
     StaggerResistLevel: 0
     HitEvents: []
@@ -214,6 +210,58 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 10
+  CounterStep:
+    AnimationName: OutSlash
+    Duration: 1.267
+    ComboTransitionTime: 0
+    Damage: 1.2
+    PoiseDamage: 10
+    HitStartTime: 0.5
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 0, z: 1}
+    HitBoxShape: 0
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 1, y: 1, z: 1}
+    HitBoxHeight: 2
+    KnockbackForce: 8
+    StaggerResistLevel: 4
+    HitEvents: []
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+    ThrustCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.013242424
+        value: 1.0025688
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.34000242
+        value: 0.0042095087
+        inSlope: -3.055329
+        outSlope: -0.0063780667
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ThrustMultiplier: 20
   SkillSteps:
   - AnimationName: ComboSlash
     Duration: 2.767
@@ -227,7 +275,6 @@ MonoBehaviour:
     HitBoxRadius: 0
     HitBoxSize: {x: 1.5, y: 1.5, z: 1.5}
     HitBoxHeight: 0
-    ForwardThrust: 15
     KnockbackForce: 15
     StaggerResistLevel: 4
     HitEvents:
@@ -349,7 +396,6 @@ MonoBehaviour:
     HitBoxRadius: 0
     HitBoxSize: {x: 5, y: 1, z: 5}
     HitBoxHeight: 0
-    ForwardThrust: 3
     KnockbackForce: 8
     StaggerResistLevel: 0
     HitEvents: []
