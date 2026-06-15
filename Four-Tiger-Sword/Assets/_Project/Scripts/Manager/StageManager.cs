@@ -77,6 +77,7 @@ public class StageManager : MonoBehaviour
     private void HandleStageClear()
     {
         _stageResultUI?.ShowResult(true);
+        SpawnAll();
         OnStageClear?.Invoke();
     }
 }

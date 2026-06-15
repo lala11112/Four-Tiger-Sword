@@ -5,7 +5,7 @@ public class PlayerParryState : IPlayerState
     private readonly PlayerController _playerController;
 
     // 예고 종료 후 첫 타가 오기를 기다리는 시간 (_lockedSource == null, 아직 아무것도 못 막은 상태)
-    private const float PreHitWindowDuration = 0.5f;
+    private const float PreHitWindowDuration = 1f;
     // 공격 액션 종료 후 반격 윈도우가 열리기까지의 딜레이 (_lockedSource != null, 이미 1타 이상 막은 상태)
     // 작을수록 반격이 빠르게 느껴짐 (0.05 ~ 0.15 권장)
     private const float PostActionWindowDuration = 0.01f;
@@ -43,7 +43,7 @@ public class PlayerParryState : IPlayerState
         ParriedHitCount = 0;
 
         _playerController.Input.ParryBuffer.Consume();
-        _playerController.Animator.CrossFade("Parry", 0.05f);
+        _playerController.Animator.CrossFade("Parry", 0.0f);
     }
 
     public void Update()

@@ -24,7 +24,7 @@ public class PlayerStateMachineSetup
         GroundTransitions(stateMachine, idle, move, jump, fall, dash, attack);
         AirTransitions(stateMachine, idle, move, jump, fall, run);
         DashTransitions(stateMachine, idle, move, dash, run);
-        AttackTransitions(stateMachine, idle, move, jump, attack);
+        AttackTransitions(stateMachine, idle, move, jump, attack, parry, dash);
         AirAttackTransitions(stateMachine, idle, move, jump, fall, airAttack);
         SkillTransitions(stateMachine, idle, move, skill, jump);
         UltimateTransitions(stateMachine, idle, move, ultimate);
@@ -77,13 +77,15 @@ public class PlayerStateMachineSetup
         stateMachine.AddTransition(dash, move, () => dash.IsDashComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
 
-    private void AttackTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerMoveState move, PlayerJumpState jump, PlayerAttackState attack)
+    private void AttackTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerMoveState move, PlayerJumpState jump, PlayerAttackState attack, PlayerParryState parry, PlayerDashState dash)
     {
         stateMachine.AddTransition(idle, attack, () => _playerController.Input.AttackBuffer.IsActive);
         stateMachine.AddTransition(move, attack, () => _playerController.Input.AttackBuffer.IsActive);
 
         // 공격 도중 점프 캔슬
         stateMachine.AddTransition(attack, jump, () => _playerController.Input.JumpBuffer.IsActive && _playerController.CanJump());
+        stateMachine.AddTransition(attack, parry, () => _playerController.Input.ParryBuffer.IsActive);
+        stateMachine.AddTransition(attack, dash, () => _playerController.Input.DashBuffer.IsActive && _playerController.CanDash);
 
         stateMachine.AddTransition(attack, idle, () => attack.IsAttackComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(attack, move, () => attack.IsAttackComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);

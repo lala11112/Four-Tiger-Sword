@@ -14,14 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MonsterComboAttackSO
   animName: Combo Attack
   engageRange: 5
-  excuteRange: 2
+  executeRange: 2
   weight: 100
   attackSpeed: 1
-  baseDamage: 0.7
-  criticalChance: 0.6
-  criticalMultiplier: 2
-  knockbackForce: 10
+  isParryable: 1
   telegraphDuration: 0.5
+  baseDamage: 0.7
+  knockbackForce: 20
   attackDuration: 3.6
   hitBoxShape: 0
   hitBoxRadius: 2

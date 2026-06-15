@@ -39,6 +39,7 @@ Transform:
   m_Children:
   - {fileID: 7113481257855138595}
   - {fileID: 22286598449320452}
+  - {fileID: 4159998458033467718}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!195 &2955510853289360473
@@ -84,7 +85,7 @@ MonoBehaviour:
   StaggerResistLevel: 2
   RootDuration: 1
   IsRoot: 0
-  _telegraphEffect: {fileID: 0}
+  _telegraphEffect: {fileID: 6400084191083594748, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
 --- !u!114 &5638142518084379733
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -319,6 +320,68 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7b9f8a5ff3b01b447bca139d1a176b16, type: 3}
   m_PrefabInstance: {fileID: 5081902898461013722}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7023762619838630536
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1993627107613058598}
+    m_Modifications:
+    - target: {fileID: 6395712273228757966, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395712273228757966, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395712273228757966, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395712273228757966, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395712273228757966, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395712273228757966, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395712273228757966, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395712273228757966, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395712273228757966, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6395712273228757966, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6400084191083594748, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+      propertyPath: m_Name
+      value: Dragon punch flash
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+--- !u!4 &4159998458033467718 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6395712273228757966, guid: ccc22a316744f104eb233bd6122a3ec3, type: 3}
+  m_PrefabInstance: {fileID: 7023762619838630536}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7292050169886399688
 PrefabInstance:

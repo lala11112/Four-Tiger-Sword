@@ -265,12 +265,12 @@ public class Enemy : MonoBehaviour, IDamageable
     public virtual void OnTelegraphStart(EnemyAction action)
     {
         if (_telegraphEffect != null)
-            _telegraphEffect.SetActive(true);
+            Instantiate(_telegraphEffect, transform.position, transform.rotation);
     }
 
     public virtual void OnTelegraphEnd(EnemyAction action)
     {
         if (_telegraphEffect != null)
-            _telegraphEffect.SetActive(false);
+            Destroy(_telegraphEffect);
     }
 }
