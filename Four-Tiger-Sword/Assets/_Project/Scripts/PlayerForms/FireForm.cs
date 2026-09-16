@@ -3,95 +3,30 @@ using UnityEngine;
 public class FireForm : BaseForm
 {
     public override ElementType Element => ElementType.ELEMENT_FIRE;
-
-    public override float SkillSpCost   => 200f;
+    public override float SkillSpCost => 200f;
     public override float SkillCooldown => 8f;
-
-    private bool _explosionSpawned = false;
-
-    public FireForm(WeaponActionDataSO weaponActionData) : base(weaponActionData) {}
-
-    public override void Equip(PlayerController playerController)
+    public FireForm(WeaponActionDataSO data) : base(data) { }
+    public override void Equip(PlayerController player)
     {
-        base.Equip(playerController);
-        PlayerUIManager.Instance.FireElement.SetActive(false);
-        playerController.WeaponManager.FireWeapon.SetActive(true);
+        base.Equip(player);
+        PlayerUIManager.Instance?.FireElement?.SetActive(false);
+        player.WeaponManager?.FireWeapon?.SetActive(true);
     }
-
-    public override void Unequip(PlayerController playerController)
+    public override void Unequip(PlayerController player)
     {
-        base.Unequip(playerController);
-        PlayerUIManager.Instance.FireElement.SetActive(true);
-        playerController.WeaponManager.FireWeapon.SetActive(false);
+        PlayerUIManager.Instance?.FireElement?.SetActive(true);
+        player.WeaponManager?.FireWeapon?.SetActive(false);
     }
-
-    public override void UpdateAttack(out bool isComplete)
+    protected override void OnHitEnemy(GameObject enemy)
     {
-        isComplete = false;
-
-        if (_weaponActionData == null || _weaponActionData.ComboSteps.Count == 0)
-        {
-            isComplete = true;
-            return;
-        }
-
-        _timer += Time.deltaTime * AttackSpeed;
-        WeaponActionData currentStep = _weaponActionData.ComboSteps[_comboStep];
-
-        ProcessHit(currentStep);
-
-        MoveForward(currentStep);
-
-        if (_timer >= currentStep.ComboTransitionTime &&
-            _playerController.Input.AttackBuffer.IsActive &&
-            _comboStep < _weaponActionData.ComboSteps.Count - 1)
-        {
-            _comboStep++;
-            PlayCombo();
-            return;
-        }
-
-        if (_timer >= currentStep.Duration)
-            isComplete = true;
+        base.OnHitEnemy(enemy);
+        TargetEffects(enemy).AddFireStack(EffectHit(2.5f), _weaponActionData.FireExplosionDelay);
     }
-
-    // Phase 0: 검 휘두르기, Phase 1: 폭발
     public override void BeginSkill()
     {
-        _explosionSpawned = false;
         base.BeginSkill();
-        //PlayStepSound(_weaponActionData.SkillSteps, 0);
-    }
-
-    public override void UpdateSkill(out bool isComplete)
-    {
-        int prevStep = _skillStep;
-        base.UpdateSkill(out isComplete);
-
-        if (_skillStep == 1 && prevStep == 0 && !_explosionSpawned)
-        {
-            _explosionSpawned = true;
-            //SpawnStepVFX(_weaponActionData.SkillSteps, 1);
-            //PlayStepSound(_weaponActionData.SkillSteps, 1);
-        }
-    }
-
-    public override void BeginUltimate()
-    {
-        base.BeginUltimate();
-        SpawnStepVFX(_weaponActionData.UltimateSteps, 0);
-        PlayStepSound(_weaponActionData.UltimateSteps, 0);
-    }
-
-    public override void UpdateUltimate(out bool isComplete)
-    {
-        int prevStep = _ultimateStep;
-        base.UpdateUltimate(out isComplete);
-
-        if (_ultimateStep != prevStep)
-        {
-            //SpawnStepVFX(_weaponActionData.UltimateSteps, _ultimateStep);
-            //PlayStepSound(_weaponActionData.UltimateSteps, _ultimateStep);
-        }
+        float impactDelay = FirstHitTime(_weaponActionData.SkillSteps[0]) / Mathf.Max(0.1f, AttackSpeed);
+        Effects.StartCoroutine(Effects.DelayedExplosion(impactDelay, 1f, _weaponActionData.AreaRadius, EffectHit(3.5f)));
+        // TODO: 폭렬참 내리찍기 모션은 기존 연결 모션을 유지하고 신규 모션 제작 후 교체.
     }
 }

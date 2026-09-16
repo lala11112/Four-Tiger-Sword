@@ -1,21 +1,21 @@
-using System.Collections;
 using UnityEngine;
 
 public class EnemyRootState : IPlayerState
 {
     Enemy _enemy;
+    private float _remaining;
 
     public EnemyRootState(Enemy enemy) { _enemy = enemy; }
     
     public void Enter()
     {
-        _enemy.StartCoroutine(RootRoutine());
+        _remaining = _enemy.RootDuration;
         _enemy.LockMovement();
     }
-
     public void Update()
     {
-
+        _remaining -= Time.deltaTime;
+        if (_remaining <= 0f) _enemy.IsRoot = false;
     }
 
     public void Exit()
@@ -23,9 +23,4 @@ public class EnemyRootState : IPlayerState
         _enemy.UnlockMovement();
     }
 
-    private IEnumerator RootRoutine()
-    {
-        yield return new WaitForSeconds(_enemy.RootDuration);
-        _enemy.IsRoot = false;
-    }
 }

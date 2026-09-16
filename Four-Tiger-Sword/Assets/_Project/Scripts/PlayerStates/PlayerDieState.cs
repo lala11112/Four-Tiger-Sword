@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerDieState : MonoBehaviour, IPlayerState
+public class PlayerDieState : IPlayerState
 {
     private PlayerController _playerController;
 

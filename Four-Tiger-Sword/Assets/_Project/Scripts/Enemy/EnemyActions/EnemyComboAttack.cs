@@ -9,7 +9,7 @@ using System.Collections.Generic;
 public class EnemyComboAttack : EnemyAction
 {
     private readonly MonsterComboAttackSO _data;
-    private readonly List<HashSet<Collider>> _hitTargets = new List<HashSet<Collider>>();
+    private readonly List<HashSet<IDamageable>> _hitTargets = new List<HashSet<IDamageable>>();
 
     public EnemyComboAttack(MonsterComboAttackSO data, Enemy enemy)
         : base(data, enemy)
@@ -23,7 +23,7 @@ public class EnemyComboAttack : EnemyAction
 
         _hitTargets.Clear();
         for (int i = 0; i < _data.hits.Count; i++)
-            _hitTargets.Add(new HashSet<Collider>());
+            _hitTargets.Add(new HashSet<IDamageable>());
 
         _enemy.Animator?.CrossFade(_data.animName, 0.01f);
 
@@ -56,13 +56,11 @@ public class EnemyComboAttack : EnemyAction
 
         foreach (var col in Physics.OverlapSphere(center, _data.hitBoxRadius, _playerLayer))
         {
-            if (_hitTargets[index].Contains(col)) continue;
-            if (!col.TryGetComponent<IDamageable>(out var damageable)) continue;
-
-            _hitTargets[index].Add(col);
+            var damageable = col.GetComponentInParent<IDamageable>();
+            if (damageable == null || !_hitTargets[index].Add(damageable)) continue;
             DamageManager.Apply(
                 new HitInfo(damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
-                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: GetKnockbackDirection(col) * _data.knockbackForce),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: GetKnockbackDirection(col) * _data.knockbackForce, isParryable: _data.isParryable, source: this),
                 damageable, col.gameObject);
         }
     }

@@ -8,7 +8,7 @@ using UnityEngine;
 public class WoodBindStackDataSO : StackDataSO
 {
     [Tooltip("속박 지속 시간 (초)")]
-    public float bindDuration = 30f;
+    public float bindDuration = 1.5f;
     [SerializeField] private GameObject _vfxPrefab;
 
     // stackType은 반드시 Wood여야 합니다.

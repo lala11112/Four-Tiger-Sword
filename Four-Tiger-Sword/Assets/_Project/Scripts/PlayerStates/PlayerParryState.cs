@@ -71,19 +71,22 @@ public class PlayerParryState : IPlayerState
                 else
                     _timer += Time.deltaTime;
 
-                // 유저가 반격 버튼을 '안 눌렀을 때' 자연스럽게 패링 상태를 종료시키는 안전장치
                 if (_timer >= PostActionWindowDuration)
                 {
                     IsParryWindowActive = false;
-
-                    // 만약 이미 반격 가능 상태였는데도 안 눌렀다면, 일정 시간 후 상태 종료
-                    // (만약 상태머신에서 IsCounterWindowActive 조건으로만 전이한다면 이 유예타이머가 필요합니다)
-                    if (_timer >= PostActionWindowDuration + CounterWindowDuration)
-                    {
-                        IsCounterWindowActive = false;
-                        IsComplete = true;
-                    }
+                    _timer = 0f; // 반격 윈도우 카운트다운을 위해 타이머 리셋
                 }
+            }
+        }
+        else if (IsCounterWindowActive)
+        {
+            // IsParryWindowActive가 꺼진 후 반격 윈도우 시간을 별도로 카운트
+            // (IsParryWindowActive 블록 안에서 처리하면 다음 프레임부터 타이머가 멈춰버리는 버그 발생)
+            _timer += Time.deltaTime;
+            if (_timer >= CounterWindowDuration)
+            {
+                IsCounterWindowActive = false;
+                IsComplete = true;
             }
         }
     }
@@ -115,9 +118,4 @@ public class PlayerParryState : IPlayerState
             _timer = 0f;
     }
 
-    private void OpenCounterWindow()
-    {
-        _timer = 0f;
-        IsCounterWindowActive = true;
-    }
 }

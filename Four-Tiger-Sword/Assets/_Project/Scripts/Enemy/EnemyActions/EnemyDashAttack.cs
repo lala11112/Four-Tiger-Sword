@@ -12,11 +12,13 @@ public class EnemyDashAttack : EnemyAction
 
     private readonly MonsterDashAttackSO _data;
     private readonly NavMeshAgent _nav;
-    private readonly HashSet<Collider> _hitTargets = new HashSet<Collider>();
+    private readonly HashSet<IDamageable> _hitTargets = new HashSet<IDamageable>();
 
     private Phase _phase;
     private Vector3 _dashDirection;
     private bool _movementUnlocked;
+    private Collider _collider;
+    private bool _colliderWasEnabled;
 
     public EnemyDashAttack(MonsterDashAttackSO data, Enemy enemy)
         : base(data, enemy)
@@ -31,8 +33,10 @@ public class EnemyDashAttack : EnemyAction
         _phase = Phase.Startup;
         _hitTargets.Clear();
         _movementUnlocked = false;
+        _collider = _enemy.GetComponent<Collider>();
+        _colliderWasEnabled = _collider != null && _collider.enabled;
 
-        _nav.ResetPath();
+        if (_nav.enabled && _nav.isOnNavMesh) _nav.ResetPath();
         _enemy.LockMovement();
         // TODO: _enemy.Animator?.SetTrigger(_data.animName);
     }
@@ -55,7 +59,7 @@ public class EnemyDashAttack : EnemyAction
                 break;
 
             case Phase.Dash:
-                _enemy.GetComponent<Collider>().enabled = false; //???
+                if (_collider != null) _collider.enabled = false;
                 PerformDash();
                 CheckHit();
                 if (_timer >= _data.dashDuration)
@@ -71,7 +75,7 @@ public class EnemyDashAttack : EnemyAction
                 if (_timer >= _data.recoveryTime)
                 {
                     IsFinished = true;
-                    _enemy.GetComponent<Collider>().enabled = true;
+                    if (_collider != null) _collider.enabled = _colliderWasEnabled;
                 }
                 break;
         }
@@ -80,6 +84,7 @@ public class EnemyDashAttack : EnemyAction
     public override void Exit()
     {
         base.Exit(); // 예고가 아직 활성 상태라면 여기서 종료
+        if (_collider != null) _collider.enabled = _colliderWasEnabled;
         if (!_movementUnlocked)
         {
             _enemy.UnlockMovement();
@@ -105,13 +110,11 @@ public class EnemyDashAttack : EnemyAction
 
         foreach (var col in Physics.OverlapSphere(center, _data.hitBoxRadius, _playerLayer))
         {
-            if (_hitTargets.Contains(col)) continue;
-            if (!col.TryGetComponent<IDamageable>(out var damageable)) continue;
-
-            _hitTargets.Add(col);
+            var damageable = col.GetComponentInParent<IDamageable>();
+            if (damageable == null || !_hitTargets.Add(damageable)) continue;
             DamageManager.Apply(
                 new HitInfo(_data.damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
-                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: _dashDirection * _data.knockbackForce),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: _dashDirection * _data.knockbackForce, isParryable: _data.isParryable, source: this),
                 damageable, col.gameObject);
         }
     }

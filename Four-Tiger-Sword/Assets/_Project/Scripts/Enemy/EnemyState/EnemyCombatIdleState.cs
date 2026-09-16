@@ -39,7 +39,7 @@ public class EnemyCombatIdleState : IPlayerState
 
     private void TrySelectAttack()
     {
-        if (_enemy.DetectedTarget == null || _enemy.EnemyStat.MonsterSkillData == null) return;
+        if (_enemy.DetectedTarget == null || _enemy.EnemyStat.MonsterSkillData?.skillData == null) return;
 
         float dist = Vector3.Distance(_enemy.transform.position, _enemy.DetectedTarget.position);
 
@@ -47,11 +47,17 @@ public class EnemyCombatIdleState : IPlayerState
         var candidates = new List<MonsterSkillData>();
         foreach (var skill in _enemy.EnemyStat.MonsterSkillData.skillData)
         {
-            if (dist <= skill.engageRange)
+            if (skill != null && skill.weight > 0f && dist <= skill.engageRange)
                 candidates.Add(skill);
         }
 
-        if (candidates.Count == 0) return;
+        if (candidates.Count == 0)
+        {
+            // 전투 범위와 공격 선택 범위 사이에서도 멈추지 않고 접근합니다.
+            if (_nav != null && _nav.enabled && _nav.isOnNavMesh)
+                _nav.SetDestination(_enemy.DetectedTarget.position);
+            return;
+        }
 
         // 가중치 합산 후 랜덤 롤
         float totalWeight = 0f;
@@ -67,7 +73,7 @@ public class EnemyCombatIdleState : IPlayerState
             if (roll <= cumulative)
             {
                 _enemy.CurrentAction = skill.CreateAction(_enemy);
-                _enemy.HasSelectedAttack = true;
+                _enemy.HasSelectedAttack = _enemy.CurrentAction != null;
                 return;
             }
         }
@@ -75,7 +81,7 @@ public class EnemyCombatIdleState : IPlayerState
         // 부동소수점 오차 폴백
         var fallback = candidates[candidates.Count - 1];
         _enemy.CurrentAction = fallback.CreateAction(_enemy);
-        _enemy.HasSelectedAttack = true;
+        _enemy.HasSelectedAttack = _enemy.CurrentAction != null;
     }
 
     // ── 배회 (쿨타임 중 플레이어 주변 랜덤 이동) ────────────────────────────
@@ -104,7 +110,7 @@ public class EnemyCombatIdleState : IPlayerState
         float randomAngle = Random.Range(-90f, 90f);
         Vector3 roamDir = Quaternion.Euler(0f, randomAngle, 0f) * baseDir;
         Vector3 targetPos = _enemy.DetectedTarget.position + roamDir * RoamRadius;
-        _nav.SetDestination(targetPos);
+        if (_nav.enabled && _nav.isOnNavMesh) _nav.SetDestination(targetPos);
         
     }
 

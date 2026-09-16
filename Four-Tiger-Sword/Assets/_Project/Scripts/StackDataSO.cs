@@ -15,7 +15,9 @@ public class StackDataSO : ScriptableObject
 
     public virtual void OnExplosion(GameObject target)
     {
-        target.GetComponent<IDamageable>()
-              ?.TakeDamage((int)explosionDamage, ElementType.ELEMENT_NONE, false);
+        var receiver = target.GetComponentInParent<IDamageable>();
+        if (receiver is Component component)
+            DamageManager.Apply(new HitInfo(explosionDamage, ElementType.ELEMENT_NONE, 0f, 1f, poiseDamage: 20f),
+                receiver, component.gameObject);
     }
 }

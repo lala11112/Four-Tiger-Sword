@@ -32,6 +32,8 @@ public class PlayerStateMachineSetup
         ParryTransitions(stateMachine, idle, move, run, parry, counter);
         CounterTransitions(stateMachine, idle, move, counter);
         AnyTransitions(stateMachine, die);
+        stateMachine.AddTransition(attack, counter, () =>
+            _playerController.FormManager.CurrentForm is EarthForm earth && earth.GuardCounterReady);
         stateMachine.ChangeState(idle);
         return stateMachine;    
     }
@@ -84,7 +86,7 @@ public class PlayerStateMachineSetup
 
         // 공격 도중 점프 캔슬
         stateMachine.AddTransition(attack, jump, () => _playerController.Input.JumpBuffer.IsActive && _playerController.CanJump());
-        stateMachine.AddTransition(attack, parry, () => _playerController.Input.ParryBuffer.IsActive);
+        stateMachine.AddTransition(attack, parry, () => _playerController.Input.ParryBuffer.IsActive && _playerController.CanParry);
         stateMachine.AddTransition(attack, dash, () => _playerController.Input.DashBuffer.IsActive && _playerController.CanDash);
 
         stateMachine.AddTransition(attack, idle, () => attack.IsAttackComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);

@@ -46,14 +46,24 @@ public class Enemy : MonoBehaviour, IDamageable
     // 현재 선택한 공격의 실행 사거리(executeRange) 안에 플레이어가 들어왔는지
     public bool IsInExecuteRange => CurrentAction != null && DetectedTarget != null
         && Vector3.Distance(transform.position, DetectedTarget.position) <= CurrentAction.SkillData.executeRange;
-    public Transform DetectedTarget => _sensor?.DetectedTarget;
+    private Transform _aggroTarget;
+    public Transform DetectedTarget
+    {
+        get
+        {
+            var sensed = _sensor?.DetectedTarget;
+            if (sensed != null && sensed.gameObject.activeInHierarchy) return sensed;
+            return _isAggroed && _aggroTarget != null && _aggroTarget.gameObject.activeInHierarchy
+                ? _aggroTarget : null;
+        }
+    }
     private float _attackCooldownTimer = 0f;
     public bool IsHurt = false;
     public bool PendingGroggy = false;
     private bool _isDie = false;
 
     public bool CanAttack => _attackCooldownTimer <= 0f;
-    public bool IsAttackFinished => CurrentAction?.IsFinished ?? false;
+    public bool IsAttackFinished => CurrentAction?.IsFinished ?? true;
 
     public Animator Animator { get; private set; }
 
@@ -67,6 +77,7 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool IsRoot = false;
 
     [SerializeField] private GameObject _telegraphEffect;
+    private GameObject _telegraphInstance;
 
 
     protected virtual void Start()
@@ -76,11 +87,18 @@ public class Enemy : MonoBehaviour, IDamageable
         if (Animator == null)
         {
             Debug.LogError("Animator is null");
+            enabled = false;
             return;
         }
 
         _sensor = GetComponent<IEnemySensor>();
         _navMeshAgent = GetComponent<NavMeshAgent>();
+        if (_navMeshAgent == null)
+        {
+            Debug.LogError($"{name}: Enemy에 NavMeshAgent가 필요합니다.", this);
+            enabled = false;
+            return;
+        }
 
         DamageTextManager.Instance?.Register(this);
         GetComponentInChildren<EnemyHpBar>(true)?.Setup(this);
@@ -103,6 +121,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
             // Trace → CombatIdle: 플레이어가 전투 범위 안
             _stateMachine.AddTransition(traceState, combatIdleState, () => _isTargetInCombatRange);
+            _stateMachine.AddTransition(traceState, idleState, () => DetectedTarget == null);
 
             // CombatIdle → Trace: 플레이어가 이탈 범위 밖
             _stateMachine.AddTransition(combatIdleState, traceState, () => _isTargetOutOfCombatRange);
@@ -113,6 +132,7 @@ public class Enemy : MonoBehaviour, IDamageable
             _stateMachine.AddTransition(approachState, attackState, () => IsInExecuteRange);
             // Approach → Trace: 플레이어가 이탈 범위 밖으로 이탈
             _stateMachine.AddTransition(approachState, traceState, () => _isTargetOutOfCombatRange);
+            _stateMachine.AddTransition(approachState, combatIdleState, () => CurrentAction == null);
 
             // Attack → CombatIdle: 공격 완료 (쿨타임 + 배회)
             _stateMachine.AddTransition(attackState, combatIdleState, () => IsAttackFinished);
@@ -135,11 +155,17 @@ public class Enemy : MonoBehaviour, IDamageable
 
     protected virtual void Update()
     {
+        if (_stateMachine == null) return;
         _isTargetFound = _sensor?.DetectTarget() ?? false;
-        stateName = _stateMachine.CurrentState.GetType().ToString(); //디버그 전용
+        // 피격 어그로로 추적할 때도 거리/공격 판단이 같은 대상을 사용해야 합니다.
+        if (_isAggroed && DetectedTarget == null)
+            _aggroTarget = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (_isAggroed && DetectedTarget == null) _isAggroed = false;
         _stateMachine.Update();
+        stateName = _stateMachine.CurrentState.GetType().ToString(); //디버그 전용
 
-        Vector3 worldVelocity = _navMeshAgent.velocity;
+        Vector3 worldVelocity = _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh
+            ? _navMeshAgent.velocity : Vector3.zero;
         Vector3 localVelocity = transform.InverseTransformDirection(worldVelocity);
         Animator.SetFloat("DirY", localVelocity.z);
         Animator.SetFloat("DirX", localVelocity.x);
@@ -150,21 +176,23 @@ public class Enemy : MonoBehaviour, IDamageable
 
     }
 
-    public virtual void TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 100f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE, bool isParryable = true)
+    public virtual DamageResult TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 100f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE, bool isParryable = true, object source = null)
     {
-        if (EnemyStat.CurrentHp <= 0) return;
+        if (!isActiveAndEnabled || EnemyStat.CurrentHp <= 0 || damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return default;
+        float hpBefore = EnemyStat.CurrentHp;
 
         GetComponent<PoiseHandler>()?.TakePoiseDamage(poiseDamage);
 
         _isAggroed = true;
 
-        if (staggerResistLevel >= StaggerResistLevel || PendingGroggy)
+        if (!IsGroggy && (staggerResistLevel >= StaggerResistLevel || PendingGroggy))
         {
             IsHurt = true;
         }
             
-        EnemyStat.CurrentHp = (int)Mathf.Max(0, EnemyStat.CurrentHp - damage);
-        OnDamaged?.Invoke(damage, damageType, isCritical);
+        EnemyStat.CurrentHp = Mathf.Max(0f, EnemyStat.CurrentHp - damage);
+        float healthDamage = hpBefore - EnemyStat.CurrentHp;
+        OnDamaged?.Invoke(healthDamage, damageType, isCritical);
 
         if (power != Vector3.zero)
             ApplyKnockback(power);
@@ -174,6 +202,7 @@ public class Enemy : MonoBehaviour, IDamageable
             OnDied?.Invoke();
             Die();
         }
+        return new DamageResult(DamageOutcome.Applied, healthDamage, killed: EnemyStat.CurrentHp <= 0f);
     }
 
     /// <summary>
@@ -239,21 +268,21 @@ public class Enemy : MonoBehaviour, IDamageable
     public void LockMovement()
     {
         _moveLockCount++;
-        if (_navMeshAgent != null && _navMeshAgent.enabled)
+        if (_navMeshAgent != null && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
             _navMeshAgent.isStopped = true;
     }
 
     public void UnlockMovement()
     {
         _moveLockCount = Mathf.Max(0, _moveLockCount - 1);
-        if (_moveLockCount == 0 && _navMeshAgent != null && _navMeshAgent.enabled)
+        if (_moveLockCount == 0 && _navMeshAgent != null && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
             _navMeshAgent.isStopped = false;
     }
 
     /// <summary>NavMeshAgent 재활성화 직후 등 isStopped 상태를 현재 잠금 수에 맞게 동기화합니다.</summary>
     public void SyncMovementLock()
     {
-        if (_navMeshAgent != null && _navMeshAgent.enabled)
+        if (_navMeshAgent != null && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
             _navMeshAgent.isStopped = _moveLockCount > 0;
     }
 
@@ -264,13 +293,14 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public virtual void OnTelegraphStart(EnemyAction action)
     {
+        if (_telegraphInstance != null) Destroy(_telegraphInstance);
         if (_telegraphEffect != null)
-            Instantiate(_telegraphEffect, transform.position, transform.rotation);
+            _telegraphInstance = Instantiate(_telegraphEffect, transform.position, transform.rotation);
     }
 
     public virtual void OnTelegraphEnd(EnemyAction action)
     {
-        if (_telegraphEffect != null)
-            Destroy(_telegraphEffect);
+        if (_telegraphInstance != null) Destroy(_telegraphInstance);
+        _telegraphInstance = null;
     }
 }

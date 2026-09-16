@@ -14,14 +14,15 @@ public class EnemyTraceState : IPlayerState
     public void Enter()
     {
         _navMeshAgent = _enemy.GetComponent<NavMeshAgent>();
-        _target = GameObject.FindGameObjectWithTag("Player").transform;
-        _navMeshAgent.SetDestination(_target.position);
-            _enemy.Animator.CrossFade("Move", 0.1f);
+        _target = _enemy.DetectedTarget;
+        _enemy.Animator.CrossFade("Move", 0.1f);
     }
 
     public void Update()
     {
-        _navMeshAgent.SetDestination(_target.position);
+        _target = _enemy.DetectedTarget;
+        if (_target != null && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
+            _navMeshAgent.SetDestination(_target.position);
         //플레이어를 추적하는 로직  
     }
 

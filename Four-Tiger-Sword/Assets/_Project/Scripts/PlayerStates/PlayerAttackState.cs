@@ -19,7 +19,7 @@ public class PlayerAttackState : IPlayerState
         if (!_playerController.IsGround())
         {
             _playerController.Movement.ApplyGravity();
-            _playerController.Controller.Move(new Vector3(0f, _playerController.VerticalVelocity, 0f) * Time.deltaTime);
+            // 실제 이동은 폼의 MoveForward에서 수평/수직을 합쳐 한 번 적용합니다.
         }
 
         _playerController.FormManager.CurrentForm.UpdateAttack(out bool isComplete);

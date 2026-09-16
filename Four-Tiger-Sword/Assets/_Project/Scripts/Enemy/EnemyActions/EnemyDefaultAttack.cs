@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class EnemyDefaultAttack : EnemyAction
 {
     private readonly MonsterDefaultAttackSO _data;
-    private readonly HashSet<Collider> _hitTargets = new HashSet<Collider>();
+    private readonly HashSet<IDamageable> _hitTargets = new HashSet<IDamageable>();
     private bool _hasHit;
 
     public EnemyDefaultAttack(MonsterDefaultAttackSO data, Enemy enemy)
@@ -45,13 +45,11 @@ public class EnemyDefaultAttack : EnemyAction
 
         foreach (var col in GetOverlap(center))
         {
-            if (_hitTargets.Contains(col)) continue;
-            if (!col.TryGetComponent<IDamageable>(out var damageable)) continue;
-
-            _hitTargets.Add(col);
+            var damageable = col.GetComponentInParent<IDamageable>();
+            if (damageable == null || !_hitTargets.Add(damageable)) continue;
             DamageManager.Apply(
                 new HitInfo(_data.damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
-                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: GetKnockbackDirection(col) * _data.knockbackForce),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: GetKnockbackDirection(col) * _data.knockbackForce, isParryable: _data.isParryable, source: this),
                 damageable, col.gameObject);
         }
     }

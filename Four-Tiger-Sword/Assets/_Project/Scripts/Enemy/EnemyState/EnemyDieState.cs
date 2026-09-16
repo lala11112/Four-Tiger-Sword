@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EnemyDieState : MonoBehaviour, IPlayerState
+public class EnemyDieState : IPlayerState
 {
     Enemy _enemy;
 
@@ -11,6 +11,7 @@ public class EnemyDieState : MonoBehaviour, IPlayerState
         //죽음
         Debug.Log($"{_enemy.name} 사망");
         _enemy.Animator.CrossFade("Die", 0.1f);
+        _enemy.LockMovement();
         _enemy.gameObject.GetComponent<Collider>().enabled = false;
         //Destroy(_enemy.gameObject);
     }

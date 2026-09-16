@@ -58,4 +58,9 @@ public class StatusEffectHandler : MonoBehaviour
         foreach (var effect in _toRemove)
             Remove(effect);
     }
+
+    private void OnDisable()
+    {
+        foreach (var effect in _effects.ToArray()) Remove(effect);
+    }
 }

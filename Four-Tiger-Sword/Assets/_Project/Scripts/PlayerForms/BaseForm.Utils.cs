@@ -3,13 +3,23 @@ using System.Collections.Generic;
 
 public abstract partial class BaseForm
 {
+    private void PlayActionAnimation(string stateName, float transition)
+    {
+        // TODO: 금/토 기본기, 신규 스킬/궁극기 모션 제작 후 AnimationName을 연결합니다.
+        // _playerController.Animator.CrossFade("NewFormMotion", transition);
+        if (string.IsNullOrWhiteSpace(stateName)) return;
+        if (_playerController.Animator.HasState(0, Animator.StringToHash(stateName)))
+            _playerController.Animator.CrossFade(stateName, transition);
+    }
+
     protected void PlayCombo()
     {
         _timer = 0;
         _playerController.Input.AttackBuffer.Consume();
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.ComboSteps[_comboStep];
-        _playerController.Animator.CrossFade(step.AnimationName, 0.1f);
+        ResetTargetApproach(step);
+        PlayActionAnimation(step.AnimationName, 0.1f);
         SpawnStepVFX(_weaponActionData.ComboSteps, _comboStep);
         PlayStepSound(_weaponActionData.ComboSteps, _comboStep);
         Debug.Log($"공격이름 : {step.AnimationName}  타수 : {_comboStep}");
@@ -20,7 +30,7 @@ public abstract partial class BaseForm
         _timer = 0;
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
-        _playerController.Animator.CrossFade(step.AnimationName, 0.01f);
+        PlayActionAnimation(step.AnimationName, 0.01f);
         SpawnStepVFX(_weaponActionData.SkillSteps, _skillStep);
         PlayStepSound(_weaponActionData.SkillSteps, _skillStep);
         Debug.Log($"스킬 단계 : {step.AnimationName} ({_skillStep})");
@@ -31,7 +41,7 @@ public abstract partial class BaseForm
         _timer = 0;
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.UltimateSteps[_ultimateStep];
-        _playerController.Animator.CrossFade(step.AnimationName, 0.01f);
+        PlayActionAnimation(step.AnimationName, 0.01f);
         SpawnStepVFX(_weaponActionData.UltimateSteps, _ultimateStep);
         PlayStepSound(_weaponActionData.UltimateSteps, _ultimateStep);
         Debug.Log($"궁극기 단계 : {step.AnimationName} ({_ultimateStep})");
@@ -79,9 +89,10 @@ public abstract partial class BaseForm
 
     // ── 소프트 타겟팅 ────────────────────────────────────────────────────────
 
-    protected void FindSoftTarget()
+    protected void FindSoftTarget(bool frontOnly = false)
     {
         _softTarget = null;
+        _softTargetCollider = null;
 
         Collider[] hits = Physics.OverlapSphere(
             _playerController.transform.position, SoftTargetSearchRadius, _enemyLayer);
@@ -91,17 +102,21 @@ public abstract partial class BaseForm
 
         foreach (var hit in hits)
         {
+            if (hit.GetComponentInParent<IDamageable>() == null) continue;
+            var enemyStats = hit.GetComponentInParent<EnemyStat>();
+            if (enemyStats != null && enemyStats.IsDead) continue;
             Vector3 toEnemy = hit.transform.position - _playerController.transform.position;
             toEnemy.y = 0f;
 
             float angle = Vector3.Angle(_playerController.transform.forward, toEnemy);
-            if (angle > SoftTargetAngle) continue;
+            if (angle > (frontOnly ? 80f : SoftTargetAngle)) continue;
 
             float dist = toEnemy.magnitude;
             if (dist < bestDist)
             {
                 bestDist = dist;
                 bestTr   = hit.transform;
+                _softTargetCollider = hit;
             }
         }
 

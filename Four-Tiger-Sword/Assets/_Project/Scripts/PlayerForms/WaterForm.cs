@@ -1,161 +1,186 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class WaterForm : BaseForm
 {
     public override ElementType Element => ElementType.ELEMENT_WATER;
-
-    public override float SkillSpCost   => 0f;
-    public override float SkillCooldown => 3f;
-
-    // ── 워터 게이지 설정 ─────────────────────────────────────────────────────
-    public float MaxWaterGauge = 100f;
-    public float GaugePerHit = 12f;  // 적 타격 1회당 게이지 충전량
-    public float GaugeDrainRate = 5f;   // 초당 게이지 감소량
-    public float BuffThreshold = 80f;  // 버프 발동 임계값
-
-    public float AtkSpdBonus = 0.3f; // 공격속도 30% 증가 (승산)
-    public float MoveSpdMultiplier = 1.3f; // 이동속도 30% 증가
-
-    public float WaterGauge { get; private set; } = 0f;
-    public bool IsBuffActive { get; private set; } = false;
-
-    private float _baseMoveSpeed;
-    private float _baseRunSpeed;
+    public override float SkillSpCost => 150f;
+    public override float SkillCooldown => 6f;
+    private readonly WaterFlowGauge _flow = new();
+    public float WaterGauge => _flow.CurrentGauge;
+    public bool IsBuffActive => _flow.IsBuffActive;
+    private bool _buffApplied;
+    private float _baseMoveSpeed, _baseRunSpeed;
     private Image _waterGaugeUI;
+    private LayerMask _savedExcludeLayers;
+    private bool _skillCollisionOverride;
+    private Vector3 _trailStart;
+    private readonly HashSet<IDamageable> _dashHitTargets = new();
+    private bool _ultimateActive;
+    private float _ultimateElapsed;
+    private int _ultimateHits;
+    private Vector3 _ultimateCenter;
+    private Transform _ultimateTarget;
+    private readonly Dictionary<Renderer, bool> _visibility = new();
 
-    public WaterForm(WeaponActionDataSO weaponActionData) : base(weaponActionData) { }
-
-    public override void Equip(PlayerController playerController)
+    public WaterForm(WeaponActionDataSO data) : base(data)
     {
-        base.Equip(playerController);
-        _baseMoveSpeed = playerController.MoveSpeed;
-        _baseRunSpeed = playerController.RunSpeed;
-        //여기서 물속성 폼 전용 UI를 켤 거임.
-        PlayerUIManager.Instance.WaterGauge.gameObject.SetActive(true);
-        PlayerUIManager.Instance.WaterElement.SetActive(false);
-        _waterGaugeUI = PlayerUIManager.Instance.WaterGauge;
-        _waterGaugeUI.fillAmount = 0f;
+        _flow.OnBuffActivated += ActivateBuff;
+        _flow.OnBuffExpired += DeactivateBuff;
     }
-
-    public override void Unequip(PlayerController playerController)
+    public override void Equip(PlayerController player)
     {
-        if (IsBuffActive)
-            DeactivateBuff();
-
-        WaterGauge = 0f;
-        //여기서 물속성 폼 전용 UI를 끌 거임.
-        PlayerUIManager.Instance.WaterGauge.gameObject.SetActive(false);
-        PlayerUIManager.Instance.WaterElement.SetActive(true);
-        _waterGaugeUI.fillAmount = 0f;
+        base.Equip(player);
+        _baseMoveSpeed = player.MoveSpeed; _baseRunSpeed = player.RunSpeed;
+        _waterGaugeUI = PlayerUIManager.Instance?.WaterGauge;
+        if (_waterGaugeUI != null) _waterGaugeUI.gameObject.SetActive(true);
+        PlayerUIManager.Instance?.WaterElement?.SetActive(false);
+        if (_flow.IsBuffActive) ActivateBuff();
     }
-
-    // ── 게이지 충전: 적 타격 시 호출 ─────────────────────────────────────────
+    public override void Unequip(PlayerController player)
+    {
+        CleanupTransientEffects();
+        DeactivateBuff();
+        if (_waterGaugeUI != null) _waterGaugeUI.gameObject.SetActive(false);
+        PlayerUIManager.Instance?.WaterElement?.SetActive(true);
+    }
     protected override void OnHitEnemy(GameObject enemy)
     {
         base.OnHitEnemy(enemy);
-        WaterGauge = Mathf.Min(WaterGauge + GaugePerHit, MaxWaterGauge);
-        _waterGaugeUI.GetComponent<Image>().fillAmount = WaterGauge / MaxWaterGauge;
-        EvaluateBuff();
-
-        if(_currentAction != ActionType.Skill) return;
-
-        var handler = enemy.GetComponent<StatusEffectHandler>();
-        if(handler == null) return;
-
-        float atk = _playerController.StatManager.GetStat(StatType.ST_ATK);
-        float critChance = _playerController.StatManager.GetStat(StatType.ST_CRT)/100f;
-        float critMultiplier = _playerController.StatManager.GetStat(StatType.ST_CRTD)/100f;
-        
-        handler.Apply(new WaterDelayedDamageEffect(atk, 1.5f, Element, critChance, critMultiplier, _weaponActionData.DelayedHitVFX));
+        _flow.Charge(12f); // 문서 미지정: 기존 타당 충전량 유지.
+        if (_currentAction == ActionType.Skill && enemy.GetComponent<IDamageable>() is Component target)
+            Effects.StartCoroutine(Effects.DelayedHits(target, EffectHit(0.5f), _weaponActionData.DelayedHitVFX));
     }
-
-    // ── 매 프레임 게이지 감소 ─────────────────────────────────────────────────
-    protected override void OnTick(float deltaTime)
+    protected override void OnTick(float dt)
     {
-        if (WaterGauge <= 0f) return;
-
-        WaterGauge = Mathf.Max(0f, WaterGauge - GaugeDrainRate * deltaTime);
-        _waterGaugeUI.GetComponent<Image>().fillAmount = WaterGauge / MaxWaterGauge;
-        EvaluateBuff();
+        _flow.Tick(dt);
+        if (_waterGaugeUI != null) _waterGaugeUI.fillAmount = _flow.GaugeRatio;
+        // 버프 중 변경되는 데이터 타이머와 모션 속도를 함께 맞춥니다.
+        if (_playerController != null && _playerController.FormManager?.CurrentForm == this
+            && (_playerController.StateMachine.CurrentState is PlayerAttackState
+                || _playerController.StateMachine.CurrentState is PlayerSkillState))
+            _playerController.Animator.speed = AttackSpeed;
     }
-
-    private void EvaluateBuff()
-    {
-        bool shouldActivate = WaterGauge >= BuffThreshold;
-
-        if (shouldActivate && !IsBuffActive)
-            ActivateBuff();
-        else if (!shouldActivate && IsBuffActive)
-            DeactivateBuff();
-    }
-
     private void ActivateBuff()
     {
-        IsBuffActive = true;
-        _playerController.StatManager.AddModifier(StatType.ST_ATK_SPD, 0f, AtkSpdBonus);
-        _playerController.StatManager.AddModifier(StatType.ST_ATK, 0f, 100);
-        _playerController.MoveSpeed = _baseMoveSpeed * MoveSpdMultiplier;
-        _playerController.RunSpeed = _baseRunSpeed * MoveSpdMultiplier;
+        if (_buffApplied || _playerController == null) return;
+        _buffApplied = true;
+        _playerController.StatManager.AddModifier(StatType.ST_ATK_SPD, 0f, 0.3f);
+        _playerController.MoveSpeed = _baseMoveSpeed * 1.3f;
+        _playerController.RunSpeed = _baseRunSpeed * 1.3f;
     }
-
     private void DeactivateBuff()
     {
-        IsBuffActive = false;
-        _playerController.StatManager.RemoveModifier(StatType.ST_ATK_SPD, 0f, AtkSpdBonus);
-        _playerController.StatManager.RemoveModifier(StatType.ST_ATK, 0f, 100);
+        if (!_buffApplied || _playerController == null) return;
+        _buffApplied = false;
+        _playerController.StatManager.RemoveModifier(StatType.ST_ATK_SPD, 0f, 0.3f);
         _playerController.MoveSpeed = _baseMoveSpeed;
         _playerController.RunSpeed = _baseRunSpeed;
     }
-
-    // ── 공격 업데이트 ─────────────────────────────────────────────────────────
-    public override void UpdateAttack(out bool isComplete)
-    {
-        base.UpdateAttack(out isComplete);
-    }
-
     public override void BeginSkill()
     {
         base.BeginSkill();
-        FindSoftTarget();
         if (_softTarget != null)
         {
-            Vector3 dir = _softTarget.position - _playerController.transform.position;
-            dir.y = 0f;
-            Quaternion targetRot = Quaternion.LookRotation(dir);
-            _playerController.transform.rotation = targetRot;   
+            var dir = Vector3.ProjectOnPlane(_softTarget.position - _playerController.transform.position, Vector3.up);
+            if (dir.sqrMagnitude > 0.001f) _playerController.transform.rotation = Quaternion.LookRotation(dir);
         }
-        _playerController.Controller.excludeLayers |= 1 << LayerMask.NameToLayer("Enemy");
-        PlayStepSound(_weaponActionData.SkillSteps, 0);
+        _savedExcludeLayers = _playerController.Controller.excludeLayers;
+        _skillCollisionOverride = true;
+        _playerController.Controller.excludeLayers |= LayerMask.GetMask("Enemy");
+        _softTarget = null; // 한 번 정한 돌진 방향으로 진행.
+        _trailStart = _playerController.Controller.bounds.center;
+        _dashHitTargets.Clear();
     }
+    protected override void ExecuteHit(WeaponActionData step, float damage, float poiseDamage, HashSet<IDamageable> targets)
+        => base.ExecuteHit(step, damage, poiseDamage, _currentAction == ActionType.Skill ? _dashHitTargets : targets);
 
     public override void UpdateSkill(out bool isComplete)
     {
-        _softTarget = null;
-        isComplete = false;
-        if (_weaponActionData == null || _weaponActionData.SkillSteps == null || _weaponActionData.SkillSteps.Count == 0) { isComplete = true; return; }
-
-        _timer += Time.deltaTime * AttackSpeed;
-        WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
-        ProcessHit(step);
-        MoveForward(step);
-
-        if (_timer >= step.Duration)
+        base.UpdateSkill(out isComplete);
+        var step = _weaponActionData.SkillSteps[_skillStep];
+        if (_timer < FirstHitTime(step)) return;
+        Vector3 end = _playerController.Controller.bounds.center;
+        // 선딜 중 이미 통과한 구간도 첫 판정에 포함합니다. 매 적당 최초 돌진 1회만 적용.
+        foreach (var collider in Physics.OverlapCapsule(_trailStart, end, Mathf.Max(0.1f, step.HitBoxRadius), _enemyLayer))
         {
-            if (_skillStep < _weaponActionData.SkillSteps.Count - 1) { _skillStep++; PlaySkillStep(); }
-            else isComplete = true;
+            var target = collider.GetComponentInParent<IDamageable>();
+            if (!(target is Component component) || !_dashHitTargets.Add(target)) continue;
+            var result = DamageManager.Apply(EffectHit(step.Damage), target, component.gameObject);
+            if (result.Applied) OnHitEnemy(component.gameObject);
         }
+        _trailStart = end;
     }
-
     public override void EndSkill()
     {
+        RestoreSkillCollision();
         base.EndSkill();
-        _playerController.Controller.excludeLayers &= ~(1 << LayerMask.NameToLayer("Enemy"));
     }
-
+    private void RestoreSkillCollision()
+    {
+        if (!_skillCollisionOverride) return;
+        _playerController.Controller.excludeLayers = _savedExcludeLayers;
+        _skillCollisionOverride = false;
+    }
     public override void BeginUltimate()
     {
         base.BeginUltimate();
-        SpawnStepVFX(_weaponActionData.UltimateSteps, 0);
+        _ultimateActive = true;
+        _ultimateElapsed = 0f; _ultimateHits = 0;
+        _ultimateTarget = _softTarget;
+        _ultimateCenter = _softTarget != null ? _softTarget.position : _playerController.transform.position;
+        _visibility.Clear();
+        foreach (var renderer in _playerController.GetComponentsInChildren<Renderer>())
+        {
+            _visibility[renderer] = renderer.enabled;
+            renderer.enabled = false;
+        }
+        // TODO: 만조의 춤 잔상 교차 베기/납도 모션.
+        // _playerController.Animator.CrossFade("WaterDance", 0.1f);
+    }
+    public override bool BlocksIncomingDamage(float damage, Vector3 power, object source = null) => _ultimateActive;
+    public override void UpdateUltimate(out bool isComplete)
+    {
+        _ultimateElapsed += Time.deltaTime;
+        if (_ultimateTarget != null) _ultimateCenter = _ultimateTarget.position;
+        while (_ultimateHits < 10 && _ultimateElapsed >= (_ultimateHits + 1) * 0.2f)
+        {
+            var hit = EffectHit(1.2f);
+            bool firstHit = true;
+            foreach (var target in FormEffectRunner.Targets(_ultimateCenter, _weaponActionData.AreaRadius))
+            {
+                if (target == null) continue;
+                var result = DamageManager.Apply(hit, (IDamageable)target, target.gameObject);
+                if (!result.Applied) continue;
+
+                // 일반 공격과 동일하게 실제 적중 시에만 타격 피드백을 재생합니다.
+                if (firstHit)
+                {
+                    _playerController.StartHitStop();
+                    firstHit = false;
+                }
+                _playerController.ImpulseSource?.GenerateImpulse();
+            }
+            _ultimateHits++;
+        }
+        isComplete = _ultimateHits >= 10;
+    }
+    public override void EndUltimate()
+    {
+        if (_ultimateTarget != null && _playerController.Controller.enabled)
+        {
+            Vector3 desired = _ultimateTarget.position - _ultimateTarget.forward * 1.5f;
+            _playerController.Controller.Move(Vector3.ProjectOnPlane(desired - _playerController.transform.position, Vector3.up));
+        }
+        CleanupTransientEffects();
+        base.EndUltimate();
+    }
+    public override void CleanupTransientEffects()
+    {
+        _ultimateActive = false;
+        foreach (var item in _visibility) if (item.Key != null) item.Key.enabled = item.Value;
+        _visibility.Clear();
+        RestoreSkillCollision();
     }
 }

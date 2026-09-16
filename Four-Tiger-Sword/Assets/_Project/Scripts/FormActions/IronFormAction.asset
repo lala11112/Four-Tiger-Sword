@@ -15,37 +15,152 @@ MonoBehaviour:
   WeaponName: 
   ComboSteps:
   - AnimationName: 
-    Duration: 0
-    ComboTransitionTime: 0
-    Damage: 0
-    CriticalChance: 0
-    CriticalMultiplier: 0
-    HitStartTime: 0
-    HitDuration: 0
-    HitBoxOffset: {x: 0, y: 0, z: 0}
-    HitBoxShape: 0
-    HitBoxRadius: 0
-    HitBoxSize: {x: 0, y: 0, z: 0}
-    HitBoxHeight: 0
-    ForwardThrust: 0
-    KnockbackForce: 0
+    Duration: 0.6
+    ComboTransitionTime: 0.3
+    Damage: 1
+    PoiseDamage: 20
+    HitStartTime: 0.2
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 1, z: 1.5}
+    HitBoxShape: 1
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 0.6, y: 1, z: 2}
+    HitBoxHeight: 2
+    KnockbackForce: 3
+    StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
     ThrustCurve:
       serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 0
-      m_PostInfinity: 0
-      m_RotationOrder: 0
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
     ThrustMultiplier: 0
+    UseTargetApproach: 1
+    StopDistance: 0.25
+    ApproachEndTime: 0.2
+    RotationEndTime: 0.2
+    MaxApproachDistance: 2
+  - AnimationName: 
+    Duration: 0.6
+    ComboTransitionTime: 0.3
+    Damage: 1.2
+    PoiseDamage: 20
+    HitStartTime: 0.2
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 1, z: 1.5}
+    HitBoxShape: 1
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 0.6, y: 1, z: 2}
+    HitBoxHeight: 2
+    KnockbackForce: 3
+    StaggerResistLevel: 0
+    HitEvents: []
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+    ThrustCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ThrustMultiplier: 0
+    UseTargetApproach: 1
+    StopDistance: 0.25
+    ApproachEndTime: 0.2
+    RotationEndTime: 0.2
+    MaxApproachDistance: 2
+  - AnimationName: 
+    Duration: 0.6
+    ComboTransitionTime: 0.3
+    Damage: 1.8
+    PoiseDamage: 20
+    HitStartTime: 0.2
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 1, z: 1.5}
+    HitBoxShape: 1
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 0.6, y: 1, z: 2}
+    HitBoxHeight: 2
+    KnockbackForce: 3
+    StaggerResistLevel: 0
+    HitEvents: []
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+    ThrustCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ThrustMultiplier: 0
+    UseTargetApproach: 1
+    StopDistance: 0.25
+    ApproachEndTime: 0.2
+    RotationEndTime: 0.2
+    MaxApproachDistance: 2
   AirAttackStep:
     AnimationName: 
     Duration: 0.5
     ComboTransitionTime: 0.3
     Damage: 10
-    CriticalChance: 0.1
-    CriticalMultiplier: 1.5
+    PoiseDamage: 10
     HitStartTime: 0.1
     HitDuration: 0.1
     HitBoxOffset: {x: 0, y: 0, z: 1}
@@ -53,8 +168,8 @@ MonoBehaviour:
     HitBoxRadius: 1.5
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
-    ForwardThrust: 2
     KnockbackForce: 8
+    StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -83,22 +198,74 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 10
+    UseTargetApproach: 0
+    StopDistance: 0.25
+    ApproachEndTime: 0.3
+    RotationEndTime: 0.2
+    MaxApproachDistance: 2
+  CounterStep:
+    AnimationName: 
+    Duration: 0.5
+    ComboTransitionTime: 0.3
+    Damage: 10
+    PoiseDamage: 10
+    HitStartTime: 0.1
+    HitDuration: 0.1
+    HitBoxOffset: {x: 0, y: 0, z: 1}
+    HitBoxShape: 0
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 1, y: 1, z: 1}
+    HitBoxHeight: 2
+    KnockbackForce: 8
+    StaggerResistLevel: 0
+    HitEvents: []
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+    ThrustCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ThrustMultiplier: 10
+    UseTargetApproach: 0
+    StopDistance: 0.25
+    ApproachEndTime: 0.3
+    RotationEndTime: 0.2
+    MaxApproachDistance: 2
   SkillSteps:
   - AnimationName: 
-    Duration: 0
-    ComboTransitionTime: 0
-    Damage: 0
-    CriticalChance: 0
-    CriticalMultiplier: 0
-    HitStartTime: 0
-    HitDuration: 0
-    HitBoxOffset: {x: 0, y: 0, z: 0}
-    HitBoxShape: 0
-    HitBoxRadius: 0
-    HitBoxSize: {x: 0, y: 0, z: 0}
-    HitBoxHeight: 0
-    ForwardThrust: 0
-    KnockbackForce: 8
+    Duration: 1.2166667
+    ComboTransitionTime: 0.6333333
+    Damage: 3
+    PoiseDamage: 20
+    HitStartTime: 0.5
+    HitDuration: 0.13333334
+    HitBoxOffset: {x: 0, y: 1, z: 1.5}
+    HitBoxShape: 1
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 0.6, y: 1, z: 2}
+    HitBoxHeight: 2
+    KnockbackForce: 3
+    StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
@@ -126,24 +293,53 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 10
+    ThrustMultiplier: 0
+    UseTargetApproach: 1
+    StopDistance: 0.25
+    ApproachEndTime: 0.5
+    RotationEndTime: 0.5
+    MaxApproachDistance: 2
   UltimateSteps:
   - AnimationName: 
-    Duration: 0
-    ComboTransitionTime: 0
-    Damage: 0
-    CriticalChance: 0
-    CriticalMultiplier: 0
-    HitStartTime: 0
-    HitDuration: 0
-    HitBoxOffset: {x: 0, y: 0, z: 0}
-    HitBoxShape: 0
-    HitBoxRadius: 0
-    HitBoxSize: {x: 0, y: 0, z: 0}
-    HitBoxHeight: 0
-    ForwardThrust: 0
-    KnockbackForce: 8
-    HitEvents: []
+    Duration: 2.05
+    ComboTransitionTime: 2
+    Damage: 2
+    PoiseDamage: 20
+    HitStartTime: 0.2
+    HitDuration: 1.8
+    HitBoxOffset: {x: 0, y: 1, z: 6}
+    HitBoxShape: 1
+    HitBoxRadius: 1.5
+    HitBoxSize: {x: 0.7, y: 1, z: 6}
+    HitBoxHeight: 2
+    KnockbackForce: 3
+    StaggerResistLevel: 0
+    HitEvents:
+    - StartTime: 0.2
+      Duration: 0.05
+      Damage: 2
+      PoiseDamage: 10
+      StaggerResistLevel: 0
+    - StartTime: 0.6
+      Duration: 0.05
+      Damage: 2
+      PoiseDamage: 10
+      StaggerResistLevel: 0
+    - StartTime: 1
+      Duration: 0.05
+      Damage: 2
+      PoiseDamage: 10
+      StaggerResistLevel: 0
+    - StartTime: 1.4
+      Duration: 0.05
+      Damage: 2
+      PoiseDamage: 10
+      StaggerResistLevel: 0
+    - StartTime: 1.8000001
+      Duration: 0.05
+      Damage: 2
+      PoiseDamage: 10
+      StaggerResistLevel: 0
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
     ThrustCurve:
@@ -170,4 +366,18 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 10
+    ThrustMultiplier: 0
+    UseTargetApproach: 1
+    StopDistance: 0.25
+    ApproachEndTime: 0.2
+    RotationEndTime: 0.2
+    MaxApproachDistance: 2
+  HitVFX: {fileID: 0}
+  HitSound: {fileID: 0}
+  DelayedHitVFX: {fileID: 0}
+  UltimateCooldown: 30
+  AreaRadius: 4
+  FieldDuration: 5
+  HealMaxHpPerSecond: 0.05
+  ShieldAmount: 300
+  ShieldDuration: 5

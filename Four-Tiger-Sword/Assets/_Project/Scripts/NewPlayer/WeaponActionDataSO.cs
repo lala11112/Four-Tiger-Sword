@@ -36,4 +36,16 @@ public class WeaponActionDataSO : ScriptableObject
     [Header("Delayed Hit Effect")]
     [Tooltip("지연 데미지가 터질 때 적 위치에 스폰할 이펙트 프리팹")]
     public GameObject DelayedHitVFX;
+
+    [Header("Fire Stack Explosion")]
+    [Tooltip("화 폼 6스택 추가 피해까지의 실제 시간(초). 히트스탑과 무관하며 0이면 즉시 적용합니다.")]
+    [Min(0f)] public float FireExplosionDelay = 0.15f;
+
+    [Header("Spec tuning (unspecified values are provisional)")]
+    [Min(0f)] public float UltimateCooldown = 30f;
+    [Min(0.1f)] public float AreaRadius = 4f;
+    [Min(0.1f)] public float FieldDuration = 5f;
+    [Range(0f, 1f)] public float HealMaxHpPerSecond = 0.05f;
+    [Min(0f)] public float ShieldAmount = 300f;
+    [Min(0.1f)] public float ShieldDuration = 5f;
 }

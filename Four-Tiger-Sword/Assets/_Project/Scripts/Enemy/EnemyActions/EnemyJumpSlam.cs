@@ -14,7 +14,7 @@ public class EnemyJumpSlam : EnemyAction
 
     private readonly MonsterJumpSlamSO _data;
     private readonly NavMeshAgent _nav;
-    private readonly HashSet<Collider> _hitTargets = new HashSet<Collider>();
+    private readonly HashSet<IDamageable> _hitTargets = new HashSet<IDamageable>();
 
     private Phase _phase;
     private Vector3 _jumpStartPos;
@@ -35,7 +35,7 @@ public class EnemyJumpSlam : EnemyAction
         _hitTargets.Clear();
         _movementUnlocked = false;
 
-        _nav.ResetPath();
+        if (_nav.enabled && _nav.isOnNavMesh) _nav.ResetPath();
         _enemy.LockMovement();
         _enemy.Animator?.CrossFade(_data.animName, 0.01f);
         // TODO: _enemy.Animator?.SetTrigger(_data.animName);
@@ -80,11 +80,9 @@ public class EnemyJumpSlam : EnemyAction
         // 상태가 중단될 경우에도 NavMeshAgent 복구
         if (!_nav.enabled)
         {
-            _nav.enabled = true;
-            if (_nav.isOnNavMesh)
-                _nav.Warp(_enemy.transform.position);
+            RestoreNavigation(_enemy.transform.position);
         }
-        _enemy.gameObject.transform.rotation = Quaternion.Euler(0f, _enemy.gameObject.transform.rotation.y, 0f);
+        _enemy.transform.rotation = Quaternion.Euler(0f, _enemy.transform.eulerAngles.y, 0f);
 
         if (!_movementUnlocked)
         {
@@ -119,7 +117,7 @@ public class EnemyJumpSlam : EnemyAction
 
     private void PerformJump()
     {
-        float t = Mathf.Clamp01(_timer / _data.jumpDuration);
+        float t = Mathf.Clamp01(_timer / Mathf.Max(0.01f, _data.jumpDuration));
 
         // 수평: 선형 보간 / 수직: sin 포물선
         Vector3 flat = Vector3.Lerp(_jumpStartPos, _jumpTargetPos, t);
@@ -139,10 +137,7 @@ public class EnemyJumpSlam : EnemyAction
     {
         _enemy.transform.position = _jumpTargetPos;
 
-        // NavMeshAgent 복구 — Warp가 가장 가까운 NavMesh 지점으로 스냅
-        _nav.enabled = true;
-        if (_nav.isOnNavMesh)
-            _nav.Warp(_jumpTargetPos);
+        RestoreNavigation(_jumpTargetPos);
 
         if (!_movementUnlocked)
         {
@@ -150,10 +145,28 @@ public class EnemyJumpSlam : EnemyAction
             _movementUnlocked = true;
         }
         _enemy.SyncMovementLock();
-        _enemy.gameObject.transform.rotation = Quaternion.Euler(0f, _enemy.gameObject.transform.rotation.y, 0f);
+        _enemy.transform.rotation = Quaternion.Euler(0f, _enemy.transform.eulerAngles.y, 0f);
         // telegraphDuration을 startupTime + jumpDuration으로 설정하면 베이스 클래스가 착지 직전에 자동으로 EndTelegraph() 호출
         BroadcastHit(); // TakeDamage에서 이 액션을 소스로 식별하기 위해
         ExecuteSlam();
+    }
+
+    private void RestoreNavigation(Vector3 desiredPosition)
+    {
+        // 공중에서 중단된 경우 먼저 지면을 찾은 뒤 에이전트를 켭니다.
+        var filter = new NavMeshQueryFilter { agentTypeID = _nav.agentTypeID, areaMask = _nav.areaMask };
+        float searchRadius = Mathf.Max(2f, _data.jumpHeight + 1f);
+        if (!NavMesh.SamplePosition(desiredPosition, out var hit, searchRadius, filter)
+            && !NavMesh.SamplePosition(_jumpStartPos, out hit, searchRadius, filter))
+        {
+            _enemy.transform.position = _jumpStartPos;
+            _nav.enabled = true;
+            Debug.LogWarning($"{_enemy.name}: 점프 복귀 위치의 NavMesh를 찾지 못했습니다.", _enemy);
+            return;
+        }
+        _enemy.transform.position = hit.position;
+        _nav.enabled = true;
+        _nav.Warp(hit.position);
     }
 
     private void ExecuteSlam()
@@ -162,16 +175,14 @@ public class EnemyJumpSlam : EnemyAction
 
         foreach (var col in Physics.OverlapSphere(center, _data.slamRadius, _playerLayer))
         {
-            if (_hitTargets.Contains(col)) continue;
-            if (!col.TryGetComponent<IDamageable>(out var damageable)) continue;
-
-            _hitTargets.Add(col);
+            var damageable = col.GetComponentInParent<IDamageable>();
+            if (damageable == null || !_hitTargets.Add(damageable)) continue;
 
             // 착지 충격은 외부로 퍼지는 방향이 아닌 위→아래 방향 넉백 포함
             Vector3 knockback = GetKnockbackDirection(col) * _data.knockbackForce;
             DamageManager.Apply(
                 new HitInfo(_data.damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
-                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: knockback),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: knockback, isParryable: _data.isParryable, source: this),
                 damageable, col.gameObject);
         }
     }

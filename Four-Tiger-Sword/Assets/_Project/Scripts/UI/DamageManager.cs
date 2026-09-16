@@ -1,41 +1,43 @@
 using UnityEngine;
 
 public static class DamageManager
-{    
-    private static ElementEffectiveManager _elementEffectiveManager;
-    public static void Apply(HitInfo info, IDamageable target, GameObject targetGO)
+{
+
+    public static DamageResult Apply(HitInfo info, IDamageable target, GameObject targetGO)
     {
-        if (_elementEffectiveManager == null)
+        if (target == null || targetGO == null || !targetGO.activeInHierarchy
+            || float.IsNaN(info.BaseDamage) || float.IsInfinity(info.BaseDamage) || info.BaseDamage < 0f)
+            return default;
+        if (target is Component receiver)
         {
-            _elementEffectiveManager = Resources.Load<ElementEffectiveManager>("ElementEffectiveManager");
-            _elementEffectiveManager.Initialize();
+            if (receiver == null) return default;
+            targetGO = receiver.gameObject;
+            if (!targetGO.activeInHierarchy) return default;
         }
-
-        float finalDamage = info.BaseDamage;
-        ElementType attackType = info.Element;
-        ElementType defenseType = targetGO.GetComponent<Enemy>()?.Element ?? targetGO.GetComponent<PlayerController>()?.Element ?? ElementType.ELEMENT_NONE;
-        float effective = _elementEffectiveManager.GetElementEffective(attackType, defenseType);
-        finalDamage = finalDamage * effective;
-
-
-        //var statHandler = targetGO.GetComponent<EnemyStatHandler>();
-
-        // 약점 노출 상태이면 무조건 치명타
-        //bool forceCrit  = statHandler != null && statHandler.IsWeakPointExposed;
-        //bool isCritical = forceCrit || Random.value < info.CriticalChance;
-        bool isCritical = Random.value < info.CriticalChance;
-
-        finalDamage = isCritical
-            ? Mathf.RoundToInt(finalDamage * info.CriticalMultiplier)
-            : finalDamage;
-
-        // ArmorPierce: 방어력 감소량만큼 데미지 증가 (DEF 시스템 도입 전 플래그 보존)
-        // 현재 구조에서 EffectiveDef가 0이면 차감 없음 — 추후 공식 추가
-        //if (info.ArmorPierce && statHandler != null)
-        //{
-        //    rawDamage += Mathf.RoundToInt(statHandler.EffectiveDef);
-        //}
-
-        target.TakeDamage(finalDamage, attackType, isCritical, info.Power, info.PoiseDamage, info.StaggerResistLevel, info.IsParryable);
+        float damage = info.BaseDamage;
+        bool critical = false;
+        if (!info.TrueDamage)
+        {
+            if (!CombatSettings.TryGetTable(out var elementTable)) return default;
+            var enemy = targetGO.GetComponent<EnemyStat>();
+            var player = targetGO.GetComponent<PlayerController>();
+            ElementType defenseElement = enemy != null ? enemy.ElementType
+                : player != null ? player.Element : ElementType.ELEMENT_NONE;
+            if (!elementTable.TryGetElementEffective(info.Element, defenseElement, out float multiplier)) return default;
+            damage *= multiplier;
+            critical = Random.value < Mathf.Clamp01(info.CriticalChance);
+            if (critical) damage *= Mathf.Max(0f, info.CriticalMultiplier);
+            if (!info.ArmorPierce)
+            {
+                float defense = enemy != null
+                    ? (targetGO.GetComponent<FormTargetEffects>()?.EffectiveDefense ?? enemy.GetStat(EnemyStatType.DEF))
+                    : player != null ? player.StatManager.GetStat(StatType.ST_DEF) : 0f;
+                damage *= 100f / (100f + Mathf.Max(0f, defense));
+            }
+        }
+        if (float.IsNaN(damage) || float.IsInfinity(damage)) return default;
+        return target.TakeDamage(damage, info.Element, critical, info.Power,
+            Mathf.Max(0f, info.PoiseDamage * info.PoiseDamageMultiplier),
+            info.StaggerResistLevel, info.IsParryable, info.Source);
     }
 }

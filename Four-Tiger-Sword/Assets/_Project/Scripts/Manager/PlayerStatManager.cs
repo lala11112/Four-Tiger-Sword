@@ -1,4 +1,4 @@
-using System;
+ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -43,17 +43,14 @@ public class PlayerStatManager : MonoBehaviour
     public bool  CanRun               => _currentStamina > 0f;
 
     /// <summary>피해를 받을 때마다 발생합니다. EarthForm 흡수 스탯 등이 구독합니다.</summary>
-    public event Action<int, ElementType, bool> OnDamageTaken;
+    public event Action<float, ElementType, bool> OnDamageTaken;
 
     /// <summary>HP가 변경될 때마다 발생합니다. (현재HP, 최대HP) UI 갱신용.</summary>
     public event Action<float, float> OnHpChanged;
     public event Action<float, float> OnSpChanged;
 
-    private PlayerController _playerController;
-
     private void Awake()
     {
-        _playerController = GetComponent<PlayerController>();
         InitializeFromData(); // SO 데이터로 초기화
     }
 
@@ -180,11 +177,18 @@ public class PlayerStatManager : MonoBehaviour
     // ── HP / TakeDamage ──────────────────────────────────────────────────────────
 
     /// <summary>피해를 적용합니다. PlayerController.TakeDamage에서 호출됩니다.</summary>
-    public void TakeDamage(int damage, ElementType damageType, bool isCritical)
+    public DamageResult TakeDamage(float damage, ElementType damageType, bool isCritical)
     {
+        if (_currentHp <= 0f || damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return default;
+        float hpBefore = _currentHp;
+        float absorbed = Mathf.Min(Shield, Mathf.Max(0, damage));
+        Shield -= absorbed;
+        damage = Mathf.Max(0f, damage - absorbed);
         _currentHp = Mathf.Max(0f, _currentHp - damage);
-        OnDamageTaken?.Invoke(damage, damageType, isCritical);
+        float healthDamage = hpBefore - _currentHp;
+        if (healthDamage > 0f) OnDamageTaken?.Invoke(healthDamage, damageType, isCritical);
         OnHpChanged?.Invoke(_currentHp, GetStat(StatType.ST_HP));
+        return new DamageResult(DamageOutcome.Applied, healthDamage, absorbed, _currentHp <= 0f);
     }
 
     // ── SP 메서드 ────────────────────────────────────────────────────────────────
@@ -220,8 +224,10 @@ public class PlayerStatManager : MonoBehaviour
 
         float maxSp = GetStat(StatType.ST_SP);
         if (_currentSp < maxSp)
+        {
             _currentSp = Mathf.Min(_currentSp + GetStat(StatType.ST_SP_REGEN) * deltaTime, maxSp);
-        OnSpChanged?.Invoke(_currentSp, GetStat(StatType.ST_SP));
+            OnSpChanged?.Invoke(_currentSp, maxSp);
+        }
     }
 
     // ── 필살기 게이지 메서드 ──────────────────────────────────────────────────────
@@ -275,4 +281,24 @@ public class PlayerStatManager : MonoBehaviour
     // ── HUD 단축 속성 ────────────────────────────────────────────────────────────
     public float MaxHp => GetStat(StatType.ST_HP);
     public float MaxSp => GetStat(StatType.ST_SP);
+
+    public float Shield { get; private set; }
+    private float _shieldTimer;
+    public void GrantShield(float amount, float duration)
+    {
+        Shield = Mathf.Max(Shield, amount);
+        _shieldTimer = Mathf.Max(0f, duration);
+    }
+    public void Heal(float amount)
+    {
+        if (_currentHp <= 0f || amount <= 0f) return;
+        _currentHp = Mathf.Min(MaxHp, _currentHp + amount);
+        OnHpChanged?.Invoke(_currentHp, MaxHp);
+    }
+    private void Update()
+    {
+        if (_shieldTimer <= 0f) { Shield = 0f; return; }
+        _shieldTimer -= Time.deltaTime;
+        if (_shieldTimer <= 0f) Shield = 0f;
+    }
 }

@@ -1,9 +1,9 @@
 using UnityEngine;
-using System.Collections;
 
-public class EnemyHurtState : MonoBehaviour, IPlayerState
+public class EnemyHurtState : IPlayerState
 {
     Enemy _enemy;
+    private float _remaining;
 
     public EnemyHurtState(Enemy enemy) { _enemy = enemy; }
 
@@ -12,22 +12,15 @@ public class EnemyHurtState : MonoBehaviour, IPlayerState
         //피격 애니메이션 재생
         _enemy.Animator.CrossFade("Hit", 0.1f);
         _enemy.LockMovement();
-        _enemy.StartCoroutine(HurtRoutine());
+        _remaining = 1f;
     }
 
     public void Update()
     {
-        //애니메이션 재생후, IsHurt를 false로 변경
-        //Debug.Log("EnemyHurtState Exit");
-    }
-
-    public void Exit()
-    {
-        Debug.Log("EnemyHurtState Exit");
-        _enemy.UnlockMovement();
+        _remaining -= Time.deltaTime;
+        if (_remaining > 0f) return;
         _enemy.IsHurt = false;
-        _enemy.StopAllCoroutines();
-
+        // 정상 종료 시에만 그로기로 이어집니다. 사망 등으로 중단되면 예약하지 않습니다.
         if (_enemy.PendingGroggy)
         {
             _enemy.PendingGroggy = false;
@@ -35,9 +28,10 @@ public class EnemyHurtState : MonoBehaviour, IPlayerState
         }
     }
 
-    private IEnumerator HurtRoutine()
+    public void Exit()
     {
-        yield return new WaitForSeconds(1f);
+        Debug.Log("EnemyHurtState Exit");
+        _enemy.UnlockMovement();
         _enemy.IsHurt = false;
     }
 }

@@ -27,7 +27,7 @@ MonoBehaviour:
     HitBoxSize: {x: 1, y: 1, z: 1}
     HitBoxHeight: 2
     KnockbackForce: 11
-    StaggerResistLevel: 1
+    StaggerResistLevel: 4
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 8300000, guid: 4ee7b1224a6ce024f93e54eadb019e3c, type: 3}
@@ -35,8 +35,8 @@ MonoBehaviour:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: -0.0020866394
-        value: 0.9978447
+        time: -0.02312851
+        value: 2.0141106
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -44,10 +44,10 @@ MonoBehaviour:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.29144788
-        value: 0.003275074
-        inSlope: -3.3882544
-        outSlope: -0.0050501833
+        time: 0.3352635
+        value: 0.0065099373
+        inSlope: -5.601689
+        outSlope: -0.0103796115
         tangentMode: 69
         weightedMode: 0
         inWeight: 0.33333334
@@ -64,7 +64,12 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 15
+    ThrustMultiplier: 4.34
+    UseTargetApproach: 1
+    StopDistance: 0.25
+    ApproachEndTime: 1
+    RotationEndTime: 1
+    MaxApproachDistance: 2
   - AnimationName: OutSlash
     Duration: 1.267
     ComboTransitionTime: 1
@@ -78,7 +83,7 @@ MonoBehaviour:
     HitBoxSize: {x: 2.5, y: 1.5, z: 2.5}
     HitBoxHeight: 2
     KnockbackForce: 13
-    StaggerResistLevel: 1
+    StaggerResistLevel: 4
     HitEvents: []
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 8300000, guid: 4ee7b1224a6ce024f93e54eadb019e3c, type: 3}
@@ -116,6 +121,11 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 20
+    UseTargetApproach: 1
+    StopDistance: 0.25
+    ApproachEndTime: 0.5
+    RotationEndTime: 0.5
+    MaxApproachDistance: 2
   - AnimationName: Fire1
     Duration: 2
     ComboTransitionTime: 0
@@ -167,6 +177,11 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 20
+    UseTargetApproach: 1
+    StopDistance: 0.25
+    ApproachEndTime: 1.06
+    RotationEndTime: 1.06
+    MaxApproachDistance: 2
   AirAttackStep:
     AnimationName: FireAirAttack
     Duration: 0.5
@@ -210,6 +225,11 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 10
+    UseTargetApproach: 0
+    StopDistance: 0.25
+    ApproachEndTime: 0.3
+    RotationEndTime: 0.2
+    MaxApproachDistance: 2
   CounterStep:
     AnimationName: OutSlash
     Duration: 1.267
@@ -262,6 +282,11 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 20
+    UseTargetApproach: 0
+    StopDistance: 0.25
+    ApproachEndTime: 0.3
+    RotationEndTime: 0.2
+    MaxApproachDistance: 2
   SkillSteps:
   - AnimationName: ComboSlash
     Duration: 2.767
@@ -383,6 +408,11 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 18
+    UseTargetApproach: 0
+    StopDistance: 0.25
+    ApproachEndTime: 0.3
+    RotationEndTime: 0.2
+    MaxApproachDistance: 2
   UltimateSteps:
   - AnimationName: FireUlt
     Duration: 2
@@ -426,6 +456,18 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     ThrustMultiplier: 10
+    UseTargetApproach: 0
+    StopDistance: 0.25
+    ApproachEndTime: 0.3
+    RotationEndTime: 0.2
+    MaxApproachDistance: 2
   HitVFX: {fileID: 1766868900565162, guid: f82a1a892a042c1438f8f4704a37e11b, type: 3}
   HitSound: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
   DelayedHitVFX: {fileID: 0}
+  FireExplosionDelay: 0.15
+  UltimateCooldown: 30
+  AreaRadius: 4
+  FieldDuration: 5
+  HealMaxHpPerSecond: 0.05
+  ShieldAmount: 300
+  ShieldDuration: 5

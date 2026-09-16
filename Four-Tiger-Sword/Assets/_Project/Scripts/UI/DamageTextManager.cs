@@ -62,6 +62,6 @@ public class DamageTextManager : MonoBehaviour
         DamageText dt = _pool.Get();
         dt.transform.position = worldPosition + offset;
 
-        dt.Init((int)damage, damageType, isCritical, () => _pool.Release(dt));
+        dt.Init(Mathf.RoundToInt(damage), damageType, isCritical, () => _pool.Release(dt));
     }
 }

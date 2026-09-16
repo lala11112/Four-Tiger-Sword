@@ -5,6 +5,7 @@ public class FormManager
     private PlayerController _playerController;
     public IForm CurrentForm{ get; private set; }
     private List<FormTransition> _transitions = new List<FormTransition>();
+    private readonly HashSet<IForm> _registeredForms = new();
     private readonly Dictionary<Type, List<FormTransition>> _fastTransitions = new Dictionary<Type, List<FormTransition>>();
 
 
@@ -18,8 +19,8 @@ public class FormManager
 
     public void Update()
     {
-        foreach (var transition in _transitions)
-            transition.TargetForm.UpdateCooldowns();
+        foreach (var form in _registeredForms)
+            form.UpdateCooldowns();
 
         (CurrentForm as BaseForm)?.UpdateSkillCooldownUI();
 
@@ -37,11 +38,17 @@ public class FormManager
 
     public void AddTransition(IForm targetForm, Func<bool> condition)
     {
+        if (targetForm == null) throw new ArgumentNullException(nameof(targetForm));
+        _registeredForms.Add(targetForm);
         _transitions.Add(new FormTransition(targetForm, condition));
     }
 
     public void AddFastTransition(IForm fromForm, IForm toForm, Func<bool> condition)
     {
+        if (fromForm == null) throw new ArgumentNullException(nameof(fromForm));
+        if (toForm == null) throw new ArgumentNullException(nameof(toForm));
+        _registeredForms.Add(fromForm);
+        _registeredForms.Add(toForm);
         if (!_fastTransitions.TryGetValue(fromForm.GetType(), out var transitions))
         {
             transitions = new List<FormTransition>();
@@ -53,6 +60,7 @@ public class FormManager
     public void ChangeForm(IForm form)
     {
         if(CurrentForm == form) return;
+        if (form != null) _registeredForms.Add(form);
 
         CurrentForm?.Unequip(_playerController);
         CurrentForm = form;

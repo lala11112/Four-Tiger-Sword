@@ -90,4 +90,16 @@ public class WeaponActionData
     
     [Tooltip("커브 값에 곱해줄 최대 속도")]
     public float ThrustMultiplier = 10f; 
+
+    [Header("Soft Target Approach")]
+    [Tooltip("타깃이 있으면 전진 커브에 거리/시간 제한을 적용합니다.")]
+    public bool UseTargetApproach;
+    [Min(0f), Tooltip("플레이어 몸체와 적 콜라이더 표면 사이에 남길 간격 (m)")]
+    public float StopDistance = 0.25f;
+    [Min(0f), Tooltip("자동 전진 종료 시점 (공격 데이터 기준 초)")]
+    public float ApproachEndTime = 0.3f;
+    [Min(0f), Tooltip("타깃 방향 회전 보정 종료 시점 (공격 데이터 기준 초)")]
+    public float RotationEndTime = 0.2f;
+    [Min(0f), Tooltip("한 타수에서 자동 전진할 수 있는 최대 거리 (m)")]
+    public float MaxApproachDistance = 2f;
 }

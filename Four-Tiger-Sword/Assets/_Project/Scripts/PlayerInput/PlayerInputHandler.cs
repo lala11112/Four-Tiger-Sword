@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[DefaultExecutionOrder(-100)]
 public class PlayerInputHandler : MonoBehaviour
 {
     [Header("Input Action References")]
@@ -35,48 +36,57 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void OnEnable()
     {
-        _moveAction.action.Enable();
-        _jumpAction.action.Enable();
-        _dashAction.action.Enable();
-        _attackAction.action.Enable();
-        _form1Action.action.Enable();
-        _form2Action.action.Enable();
-        _form3Action?.action.Enable();
-        _form4Action?.action.Enable();
-        _form5Action?.action.Enable();
-        _fastFormAction.action.Enable();
-        _skillAction.action.Enable();
-        _ultimateAction.action.Enable();
-        _parryAction?.action.Enable();
+        _moveAction?.action?.Enable();
+        _jumpAction?.action?.Enable();
+        _dashAction?.action?.Enable();
+        _attackAction?.action?.Enable();
+        _form1Action?.action?.Enable();
+        _form2Action?.action?.Enable();
+        _form3Action?.action?.Enable();
+        _form4Action?.action?.Enable();
+        _form5Action?.action?.Enable();
+        _fastFormAction?.action?.Enable();
+        _skillAction?.action?.Enable();
+        _ultimateAction?.action?.Enable();
+        _parryAction?.action?.Enable();
     }
 
     private void OnDisable()
     {
-        _moveAction.action.Disable();
-        _jumpAction.action.Disable();
-        _dashAction.action.Disable();
-        _attackAction.action.Disable();
-        _form1Action.action.Disable();
-        _form2Action.action.Disable();
-        _form3Action?.action.Disable();
-        _form4Action?.action.Disable();
-        _form5Action?.action.Disable();
-        _fastFormAction.action.Disable();
-        _skillAction.action.Disable();
-        _ultimateAction.action.Disable();
-        _parryAction?.action.Disable();
+        MoveInput = Vector2.zero;
+        IsDashHeld = false;
+        IsForm1Pressed = IsForm2Pressed = IsForm3Pressed = IsForm4Pressed = IsForm5Pressed = IsFastFormPressed = false;
+        JumpBuffer.Consume();
+        AttackBuffer.Consume();
+        DashBuffer.Consume();
+        SkillBuffer.Consume();
+        UltimateBuffer.Consume();
+        ParryBuffer.Consume();
+        _moveAction?.action?.Disable();
+        _jumpAction?.action?.Disable();
+        _dashAction?.action?.Disable();
+        _attackAction?.action?.Disable();
+        _form1Action?.action?.Disable();
+        _form2Action?.action?.Disable();
+        _form3Action?.action?.Disable();
+        _form4Action?.action?.Disable();
+        _form5Action?.action?.Disable();
+        _fastFormAction?.action?.Disable();
+        _skillAction?.action?.Disable();
+        _ultimateAction?.action?.Disable();
+        _parryAction?.action?.Disable();
     }
 
     private void Update()
     {
-        MoveInput = _moveAction.action.ReadValue<Vector2>();
-        IsDashHeld = _dashAction.action.IsPressed();
-        IsForm1Pressed = _form1Action.action.WasPressedThisFrame();
-        IsForm2Pressed = _form2Action.action.WasPressedThisFrame();
-        IsForm3Pressed = _form3Action != null && _form3Action.action.WasPressedThisFrame();
-        IsForm4Pressed = _form4Action != null && _form4Action.action.WasPressedThisFrame();
-        IsForm5Pressed = _form5Action != null && _form5Action.action.WasPressedThisFrame();
-        IsFastFormPressed = _fastFormAction.action.WasPressedThisFrame();
+        MoveInput = _moveAction?.action?.ReadValue<Vector2>() ?? Vector2.zero;
+        IsDashHeld = _dashAction?.action?.IsPressed() ?? false;
+        IsForm1Pressed = _form1Action?.action?.WasPressedThisFrame() ?? false;
+        IsForm2Pressed = _form2Action?.action?.WasPressedThisFrame() ?? false;
+        IsForm3Pressed = (_form3Action?.action?.WasPressedThisFrame() ?? false);
+        IsForm4Pressed = (_form4Action?.action?.WasPressedThisFrame() ?? false);
+        IsForm5Pressed = (_form5Action?.action?.WasPressedThisFrame() ?? false);
+        IsFastFormPressed = _fastFormAction?.action?.WasPressedThisFrame() ?? false;
 
         JumpBuffer.Update(Time.deltaTime);
         AttackBuffer.Update(Time.deltaTime);
@@ -85,22 +95,22 @@ public class PlayerInputHandler : MonoBehaviour
         UltimateBuffer.Update(Time.deltaTime);
         ParryBuffer.Update(Time.deltaTime);
 
-        if(_jumpAction.action.WasPressedThisFrame())
+        if(_jumpAction?.action?.WasPressedThisFrame() ?? false)
             JumpBuffer.Set();
 
-        if(_attackAction.action.WasPressedThisFrame())
+        if(_attackAction?.action?.WasPressedThisFrame() ?? false)
             AttackBuffer.Set(0.5f);
 
-        if(_dashAction.action.WasPressedThisFrame())
+        if(_dashAction?.action?.WasPressedThisFrame() ?? false)
             DashBuffer.Set();
 
-        if(_skillAction.action.WasPressedThisFrame())
+        if(_skillAction?.action?.WasPressedThisFrame() ?? false)
             SkillBuffer.Set();
 
-        if(_ultimateAction.action.WasPressedThisFrame())
+        if(_ultimateAction?.action?.WasPressedThisFrame() ?? false)
             UltimateBuffer.Set();
 
-        if(_parryAction != null && _parryAction.action.WasPressedThisFrame())
+        if((_parryAction?.action?.WasPressedThisFrame() ?? false))
             ParryBuffer.Set();
     }
 }

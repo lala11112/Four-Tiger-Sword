@@ -6,6 +6,7 @@ public abstract class EnemyAction
     public bool IsFinished { get; protected set; }
 
     protected readonly Enemy _enemy;
+    public Enemy Owner => _enemy;
     protected readonly LayerMask _playerLayer;
     protected float _timer;
 
@@ -51,7 +52,7 @@ public abstract class EnemyAction
         if (_enemy.Animator != null)
             _enemy.Animator.speed = 1f;
 
-        //EndTelegraph();
+        EndTelegraph();
     }
 
     /// <summary>패링 가능한 공격임을 플레이어 패링 시스템에 알립니다. Enter 시 자동 호출됩니다.</summary>

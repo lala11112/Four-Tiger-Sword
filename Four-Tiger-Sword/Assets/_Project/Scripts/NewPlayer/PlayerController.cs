@@ -69,6 +69,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     [SerializeField] private float _knockbackDuration = 0.25f;
     private Coroutine _knockbackCoroutine;
     private Coroutine _hitStopCoroutine;
+    private float _timeScaleBeforeHitStop;
 
     [Header("Hit Stop Settings")]
     [SerializeField] private float _hitStopDuration  = 0.25f;
@@ -91,12 +92,12 @@ public class PlayerController : MonoBehaviour, IDamageable
         ImpulseSource = GetComponent<CinemachineImpulseSource>();
         Controller = GetComponent<CharacterController>();
         Input = GetComponent<PlayerInputHandler>();
-        CameraTransform = Camera.main.transform;
+        if (CameraTransform == null && Camera.main != null)
+            CameraTransform = Camera.main.transform;
         Movement = GetComponent<PlayerMovement>();
         Movement.Initialize(this);
         WeaponManager = GetComponent<WeaponManager>();
         
-        StateMachine = new StateMachine();
         var stateMachineSetup = new PlayerStateMachineSetup(this);
         StateMachine = stateMachineSetup.Build();
 
@@ -121,7 +122,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         StatManager.UpdateSpRegen(Time.deltaTime);
         StateMachine.Update();
         FormManager.Update();
-        //Debug.Log(StateMachine.CurrentState.GetType().Name);
     }
 
     private void UpdateCoyoteTimer()
@@ -149,17 +149,12 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     public void StartParryCooldown() => _parryCooldownTimer = ParryCooldown;
 
-    /// <summary>
-    /// 패링으로 타격을 막을 때마다 호출됩니다.
-    /// 막은 타격 하나하나마다 히트스탑 + 카메라 반응을 줘서 ZZZ Defensive Assist 같은 타격감을 형성합니다.
-    /// </summary>
     public void OnParrySuccess()
     {
         StartHitStop();
-        ImpulseSource.GenerateImpulse();
+        ImpulseSource?.GenerateImpulse();
         StatManager.AddUltimateGauge(ParryUltimateGaugeReward);
     }
-
 
 
     private void OnDrawGizmos()
@@ -175,7 +170,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     public void ConsumeCoyote() => _coyoteTimer = 0f;
     public void StartDashCooldown() => _dashCooldownTimer = DashCooldown;
 
-    public bool IsGround()
+    public bool IsGround() //자체 isGround. 일반적인 Controller는 바닥으로 Ray하나만 쏴서 한쪽 발이 걸려있어도 떨어지는걸로 판명되어 직접 작성함
     {
         Vector3 sphereCenter = transform.position + Controller.center + Vector3.down * (Controller.height / 2f - Controller.radius);
         RaycastHit[] hits = Physics.SphereCastAll(sphereCenter, Controller.radius, Vector3.down, 0.1f, _groundLayer);
@@ -188,26 +183,29 @@ public class PlayerController : MonoBehaviour, IDamageable
         return false;
     }
 
-    public void TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE, bool isParryable = true)
+    public DamageResult TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE, bool isParryable = true, object source = null)
     {
-        if (IsDashing) return;
+        if (!isActiveAndEnabled || StatManager.CurrentHp <= 0f || IsDashing
+            || damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return default;
+        if ((FormManager.CurrentForm as BaseForm)?.BlocksIncomingDamage(damage, power, source) == true)
+            return new DamageResult(DamageOutcome.Blocked);
 
         if (isParryable && IsParryActive)
         {
             var parryState = StateMachine.CurrentState as PlayerParryState;
             if (parryState != null)
-                parryState.OnHitParried(ParryEventBus.CurrentAttackSource);
+                parryState.OnHitParried(source);
 
             ApplyKnockback(power);
-            // 막은 타격마다 히트스탑 + 카메라 반응 (ZZZ Defensive Assist 방식)
             OnParrySuccess();
-            (ParryEventBus.CurrentAttackSource as EnemyAction)?.OnParried();
-            return;
+            (source as EnemyAction)?.OnParried();
+            return new DamageResult(DamageOutcome.Parried);
         }
 
         Debug.Log("플레이어 피격!");
-        StatManager.TakeDamage((int)damage, damageType, isCritical);
+        var result = StatManager.TakeDamage(damage, damageType, isCritical);
         ApplyKnockback(power);
+        return result;
     }
 
     private void ApplyKnockback(Vector3 power)
@@ -223,9 +221,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         _knockbackCoroutine = StartCoroutine(KnockbackRoutine(velocity));
     }
 
-    /// <summary>
-    /// 초기 속도에서 0으로 감속하며 NavMesh 위에서 적을 밀어냅니다.
-    /// </summary>
     /// <summary>기본 히트스탑 (Inspector 설정값 사용)</summary>
     public void StartHitStop()
         => StartHitStop(_hitStopDuration, _hitStopTimeScale);
@@ -233,16 +228,35 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>히트스탑 지속시간과 타임스케일을 직접 지정합니다. 퍼펙트 패링 등 특수 연출에 사용합니다.</summary>
     public void StartHitStop(float duration, float timeScale)
     {
+        if (!isActiveAndEnabled || duration <= 0f) return;
         if (_hitStopCoroutine != null) StopCoroutine(_hitStopCoroutine);
+        else _timeScaleBeforeHitStop = Time.timeScale;
         _hitStopCoroutine = StartCoroutine(HitStopRoutine(duration, timeScale));
     }
 
     private IEnumerator HitStopRoutine(float duration, float timeScale)
     {
-        Time.timeScale = timeScale;
+        Time.timeScale = Mathf.Clamp01(timeScale);
         yield return new WaitForSecondsRealtime(duration);
-        Time.timeScale = 1f;
+        Time.timeScale = _timeScaleBeforeHitStop;
         _hitStopCoroutine = null;
+    }
+
+    private void OnDisable()
+    {
+        (FormManager?.CurrentForm as BaseForm)?.CleanupTransientEffects();
+        if (_hitStopCoroutine != null)
+        {
+            StopCoroutine(_hitStopCoroutine);
+            Time.timeScale = _timeScaleBeforeHitStop;
+            _hitStopCoroutine = null;
+        }
+
+        if (_knockbackCoroutine != null)
+        {
+            StopCoroutine(_knockbackCoroutine);
+            _knockbackCoroutine = null;
+        }
     }
 
     private IEnumerator KnockbackRoutine(Vector3 initialVelocity)
@@ -256,9 +270,10 @@ public class PlayerController : MonoBehaviour, IDamageable
         float elapsed = 0f;
         while (elapsed < _knockbackDuration)
         {
+            if (!Controller.enabled || StatManager.CurrentHp <= 0f) break;
             float t = 1f - (elapsed / _knockbackDuration); // 선형 감속
             Vector3 delta = initialVelocity * t * Time.deltaTime;
-            transform.position += delta;
+            Controller.Move(delta);
 
             elapsed += Time.deltaTime;
             yield return null;

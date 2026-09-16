@@ -21,7 +21,7 @@ public class EnemyAttackState : IPlayerState
     public void Enter()
     {
         _nav = _enemy.GetComponent<NavMeshAgent>();
-        _nav.ResetPath();
+        if (_nav.enabled && _nav.isOnNavMesh) _nav.ResetPath();
 
         _timer = 0f;
         _actionStarted = false;

@@ -9,6 +9,7 @@ public class EnemyApproachState : IPlayerState
 {
     private readonly Enemy _enemy;
     private NavMeshAgent _nav;
+    private float _previousStoppingDistance;
 
     public EnemyApproachState(Enemy enemy)
     {
@@ -18,17 +19,23 @@ public class EnemyApproachState : IPlayerState
     public void Enter()
     {
         _nav = _enemy.GetComponent<NavMeshAgent>();
+        _previousStoppingDistance = _nav.stoppingDistance;
+        if (_enemy.CurrentAction != null)
+            _nav.stoppingDistance = Mathf.Min(_previousStoppingDistance,
+                Mathf.Max(0f, _enemy.CurrentAction.SkillData.executeRange * 0.8f));
         _enemy.Animator.CrossFade("Move", 0.1f);
     }
 
     public void Update()
     {
         if (_enemy.DetectedTarget == null || _enemy.CurrentAction == null) return;
-        _nav.SetDestination(_enemy.DetectedTarget.position);
+        if (_nav.enabled && _nav.isOnNavMesh)
+            _nav.SetDestination(_enemy.DetectedTarget.position);
     }
 
     public void Exit()
     {
-        _nav.ResetPath();
+        _nav.stoppingDistance = _previousStoppingDistance;
+        if (_nav.enabled && _nav.isOnNavMesh) _nav.ResetPath();
     }
 }

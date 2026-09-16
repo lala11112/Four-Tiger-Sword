@@ -13,6 +13,7 @@ public class PlayerIdleState : IPlayerState
     public void Update()
     {
         _playerController.Movement.ApplyGravity();
+        _playerController.Controller.Move(Vector3.up * _playerController.VerticalVelocity * Time.deltaTime);
     }
 
     public void Exit()
