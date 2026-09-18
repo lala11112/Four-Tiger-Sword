@@ -182,8 +182,12 @@ MonoBehaviour:
     ApproachEndTime: 1.06
     RotationEndTime: 1.06
     MaxApproachDistance: 2
+  ParryAnimationName: Parry
+  AirAttackStartAnimationName: FireAirStart
+  AirAttackStartDuration: 0.6
+  AirAttackLoopAnimationName: FireAirIdle
   AirAttackStep:
-    AnimationName: FireAirAttack
+    AnimationName: FireAirEnd
     Duration: 0.5
     ComboTransitionTime: 0.3
     Damage: 37

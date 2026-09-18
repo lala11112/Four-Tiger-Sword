@@ -5,7 +5,6 @@ public class EnemyDefaultAttack : EnemyAction
 {
     private readonly MonsterDefaultAttackSO _data;
     private readonly HashSet<IDamageable> _hitTargets = new HashSet<IDamageable>();
-    private bool _hasHit;
 
     public EnemyDefaultAttack(MonsterDefaultAttackSO data, Enemy enemy)
         : base(data, enemy)
@@ -16,7 +15,6 @@ public class EnemyDefaultAttack : EnemyAction
     public override void Enter()
     {
         base.Enter();
-        _hasHit = false;
         _hitTargets.Clear();
         _enemy.Animator?.CrossFade(_data.animName, 0.01f);
 
@@ -25,14 +23,15 @@ public class EnemyDefaultAttack : EnemyAction
 
     public override void Update()
     {
+        float previousTime = _timer;
         base.Update();
 
-        if (!_hasHit && _timer >= _data.hitStartTime && _timer <= _data.hitStartTime + _data.hitDuration)
+        if (CrossesHitWindow(previousTime, Mathf.Min(_timer, _data.attackDuration),
+            _data.hitStartTime, _data.hitDuration))
         {
             // telegraphDuration을 hitStartTime으로 설정하면 베이스 클래스가 이 시점에 자동으로 EndTelegraph() 호출
             BroadcastHit(); // TakeDamage에서 이 액션을 소스로 식별하기 위해
             ExecuteHit();
-            _hasHit = true;
         }
 
         if (_timer >= _data.attackDuration)

@@ -4,6 +4,7 @@ public abstract class EnemyAction
 {
     public MonsterSkillData SkillData { get; protected set; }
     public bool IsFinished { get; protected set; }
+    public bool IsActive { get; private set; }
 
     protected readonly Enemy _enemy;
     public Enemy Owner => _enemy;
@@ -23,9 +24,11 @@ public abstract class EnemyAction
 
     public virtual void Enter()
     {
+        _enemy.RecordAttackStarted(SkillData);
         _timer = 0f;
         _telegraphTimer = 0f;
         IsFinished = false;
+        IsActive = true;
         _telegraphActive = false;
         if (_enemy.Animator != null)
             _enemy.Animator.speed = SkillData.attackSpeed;
@@ -49,6 +52,9 @@ public abstract class EnemyAction
 
     public virtual void Exit()
     {
+        // 중단된 공격도 패링 시스템에서 완료된 공격으로 취급해야 합니다.
+        IsFinished = true;
+        IsActive = false;
         if (_enemy.Animator != null)
             _enemy.Animator.speed = 1f;
 
@@ -84,6 +90,10 @@ public abstract class EnemyAction
     
 
     // ── 공통 헬퍼 ────────────────────────────────────────────────────────────
+
+    protected static bool CrossesHitWindow(float previousTime, float currentTime, float start, float duration)
+        => duration > 0f && currentTime > previousTime
+            && currentTime >= start && previousTime < start + duration;
 
     protected Vector3 GetHitCenter(Vector3 localOffset)
         => _enemy.transform.position + _enemy.transform.rotation * localOffset;

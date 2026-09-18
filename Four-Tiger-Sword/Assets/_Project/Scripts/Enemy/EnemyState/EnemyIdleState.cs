@@ -6,6 +6,8 @@ public class EnemyIdleState : IPlayerState
 
     public void Enter()
     {
+        var nav = _enemy.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (nav != null && nav.enabled && nav.isOnNavMesh) nav.ResetPath();
         _enemy.Animator.CrossFade("Idle", 0.1f);
     }
 

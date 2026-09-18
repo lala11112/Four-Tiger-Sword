@@ -11,6 +11,7 @@ public class PlayerRunState : IPlayerState
 
     public void Enter()
     {
+        _playerController.Animator.applyRootMotion = false;
         _playerController.Animator.CrossFade("Run", 0.1f);
     }
 

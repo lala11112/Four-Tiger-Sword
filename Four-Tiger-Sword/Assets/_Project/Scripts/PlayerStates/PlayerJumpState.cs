@@ -8,6 +8,7 @@ public class PlayerJumpState : IPlayerState
 
     public void Enter()
     {
+        _playerController.Animator.applyRootMotion = false;
         _playerController.Animator.CrossFade("Jump", 0.1f);
         _playerController.Input.JumpBuffer.Consume();
         _playerController.ConsumeCoyote();

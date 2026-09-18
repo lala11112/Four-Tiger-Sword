@@ -78,6 +78,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   EnemyStat: {fileID: 0}
   stateName: 
+  _targetMemoryDuration: 4
+  ApproachTimeout: 6
+  ApproachStuckTimeout: 1.5
+  FailedAttackRetryDelay: 1
   IsHurt: 0
   PendingGroggy: 0
   GroggyDuration: 5
@@ -100,8 +104,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FanVisionSensor
   _range: 20
   _halfAngle: 45
+  _proximityRange: 3
   _rayCount: 7
   _heightOffset: 0.5
+  _visibilityMask:
+    serializedVersion: 2
+    m_Bits: 1011
 --- !u!114 &7509749313822065393
 MonoBehaviour:
   m_ObjectHideFlags: 0

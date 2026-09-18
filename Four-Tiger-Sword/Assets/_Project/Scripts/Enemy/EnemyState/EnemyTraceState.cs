@@ -21,8 +21,8 @@ public class EnemyTraceState : IPlayerState
     public void Update()
     {
         _target = _enemy.DetectedTarget;
-        if (_target != null && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
-            _navMeshAgent.SetDestination(_target.position);
+        if ((_target != null || _enemy.HasTargetMemory) && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
+            _navMeshAgent.SetDestination(_target != null ? _target.position : _enemy.LastKnownTargetPosition);
         //플레이어를 추적하는 로직  
     }
 

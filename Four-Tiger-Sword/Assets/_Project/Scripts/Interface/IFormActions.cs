@@ -5,8 +5,14 @@ public interface IFormActions
     void EndAttack();
 
     void BeginAirAttack();
+    void UpdateAirAttackStart(out bool isComplete);
+    void BeginAirAttackLoop();
+    void BeginAirAttackFinish();
     void UpdateAirAttack(out bool isComplete);
     void EndAirAttack();
+
+    void BeginParry();
+    void EndParry();
 
     void BeginSkill();
     void UpdateSkill(out bool isComplete);

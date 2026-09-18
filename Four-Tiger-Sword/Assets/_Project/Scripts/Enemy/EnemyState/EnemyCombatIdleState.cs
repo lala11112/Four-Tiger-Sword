@@ -6,6 +6,8 @@ public class EnemyCombatIdleState : IPlayerState
 {
     private readonly Enemy _enemy;
     private NavMeshAgent _nav;
+    private readonly List<MonsterSkillData> _candidates = new();
+    private readonly List<float> _candidateWeights = new();
 
     private float _roamTimer;
     private const float RoamInterval = 5f;
@@ -44,32 +46,41 @@ public class EnemyCombatIdleState : IPlayerState
         float dist = Vector3.Distance(_enemy.transform.position, _enemy.DetectedTarget.position);
 
         // 현재 거리에서 선택 가능한 공격 목록 (engageRange 이내)
-        var candidates = new List<MonsterSkillData>();
+        var candidates = _candidates;
+        candidates.Clear();
+        _candidateWeights.Clear();
+        float totalWeight = 0f;
         foreach (var skill in _enemy.EnemyStat.MonsterSkillData.skillData)
         {
-            if (skill != null && skill.weight > 0f && dist <= skill.engageRange)
-                candidates.Add(skill);
+            float weight = _enemy.GetAttackSelectionWeight(skill, dist);
+            if (weight <= 0f) continue;
+            candidates.Add(skill);
+            _candidateWeights.Add(weight);
+            totalWeight += weight;
         }
 
         if (candidates.Count == 0)
         {
-            // 전투 범위와 공격 선택 범위 사이에서도 멈추지 않고 접근합니다.
-            if (_nav != null && _nav.enabled && _nav.isOnNavMesh)
+            // 사거리 밖일 때만 접근하고, 쿨타임/최소 거리 때문에 선택할 수 없으면 배회합니다.
+            bool outsideAllRanges = true;
+            foreach (var skill in _enemy.EnemyStat.MonsterSkillData.skillData)
+                if (skill != null && skill.weight > 0f && dist <= skill.engageRange)
+                    outsideAllRanges = false;
+            if (outsideAllRanges && _nav != null && _nav.enabled && _nav.isOnNavMesh)
                 _nav.SetDestination(_enemy.DetectedTarget.position);
+            else
+                Roam();
             return;
         }
 
         // 가중치 합산 후 랜덤 롤
-        float totalWeight = 0f;
-        foreach (var s in candidates)
-            totalWeight += s.weight;
-
         float roll = Random.Range(0f, totalWeight);
         float cumulative = 0f;
 
-        foreach (var skill in candidates)
+        for (int i = 0; i < candidates.Count; i++)
         {
-            cumulative += skill.weight;
+            var skill = candidates[i];
+            cumulative += _candidateWeights[i];
             if (roll <= cumulative)
             {
                 _enemy.CurrentAction = skill.CreateAction(_enemy);

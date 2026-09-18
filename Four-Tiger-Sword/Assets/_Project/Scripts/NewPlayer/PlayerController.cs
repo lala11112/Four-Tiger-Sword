@@ -54,7 +54,23 @@ public class PlayerController : MonoBehaviour, IDamageable
     public bool CanSkill => FormManager?.CurrentForm?.CanSkill ?? false;
     public bool CanUltimate => FormManager?.CurrentForm?.CanUltimate ?? false;
 
-    public bool IsKnockbacking => _knockbackCoroutine != null;
+    public bool IsKnockbacking => _knockbackCoroutine != null
+        || PendingHitReaction == PlayerHitReaction.Knockback
+        || StateMachine?.CurrentState is PlayerKnockbackState knockback && !knockback.IsComplete;
+
+    [Header("Hit Reaction Settings")]
+    [Min(0f)] public float HitDuration = 0.15f;
+    [Min(0f)] public float StaggerDuration = 0.4f;
+    [Tooltip("이 강인도 피해 이상이면 짧은 피격 대신 경직됩니다. 누적 게이지가 아닌 1회 타격 기준입니다.")]
+    [Min(0f)] public float StaggerPoiseThreshold = 20f;
+    public StaggerResistLevel HitStaggerResistance = StaggerResistLevel.NONE;
+    public string HitAnimationName = "Hit";
+    public string StaggerAnimationName = "Stagger";
+    public string KnockbackAnimationName = "Knockback";
+
+    public PlayerHitReaction PendingHitReaction { get; private set; }
+    private Vector3 _pendingHitVelocity;
+    public float KnockbackDuration => Mathf.Max(0f, _knockbackDuration);
 
     [Header("CombatData")]
     [SerializeField] private WeaponActionDataSO _FireFormActionData;
@@ -204,21 +220,64 @@ public class PlayerController : MonoBehaviour, IDamageable
 
         Debug.Log("플레이어 피격!");
         var result = StatManager.TakeDamage(damage, damageType, isCritical);
-        ApplyKnockback(power);
+        if (result.Applied && !result.Killed && result.HealthDamage + result.ShieldDamage > 0f)
+            RequestHitReaction(power, poiseDamage, staggerResistLevel);
         return result;
     }
 
+    private void RequestHitReaction(Vector3 power, float poiseDamage, StaggerResistLevel attackLevel)
+    {
+        if (HitStaggerResistance == StaggerResistLevel.SUPER_ARMOR || attackLevel < HitStaggerResistance)
+            return;
+
+        Vector3 velocity = GetKnockbackVelocity(power);
+        PlayerHitReaction reaction = velocity.sqrMagnitude > 0f && KnockbackDuration > 0f
+            ? PlayerHitReaction.Knockback
+            : poiseDamage > 0f && poiseDamage >= StaggerPoiseThreshold
+                ? PlayerHitReaction.Stagger : PlayerHitReaction.Hit;
+
+        // 같은 프레임의 약한 타격이 강한 반응을 덮어쓰거나 진행 중인 넉백을 취소하지 않습니다.
+        if (PendingHitReaction > reaction) return;
+        if (StateMachine.CurrentState is PlayerHitState active && !active.IsComplete && active.Reaction > reaction)
+            return;
+
+        PendingHitReaction = reaction;
+        _pendingHitVelocity = velocity;
+    }
+
+    public Vector3 ConsumeHitReaction()
+    {
+        Vector3 velocity = _pendingHitVelocity;
+        PendingHitReaction = PlayerHitReaction.None;
+        _pendingHitVelocity = Vector3.zero;
+        return velocity;
+    }
+
+    private Vector3 GetKnockbackVelocity(Vector3 power)
+    {
+        if (float.IsNaN(power.sqrMagnitude) || float.IsInfinity(power.sqrMagnitude)) return Vector3.zero;
+        float effectiveForce = Mathf.Max(0f, power.magnitude - _knockbackResistance);
+        Vector3 horizontal = Vector3.ProjectOnPlane(power, Vector3.up);
+        return horizontal.sqrMagnitude > 0f ? horizontal.normalized * effectiveForce : Vector3.zero;
+    }
+
+    // 패링 성공 시에는 반격 상태를 유지한 채 밀림만 적용합니다.
     private void ApplyKnockback(Vector3 power)
     {
-        float effectiveForce = power.magnitude - _knockbackResistance;
-        if (effectiveForce <= 0f) return;
-
-        Vector3 velocity = power.normalized * effectiveForce;
+        Vector3 velocity = GetKnockbackVelocity(power);
+        if (velocity.sqrMagnitude <= 0f || KnockbackDuration <= 0f) return;
 
         if (_knockbackCoroutine != null)
             StopCoroutine(_knockbackCoroutine);
 
         _knockbackCoroutine = StartCoroutine(KnockbackRoutine(velocity));
+    }
+
+    public void StopParryKnockback()
+    {
+        if (_knockbackCoroutine == null) return;
+        StopCoroutine(_knockbackCoroutine);
+        _knockbackCoroutine = null;
     }
 
     /// <summary>기본 히트스탑 (Inspector 설정값 사용)</summary>
@@ -252,11 +311,8 @@ public class PlayerController : MonoBehaviour, IDamageable
             _hitStopCoroutine = null;
         }
 
-        if (_knockbackCoroutine != null)
-        {
-            StopCoroutine(_knockbackCoroutine);
-            _knockbackCoroutine = null;
-        }
+        StopParryKnockback();
+        ConsumeHitReaction();
     }
 
     private IEnumerator KnockbackRoutine(Vector3 initialVelocity)

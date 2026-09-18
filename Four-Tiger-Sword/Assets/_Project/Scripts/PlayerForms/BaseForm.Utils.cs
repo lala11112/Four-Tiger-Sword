@@ -9,7 +9,10 @@ public abstract partial class BaseForm
         // _playerController.Animator.CrossFade("NewFormMotion", transition);
         if (string.IsNullOrWhiteSpace(stateName)) return;
         if (_playerController.Animator.HasState(0, Animator.StringToHash(stateName)))
+        {
+            //_playerController.Animator.applyRootMotion = true;
             _playerController.Animator.CrossFade(stateName, transition);
+        }
     }
 
     protected void PlayCombo()

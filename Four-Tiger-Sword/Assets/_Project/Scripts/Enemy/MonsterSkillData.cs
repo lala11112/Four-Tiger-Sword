@@ -9,10 +9,21 @@ public abstract class MonsterSkillData : ScriptableObject
     public float engageRange = 5f;
 
     [Tooltip("공격을 실행하는 거리 (히트박스 사거리)")]
+    [UnityEngine.Serialization.FormerlySerializedAs("excuteRange")]
     public float executeRange = 2f;
 
     [Tooltip("공격 선택 가중치. 낮을수록 드물게 선택됨")]
     public float weight = 10f;
+
+    [Header("AI 공격 선택")]
+    [Tooltip("이 거리보다 가까우면 선택/실행하지 않습니다. executeRange 이하로 설정하세요.")]
+    [Min(0f)] public float minimumRange = 0f;
+    [Tooltip("선호하는 선택 거리. 0이면 executeRange를 사용합니다.")]
+    [Min(0f)] public float preferredRange = 0f;
+    [Tooltip("공격 시작부터 계산하는 개체별 스킬 쿨타임")]
+    [Min(0f)] public float cooldown = 0f;
+    [Tooltip("직전에 사용한 공격의 선택 가중치 배율")]
+    [Range(0.1f, 1f)] public float repeatWeightMultiplier = 0.5f;
 
     [Header("공격 속도")]
     [Tooltip("공격 애니메이션 재생 속도 및 피격 판정 타이밍 배율. 1.0 = 기본, 2.0 = 2배 빠름")]

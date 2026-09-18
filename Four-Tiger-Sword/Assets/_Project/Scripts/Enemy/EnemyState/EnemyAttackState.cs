@@ -10,8 +10,6 @@ public class EnemyAttackState : IPlayerState
     private readonly Enemy _enemy;
     private NavMeshAgent _nav;
 
-    private float _timer;
-    private bool _actionStarted;
 
     public EnemyAttackState(Enemy enemy)
     {
@@ -23,38 +21,20 @@ public class EnemyAttackState : IPlayerState
         _nav = _enemy.GetComponent<NavMeshAgent>();
         if (_nav.enabled && _nav.isOnNavMesh) _nav.ResetPath();
 
-        _timer = 0f;
-        _actionStarted = false;
-
         // 플레이어 방향 고정
         FaceTarget();
-        Debug.Log("공격 시작!");
-        //_enemy.GetComponent<Renderer>().material.color = Color.red;
-
-        // TODO: 번쩍임 이펙트 재생 (예: Outline, DOTween 깜빡임 등)
+        // 예고와 선딜은 액션의 타임라인에서 한 번만 처리합니다.
+        _enemy.CurrentAction?.Enter();
     }
 
     public void Update()
     {
-        _timer += Time.deltaTime;
-
-        if (!_actionStarted)
-        {
-            if (_timer >= GetTelegraphDuration())
-            {
-                _actionStarted = true;
-                _enemy.CurrentAction?.Enter();
-            }
-        }
-        else
-        {
-            _enemy.CurrentAction?.Update();
-        }
+        _enemy.CurrentAction?.Update();
     }
 
     public void Exit()
     {
-        if (_actionStarted)
+        if (_enemy.CurrentAction?.IsActive == true)
             _enemy.CurrentAction?.Exit();
 
         _enemy.Animator.CrossFade("Move", 0.1f);
@@ -75,15 +55,4 @@ public class EnemyAttackState : IPlayerState
             _enemy.transform.rotation = Quaternion.LookRotation(dir);
     }
 
-    private float GetTelegraphDuration()
-    {
-        return _enemy.CurrentAction?.SkillData switch
-        {
-            MonsterDefaultAttackSO so => so.telegraphDuration,
-            MonsterDashAttackSO    so => so.telegraphDuration,
-            MonsterComboAttackSO   so => so.telegraphDuration,
-            MonsterJumpSlamSO      so => so.telegraphDuration,
-            _                         => 0.5f
-        };
-    }
 }

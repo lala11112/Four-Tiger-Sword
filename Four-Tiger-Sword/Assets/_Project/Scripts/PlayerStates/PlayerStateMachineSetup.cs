@@ -20,18 +20,24 @@ public class PlayerStateMachineSetup
         var parry = new PlayerParryState(_playerController);
         var counter = new PlayerCounterState(_playerController);
         var die = new PlayerDieState(_playerController);
+        var hit = new PlayerHitState(_playerController);
+        var stagger = new PlayerStaggerState(_playerController);
+        var knockback = new PlayerKnockbackState(_playerController);
 
         GroundTransitions(stateMachine, idle, move, jump, fall, dash, attack);
         AirTransitions(stateMachine, idle, move, jump, fall, run);
         DashTransitions(stateMachine, idle, move, dash, run);
         AttackTransitions(stateMachine, idle, move, jump, attack, parry, dash);
         AirAttackTransitions(stateMachine, idle, move, jump, fall, airAttack);
-        SkillTransitions(stateMachine, idle, move, skill, jump);
-        UltimateTransitions(stateMachine, idle, move, ultimate);
+        SkillTransitions(stateMachine, idle, move, run, skill, jump);
+        UltimateTransitions(stateMachine, idle, move, run, ultimate);
         RunTransitions(stateMachine, idle, move, run, dash, attack);
         ParryTransitions(stateMachine, idle, move, run, parry, counter);
         CounterTransitions(stateMachine, idle, move, counter);
         AnyTransitions(stateMachine, die);
+        HitReactionTransitions(stateMachine, hit, idle, move, run, fall);
+        HitReactionTransitions(stateMachine, stagger, idle, move, run, fall);
+        HitReactionTransitions(stateMachine, knockback, idle, move, run, fall);
         stateMachine.AddTransition(attack, counter, () =>
             _playerController.FormManager.CurrentForm is EarthForm earth && earth.GuardCounterReady);
         stateMachine.ChangeState(idle);
@@ -102,10 +108,11 @@ public class PlayerStateMachineSetup
         stateMachine.AddTransition(airAttack, move, () => airAttack.IsComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
 
-    private void SkillTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerMoveState move, PlayerSkillState skill, PlayerJumpState jump)
+    private void SkillTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerMoveState move, PlayerRunState run, PlayerSkillState skill, PlayerJumpState jump)
     {
         stateMachine.AddTransition(idle, skill, () => _playerController.Input.SkillBuffer.IsActive && _playerController.CanSkill);
         stateMachine.AddTransition(move, skill, () => _playerController.Input.SkillBuffer.IsActive && _playerController.CanSkill);
+        stateMachine.AddTransition(run, skill, () => _playerController.Input.SkillBuffer.IsActive && _playerController.CanSkill);
 
         stateMachine.AddTransition(skill, jump, () => _playerController.Input.JumpBuffer.IsActive && _playerController.CanJump());
 
@@ -113,10 +120,11 @@ public class PlayerStateMachineSetup
         stateMachine.AddTransition(skill, move, () => skill.IsComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
 
-    private void UltimateTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerMoveState move, PlayerUltimateState ultimate)
+    private void UltimateTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerMoveState move, PlayerRunState run, PlayerUltimateState ultimate)
     {
         stateMachine.AddTransition(idle, ultimate, () => _playerController.Input.UltimateBuffer.IsActive && _playerController.CanUltimate);
         stateMachine.AddTransition(move, ultimate, () => _playerController.Input.UltimateBuffer.IsActive && _playerController.CanUltimate);
+        stateMachine.AddTransition(run, ultimate, () => _playerController.Input.UltimateBuffer.IsActive && _playerController.CanUltimate);
 
         stateMachine.AddTransition(ultimate, idle, () => ultimate.IsComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(ultimate, move, () => ultimate.IsComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
@@ -151,6 +159,20 @@ public class PlayerStateMachineSetup
         // 반격 모션 종료 후 복귀
         stateMachine.AddTransition(counter, idle, () => counter.IsComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(counter, move, () => counter.IsComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
+    }
+
+    private void HitReactionTransitions(StateMachine stateMachine, PlayerHitState reaction,
+        PlayerIdleState idle, PlayerMoveState move, PlayerRunState run, PlayerFallState fall)
+    {
+        // 사망 전이 이후 등록되어 치명타는 피격 모션보다 사망을 우선합니다.
+        stateMachine.AddAnyTransition(reaction, () => _playerController.PendingHitReaction == reaction.Reaction);
+        stateMachine.AddTransition(reaction, fall, () => reaction.IsComplete && !_playerController.IsGround());
+        stateMachine.AddTransition(reaction, run, () => reaction.IsComplete
+            && _playerController.Input.MoveInput.sqrMagnitude > 0.01f
+            && _playerController.Input.IsDashHeld && _playerController.CanRun);
+        stateMachine.AddTransition(reaction, move, () => reaction.IsComplete
+            && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
+        stateMachine.AddTransition(reaction, idle, () => reaction.IsComplete);
     }
 
     private void AnyTransitions(StateMachine stateMachine, PlayerDieState die)

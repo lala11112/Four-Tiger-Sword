@@ -3,9 +3,12 @@ using UnityEngine;
 public class PlayerAirAttackState : IPlayerState
 {
     private readonly PlayerController _playerController;
-    private bool _isDescending;
+    private enum Phase { Start, Loop, Finish }
+    private Phase _phase;
+    private LayerMask _savedExcludeLayers;
 
     public bool IsComplete { get; private set; }
+    public bool IsFinishing => _phase == Phase.Finish;
 
     public PlayerAirAttackState(PlayerController playerController)
     {
@@ -14,26 +17,37 @@ public class PlayerAirAttackState : IPlayerState
 
     public void Enter()
     {
-        //_playerController.VerticalVelocity = Mathf.Sqrt(_playerController.JumpForce * -2f * _playerController.Gravity);
         IsComplete = false;
-        _isDescending = true;
+        _phase = Phase.Start;
         _playerController.Input.AttackBuffer.Consume();
-        _playerController.VerticalVelocity = -_playerController.AirAttackDescentSpeed;
-        _playerController.Controller.excludeLayers |= 1 << LayerMask.NameToLayer("Enemy");
-
+        _playerController.VerticalVelocity = 0f;
+        _savedExcludeLayers = _playerController.Controller.excludeLayers;
+        _playerController.Controller.excludeLayers |= LayerMask.GetMask("Enemy");
+        _playerController.FormManager.CurrentForm.BeginAirAttack();
     }
 
     public void Update()
     {
-        if (_isDescending)
+        if (_phase == Phase.Start)
+        {
+            // 시작 모션 동안 공중에 머문 뒤 하강합니다.
+            _playerController.FormManager.CurrentForm.UpdateAirAttackStart(out bool startComplete);
+            if (!startComplete) return;
+
+            _phase = Phase.Loop;
+            _playerController.VerticalVelocity = -_playerController.AirAttackDescentSpeed;
+            _playerController.FormManager.CurrentForm.BeginAirAttackLoop();
+        }
+
+        if (_phase == Phase.Loop)
         {
             _playerController.Controller.Move(new Vector3(0f, _playerController.VerticalVelocity, 0f) * Time.deltaTime);
 
             if (_playerController.IsGround())
             {
-                _isDescending = false;
+                _phase = Phase.Finish;
                 _playerController.VerticalVelocity = 0f;
-                _playerController.FormManager.CurrentForm.BeginAirAttack();
+                _playerController.FormManager.CurrentForm.BeginAirAttackFinish();
             }
         }
         else
@@ -46,7 +60,6 @@ public class PlayerAirAttackState : IPlayerState
     public void Exit()
     {
         _playerController.FormManager.CurrentForm.EndAirAttack();
-        _playerController.Controller.excludeLayers &= ~(1 << LayerMask.NameToLayer("Enemy"));
-
+        _playerController.Controller.excludeLayers = _savedExcludeLayers;
     }
 }

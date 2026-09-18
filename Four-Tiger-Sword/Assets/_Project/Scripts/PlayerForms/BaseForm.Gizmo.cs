@@ -20,8 +20,8 @@ public abstract partial class BaseForm
         if (state is PlayerAttackState)
             return _weaponActionData.ComboSteps?.Count > 0 ? _weaponActionData.ComboSteps[_comboStep] : null;
 
-        if (state is PlayerAirAttackState)
-            return _weaponActionData.AirAttackStep;
+        if (state is PlayerAirAttackState airAttack)
+            return airAttack.IsFinishing ? _weaponActionData.AirAttackStep : null;
 
         if (state is PlayerSkillState)
             return _weaponActionData.SkillSteps?.Count > 0 ? _weaponActionData.SkillSteps[_skillStep] : null;

@@ -15,8 +15,8 @@ MonoBehaviour:
   WeaponName: 
   ComboSteps:
   - AnimationName: Water1
-    Duration: 0.7
-    ComboTransitionTime: 0
+    Duration: 1.433
+    ComboTransitionTime: 1
     Damage: 0
     PoiseDamage: 0
     HitStartTime: 0
@@ -80,9 +80,9 @@ MonoBehaviour:
     ApproachEndTime: 0.3
     RotationEndTime: 0.3
     MaxApproachDistance: 2
-  - AnimationName: 
-    Duration: 0.6
-    ComboTransitionTime: 0.35
+  - AnimationName: Water2
+    Duration: 1.4
+    ComboTransitionTime: 1
     Damage: 0.6
     PoiseDamage: 0
     HitStartTime: 0
@@ -113,17 +113,17 @@ MonoBehaviour:
       - serializedVersion: 3
         time: 0
         value: 1
-        inSlope: -3.5360045
-        outSlope: -3.5360045
+        inSlope: -2.492821
+        outSlope: -2.492821
         tangentMode: 34
         weightedMode: 0
         inWeight: 0
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 0.28118315
+        time: 0.3988513
         value: 0.00573509
-        inSlope: -3.5360045
-        outSlope: 0.00017725173
+        inSlope: -2.492821
+        outSlope: 0.00021145797
         tangentMode: 69
         weightedMode: 0
         inWeight: 0.33333334
@@ -131,8 +131,8 @@ MonoBehaviour:
       - serializedVersion: 3
         time: 1.0085902
         value: 0.005864024
-        inSlope: 0.00017725173
-        outSlope: 0.00017725173
+        inSlope: 0.00021145797
+        outSlope: 0.00021145797
         tangentMode: 34
         weightedMode: 0
         inWeight: 0.33333334
@@ -146,9 +146,9 @@ MonoBehaviour:
     ApproachEndTime: 0.13333334
     RotationEndTime: 0.13333334
     MaxApproachDistance: 2
-  - AnimationName: 
-    Duration: 0.6
-    ComboTransitionTime: 0.35
+  - AnimationName: Water3
+    Duration: 1.7
+    ComboTransitionTime: 0
     Damage: 0.6
     PoiseDamage: 0
     HitStartTime: 0
@@ -161,12 +161,12 @@ MonoBehaviour:
     KnockbackForce: 0
     StaggerResistLevel: 0
     HitEvents:
-    - StartTime: 0.13333334
+    - StartTime: 0.43
       Duration: 0.04
       Damage: 0.6
       PoiseDamage: 10
       StaggerResistLevel: 0
-    - StartTime: 0.21666667
+    - StartTime: 1
       Duration: 0.04
       Damage: 0.6
       PoiseDamage: 10
@@ -179,17 +179,44 @@ MonoBehaviour:
       - serializedVersion: 3
         time: 0
         value: 1
-        inSlope: -3.5360045
-        outSlope: -3.5360045
+        inSlope: -4.0423717
+        outSlope: -4.0423717
         tangentMode: 34
         weightedMode: 0
         inWeight: 0
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 0.28118315
-        value: 0.00573509
-        inSlope: -3.5360045
-        outSlope: 0.00017725173
+        time: 0.24476042
+        value: 0.010587385
+        inSlope: -4.0423717
+        outSlope: -0.023701403
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.46502894
+        value: 0.005366712
+        inSlope: -0.0061837854
+        outSlope: -0.0061837854
+        tangentMode: 1
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.5127001
+        value: 1.001651
+        inSlope: -0.0023588869
+        outSlope: -0.0023588869
+        tangentMode: 1
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.6737121
+        value: 0.014565486
+        inSlope: -6.13051
+        outSlope: -0.025983965
         tangentMode: 69
         weightedMode: 0
         inWeight: 0.33333334
@@ -197,8 +224,8 @@ MonoBehaviour:
       - serializedVersion: 3
         time: 1.0085902
         value: 0.005864024
-        inSlope: 0.00017725173
-        outSlope: 0.00017725173
+        inSlope: -0.025983965
+        outSlope: -0.025983965
         tangentMode: 34
         weightedMode: 0
         inWeight: 0.33333334
@@ -212,8 +239,12 @@ MonoBehaviour:
     ApproachEndTime: 0.13333334
     RotationEndTime: 0.13333334
     MaxApproachDistance: 2
+  ParryAnimationName: WaterParry
+  AirAttackStartAnimationName: WaterAirStart
+  AirAttackStartDuration: 0.3
+  AirAttackLoopAnimationName: WaterAtrIdle
   AirAttackStep:
-    AnimationName: 
+    AnimationName: WaterAirEnd
     Duration: 0.5
     ComboTransitionTime: 0.3
     Damage: 10
@@ -261,7 +292,7 @@ MonoBehaviour:
     RotationEndTime: 0.2
     MaxApproachDistance: 2
   CounterStep:
-    AnimationName: 
+    AnimationName: WaterSkill
     Duration: 0.5
     ComboTransitionTime: 0.3
     Damage: 10
@@ -416,6 +447,7 @@ MonoBehaviour:
   HitVFX: {fileID: 1089465354904564, guid: f0855940e22dbcd4aad5ca152a089348, type: 3}
   HitSound: {fileID: 0}
   DelayedHitVFX: {fileID: 1089465354904564, guid: f0855940e22dbcd4aad5ca152a089348, type: 3}
+  FireExplosionDelay: 0.15
   UltimateCooldown: 25
   AreaRadius: 4
   FieldDuration: 5

@@ -43,7 +43,7 @@ public class PlayerParryState : IPlayerState
         ParriedHitCount = 0;
 
         _playerController.Input.ParryBuffer.Consume();
-        _playerController.Animator.CrossFade("Parry", 0.0f);
+        _playerController.FormManager.CurrentForm.BeginParry();
     }
 
     public void Update()
@@ -93,6 +93,7 @@ public class PlayerParryState : IPlayerState
 
     public void Exit()
     {
+        _playerController.FormManager.CurrentForm.EndParry();
         IsParryWindowActive = false;
         IsCounterWindowActive = false;
         _playerController.StartParryCooldown();

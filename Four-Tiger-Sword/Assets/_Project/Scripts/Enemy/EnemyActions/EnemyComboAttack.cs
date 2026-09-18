@@ -32,12 +32,14 @@ public class EnemyComboAttack : EnemyAction
 
     public override void Update()
     {
+        float previousTime = _timer;
         base.Update();
 
         for (int i = 0; i < _data.hits.Count; i++)
         {
             EnemyHitEvent e = _data.hits[i];
-            if (_timer >= e.hitStartTime && _timer <= e.hitStartTime + e.hitDuration)
+            if (e != null && CrossesHitWindow(previousTime, Mathf.Min(_timer, _data.attackDuration),
+                e.hitStartTime, e.hitDuration))
                 ExecuteHit(i, e);
         }
 

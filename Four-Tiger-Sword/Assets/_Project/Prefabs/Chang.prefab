@@ -77,6 +77,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   EnemyStat: {fileID: 0}
   stateName: 
+  _targetMemoryDuration: 4
+  ApproachTimeout: 6
+  ApproachStuckTimeout: 1.5
+  FailedAttackRetryDelay: 1
   IsHurt: 0
   PendingGroggy: 0
   GroggyDuration: 5
@@ -99,8 +103,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FanVisionSensor
   _range: 20
   _halfAngle: 45
+  _proximityRange: 3
   _rayCount: 7
   _heightOffset: 0.5
+  _visibilityMask:
+    serializedVersion: 2
+    m_Bits: 1011
 --- !u!114 &4674384058193972284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298,6 +306,10 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 8071884ffbb7c4541be76d7ebbd2fab7, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 005e464d7162ed1438efc6940f5bf10e, type: 3}
+      propertyPath: m_WarningMessage
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 005e464d7162ed1438efc6940f5bf10e, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0

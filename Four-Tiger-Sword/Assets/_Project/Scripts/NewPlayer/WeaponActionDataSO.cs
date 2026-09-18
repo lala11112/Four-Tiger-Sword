@@ -10,8 +10,18 @@ public class WeaponActionDataSO : ScriptableObject
     [Tooltip("1타, 2타, 3타... 에 대한 데이터 리스트")]
     public List<WeaponActionData> ComboSteps;
 
+    [Header("Parry")]
+    [Tooltip("이 폼의 패링 Animator 상태 이름")]
+    public string ParryAnimationName = "Parry";
+
     [Header("Air Attack")]
-    [Tooltip("공중 내려찍기 공격 데이터")]
+    [Tooltip("공중 공격 시작 Animator 상태 이름. 비어 있으면 시작 단계를 생략합니다.")]
+    public string AirAttackStartAnimationName;
+    [Tooltip("시작 모션 길이(초). 공격 속도 배율이 적용됩니다.")]
+    [Min(0f)] public float AirAttackStartDuration = 0.15f;
+    [Tooltip("시작 모션 이후 착지할 때까지 재생할 Animator 상태 이름. 반복 클립을 사용하세요.")]
+    public string AirAttackLoopAnimationName;
+    [Tooltip("착지 시 마무리 공격 데이터. AnimationName은 마무리 모션, Duration은 마무리 시간입니다.")]
     public WeaponActionData AirAttackStep;
 
     [Header("Counter Attack (패링 반격)")]

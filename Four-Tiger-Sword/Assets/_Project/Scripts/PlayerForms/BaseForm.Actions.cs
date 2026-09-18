@@ -51,15 +51,53 @@ public abstract partial class BaseForm
         _playerController.Animator.speed = 1f;
     }
 
-    // ── 공중 공격 ─────────────────────────────────────────────────────────────
+    // ── 패링 ─────────────────────────────────────────────────────────────────
+
+    public virtual void BeginParry()
+    {
+        _playerController.Animator.speed = 1f;
+        PlayActionAnimation(_weaponActionData?.ParryAnimationName, 0f);
+    }
+
+    public virtual void EndParry()
+    {
+        _playerController.Animator.speed = 1f;
+    }
+
+    // ── 공중 공격: 시작 → 하강 반복 → 착지 마무리 ──────────────────────────
 
     public virtual void BeginAirAttack()
     {
         _currentAction = ActionType.AirAttack;
         _timer = 0;
+        _softTarget = null;
+        ClearHitTargets();
+        _playerController.Animator.speed = AttackSpeed;
+        PlayActionAnimation(_weaponActionData?.AirAttackStartAnimationName, 0.05f);
+    }
+
+    public virtual void UpdateAirAttackStart(out bool isComplete)
+    {
+        _playerController.Animator.speed = AttackSpeed;
+        _timer += Time.deltaTime * AttackSpeed;
+        isComplete = _weaponActionData == null
+            || string.IsNullOrWhiteSpace(_weaponActionData.AirAttackStartAnimationName)
+            || _timer >= _weaponActionData.AirAttackStartDuration;
+    }
+
+    public virtual void BeginAirAttackLoop()
+    {
+        _timer = 0f;
+        PlayActionAnimation(_weaponActionData?.AirAttackLoopAnimationName, 0.05f);
+    }
+
+    public virtual void BeginAirAttackFinish()
+    {
+        _timer = 0f;
         FindSoftTarget();
         ClearHitTargets();
         _playerController.Animator.speed = AttackSpeed;
+        PlayActionAnimation(_weaponActionData?.AirAttackStep?.AnimationName, 0.05f);
     }
 
     public virtual void UpdateAirAttack(out bool isComplete)
@@ -67,6 +105,7 @@ public abstract partial class BaseForm
         isComplete = false;
         if (_weaponActionData == null || _weaponActionData.AirAttackStep == null) { isComplete = true; return; }
 
+        _playerController.Animator.speed = AttackSpeed;
         _timer += Time.deltaTime * AttackSpeed;
         RotateTowardSoftTarget();
         ProcessHit(_weaponActionData.AirAttackStep);
