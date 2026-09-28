@@ -16,6 +16,7 @@ public class PlayerDieState : IPlayerState
         _playerController.Controller.enabled = false;
         _playerController.Input.enabled = false;
         _playerController.Movement.enabled = false;
+        _playerController.FormManager.CleanupTransientEffects();
         _playerController.FormManager.CurrentForm.Unequip(_playerController);
         Debug.Log("Player Die");
     }

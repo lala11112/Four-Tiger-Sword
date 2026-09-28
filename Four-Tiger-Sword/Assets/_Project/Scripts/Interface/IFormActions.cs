@@ -3,6 +3,8 @@ public interface IFormActions
     void BeginAttack();
     void UpdateAttack(out bool isComplete);
     void EndAttack();
+    bool CanChainAttack { get; }
+    bool TryContinueAttack();
 
     void BeginAirAttack();
     void UpdateAirAttackStart(out bool isComplete);

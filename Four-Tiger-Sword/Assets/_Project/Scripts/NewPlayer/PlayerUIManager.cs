@@ -7,7 +7,6 @@ public class PlayerUIManager : MonoBehaviour
     [SerializeField] private Image hpBarImage;
     [SerializeField] private Image spBarImage;
     [SerializeField] private Image ultimateGaugeImage;
-    public Image WaterGauge;
 
     public GameObject FireElement;
     public GameObject WaterElement;
@@ -18,7 +17,6 @@ public class PlayerUIManager : MonoBehaviour
     public Image SkillCoolTimeImage;
 
     private PlayerStatManager _statManager;
-
     private void Awake()
     {
         if (Instance == null)

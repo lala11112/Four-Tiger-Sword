@@ -1,22 +1,48 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class WaterForm : BaseForm
+public class WaterForm : BaseForm, IHeavyAttackForm
 {
     public override ElementType Element => ElementType.ELEMENT_WATER;
     public override float SkillSpCost => 150f;
     public override float SkillCooldown => 6f;
-    private readonly WaterFlowGauge _flow = new();
+    private readonly WaterFlowGauge _flow;
     public float WaterGauge => _flow.CurrentGauge;
-    public bool IsBuffActive => _flow.IsBuffActive;
-    private bool _buffApplied;
-    private float _baseMoveSpeed, _baseRunSpeed;
-    private Image _waterGaugeUI;
+    public float WaterGaugeMax => _flow.MaxGauge;
+    public float WaterGaugePerSegment => _flow.PointsPerSegment;
+    public float WaterGaugeRatio => _flow.GaugeRatio;
+    public int WaterGaugeSegmentCount => WaterFlowGauge.SegmentCount;
+    public int HeavyAttackCharges => _flow.AvailableCharges;
+    protected override WeaponActionData HeavyAttackStep => _weaponActionData?.HeavyAttackStep;
+    public bool CanHeavyAttack => HeavyAttackStep != null
+        && !string.IsNullOrWhiteSpace(HeavyAttackStep.AnimationName)
+        && HeavyAttackStep.Duration > 0f && HeavyAttackCharges > 0;
+    public float HeavyAttackHoldTime => Mathf.Max(0.05f, _weaponActionData.HeavyAttackHoldTime);
+    public float SkillBuffRemaining { get; private set; }
+    public bool IsSkillBuffActive => SkillBuffRemaining > 0f;
+    public float SkillAttackBonusPercent => IsSkillBuffActive ? _appliedAttackBonus * 100f : 0f;
+    public float HeavyAttackDamageMultiplier => IsSkillBuffActive ? 1f + _heavyDamageBonus : 1f;
+    private float _appliedAttackBonus;
+    private float _heavyDamageBonus;
     private LayerMask _savedExcludeLayers;
     private bool _skillCollisionOverride;
     private Vector3 _trailStart;
     private readonly HashSet<IDamageable> _dashHitTargets = new();
+    private readonly HashSet<IDamageable> _heavyDashTargets = new();
+    private LayerMask _heavySavedExcludeLayers;
+    private bool _heavyCollisionOverride;
+    private Vector3 _heavyDashDirection;
+    private float _heavyDashDistance;
+    private float _heavyDashDuration;
+    private float _heavyAttackDuration;
+    private bool _heavyAttackFinished;
+    private Component _heavyChainTarget;
+    private Collider _heavyChainTargetCollider;
+    public Transform HeavyAttackTarget => HasHeavyChainTarget ? _heavyChainTarget.transform : null;
+    private bool HasHeavyChainTarget => _heavyChainTarget != null && _heavyChainTarget.gameObject.activeInHierarchy
+        && _heavyChainTargetCollider != null && _heavyChainTargetCollider.enabled
+        && _heavyChainTargetCollider.gameObject.activeInHierarchy
+        && !(_heavyChainTarget.GetComponent<EnemyStat>() is EnemyStat stats && stats.IsDead);
     private bool _ultimateActive;
     private float _ultimateElapsed;
     private int _ultimateHits;
@@ -26,75 +52,188 @@ public class WaterForm : BaseForm
 
     public WaterForm(WeaponActionDataSO data) : base(data)
     {
-        _flow.OnBuffActivated += ActivateBuff;
-        _flow.OnBuffExpired += DeactivateBuff;
+        _flow = new WaterFlowGauge(data != null ? data.WaterGaugePerSegment : 100f);
     }
     public override void Equip(PlayerController player)
     {
         base.Equip(player);
-        _baseMoveSpeed = player.MoveSpeed; _baseRunSpeed = player.RunSpeed;
-        _waterGaugeUI = PlayerUIManager.Instance?.WaterGauge;
-        if (_waterGaugeUI != null) _waterGaugeUI.gameObject.SetActive(true);
         PlayerUIManager.Instance?.WaterElement?.SetActive(false);
-        if (_flow.IsBuffActive) ActivateBuff();
     }
     public override void Unequip(PlayerController player)
     {
-        CleanupTransientEffects();
-        DeactivateBuff();
-        if (_waterGaugeUI != null) _waterGaugeUI.gameObject.SetActive(false);
+        CleanupActionEffects();
         PlayerUIManager.Instance?.WaterElement?.SetActive(true);
     }
     protected override void OnHitEnemy(GameObject enemy)
     {
         base.OnHitEnemy(enemy);
-        _flow.Charge(12f); // 문서 미지정: 기존 타당 충전량 유지.
-        if (_currentAction == ActionType.Skill && enemy.GetComponent<IDamageable>() is Component target)
-            Effects.StartCoroutine(Effects.DelayedHits(target, EffectHit(0.5f), _weaponActionData.DelayedHitVFX));
+        if (_currentAction == ActionType.Attack)
+            _flow.Charge(_weaponActionData.WaterNormalHitGain);
     }
+
     protected override void OnTick(float dt)
     {
-        _flow.Tick(dt);
-        if (_waterGaugeUI != null) _waterGaugeUI.fillAmount = _flow.GaugeRatio;
-        // 버프 중 변경되는 데이터 타이머와 모션 속도를 함께 맞춥니다.
-        if (_playerController != null && _playerController.FormManager?.CurrentForm == this
-            && (_playerController.StateMachine.CurrentState is PlayerAttackState
-                || _playerController.StateMachine.CurrentState is PlayerSkillState))
-            _playerController.Animator.speed = AttackSpeed;
+        Debug.Log(WaterGauge);
+        if (!IsSkillBuffActive) return;
+        if (_playerController == null || !_playerController.isActiveAndEnabled
+            || _playerController.StatManager.CurrentHp <= 0f)
+        {
+            RemoveSkillBuff();
+            return;
+        }
+        SkillBuffRemaining = Mathf.Max(0f, SkillBuffRemaining - dt);
+        if (SkillBuffRemaining <= 0f) RemoveSkillBuff();
     }
-    private void ActivateBuff()
+
+    private void ApplySkillBuff()
     {
-        if (_buffApplied || _playerController == null) return;
-        _buffApplied = true;
-        _playerController.StatManager.AddModifier(StatType.ST_ATK_SPD, 0f, 0.3f);
-        _playerController.MoveSpeed = _baseMoveSpeed * 1.3f;
-        _playerController.RunSpeed = _baseRunSpeed * 1.3f;
+        RemoveSkillBuff();
+        SkillBuffRemaining = Mathf.Max(0f, _weaponActionData.WaterSkillBuffDuration);
+        if (!IsSkillBuffActive) return;
+        // Snapshot the applied modifier so later Inspector edits cannot leave residual stats.
+        _appliedAttackBonus = Mathf.Max(0f, _weaponActionData.WaterSkillAttackBonusPercent) / 100f;
+        _heavyDamageBonus = Mathf.Max(0f, _weaponActionData.WaterSkillHeavyDamageBonusPercent) / 100f;
+        if (_appliedAttackBonus > 0f)
+            _playerController.StatManager.AddModifier(StatType.ST_ATK, 0f, _appliedAttackBonus);
     }
-    private void DeactivateBuff()
+
+    private void RemoveSkillBuff()
     {
-        if (!_buffApplied || _playerController == null) return;
-        _buffApplied = false;
-        _playerController.StatManager.RemoveModifier(StatType.ST_ATK_SPD, 0f, 0.3f);
-        _playerController.MoveSpeed = _baseMoveSpeed;
-        _playerController.RunSpeed = _baseRunSpeed;
+        if (_appliedAttackBonus > 0f && _playerController != null)
+            _playerController.StatManager.RemoveModifier(StatType.ST_ATK, 0f, _appliedAttackBonus);
+        SkillBuffRemaining = 0f;
+        _appliedAttackBonus = _heavyDamageBonus = 0f;
+    }
+    public bool TryBeginHeavyAttack() => StartHeavyDash(false);
+
+    public bool TryContinueHeavyAttack() => _heavyAttackFinished && StartHeavyDash(true);
+
+    private bool StartHeavyDash(bool continuing)
+    {
+        if (!CanHeavyAttack || !_flow.TryConsumeCharge()) return false;
+        RestoreHeavyCollision();
+        if (!continuing)
+        {
+            _heavyChainTarget = null;
+            _heavyChainTargetCollider = null;
+        }
+        _heavyDashDirection = _playerController.Input.MoveInput.sqrMagnitude > 0.01f
+            ? _playerController.Movement.GetMoveDirection().normalized
+            : _playerController.transform.forward;
+        _heavyDashDistance = Mathf.Max(0f, _weaponActionData.WaterHeavyDashDistance);
+        if (continuing && HasHeavyChainTarget)
+        {
+            Vector3 toTarget = Vector3.ProjectOnPlane(
+                _heavyChainTargetCollider.bounds.center - _playerController.transform.position, Vector3.up);
+            if (toTarget.sqrMagnitude > 0.001f)
+            {
+                _heavyDashDirection = toTarget.normalized;
+                _heavyDashDistance = Mathf.Max(_heavyDashDistance,
+                    toTarget.magnitude + Mathf.Max(0f, _weaponActionData.WaterHeavyTargetOvershoot));
+            }
+        }
+        _heavyAttackDuration = HeavyAttackStep.Duration;
+        _heavyDashDuration = Mathf.Clamp(_weaponActionData.WaterHeavyDashDuration, 0.01f, _heavyAttackDuration);
+        _heavyAttackFinished = false;
+        _heavyDashDirection = Vector3.ProjectOnPlane(_heavyDashDirection, Vector3.up).normalized;
+        if (_heavyDashDirection.sqrMagnitude < 0.001f) _heavyDashDirection = _playerController.transform.forward;
+        _playerController.transform.rotation = Quaternion.LookRotation(_heavyDashDirection);
+        BeginHeavyAttack();
+        _softTarget = null;
+        _heavySavedExcludeLayers = _playerController.Controller.excludeLayers;
+        _heavyCollisionOverride = true;
+        _playerController.Controller.excludeLayers |= LayerMask.GetMask("Enemy");
+        _heavyDashTargets.Clear();
+        return true;
+    }
+
+    public override void UpdateHeavyAttack(out bool isComplete)
+    {
+        var step = HeavyAttackStep;
+        float previous = _timer;
+        _timer = Mathf.Min(_heavyAttackDuration, _timer + Time.deltaTime * AttackSpeed);
+        Vector3 offset = _playerController.transform.rotation * step.HitBoxOffset;
+        Vector3 from = _playerController.transform.position + offset;
+        float distance = _heavyDashDistance * (Mathf.Clamp01(_timer / _heavyDashDuration)
+            - Mathf.Clamp01(previous / _heavyDashDuration));
+        Vector3 movement = _heavyDashDirection * distance;
+        movement.y = _playerController.VerticalVelocity * Time.deltaTime;
+        _playerController.Controller.Move(movement);
+        Vector3 to = _playerController.transform.position + offset;
+
+        // Sweep the actual path, including enemies crossed entirely in one frame.
+        float hitStart = Mathf.Max(previous, step.HitStartTime);
+        float hitEnd = Mathf.Min(_timer, Mathf.Min(_heavyDashDuration, step.HitStartTime + step.HitDuration));
+        if (_timer > previous && hitEnd > hitStart)
+        {
+            float moveInterval = Mathf.Min(_timer, _heavyDashDuration) - previous;
+            Vector3 start = Vector3.Lerp(from, to, (hitStart - previous) / moveInterval);
+            Vector3 end = Vector3.Lerp(from, to, (hitEnd - previous) / moveInterval);
+            bool firstHit = true;
+            var hits = Physics.OverlapCapsule(start, end, Mathf.Max(0.1f, step.HitBoxRadius), _enemyLayer);
+            System.Array.Sort(hits, (a, b) => (a.ClosestPoint(start) - start).sqrMagnitude.CompareTo(
+                (b.ClosestPoint(start) - start).sqrMagnitude));
+            foreach (var collider in hits)
+            {
+                var target = collider.GetComponentInParent<IDamageable>();
+                if (!(target is Component component)) continue;
+                var stats = component.GetComponent<EnemyStat>();
+                if ((stats != null && stats.IsDead) || !_heavyDashTargets.Add(target)) continue;
+                float attack = _playerController.StatManager.GetStat(StatType.ST_ATK);
+                var hit = new HitInfo(step.Damage * HeavyAttackDamageMultiplier * attack, Element,
+                    _playerController.StatManager.GetStat(StatType.ST_CRT) / 100f,
+                    _playerController.StatManager.GetStat(StatType.ST_CRTD) / 100f,
+                    source: _playerController,
+                    power: _heavyDashDirection * step.KnockbackForce * (1f + attack * 0.01f),
+                    poiseDamage: step.PoiseDamage, staggerResistLevel: step.StaggerResistLevel);
+                var result = DamageManager.Apply(hit, target, component.gameObject);
+                if (!result.Applied) continue;
+                if (!HasHeavyChainTarget)
+                {
+                    _heavyChainTarget = component;
+                    _heavyChainTargetCollider = collider;
+                }
+                if (firstHit) { _playerController.StartHitStop(); firstHit = false; }
+                _playerController.ImpulseSource?.GenerateImpulse();
+                OnHitEnemy(component.gameObject);
+            }
+        }
+        // Movement can finish earlier; queued attacks wait for the entire attack motion.
+        _heavyAttackFinished = _timer >= _heavyAttackDuration;
+        isComplete = _heavyAttackFinished;
+    }
+
+    public override void EndHeavyAttack()
+    {
+        RestoreHeavyCollision();
+        _heavyChainTarget = null;
+        _heavyChainTargetCollider = null;
+        _heavyAttackFinished = false;
+        base.EndHeavyAttack();
+    }
+
+    private void RestoreHeavyCollision()
+    {
+        if (!_heavyCollisionOverride) return;
+        _playerController.Controller.excludeLayers = _heavySavedExcludeLayers;
+        _heavyCollisionOverride = false;
     }
     public override void BeginSkill()
     {
         base.BeginSkill();
-        if (_softTarget != null)
-        {
-            var dir = Vector3.ProjectOnPlane(_softTarget.position - _playerController.transform.position, Vector3.up);
-            if (dir.sqrMagnitude > 0.001f) _playerController.transform.rotation = Quaternion.LookRotation(dir);
-        }
+        _flow.Charge(_weaponActionData.WaterSkillUseGain);
+        ApplySkillBuff();
         _savedExcludeLayers = _playerController.Controller.excludeLayers;
         _skillCollisionOverride = true;
         _playerController.Controller.excludeLayers |= LayerMask.GetMask("Enemy");
-        _softTarget = null; // 한 번 정한 돌진 방향으로 진행.
+        _softTarget = null; // 스킬은 사용 시 플레이어가 바라보는 전방으로 진행합니다.
         _trailStart = _playerController.Controller.bounds.center;
         _dashHitTargets.Clear();
     }
     protected override void ExecuteHit(WeaponActionData step, float damage, float poiseDamage, HashSet<IDamageable> targets)
-        => base.ExecuteHit(step, damage, poiseDamage, _currentAction == ActionType.Skill ? _dashHitTargets : targets);
+        => base.ExecuteHit(step,
+            damage * (_currentAction == ActionType.HeavyAttack ? HeavyAttackDamageMultiplier : 1f),
+            poiseDamage, _currentAction == ActionType.Skill ? _dashHitTargets : targets);
 
     public override void UpdateSkill(out bool isComplete)
     {
@@ -173,14 +312,24 @@ public class WaterForm : BaseForm
             Vector3 desired = _ultimateTarget.position - _ultimateTarget.forward * 1.5f;
             _playerController.Controller.Move(Vector3.ProjectOnPlane(desired - _playerController.transform.position, Vector3.up));
         }
-        CleanupTransientEffects();
+        CleanupActionEffects();
         base.EndUltimate();
     }
     public override void CleanupTransientEffects()
+    {
+        CleanupActionEffects();
+        RemoveSkillBuff();
+    }
+
+    private void CleanupActionEffects()
     {
         _ultimateActive = false;
         foreach (var item in _visibility) if (item.Key != null) item.Key.enabled = item.Value;
         _visibility.Clear();
         RestoreSkillCollision();
+        RestoreHeavyCollision();
+        _heavyChainTarget = null;
+        _heavyChainTargetCollider = null;
+        _heavyAttackFinished = false;
     }
 }

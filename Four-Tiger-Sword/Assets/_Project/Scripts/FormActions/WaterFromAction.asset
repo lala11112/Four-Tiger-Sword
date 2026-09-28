@@ -27,7 +27,7 @@ MonoBehaviour:
     HitBoxSize: {x: 0, y: 0, z: 0}
     HitBoxHeight: 0
     KnockbackForce: 0
-    StaggerResistLevel: 0
+    StaggerResistLevel: 1
     HitEvents:
     - StartTime: 0.3
       Duration: 0.05
@@ -93,18 +93,18 @@ MonoBehaviour:
     HitBoxSize: {x: 0, y: 0, z: 0}
     HitBoxHeight: 0
     KnockbackForce: 0
-    StaggerResistLevel: 0
+    StaggerResistLevel: 1
     HitEvents:
     - StartTime: 0.13333334
       Duration: 0.04
       Damage: 0.6
       PoiseDamage: 10
-      StaggerResistLevel: 0
+      StaggerResistLevel: 2
     - StartTime: 0.21666667
       Duration: 0.04
       Damage: 0.6
       PoiseDamage: 10
-      StaggerResistLevel: 0
+      StaggerResistLevel: 2
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
     ThrustCurve:
@@ -159,18 +159,18 @@ MonoBehaviour:
     HitBoxSize: {x: 0, y: 0, z: 0}
     HitBoxHeight: 0
     KnockbackForce: 0
-    StaggerResistLevel: 0
+    StaggerResistLevel: 2
     HitEvents:
     - StartTime: 0.43
       Duration: 0.04
       Damage: 0.6
       PoiseDamage: 10
-      StaggerResistLevel: 0
+      StaggerResistLevel: 2
     - StartTime: 1
       Duration: 0.04
       Damage: 0.6
       PoiseDamage: 10
-      StaggerResistLevel: 0
+      StaggerResistLevel: 3
     SlashVFX: {fileID: 0}
     SwingSound: {fileID: 0}
     ThrustCurve:
@@ -239,6 +239,64 @@ MonoBehaviour:
     ApproachEndTime: 0.13333334
     RotationEndTime: 0.13333334
     MaxApproachDistance: 2
+  HeavyAttackStep:
+    AnimationName: WaterSkill
+    Duration: 1.1666667
+    ComboTransitionTime: 0
+    Damage: 2.4
+    PoiseDamage: 40
+    HitStartTime: 0
+    HitDuration: 0.35
+    HitBoxOffset: {x: 0, y: 0.8, z: 0}
+    HitBoxShape: 0
+    HitBoxRadius: 0.8
+    HitBoxSize: {x: 0, y: 0, z: 0}
+    HitBoxHeight: 0
+    KnockbackForce: 0
+    StaggerResistLevel: 2
+    HitEvents: []
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+    ThrustCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ThrustMultiplier: 0
+    UseTargetApproach: 0
+    StopDistance: 0.25
+    ApproachEndTime: 0.13333334
+    RotationEndTime: 0.13333334
+    MaxApproachDistance: 2
+  HeavyAttackHoldTime: 0.35
+  WaterHeavyDashDistance: 6
+  WaterHeavyDashDuration: 0.35
+  WaterHeavyTargetOvershoot: 1
+  WaterGaugePerSegment: 100
+  WaterNormalHitGain: 12
+  WaterSkillUseGain: 100
+  WaterSkillBuffDuration: 6
+  WaterSkillAttackBonusPercent: 20
+  WaterSkillHeavyDamageBonusPercent: 30
   ParryAnimationName: WaterParry
   AirAttackStartAnimationName: WaterAirStart
   AirAttackStartDuration: 0.3
@@ -293,11 +351,11 @@ MonoBehaviour:
     MaxApproachDistance: 2
   CounterStep:
     AnimationName: WaterSkill
-    Duration: 0.5
-    ComboTransitionTime: 0.3
+    Duration: 1.2
+    ComboTransitionTime: 0
     Damage: 10
     PoiseDamage: 10
-    HitStartTime: 0.1
+    HitStartTime: 0.5
     HitDuration: 0.1
     HitBoxOffset: {x: 0, y: 0, z: 1}
     HitBoxShape: 0
@@ -313,14 +371,23 @@ MonoBehaviour:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0
-        value: 0
+        time: 0.00630641
+        value: 1.0001788
         inSlope: 0
         outSlope: 0
         tangentMode: 0
         weightedMode: 0
         inWeight: 0
         outWeight: 0
+      - serializedVersion: 3
+        time: 0.3494375
+        value: 0.0012263656
+        inSlope: -2.9112852
+        outSlope: -0.0018850849
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
         value: 0
@@ -333,8 +400,8 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    ThrustMultiplier: 10
-    UseTargetApproach: 0
+    ThrustMultiplier: 20
+    UseTargetApproach: 1
     StopDistance: 0.25
     ApproachEndTime: 0.3
     RotationEndTime: 0.2
@@ -347,7 +414,7 @@ MonoBehaviour:
     PoiseDamage: 10
     HitStartTime: 0.15
     HitDuration: 1.7
-    HitBoxOffset: {x: 0, y: 0, z: 0}
+    HitBoxOffset: {x: 0, y: 0, z: 2}
     HitBoxShape: 1
     HitBoxRadius: 0
     HitBoxSize: {x: 2, y: 1, z: 2}
@@ -361,8 +428,8 @@ MonoBehaviour:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.009780884
-        value: 1.9762268
+        time: 0.0015296936
+        value: 0.9990349
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -370,10 +437,10 @@ MonoBehaviour:
         inWeight: 0.33333334
         outWeight: 0
       - serializedVersion: 3
-        time: 0.6568793
-        value: 0.018660307
-        inSlope: -3.0251448
-        outSlope: 0.014901131
+        time: 0.25804508
+        value: -0.00044369698
+        inSlope: -3.896369
+        outSlope: 0.032639302
         tangentMode: 69
         weightedMode: 0
         inWeight: 0.33333334
@@ -381,8 +448,8 @@ MonoBehaviour:
       - serializedVersion: 3
         time: 1
         value: 0.023773193
-        inSlope: 0.014901131
-        outSlope: 0.014901131
+        inSlope: 0.032639302
+        outSlope: 0.032639302
         tangentMode: 34
         weightedMode: 0
         inWeight: 0.33333334

@@ -17,6 +17,9 @@ public abstract partial class BaseForm
     {
         var state = _playerController.StateMachine.CurrentState;
 
+        if (state is PlayerAttackState attack && attack.IsCharging) return null;
+        if (state is PlayerAttackState && _currentAction == ActionType.HeavyAttack)
+            return HeavyAttackStep;
         if (state is PlayerAttackState)
             return _weaponActionData.ComboSteps?.Count > 0 ? _weaponActionData.ComboSteps[_comboStep] : null;
 

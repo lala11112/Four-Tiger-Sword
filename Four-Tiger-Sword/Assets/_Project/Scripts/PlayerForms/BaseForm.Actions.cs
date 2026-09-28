@@ -30,17 +30,19 @@ public abstract partial class BaseForm
 
         MoveForward(currentStep);
 
-        if (_timer >= currentStep.ComboTransitionTime &&
-            _playerController.Input.AttackBuffer.IsActive &&
-            _comboStep < _weaponActionData.ComboSteps.Count - 1)
-        {
-            _comboStep++;
-            PlayCombo();
-            return;
-        }
-
         if (_timer >= currentStep.Duration)
             isComplete = true;
+    }
+
+    public bool CanChainAttack => HasSteps(_weaponActionData?.ComboSteps)
+        && _timer >= _weaponActionData.ComboSteps[_comboStep].ComboTransitionTime;
+
+    public bool TryContinueAttack()
+    {
+        if (!CanChainAttack || _comboStep >= _weaponActionData.ComboSteps.Count - 1) return false;
+        _comboStep++;
+        PlayCombo();
+        return true;
     }
 
     public virtual void EndAttack()
@@ -257,8 +259,9 @@ public abstract partial class BaseForm
     {
         if (step.Duration <= 0f) return;
 
-        // 이번 단계는 일반 콤보에만 적용합니다. 스킬의 고유 돌진 처리는 유지합니다.
-        bool useApproach = _currentAction == ActionType.Attack && step.UseTargetApproach && _approachingTarget;
+        // Basic/heavy attacks share approach limits; skills retain their own dash movement.
+        bool useApproach = (_currentAction == ActionType.Attack || _currentAction == ActionType.HeavyAttack)
+            && step.UseTargetApproach && _approachingTarget;
         bool targetAlive = _softTarget != null && _softTargetCollider != null
             && _softTargetCollider.enabled && _softTargetCollider.gameObject.activeInHierarchy;
         float previousTime = _previousMoveTime;

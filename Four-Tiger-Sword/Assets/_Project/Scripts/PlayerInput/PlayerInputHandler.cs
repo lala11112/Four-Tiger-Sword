@@ -21,6 +21,9 @@ public class PlayerInputHandler : MonoBehaviour
 
     public Vector2 MoveInput { get; private set; }
     public bool IsDashHeld { get; private set; }
+    public bool IsAttackHeld { get; private set; }
+    public float AttackHeldTime { get; private set; }
+    public uint AttackPressId { get; private set; }
     public bool IsForm1Pressed { get; private set; }
     public bool IsForm2Pressed { get; private set; }
     public bool IsForm3Pressed { get; private set; }
@@ -55,6 +58,8 @@ public class PlayerInputHandler : MonoBehaviour
     {
         MoveInput = Vector2.zero;
         IsDashHeld = false;
+        IsAttackHeld = false;
+        AttackHeldTime = 0f;
         IsForm1Pressed = IsForm2Pressed = IsForm3Pressed = IsForm4Pressed = IsForm5Pressed = IsFastFormPressed = false;
         JumpBuffer.Consume();
         AttackBuffer.Consume();
@@ -98,8 +103,15 @@ public class PlayerInputHandler : MonoBehaviour
         if(_jumpAction?.action?.WasPressedThisFrame() ?? false)
             JumpBuffer.Set();
 
-        if(_attackAction?.action?.WasPressedThisFrame() ?? false)
+        IsAttackHeld = _attackAction?.action?.IsPressed() ?? false;
+        if (_attackAction?.action?.WasPressedThisFrame() ?? false)
+        {
+            AttackPressId++;
+            AttackHeldTime = 0f;
             AttackBuffer.Set(0.5f);
+        }
+        // Retain the duration on release for buffered taps/holds.
+        if (IsAttackHeld) AttackHeldTime += Time.deltaTime;
 
         if(_dashAction?.action?.WasPressedThisFrame() ?? false)
             DashBuffer.Set();

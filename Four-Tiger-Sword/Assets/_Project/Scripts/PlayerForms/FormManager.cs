@@ -36,6 +36,13 @@ public class FormManager
         }
     }
 
+    public void CleanupTransientEffects()
+    {
+        // Buffs may belong to an unequipped form; clear every registered owner on shutdown/death.
+        foreach (var form in _registeredForms)
+            (form as BaseForm)?.CleanupTransientEffects();
+    }
+
     public void AddTransition(IForm targetForm, Func<bool> condition)
     {
         if (targetForm == null) throw new ArgumentNullException(nameof(targetForm));

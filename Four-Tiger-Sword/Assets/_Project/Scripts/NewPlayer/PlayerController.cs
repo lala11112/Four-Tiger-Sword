@@ -303,7 +303,7 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void OnDisable()
     {
-        (FormManager?.CurrentForm as BaseForm)?.CleanupTransientEffects();
+        FormManager?.CleanupTransientEffects();
         if (_hitStopCoroutine != null)
         {
             StopCoroutine(_hitStopCoroutine);
