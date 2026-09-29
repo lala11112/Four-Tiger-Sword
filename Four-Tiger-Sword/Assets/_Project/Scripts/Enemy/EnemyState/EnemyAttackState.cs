@@ -18,6 +18,12 @@ public class EnemyAttackState : IPlayerState
 
     public void Enter()
     {
+        if (_enemy.IsSilenced)
+        {
+            _enemy.CurrentAction?.Exit();
+            _enemy.CurrentAction = null;
+            return;
+        }
         _nav = _enemy.GetComponent<NavMeshAgent>();
         if (_nav.enabled && _nav.isOnNavMesh) _nav.ResetPath();
 
@@ -29,6 +35,12 @@ public class EnemyAttackState : IPlayerState
 
     public void Update()
     {
+        if (_enemy.IsSilenced)
+        {
+            _enemy.CurrentAction?.Exit();
+            _enemy.CurrentAction = null;
+            return;
+        }
         _enemy.CurrentAction?.Update();
     }
 

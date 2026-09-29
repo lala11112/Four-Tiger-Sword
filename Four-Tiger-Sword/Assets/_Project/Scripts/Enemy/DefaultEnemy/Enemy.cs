@@ -70,7 +70,8 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool PendingGroggy = false;
     private bool _isDie = false;
 
-    public bool CanAttack => _attackCooldownTimer <= 0f;
+    public bool IsSilenced => GetComponent<StatusEffectHandler>()?.Get<SilenceEffect>() is { IsExpired: false };
+    public bool CanAttack => !IsSilenced && _attackCooldownTimer <= 0f;
     public bool IsAttackFinished => CurrentAction?.IsFinished ?? true;
 
     public Animator Animator { get; private set; }

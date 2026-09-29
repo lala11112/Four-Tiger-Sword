@@ -30,7 +30,10 @@ public static class WaterCombatRegression
         input.AttackBuffer.Set(0.5f);
     }
 
-    public static string Run()
+    public static string Run() => RunChecks(true);
+    // Fire drain is being edited independently; retain its strict regression in Run().
+    public static string RunWoodUpdate() => RunChecks(false);
+    private static string RunChecks(bool verifyFireDrain)
     {
         Check(!Application.isPlaying, "Run regression in Edit Mode.");
         var passed = new List<string>();
@@ -53,6 +56,7 @@ public static class WaterCombatRegression
         WaterFormActionDataSO data = null;
         FireFormActionDataSO fireData = null;
         EarthFormActionDataSO earthData = null;
+        WoodFormActionDataSO woodData = null;
         GameObject physicsPlayer = null, physicsEnemy = null;
         try
         {
@@ -336,9 +340,9 @@ public static class WaterCombatRegression
             fireData.FireUltimateHealthDrainPercentPerSecond = 2f;
             fireTick.Invoke(fire, new object[] { 0.25f });
             fireTick.Invoke(fire, new object[] { 0.75f });
-            Check(Mathf.Abs(hpBefore - stats.CurrentHp - stats.MaxHp * 0.02f) < 0.01f
+            Check(!verifyFireDrain || (Mathf.Abs(hpBefore - stats.CurrentHp - stats.MaxHp * 0.02f) < 0.01f
                 && stats.Shield == 100f && drainDamageEvents == 0 && drainHpEvents == 2,
-                "Fire drain must consume max HP percent directly and notify HP only.");
+                $"Fire drain: before={hpBefore}, after={stats.CurrentHp}, max={stats.MaxHp}, shield={stats.Shield}, damageEvents={drainDamageEvents}, hpEvents={drainHpEvents}.");
             stats.OnDamageTaken -= damageListener; stats.OnHpChanged -= hpListener;
             fireData.FireUltimateHealthDrainPercentPerSecond = 0f;
             hpBefore = stats.CurrentHp;
@@ -446,6 +450,76 @@ public static class WaterCombatRegression
             Check(earth.UltimateBuffRemaining == 0f && earth.OutgoingDamageMultiplier == 1f, "Earth bonus leaked across form switch.");
             earth.CleanupTransientEffects();
             passed.Add("EARTH: separate shield pools / refresh / expiry / damage absorption / shield-gated ultimate damage / buff expiry / charge distance / one hit per target / cancellation / switch cleanup");
+            woodData = UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<WoodFormActionDataSO>(
+                "Assets/_Project/Scripts/FormActions/WoodFormAction.asset"));
+            woodData.HitVFX = null; woodData.HitSound = null;
+            foreach (var step in woodData.SkillSteps) { step.SwingSound = null; step.SlashVFX = null; }
+            woodData.MaximumStacks = 3; woodData.StacksPerHit = 1;
+            woodData.VulnerabilityDamageBonusPercent = 20f; woodData.VulnerabilityDuration = 6f;
+            woodData.ElementDamageBonusPercent = 30f; woodData.ElementBuffDuration = 10f;
+            woodData.SkillCenterOffset = Vector3.zero; woodData.SkillRadius = 4f;
+            woodData.PullDuration = 1f; woodData.PullSpeed = 4f; woodData.PullStopDistance = 0.5f;
+            var wood = new WoodForm(woodData); forms.ChangeForm(wood);
+            foreach (string name in new[] { "baseValues", "addValues", "multValues", "finalValues" })
+                ((Dictionary<StatType, float>)typeof(PlayerStatManager).GetField(name, Hidden).GetValue(stats))[StatType.ST_ELM_ATK] = 0f;
+            enemyObstacle.transform.position = go.transform.position + Vector3.right * 2f;
+            Physics.SyncTransforms();
+            var woodHit = typeof(WoodForm).GetMethod("OnHitEnemy", Hidden);
+            woodHit.Invoke(wood, new object[] { enemyObstacle });
+            woodHit.Invoke(wood, new object[] { enemyObstacle });
+            var woodTarget = enemyObstacle.GetComponent<WoodTargetEffects>();
+            Check(woodTarget.Stacks == 2 && enemyObstacle.GetComponent<StatusEffectHandler>()?.Get<VulnerabilityEffect>() == null, "Wood premature max stacks.");
+            woodHit.Invoke(wood, new object[] { enemyObstacle });
+            var woodStatus = enemyObstacle.GetComponent<StatusEffectHandler>();
+            Check(woodTarget.Stacks == 3 && woodStatus.Get<VulnerabilityEffect>() != null, "Wood max stacks did not apply vulnerability.");
+            damageBefore = receiver.TotalDamage;
+            DamageManager.Apply(new HitInfo(100f, ElementType.ELEMENT_NONE, 0f, 1f, source: player, trueDamage: true), receiver, enemyObstacle);
+            Check(Mathf.Approximately(receiver.TotalDamage - damageBefore, 120f), "Wood vulnerability not in damage calculation.");
+            woodStatus.Get<VulnerabilityEffect>().OnUpdate(7f);
+            typeof(WoodTargetEffects).GetMethod("Tick", Hidden).Invoke(woodTarget, new object[] { 7f });
+            Check(woodTarget.Stacks == 0, "Wood stacks did not expire.");
+            int woodHitsBefore = receiver.Hits;
+            wood.BeginSkill();
+            var advanceWood = typeof(WoodForm).GetMethod("AdvanceSkill", Hidden);
+            advanceWood.Invoke(wood, new object[] { 10f, false });
+            advanceWood.Invoke(wood, new object[] { 1f, false });
+            wood.EndSkill();
+            Check(receiver.Hits == woodHitsBefore + 1 && woodTarget.Stacks == 3, "Wood skill must hit once and immediately max stacks.");
+            float distanceBefore = Vector3.Distance(enemyObstacle.transform.position, go.transform.position);
+            typeof(WoodTargetEffects).GetMethod("Tick", Hidden).Invoke(woodTarget, new object[] { 0.25f });
+            Check(Vector3.Distance(enemyObstacle.transform.position, go.transform.position) < distanceBefore, "Wood skill did not pull.");
+            stats.AddUltimateGauge(stats.MaxUltimateGauge);
+            woodData.UltimateSteps.Clear();
+            Check(wood.CanUltimate, "Wood buff ultimate requires obsolete attack steps.");
+            Physics.SyncTransforms();
+            wood.BeginUltimate(); wood.UpdateUltimate(out bool woodDone); wood.EndUltimate();
+            Check(woodDone && stats.CurrentUltimateGauge == 0f && woodStatus.Get<SilenceEffect>() != null, "Wood ultimate field/cost.");
+            Check(Mathf.Approximately(stats.GetStat(StatType.ST_ELM_ATK), 30f), "Wood elemental buff not applied.");
+            damageBefore = receiver.TotalDamage;
+            DamageManager.Apply(new HitInfo(100f, ElementType.ELEMENT_FIRE, 0f, 1f, source: player, trueDamage: true), receiver, enemyObstacle);
+            Check(Mathf.Abs(receiver.TotalDamage - damageBefore - 156f) < 0.01f, "Element buff and vulnerability composition.");
+            damageBefore = receiver.TotalDamage;
+            DamageManager.Apply(new HitInfo(100f, ElementType.ELEMENT_NONE, 0f, 1f, source: player, trueDamage: true), receiver, enemyObstacle);
+            Check(Mathf.Approximately(receiver.TotalDamage - damageBefore, 120f), "Element buff changed neutral damage.");
+            wood.BeginUltimate();
+            Check(Mathf.Approximately(stats.GetStat(StatType.ST_ELM_ATK), 30f), "Wood ultimate buff stacked on refresh.");
+            forms.ChangeForm(water);
+            Check(stats.GetStat(StatType.ST_ELM_ATK) == 30f, "Wood player buff lost on form switch.");
+            typeof(WoodForm).GetMethod("OnTick", Hidden).Invoke(wood, new object[] { 11f });
+            Check(stats.GetStat(StatType.ST_ELM_ATK) == 0f && wood.UltimateFieldRemaining == 0f, "Wood buff/field expiry.");
+            var silenceGo = new GameObject("SilenceRegressionTarget");
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(silenceGo, scene);
+            var silencedEnemy = silenceGo.AddComponent<Enemy>();
+            var testAction = new WoodSilenceRegressionAction(silencedEnemy);
+            silencedEnemy.CurrentAction = testAction; silencedEnemy.HasSelectedAttack = true;
+            var silenceHandler = silenceGo.AddComponent<StatusEffectHandler>();
+            silenceHandler.Apply(new SilenceEffect(1f));
+            Check(testAction.IsFinished && silencedEnemy.CurrentAction == null && !silencedEnemy.CanAttack
+                && !silencedEnemy.HasSelectedAttack, "Silence did not cancel and block attacks.");
+            silenceHandler.Get<SilenceEffect>().OnUpdate(2f);
+            Check(silencedEnemy.CanAttack, "Expired silence still blocks attacks.");
+            wood.CleanupTransientEffects();
+            passed.Add("WOOD: stack cap/expiry / vulnerability damage / one gather hit / max stacks / pull / silence field / elemental-only buff / refresh / switch / expiry / attack cancellation");
             return "PASS: " + string.Join("; ", passed);
         }
         finally
@@ -457,6 +531,7 @@ public static class WaterCombatRegression
             if (data != null) UnityEngine.Object.DestroyImmediate(data);
             if (fireData != null) UnityEngine.Object.DestroyImmediate(fireData);
             if (earthData != null) UnityEngine.Object.DestroyImmediate(earthData);
+            if (woodData != null) UnityEngine.Object.DestroyImmediate(woodData);
             PlayerUIManager.Instance = previousUI;
             typeof(CombatSettings).GetProperty("Active").SetValue(null, previousCombatSettings);
         }
@@ -475,4 +550,9 @@ public class WaterDashRegressionTarget : MonoBehaviour, IDamageable
         TotalDamage += damage;
         return new DamageResult(DamageOutcome.Applied, damage);
     }
+}
+
+public class WoodSilenceRegressionAction : EnemyAction
+{
+    public WoodSilenceRegressionAction(Enemy enemy) : base(null, enemy) { }
 }

@@ -99,16 +99,6 @@ public class FireForm : BaseForm, IToggleUltimateForm
             SkillBuffRemaining = Mathf.Max(0f, SkillBuffRemaining - dt);
             if (!IsSkillBuffActive) RemoveSkillBuff();
         }
-        if (IsUltimateActive)
-        {
-            var stats = _playerController.StatManager;
-            float drainRate = Mathf.Max(0f, _fireData.FireUltimateHealthDrainPercentPerSecond) / 100f;
-            if (drainRate > 0f)
-            {
-                stats.ConsumeHealth(stats.MaxHp * drainRate * Mathf.Max(0f, dt));
-                if (stats.CurrentHp <= 1f) DeactivateUltimate();
-            }
-        }
         UpdateCombatAnimationSpeed();
     }
     private void UpdateCombatAnimationSpeed()

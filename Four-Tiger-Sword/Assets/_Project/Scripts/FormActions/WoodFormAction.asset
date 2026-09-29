@@ -381,6 +381,21 @@ MonoBehaviour:
   HitVFX: {fileID: 0}
   HitSound: {fileID: 0}
   UltimateCooldown: 35
-  AreaRadius: 4
-  FieldDuration: 5
-  HealMaxHpPerSecond: 0.05
+  MaximumStacks: 5
+  StacksPerHit: 1
+  StackLifetime: 5
+  VulnerabilityDamageBonusPercent: 20
+  VulnerabilityDuration: 6
+  SkillSpiritCost: 180
+  SkillCooldownSeconds: 12
+  SkillRadius: 4
+  SkillCenterOffset: {x: 0, y: 0, z: 2}
+  SkillDamageMultiplier: 0.5
+  PullDuration: 0.8
+  PullSpeed: 8
+  PullStopDistance: 0.5
+  ElementDamageBonusPercent: 30
+  ElementBuffDuration: 10
+  UltimateRadius: 6
+  UltimateFieldDuration: 5
+  SilenceDuration: 0.3

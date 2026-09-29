@@ -16,7 +16,13 @@ public static class DamageManager
         }
         float damage = info.BaseDamage;
         if (info.Source is PlayerController owner && owner.FormManager?.CurrentForm is BaseForm form)
+        {
             damage *= form.OutgoingDamageMultiplier;
+            if (info.Element != ElementType.ELEMENT_NONE)
+                damage *= 1f + Mathf.Max(0f, owner.StatManager.GetStat(StatType.ST_ELM_ATK)) / 100f;
+        }
+        var vulnerability = targetGO.GetComponent<StatusEffectHandler>()?.Get<VulnerabilityEffect>();
+        if (vulnerability != null && !vulnerability.IsExpired) damage *= vulnerability.DamageMultiplier;
         bool critical = false;
         if (!info.TrueDamage)
         {
