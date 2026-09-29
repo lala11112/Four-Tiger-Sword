@@ -8,8 +8,8 @@ using System.Collections.Generic;
 
 public class Enemy : MonoBehaviour, IDamageable
 {
-    public EnemyStat EnemyStat; //몬스터의 스텟텟
-    public string stateName; //디버그 전용용
+    public EnemyStat EnemyStat; //몬스터의 스텟
+    public string stateName; //디버그 전용
     public ElementType Element => EnemyStat.ElementType; //몬스터의 속성
     public float CombatRange => EnemyStat.GetStat(EnemyStatType.CombatRange); //몬스터의 전투상태 진입거리
     public float CombatExitRange => EnemyStat.GetStat(EnemyStatType.CombatExitRange); //몬스터의 전투상태 종료거리

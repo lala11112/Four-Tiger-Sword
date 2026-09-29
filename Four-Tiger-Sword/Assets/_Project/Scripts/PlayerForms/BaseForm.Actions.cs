@@ -163,13 +163,18 @@ public abstract partial class BaseForm
 
     public virtual void BeginUltimate()
     {
-        _ultimateCooldownTimer = _weaponActionData != null ? _weaponActionData.UltimateCooldown : 30f;
+        ConsumeUltimateResources();
         _currentAction = ActionType.Ultimate;
-        _playerController.StatManager.ConsumeAllUltimateGauge();
         _ultimateStep = 0;
         FindSoftTarget();
         _playerController.Animator.speed = AttackSpeed;
         PlayUltimateStep();
+    }
+
+    protected void ConsumeUltimateResources()
+    {
+        _ultimateCooldownTimer = _weaponActionData != null ? _weaponActionData.UltimateCooldown : 30f;
+        _playerController.StatManager.ConsumeAllUltimateGauge();
     }
 
     public virtual void UpdateUltimate(out bool isComplete)

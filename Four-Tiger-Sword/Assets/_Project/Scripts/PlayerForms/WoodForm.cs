@@ -2,10 +2,12 @@ using UnityEngine;
 
 public class WoodForm : BaseForm
 {
+    private readonly WoodFormActionDataSO _woodData;
+
     public override ElementType Element => ElementType.ELEMENT_WOOD;
     public override float SkillSpCost => 180f;
     public override float SkillCooldown => 12f;
-    public WoodForm(WeaponActionDataSO data) : base(data) { }
+    public WoodForm(WoodFormActionDataSO data) : base(data) { _woodData = data; }
     public override void Equip(PlayerController player)
     {
         base.Equip(player);
@@ -17,7 +19,7 @@ public class WoodForm : BaseForm
     {
         base.BeginSkill();
         Effects.StartCoroutine(Effects.Field(FirstHitTime(_weaponActionData.SkillSteps[0]) / Mathf.Max(0.1f, AttackSpeed),
-            _weaponActionData.FieldDuration, _weaponActionData.AreaRadius, EffectHit(0.5f), 0f));
+            _woodData.FieldDuration, _woodData.AreaRadius, EffectHit(0.5f), 0f));
         // TODO: 가시 덩굴 모션.
         // _playerController.Animator.CrossFade("ThornField", 0.1f);
     }
@@ -25,7 +27,7 @@ public class WoodForm : BaseForm
     {
         base.BeginUltimate();
         Effects.StartCoroutine(Effects.Field(FirstHitTime(_weaponActionData.UltimateSteps[0]) / Mathf.Max(0.1f, AttackSpeed),
-            _weaponActionData.FieldDuration, _weaponActionData.AreaRadius, EffectHit(0f), _weaponActionData.HealMaxHpPerSecond));
+            _woodData.FieldDuration, _woodData.AreaRadius, EffectHit(0f), _woodData.HealMaxHpPerSecond));
         // TODO: 태초의 숲 모션.
         // _playerController.Animator.CrossFade("PrimordialForest", 0.1f);
     }

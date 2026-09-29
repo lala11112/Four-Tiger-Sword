@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class WaterForm : BaseForm, IHeavyAttackForm
 {
+    private readonly WaterFormActionDataSO _waterData;
+
     public override ElementType Element => ElementType.ELEMENT_WATER;
     public override float SkillSpCost => 150f;
     public override float SkillCooldown => 6f;
@@ -13,11 +15,11 @@ public class WaterForm : BaseForm, IHeavyAttackForm
     public float WaterGaugeRatio => _flow.GaugeRatio;
     public int WaterGaugeSegmentCount => WaterFlowGauge.SegmentCount;
     public int HeavyAttackCharges => _flow.AvailableCharges;
-    protected override WeaponActionData HeavyAttackStep => _weaponActionData?.HeavyAttackStep;
+    protected override WeaponActionData HeavyAttackStep => _waterData?.HeavyAttackStep;
     public bool CanHeavyAttack => HeavyAttackStep != null
         && !string.IsNullOrWhiteSpace(HeavyAttackStep.AnimationName)
         && HeavyAttackStep.Duration > 0f && HeavyAttackCharges > 0;
-    public float HeavyAttackHoldTime => Mathf.Max(0.05f, _weaponActionData.HeavyAttackHoldTime);
+    public float HeavyAttackHoldTime => Mathf.Max(0.05f, _waterData.HeavyAttackHoldTime);
     public float SkillBuffRemaining { get; private set; }
     public bool IsSkillBuffActive => SkillBuffRemaining > 0f;
     public float SkillAttackBonusPercent => IsSkillBuffActive ? _appliedAttackBonus * 100f : 0f;
@@ -50,8 +52,9 @@ public class WaterForm : BaseForm, IHeavyAttackForm
     private Transform _ultimateTarget;
     private readonly Dictionary<Renderer, bool> _visibility = new();
 
-    public WaterForm(WeaponActionDataSO data) : base(data)
+    public WaterForm(WaterFormActionDataSO data) : base(data)
     {
+        _waterData = data;
         _flow = new WaterFlowGauge(data != null ? data.WaterGaugePerSegment : 100f);
     }
     public override void Equip(PlayerController player)
@@ -68,7 +71,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
     {
         base.OnHitEnemy(enemy);
         if (_currentAction == ActionType.Attack)
-            _flow.Charge(_weaponActionData.WaterNormalHitGain);
+            _flow.Charge(_waterData.WaterNormalHitGain);
     }
 
     protected override void OnTick(float dt)
@@ -88,11 +91,11 @@ public class WaterForm : BaseForm, IHeavyAttackForm
     private void ApplySkillBuff()
     {
         RemoveSkillBuff();
-        SkillBuffRemaining = Mathf.Max(0f, _weaponActionData.WaterSkillBuffDuration);
+        SkillBuffRemaining = Mathf.Max(0f, _waterData.WaterSkillBuffDuration);
         if (!IsSkillBuffActive) return;
         // Snapshot the applied modifier so later Inspector edits cannot leave residual stats.
-        _appliedAttackBonus = Mathf.Max(0f, _weaponActionData.WaterSkillAttackBonusPercent) / 100f;
-        _heavyDamageBonus = Mathf.Max(0f, _weaponActionData.WaterSkillHeavyDamageBonusPercent) / 100f;
+        _appliedAttackBonus = Mathf.Max(0f, _waterData.WaterSkillAttackBonusPercent) / 100f;
+        _heavyDamageBonus = Mathf.Max(0f, _waterData.WaterSkillHeavyDamageBonusPercent) / 100f;
         if (_appliedAttackBonus > 0f)
             _playerController.StatManager.AddModifier(StatType.ST_ATK, 0f, _appliedAttackBonus);
     }
@@ -120,7 +123,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
         _heavyDashDirection = _playerController.Input.MoveInput.sqrMagnitude > 0.01f
             ? _playerController.Movement.GetMoveDirection().normalized
             : _playerController.transform.forward;
-        _heavyDashDistance = Mathf.Max(0f, _weaponActionData.WaterHeavyDashDistance);
+        _heavyDashDistance = Mathf.Max(0f, _waterData.WaterHeavyDashDistance);
         if (continuing && HasHeavyChainTarget)
         {
             Vector3 toTarget = Vector3.ProjectOnPlane(
@@ -129,11 +132,11 @@ public class WaterForm : BaseForm, IHeavyAttackForm
             {
                 _heavyDashDirection = toTarget.normalized;
                 _heavyDashDistance = Mathf.Max(_heavyDashDistance,
-                    toTarget.magnitude + Mathf.Max(0f, _weaponActionData.WaterHeavyTargetOvershoot));
+                    toTarget.magnitude + Mathf.Max(0f, _waterData.WaterHeavyTargetOvershoot));
             }
         }
         _heavyAttackDuration = HeavyAttackStep.Duration;
-        _heavyDashDuration = Mathf.Clamp(_weaponActionData.WaterHeavyDashDuration, 0.01f, _heavyAttackDuration);
+        _heavyDashDuration = Mathf.Clamp(_waterData.WaterHeavyDashDuration, 0.01f, _heavyAttackDuration);
         _heavyAttackFinished = false;
         _heavyDashDirection = Vector3.ProjectOnPlane(_heavyDashDirection, Vector3.up).normalized;
         if (_heavyDashDirection.sqrMagnitude < 0.001f) _heavyDashDirection = _playerController.transform.forward;
@@ -221,7 +224,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
     public override void BeginSkill()
     {
         base.BeginSkill();
-        _flow.Charge(_weaponActionData.WaterSkillUseGain);
+        _flow.Charge(_waterData.WaterSkillUseGain);
         ApplySkillBuff();
         _savedExcludeLayers = _playerController.Controller.excludeLayers;
         _skillCollisionOverride = true;
@@ -287,7 +290,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
         {
             var hit = EffectHit(1.2f);
             bool firstHit = true;
-            foreach (var target in FormEffectRunner.Targets(_ultimateCenter, _weaponActionData.AreaRadius))
+            foreach (var target in FormEffectRunner.Targets(_ultimateCenter, _waterData.AreaRadius))
             {
                 if (target == null) continue;
                 var result = DamageManager.Apply(hit, (IDamageable)target, target.gameObject);

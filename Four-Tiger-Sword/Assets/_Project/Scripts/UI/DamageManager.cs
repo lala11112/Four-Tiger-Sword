@@ -15,6 +15,8 @@ public static class DamageManager
             if (!targetGO.activeInHierarchy) return default;
         }
         float damage = info.BaseDamage;
+        if (info.Source is PlayerController owner && owner.FormManager?.CurrentForm is BaseForm form)
+            damage *= form.OutgoingDamageMultiplier;
         bool critical = false;
         if (!info.TrueDamage)
         {

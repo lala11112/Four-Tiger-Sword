@@ -50,11 +50,14 @@ public static class WaterCombatRegression
         var previousUI = PlayerUIManager.Instance;
         var previousCombatSettings = CombatSettings.Active;
         var scene = EditorSceneManager.NewPreviewScene();
-        WeaponActionDataSO data = null;
+        WaterFormActionDataSO data = null;
+        FireFormActionDataSO fireData = null;
+        EarthFormActionDataSO earthData = null;
+        GameObject physicsPlayer = null, physicsEnemy = null;
         try
         {
             PlayerUIManager.Instance = null;
-            data = UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<WeaponActionDataSO>(
+            data = UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<WaterFormActionDataSO>(
                 "Assets/_Project/Scripts/FormActions/WaterFromAction.asset"));
             data.HitVFX = null; data.HitSound = null;
             data.HeavyAttackStep.SlashVFX = null; data.HeavyAttackStep.SwingSound = null;
@@ -77,6 +80,10 @@ public static class WaterCombatRegression
             ((Dictionary<StatType, float>)typeof(PlayerStatManager).GetField("baseValues", Hidden).GetValue(stats))[StatType.ST_ATK] = 100f;
             ((Dictionary<StatType, float>)typeof(PlayerStatManager).GetField("addValues", Hidden).GetValue(stats))[StatType.ST_ATK] = 0f;
             ((Dictionary<StatType, float>)typeof(PlayerStatManager).GetField("multValues", Hidden).GetValue(stats))[StatType.ST_ATK] = 0f;
+            ((Dictionary<StatType, float>)typeof(PlayerStatManager).GetField("baseValues", Hidden).GetValue(stats))[StatType.ST_ATK_SPD] = 1f;
+            ((Dictionary<StatType, float>)typeof(PlayerStatManager).GetField("addValues", Hidden).GetValue(stats))[StatType.ST_ATK_SPD] = 0f;
+            ((Dictionary<StatType, float>)typeof(PlayerStatManager).GetField("multValues", Hidden).GetValue(stats))[StatType.ST_ATK_SPD] = 0f;
+            values[StatType.ST_HP] = 1000f;
             typeof(PlayerStatManager).GetField("_currentHp", Hidden).SetValue(stats, 100f);
             Set(player, "Animator", animator); Set(player, "Input", input);
             Set(player, "Controller", go.GetComponent<CharacterController>());
@@ -128,7 +135,9 @@ public static class WaterCombatRegression
             Check(water.WaterGauge == 112f && !input.AttackBuffer.IsActive, "Canceled charge spent/leaked input.");
             passed.Add("normal combo with available gauge / charge cancellation preserves gauge");
 
-            var fire = new FireForm(data); forms.ChangeForm(fire);
+            fireData = ScriptableObject.CreateInstance<FireFormActionDataSO>();
+            JsonUtility.FromJsonOverwrite(JsonUtility.ToJson(data), fireData);
+            var fire = new FireForm(fireData); forms.ChangeForm(fire);
             Press(input, 7, 0f); attack = new PlayerAttackState(player); attack.Enter();
             Check(!attack.IsCharging && Combo(fire) == 0, "Other form attack delayed.");
             Press(input, 8, 0f); Timer(fire, 1.01f); attack.Update();
@@ -201,7 +210,7 @@ public static class WaterCombatRegression
             Vector3 dashStart = go.transform.position;
             Gauge(water).Charge(100f); water.TryBeginHeavyAttack();
             bool dashDone = false;
-            for (int i = 0; i < 120 && !dashDone; i++) water.UpdateHeavyAttack(out dashDone);
+            for (int i = 0; i < 4096 && !dashDone; i++) water.UpdateHeavyAttack(out dashDone);
             Check(dashDone && Mathf.Abs(Vector3.Distance(dashStart, go.transform.position) - data.WaterHeavyDashDistance) < 0.05f,
                 "Dash did not travel the configured distance.");
             water.EndHeavyAttack();
@@ -217,7 +226,7 @@ public static class WaterCombatRegression
             Physics.SyncTransforms();
             dashStart = go.transform.position;
             Gauge(water).Charge(100f); water.TryBeginHeavyAttack(); dashDone = false;
-            for (int i = 0; i < 120 && !dashDone; i++) water.UpdateHeavyAttack(out dashDone);
+            for (int i = 0; i < 4096 && !dashDone; i++) water.UpdateHeavyAttack(out dashDone);
             float traveled = Vector3.Distance(dashStart, go.transform.position);
             Check(dashDone && traveled > 2.5f && traveled < 5f, "Dash must cross the enemy and stop at the wall: " + traveled);
             water.EndHeavyAttack();
@@ -240,6 +249,10 @@ public static class WaterCombatRegression
             settings.ElementTable.Initialize();
             typeof(CombatSettings).GetProperty("Active").SetValue(null, settings);
             wallObstacle.SetActive(false);
+            // Physics.OverlapCapsule queries the default physics scene, unlike Controller.Move.
+            physicsPlayer = go; physicsEnemy = enemyObstacle;
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(go, UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(enemyObstacle, UnityEngine.SceneManagement.SceneManager.GetActiveScene());
             player.VerticalVelocity = 0f;
             go.transform.rotation = Quaternion.identity;
             enemyObstacle.transform.position = go.transform.position + Vector3.forward * 2f + Vector3.up * 0.8f;
@@ -249,15 +262,15 @@ public static class WaterCombatRegression
             water.TryBeginHeavyAttack();
             Check(!water.TryContinueHeavyAttack() && water.HeavyAttackCharges == 2, "Follow-up started during first dash.");
             dashDone = false;
-            for (int i = 0; i < 120 && !dashDone; i++) water.UpdateHeavyAttack(out dashDone);
+            for (int i = 0; i < 4096 && !dashDone; i++) water.UpdateHeavyAttack(out dashDone);
             Check(dashDone && receiver.Hits == 1 && water.HeavyAttackTarget == receiver.transform,
-                "First dash did not remember its damaged target.");
+                "First dash target: done=" + dashDone + ", hits=" + receiver.Hits + ", target=" + water.HeavyAttackTarget);
             Vector3 beforeReturn = go.transform.position;
             Check(water.TryContinueHeavyAttack(), "Completed dash could not continue.");
             Check(Vector3.Dot(go.transform.forward, Vector3.back) > 0.9f, "Return dash did not face the remembered target.");
             Check(receiver.Hits == 1, "Follow-up dealt damage before physically reaching target.");
             dashDone = false;
-            for (int i = 0; i < 120 && !dashDone; i++) water.UpdateHeavyAttack(out dashDone);
+            for (int i = 0; i < 4096 && !dashDone; i++) water.UpdateHeavyAttack(out dashDone);
             Check(dashDone && receiver.Hits == 2 && go.transform.position.z < beforeReturn.z,
                 "Remembered target was not hit once again on return dash.");
             water.EndHeavyAttack();
@@ -275,13 +288,175 @@ public static class WaterCombatRegression
             Check(water.HeavyAttackCharges == 1, "Queue failed after full attack completion.");
             attack.Exit();
             passed.Add("queued input waits through recovery until the full motion completes");
+
+            UnityEngine.Object.DestroyImmediate(fireData);
+            fireData = UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<FireFormActionDataSO>(
+                "Assets/_Project/Scripts/FormActions/FireFormAction.asset"));
+            // Fix test inputs on the clone; Inspector balancing on the real asset is independent.
+            fireData.FireUltimateNormalLifeStealPercent = 10f;
+            fireData.FireUltimateSkillLifeStealPercent = 25f;
+            fireData.HitVFX = null; fireData.HitSound = null;
+            foreach (var step in fireData.ComboSteps) { step.SwingSound = null; step.SlashVFX = null; }
+            foreach (var step in fireData.SkillSteps) { step.SwingSound = null; step.SlashVFX = null; }
+            fire = new FireForm(fireData); forms.ChangeForm(fire);
+            stats.RemoveModifier(StatType.ST_ATK, 0f, 0.1f);
+            typeof(PlayerStatManager).GetField("_currentHp", Hidden).SetValue(stats, 500f);
+            fire.BeginSkill(); fire.EndSkill();
+            Check(fire.IsSkillBuffActive && Mathf.Approximately(stats.GetStat(StatType.ST_ATK), 120f), "Fire skill attack buff.");
+            fire.BeginSkill(); fire.EndSkill();
+            Check(Mathf.Approximately(stats.GetStat(StatType.ST_ATK), 120f), "Fire skill buff stacked.");
+            enemyObstacle.transform.position = go.transform.position + Vector3.right * 4f;
+            Physics.SyncTransforms();
+            var query = typeof(FireForm).GetMethod("QueryOverlap", Hidden);
+            var hitStep = new WeaponActionData { Damage = 1f, HitBoxRadius = 1f, HitBoxOffset = Vector3.zero };
+            Check((int)query.Invoke(fire, new object[] { hitStep, go.transform.position }) == 0, "Normal skill radius too large.");
+            stats.AddUltimateGauge(stats.MaxUltimateGauge);
+            fireData.UltimateSteps.Clear(); // Toggle stance has no separate ultimate attack animation/data requirement.
+            Check(fire.CanUltimate, "Fire ultimate cannot activate.");
+            fire.BeginUltimate(); fire.UpdateUltimate(out bool activationDone); fire.EndUltimate();
+            Check(activationDone && fire.IsUltimateActive && stats.CurrentUltimateGauge == 0f
+                && !fire.CanUltimate && Mathf.Approximately(stats.GetStat(StatType.ST_ATK_SPD), 1.3f), "Fire stance activation/cost/speed.");
+            fire.BeginSkill(); fire.EndSkill();
+            Check((int)query.Invoke(fire, new object[] { hitStep, go.transform.position }) >= 1, "Enhanced skill radius did not expand.");
+            float damageBefore = receiver.TotalDamage;
+            DamageManager.Apply(new HitInfo(100f, ElementType.ELEMENT_FIRE, 0f, 1f, source: player, trueDamage: true), receiver, enemyObstacle);
+            Check(Mathf.Approximately(receiver.TotalDamage - damageBefore, 150f), "Fire outgoing multiplier.");
+            float hpBefore = stats.CurrentHp;
+            player.TakeDamage(10f, poiseDamage: 0f);
+            Check(Mathf.Approximately(hpBefore - stats.CurrentHp, 13f), "Fire incoming vulnerability.");
+            player.ConsumeHitReaction();
+
+            var fireTick = typeof(FireForm).GetMethod("OnTick", Hidden);
+            int drainDamageEvents = 0, drainHpEvents = 0;
+            System.Action<float, ElementType, bool> damageListener = (a, b, c) => drainDamageEvents++;
+            System.Action<float, float> hpListener = (a, b) => drainHpEvents++;
+            stats.OnDamageTaken += damageListener; stats.OnHpChanged += hpListener;
+            stats.GrantShield(100f, 10f);
+            hpBefore = stats.CurrentHp;
+            fireData.FireUltimateHealthDrainPercentPerSecond = 2f;
+            fireTick.Invoke(fire, new object[] { 0.25f });
+            fireTick.Invoke(fire, new object[] { 0.75f });
+            Check(Mathf.Abs(hpBefore - stats.CurrentHp - stats.MaxHp * 0.02f) < 0.01f
+                && stats.Shield == 100f && drainDamageEvents == 0 && drainHpEvents == 2,
+                "Fire drain must consume max HP percent directly and notify HP only.");
+            stats.OnDamageTaken -= damageListener; stats.OnHpChanged -= hpListener;
+            fireData.FireUltimateHealthDrainPercentPerSecond = 0f;
+            hpBefore = stats.CurrentHp;
+            fireTick.Invoke(fire, new object[] { 1f });
+            Check(stats.CurrentHp == hpBefore, "Zero drain setting ignored.");
+            fireData.FireUltimateHealthDrainPercentPerSecond = 2f;
+
+            enemyObstacle.transform.position = go.transform.position;
+            Physics.SyncTransforms();
+            var execute = typeof(BaseForm).GetMethod("ExecuteHit", Hidden);
+            fire.BeginAttack(); hpBefore = stats.CurrentHp; damageBefore = receiver.TotalDamage;
+            execute.Invoke(fire, new object[] { hitStep, 1f, 0f, new HashSet<IDamageable>() });
+            float normalHeal = stats.CurrentHp - hpBefore;
+            Check(normalHeal > 0f && Mathf.Abs(normalHeal - (receiver.TotalDamage - damageBefore) * 0.1f) < 0.01f, $"Fire normal lifesteal: heal={normalHeal}, damage={receiver.TotalDamage - damageBefore}, hp={hpBefore}, rate={fireData.FireUltimateNormalLifeStealPercent}.");
+            fire.EndAttack();
+            fire.BeginSkill(); hpBefore = stats.CurrentHp; damageBefore = receiver.TotalDamage;
+            execute.Invoke(fire, new object[] { hitStep, 1f, 0f, new HashSet<IDamageable>() });
+            Check(stats.CurrentHp - hpBefore > normalHeal
+                && Mathf.Abs(stats.CurrentHp - hpBefore - (receiver.TotalDamage - damageBefore) * 0.25f) < 0.01f, "Fire skill lifesteal.");
+            fire.EndSkill();
+            input.UltimateBuffer.Set();
+            typeof(PlayerController).GetMethod("TryDeactivateUltimate", Hidden).Invoke(player, null);
+            Check(!fire.IsUltimateActive && !input.UltimateBuffer.IsActive
+                && Mathf.Approximately(stats.GetStat(StatType.ST_ATK_SPD), 1f)
+                && fire.IncomingDamageMultiplier == 1f && fire.OutgoingDamageMultiplier == 1f, "Manual ultimate deactivation.");
+            fire.BeginAttack(); hpBefore = stats.CurrentHp;
+            execute.Invoke(fire, new object[] { hitStep, 1f, 0f, new HashSet<IDamageable>() });
+            Check(stats.CurrentHp == hpBefore, "Lifesteal persisted after deactivation.");
+            fire.EndAttack();
+            fire.BeginUltimate(); forms.ChangeForm(water);
+            Check(!fire.IsUltimateActive && Mathf.Approximately(stats.GetStat(StatType.ST_ATK_SPD), 1f), "Switch did not end fire ultimate.");
+            typeof(FireForm).GetMethod("OnTick", Hidden).Invoke(fire, new object[] { 7f });
+            Check(!fire.IsSkillBuffActive && Mathf.Approximately(stats.GetStat(StatType.ST_ATK), 100f), "Fire skill buff did not expire.");
+            hpBefore = stats.CurrentHp;
+            fireTick.Invoke(fire, new object[] { 1f });
+            Check(stats.CurrentHp == hpBefore, "Drain continued after form switch.");
+            forms.ChangeForm(fire); fire.BeginUltimate();
+            typeof(PlayerStatManager).GetField("_currentHp", Hidden).SetValue(stats, 2f);
+            fireTick.Invoke(fire, new object[] { 100f });
+            Check(stats.CurrentHp == 1f && !fire.IsUltimateActive
+                && fire.IncomingDamageMultiplier == 1f && fire.OutgoingDamageMultiplier == 1f
+                && Mathf.Approximately(stats.GetStat(StatType.ST_ATK_SPD), 1f), "Low HP must end stance without killing player.");
+            fireTick.Invoke(fire, new object[] { 1f });
+            Check(stats.CurrentHp == 1f, "Drain continued after automatic deactivation.");
+            passed.Add("FIRE drain: frame-independent max HP cost / shield bypass / HP event / no hit event / zero setting / switch stop / low HP automatic off");
+            passed.Add("FIRE: AoE radii / skill buff refresh-expiry / toggle cost / dealt-taken damage / speed / normal-skill lifesteal / manual off / switch cleanup");
+            earthData = UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<EarthFormActionDataSO>(
+                "Assets/_Project/Scripts/FormActions/EarthFormAction.asset"));
+            earthData.HitVFX = null; earthData.HitSound = null;
+            foreach (var step in earthData.SkillSteps) { step.SwingSound = null; step.SlashVFX = null; }
+            var earth = new EarthForm(earthData); forms.ChangeForm(earth);
+            typeof(PlayerStatManager).GetField("_currentHp", Hidden).SetValue(stats, 1000f);
+            var shieldTick = typeof(PlayerStatManager).GetMethod("UpdateShields", Hidden);
+            shieldTick.Invoke(stats, new object[] { 100f });
+            earth.BeginSkill(); earth.EndSkill();
+            Check(earth.SkillShield == 300f && earth.UltimateShield == 0f && earth.OutgoingDamageMultiplier == 1f, "Skill shield alone must not activate ultimate buff.");
+            stats.AddUltimateGauge(stats.MaxUltimateGauge);
+            earthData.UltimateSteps.Clear();
+            Check(earth.CanUltimate, "Earth shield ultimate requires unused attack steps.");
+            earth.BeginUltimate(); earth.UpdateUltimate(out bool earthDone); earth.EndUltimate();
+            Check(earthDone && stats.CurrentUltimateGauge == 0f && stats.Shield == 900f
+                && Mathf.Approximately(earth.OutgoingDamageMultiplier, 1.3f), "Independent earth shields/ultimate activation.");
+            var shieldHit = stats.TakeDamage(350f, ElementType.ELEMENT_NONE, false);
+            Check(earth.SkillShield == 0f && earth.UltimateShield == 550f && shieldHit.HealthDamage == 0f
+                && shieldHit.ShieldDamage == 350f && earth.IsUltimateDamageBuffActive, "Shield consumption ordering.");
+            earth.BeginSkill(); earth.EndSkill();
+            Check(earth.SkillShield == 300f && earth.UltimateShield == 550f, "Skill refresh changed ultimate shield.");
+            shieldTick.Invoke(stats, new object[] { 5f });
+            Check(earth.SkillShield == 0f && earth.UltimateShield == 550f && earth.IsUltimateDamageBuffActive, "Shield lifetimes not independent.");
+            stats.TakeDamage(550f, ElementType.ELEMENT_NONE, false);
+            Check(!earth.IsUltimateDamageBuffActive && earth.OutgoingDamageMultiplier == 1f, "Buff survived both shield breaks.");
+            earth.BeginSkill(); earth.EndSkill();
+            Check(earth.IsUltimateDamageBuffActive, "Skill shield failed to restore buff within ultimate duration.");
+            damageBefore = receiver.TotalDamage;
+            DamageManager.Apply(new HitInfo(100f, ElementType.ELEMENT_EARTH, 0f, 1f, source: player, trueDamage: true), receiver, enemyObstacle);
+            Check(Mathf.Approximately(receiver.TotalDamage - damageBefore, 130f), "Earth outgoing damage not applied.");
+            typeof(EarthForm).GetMethod("OnTick", Hidden).Invoke(earth, new object[] { 11f });
+            Check(earth.SkillShield > 0f && !earth.IsUltimateDamageBuffActive, "Expired ultimate still buffed skill shield.");
+            earth.CleanupTransientEffects();
+            Check(stats.Shield == 0f, "Earth shield cleanup.");
+
+            enemyObstacle.transform.position = go.transform.position + Vector3.right * 50f;
+            go.transform.rotation = Quaternion.identity;
+            Physics.SyncTransforms();
+            var advanceEarth = typeof(EarthForm).GetMethod("AdvanceSkill", Hidden);
+            Vector3 earthStart = go.transform.position;
+            earth.BeginSkill();
+            advanceEarth.Invoke(earth, new object[] { 0.2f, false });
+            advanceEarth.Invoke(earth, new object[] { 0.2f, false });
+            Check(Mathf.Abs(Vector3.Distance(earthStart, go.transform.position) - earthData.SkillDashDistance) < 0.05f, "Earth charge distance.");
+            earth.EndSkill();
+            earthStart = go.transform.position;
+            advanceEarth.Invoke(earth, new object[] { 1f, false });
+            Check(go.transform.position == earthStart, "Cancelled earth skill continued moving.");
+            enemyObstacle.transform.position = go.transform.position + Vector3.up;
+            Physics.SyncTransforms();
+            earthData.SkillDashDistance = 0f;
+            int earthHitsBefore = receiver.Hits;
+            earth.BeginSkill();
+            advanceEarth.Invoke(earth, new object[] { 0.1f, false });
+            advanceEarth.Invoke(earth, new object[] { 0.1f, false });
+            Check(receiver.Hits == earthHitsBefore + 1, "Earth charge must hit each target once.");
+            earth.EndSkill();
+            earth.BeginUltimate(); forms.ChangeForm(water);
+            Check(earth.UltimateBuffRemaining == 0f && earth.OutgoingDamageMultiplier == 1f, "Earth bonus leaked across form switch.");
+            earth.CleanupTransientEffects();
+            passed.Add("EARTH: separate shield pools / refresh / expiry / damage absorption / shield-gated ultimate damage / buff expiry / charge distance / one hit per target / cancellation / switch cleanup");
             return "PASS: " + string.Join("; ", passed);
         }
         finally
         {
             PlayerUIManager.Instance = null;
+            if (physicsPlayer != null) UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(physicsPlayer, scene);
+            if (physicsEnemy != null) UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(physicsEnemy, scene);
             EditorSceneManager.ClosePreviewScene(scene);
             if (data != null) UnityEngine.Object.DestroyImmediate(data);
+            if (fireData != null) UnityEngine.Object.DestroyImmediate(fireData);
+            if (earthData != null) UnityEngine.Object.DestroyImmediate(earthData);
             PlayerUIManager.Instance = previousUI;
             typeof(CombatSettings).GetProperty("Active").SetValue(null, previousCombatSettings);
         }
@@ -291,11 +466,13 @@ public static class WaterCombatRegression
 public class WaterDashRegressionTarget : MonoBehaviour, IDamageable
 {
     public int Hits;
+    public float TotalDamage;
     public DamageResult TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE,
         bool isCritical = false, Vector3 power = default, float poiseDamage = 20f,
         StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE, bool isParryable = true, object source = null)
     {
         Hits++;
+        TotalDamage += damage;
         return new DamageResult(DamageOutcome.Applied, damage);
     }
 }

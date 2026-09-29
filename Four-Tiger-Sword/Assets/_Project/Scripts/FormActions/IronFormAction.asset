@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6958ed5f106d2834fa69c4f7432303d3, type: 3}
+  m_Script: {fileID: 11500000, guid: 2cabcad0b29897844aa43b6df0763a92, type: 3}
   m_Name: IronFormAction
   m_EditorClassIdentifier: Assembly-CSharp::WeaponActionDataSO
   WeaponName: 
@@ -156,9 +156,9 @@ MonoBehaviour:
     RotationEndTime: 0.2
     MaxApproachDistance: 2
   ParryAnimationName: Parry
-  AirAttackStartAnimationName:
+  AirAttackStartAnimationName: 
   AirAttackStartDuration: 0.15
-  AirAttackLoopAnimationName:
+  AirAttackLoopAnimationName: 
   AirAttackStep:
     AnimationName: 
     Duration: 0.5
@@ -378,10 +378,4 @@ MonoBehaviour:
     MaxApproachDistance: 2
   HitVFX: {fileID: 0}
   HitSound: {fileID: 0}
-  DelayedHitVFX: {fileID: 0}
   UltimateCooldown: 30
-  AreaRadius: 4
-  FieldDuration: 5
-  HealMaxHpPerSecond: 0.05
-  ShieldAmount: 300
-  ShieldDuration: 5

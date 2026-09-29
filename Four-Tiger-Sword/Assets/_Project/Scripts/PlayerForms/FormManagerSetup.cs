@@ -4,7 +4,7 @@ public class FormManagerSetup
 
     public FormManagerSetup(PlayerController playerController) {_playerController = playerController;}
 
-    public FormManager Build(WeaponActionDataSO FireFormActionData, WeaponActionDataSO WaterFormActionData, WeaponActionDataSO WoodFormActionData, WeaponActionDataSO IronFormActionData, WeaponActionDataSO EarthFormActionData)
+    public FormManager Build(FireFormActionDataSO FireFormActionData, WaterFormActionDataSO WaterFormActionData, WoodFormActionDataSO WoodFormActionData, IronFormActionDataSO IronFormActionData, EarthFormActionDataSO EarthFormActionData)
     {
         var formManager = new FormManager(_playerController);
         var fireForm  = new FireForm(FireFormActionData);

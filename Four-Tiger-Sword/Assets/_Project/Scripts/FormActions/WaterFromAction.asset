@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6958ed5f106d2834fa69c4f7432303d3, type: 3}
+  m_Script: {fileID: 11500000, guid: b5f3de366a60d6048a74f5a12932b470, type: 3}
   m_Name: WaterFromAction
   m_EditorClassIdentifier: Assembly-CSharp::WeaponActionDataSO
   WeaponName: 
@@ -239,64 +239,6 @@ MonoBehaviour:
     ApproachEndTime: 0.13333334
     RotationEndTime: 0.13333334
     MaxApproachDistance: 2
-  HeavyAttackStep:
-    AnimationName: WaterSkill
-    Duration: 1.1666667
-    ComboTransitionTime: 0
-    Damage: 2.4
-    PoiseDamage: 40
-    HitStartTime: 0
-    HitDuration: 0.35
-    HitBoxOffset: {x: 0, y: 0.8, z: 0}
-    HitBoxShape: 0
-    HitBoxRadius: 0.8
-    HitBoxSize: {x: 0, y: 0, z: 0}
-    HitBoxHeight: 0
-    KnockbackForce: 0
-    StaggerResistLevel: 2
-    HitEvents: []
-    SlashVFX: {fileID: 0}
-    SwingSound: {fileID: 0}
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 0
-    UseTargetApproach: 0
-    StopDistance: 0.25
-    ApproachEndTime: 0.13333334
-    RotationEndTime: 0.13333334
-    MaxApproachDistance: 2
-  HeavyAttackHoldTime: 0.35
-  WaterHeavyDashDistance: 6
-  WaterHeavyDashDuration: 0.35
-  WaterHeavyTargetOvershoot: 1
-  WaterGaugePerSegment: 100
-  WaterNormalHitGain: 12
-  WaterSkillUseGain: 100
-  WaterSkillBuffDuration: 6
-  WaterSkillAttackBonusPercent: 20
-  WaterSkillHeavyDamageBonusPercent: 30
   ParryAnimationName: WaterParry
   AirAttackStartAnimationName: WaterAirStart
   AirAttackStartDuration: 0.3
@@ -513,11 +455,64 @@ MonoBehaviour:
     MaxApproachDistance: 2
   HitVFX: {fileID: 1089465354904564, guid: f0855940e22dbcd4aad5ca152a089348, type: 3}
   HitSound: {fileID: 0}
-  DelayedHitVFX: {fileID: 1089465354904564, guid: f0855940e22dbcd4aad5ca152a089348, type: 3}
-  FireExplosionDelay: 0.15
   UltimateCooldown: 25
+  HeavyAttackStep:
+    AnimationName: WaterSkill
+    Duration: 0.8
+    ComboTransitionTime: 0
+    Damage: 2.4
+    PoiseDamage: 40
+    HitStartTime: 0
+    HitDuration: 0.35
+    HitBoxOffset: {x: 0, y: 0.8, z: 0}
+    HitBoxShape: 0
+    HitBoxRadius: 0.8
+    HitBoxSize: {x: 0, y: 0, z: 0}
+    HitBoxHeight: 0
+    KnockbackForce: 0
+    StaggerResistLevel: 2
+    HitEvents: []
+    SlashVFX: {fileID: 0}
+    SwingSound: {fileID: 0}
+    ThrustCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ThrustMultiplier: 0
+    UseTargetApproach: 0
+    StopDistance: 0.25
+    ApproachEndTime: 0.13333334
+    RotationEndTime: 0.13333334
+    MaxApproachDistance: 2
+  HeavyAttackHoldTime: 0.35
+  WaterHeavyDashDistance: 6
+  WaterHeavyDashDuration: 0.35
+  WaterHeavyTargetOvershoot: 1
+  WaterGaugePerSegment: 100
+  WaterNormalHitGain: 12
+  WaterSkillUseGain: 100
+  WaterSkillBuffDuration: 6
+  WaterSkillAttackBonusPercent: 20
+  WaterSkillHeavyDamageBonusPercent: 30
+  DelayedHitVFX: {fileID: 1089465354904564, guid: f0855940e22dbcd4aad5ca152a089348, type: 3}
   AreaRadius: 4
-  FieldDuration: 5
-  HealMaxHpPerSecond: 0.05
-  ShieldAmount: 300
-  ShieldDuration: 5

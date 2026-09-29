@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6958ed5f106d2834fa69c4f7432303d3, type: 3}
+  m_Script: {fileID: 11500000, guid: b4a81cb3897436c46882329f462be168, type: 3}
   m_Name: FireFormAction
   m_EditorClassIdentifier: Assembly-CSharp::WeaponActionDataSO
   WeaponName: Fire
@@ -467,11 +467,15 @@ MonoBehaviour:
     MaxApproachDistance: 2
   HitVFX: {fileID: 1766868900565162, guid: f82a1a892a042c1438f8f4704a37e11b, type: 3}
   HitSound: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
-  DelayedHitVFX: {fileID: 0}
-  FireExplosionDelay: 0.15
   UltimateCooldown: 30
-  AreaRadius: 4
-  FieldDuration: 5
-  HealMaxHpPerSecond: 0.05
-  ShieldAmount: 300
-  ShieldDuration: 5
+  FireSkillRadius: 3
+  FireEnhancedSkillRadius: 5
+  FireSkillBuffDuration: 6
+  FireSkillAttackBonusPercent: 20
+  FireUltimateHealthDrainPercentPerSecond: 2
+  FireUltimateDamageDealtBonusPercent: 50
+  FireUltimateDamageTakenBonusPercent: 30
+  FireUltimateAttackSpeedBonusPercent: 30
+  FireUltimateNormalLifeStealPercent: 50
+  FireUltimateSkillLifeStealPercent: 80
+  FireExplosionDelay: 0.15

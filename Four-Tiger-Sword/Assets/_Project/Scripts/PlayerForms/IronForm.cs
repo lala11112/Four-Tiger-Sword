@@ -6,7 +6,7 @@ public class IronForm : BaseForm
     public override float SkillSpCost => 200f;
     public override float SkillCooldown => 10f;
     protected override bool DealsTrueDamage => _currentAction == ActionType.Ultimate;
-    public IronForm(WeaponActionDataSO data) : base(data) { }
+    public IronForm(IronFormActionDataSO data) : base(data) { }
     public override void Equip(PlayerController player)
     {
         base.Equip(player);

@@ -5,7 +5,7 @@ public abstract partial class BaseForm
 {
     private readonly Dictionary<int, HashSet<IDamageable>> _hitEventTargets = new();
     private float _previousHitTime;
-    private Collider[] _overlapBuffer = new Collider[32];
+    protected Collider[] _overlapBuffer = new Collider[32];
 
     private void ClearHitTargets()
     {
@@ -81,7 +81,7 @@ public abstract partial class BaseForm
                 firstHit = false;
             }
             _playerController.ImpulseSource?.GenerateImpulse();
-            OnHitEnemy(target);
+            OnDamageDealt(target, result);
         }
     }
 
@@ -96,7 +96,7 @@ public abstract partial class BaseForm
         }
     }
 
-    private int QueryOverlap(WeaponActionData step, Vector3 center)
+    protected virtual int QueryOverlap(WeaponActionData step, Vector3 center)
     {
         switch (step.HitBoxShape)
         {

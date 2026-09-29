@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6958ed5f106d2834fa69c4f7432303d3, type: 3}
+  m_Script: {fileID: 11500000, guid: 0c803fbe92d97884fbc400a3b6eb9f02, type: 3}
   m_Name: EarthFormAction
   m_EditorClassIdentifier: Assembly-CSharp::WeaponActionDataSO
   WeaponName: 
@@ -127,9 +127,9 @@ MonoBehaviour:
     RotationEndTime: 0.2
     MaxApproachDistance: 2
   ParryAnimationName: Parry
-  AirAttackStartAnimationName:
+  AirAttackStartAnimationName: 
   AirAttackStartDuration: 0.15
-  AirAttackLoopAnimationName:
+  AirAttackLoopAnimationName: 
   AirAttackStep:
     AnimationName: 
     Duration: 0.5
@@ -324,11 +324,17 @@ MonoBehaviour:
     MaxApproachDistance: 2
   HitVFX: {fileID: 0}
   HitSound: {fileID: 0}
-  DelayedHitVFX: {fileID: 0}
-  FireExplosionDelay: 0.15
   UltimateCooldown: 40
-  AreaRadius: 4
-  FieldDuration: 5
-  HealMaxHpPerSecond: 0.05
+  SkillSpiritCost: 150
+  SkillCooldownSeconds: 8
+  SkillDashDistance: 5
+  SkillDashDuration: 0.4
+  SkillDashDamageMultiplier: 2
+  SkillDashHitRadius: 1.2
+  SkillDashHitOffset: {x: 0, y: 1, z: 0.8}
   ShieldAmount: 300
   ShieldDuration: 5
+  UltimateShieldAmount: 600
+  UltimateShieldDuration: 10
+  UltimateBuffDuration: 10
+  UltimateShieldDamageBonusPercent: 30

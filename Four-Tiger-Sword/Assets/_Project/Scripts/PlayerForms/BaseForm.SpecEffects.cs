@@ -14,6 +14,9 @@ public abstract partial class BaseForm
         => target.GetComponent<FormTargetEffects>() ?? target.AddComponent<FormTargetEffects>();
 
     protected virtual bool DealsTrueDamage => false;
+    public virtual float OutgoingDamageMultiplier => 1f;
+    public virtual float IncomingDamageMultiplier => 1f;
+    protected virtual void OnDamageDealt(GameObject target, DamageResult result) => OnHitEnemy(target);
     public virtual bool BlocksIncomingDamage(float damage, Vector3 incomingPower, object source = null) => false;
     public virtual void CleanupTransientEffects() { }
 

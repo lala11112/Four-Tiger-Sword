@@ -42,8 +42,10 @@ public abstract partial class BaseForm : IForm
         && _skillCooldownTimer <= 0f && _playerController.StatManager.HasEnoughSp(SkillSpCost);
 
     /// <summary>필살기 사용 가능 여부: 필살기 게이지가 가득 찼는지 확인합니다 (SP/쿨타임 무관).</summary>
-    public bool CanUltimate => HasSteps(_weaponActionData?.UltimateSteps)
-        && _ultimateCooldownTimer <= 0f && _playerController.StatManager.IsUltimateGaugeReady;
+    public virtual bool CanUltimate => HasSteps(_weaponActionData?.UltimateSteps)
+        && UltimateResourcesReady;
+    protected bool UltimateResourcesReady => _ultimateCooldownTimer <= 0f
+        && _playerController.StatManager.IsUltimateGaugeReady;
 
     /// <summary>공격 속도 배율. 1.0 = 기본, 2.0 = 2배 빠름. 스탯 시스템에서 읽어옵니다.</summary>
     protected float AttackSpeed => _playerController?.StatManager?.GetStat(StatType.ST_ATK_SPD) ?? 1f;

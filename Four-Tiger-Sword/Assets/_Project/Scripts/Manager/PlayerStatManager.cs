@@ -181,8 +181,7 @@ public class PlayerStatManager : MonoBehaviour
     {
         if (_currentHp <= 0f || damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return default;
         float hpBefore = _currentHp;
-        float absorbed = Mathf.Min(Shield, Mathf.Max(0, damage));
-        Shield -= absorbed;
+        float absorbed = AbsorbWithShields(Mathf.Max(0f, damage));
         damage = Mathf.Max(0f, damage - absorbed);
         _currentHp = Mathf.Max(0f, _currentHp - damage);
         float healthDamage = hpBefore - _currentHp;
@@ -282,12 +281,53 @@ public class PlayerStatManager : MonoBehaviour
     public float MaxHp => GetStat(StatType.ST_HP);
     public float MaxSp => GetStat(StatType.ST_SP);
 
-    public float Shield { get; private set; }
-    private float _shieldTimer;
-    public void GrantShield(float amount, float duration)
+    private sealed class ShieldLayer
     {
-        Shield = Mathf.Max(Shield, amount);
-        _shieldTimer = Mathf.Max(0f, duration);
+        public object Source;
+        public float Amount, Remaining;
+    }
+    private readonly List<ShieldLayer> _shields = new();
+    private readonly object _defaultShieldSource = new();
+    public float Shield
+    {
+        get { float total = 0f; foreach (var layer in _shields) total += layer.Amount; return total; }
+    }
+    public void GrantShield(float amount, float duration)
+        => GrantShield(_defaultShieldSource, Mathf.Max(GetShield(_defaultShieldSource), amount), duration);
+
+    /// <summary>출처별 방어막. 같은 출처는 교체하고 다른 출처는 독립적으로 유지합니다.</summary>
+    public void GrantShield(object source, float amount, float duration)
+    {
+        if (source == null) return;
+        RemoveShield(source);
+        if (amount <= 0f || duration <= 0f || float.IsNaN(amount) || float.IsInfinity(amount)
+            || float.IsNaN(duration) || float.IsInfinity(duration)) return;
+        _shields.Add(new ShieldLayer { Source = source, Amount = amount, Remaining = duration });
+    }
+    public float GetShield(object source) => _shields.Find(layer => ReferenceEquals(layer.Source, source))?.Amount ?? 0f;
+    public float GetShieldRemaining(object source) => _shields.Find(layer => ReferenceEquals(layer.Source, source))?.Remaining ?? 0f;
+    public void RemoveShield(object source) => _shields.RemoveAll(layer => ReferenceEquals(layer.Source, source));
+    private float AbsorbWithShields(float damage)
+    {
+        float remaining = damage;
+        // 먼저 부여된 방어막부터 소모합니다.
+        for (int i = 0; i < _shields.Count && remaining > 0f;)
+        {
+            var layer = _shields[i];
+            float absorbed = Mathf.Min(layer.Amount, remaining);
+            layer.Amount -= absorbed;
+            remaining -= absorbed;
+            if (layer.Amount <= 0f) _shields.RemoveAt(i); else i++;
+        }
+        return damage - remaining;
+    }
+    private void UpdateShields(float dt)
+    {
+        for (int i = _shields.Count - 1; i >= 0; i--)
+        {
+            _shields[i].Remaining -= Mathf.Max(0f, dt);
+            if (_shields[i].Remaining <= 0f) _shields.RemoveAt(i);
+        }
     }
     public void Heal(float amount)
     {
@@ -295,10 +335,18 @@ public class PlayerStatManager : MonoBehaviour
         _currentHp = Mathf.Min(MaxHp, _currentHp + amount);
         OnHpChanged?.Invoke(_currentHp, MaxHp);
     }
+    /// <summary>체력을 비용으로 소모합니다. 보호막과 피격 이벤트를 거치지 않으며 최소 체력을 남깁니다.</summary>
+    public void ConsumeHealth(float amount, float minimumHp = 1f)
+    {
+        if (amount <= 0f || float.IsNaN(amount) || float.IsInfinity(amount)
+            || float.IsNaN(minimumHp) || float.IsInfinity(minimumHp)) return;
+        float cost = Mathf.Min(amount, Mathf.Max(0f, _currentHp - Mathf.Max(0f, minimumHp)));
+        if (cost <= 0f) return;
+        _currentHp -= cost;
+        OnHpChanged?.Invoke(_currentHp, MaxHp);
+    }
     private void Update()
     {
-        if (_shieldTimer <= 0f) { Shield = 0f; return; }
-        _shieldTimer -= Time.deltaTime;
-        if (_shieldTimer <= 0f) Shield = 0f;
+        UpdateShields(Time.deltaTime);
     }
 }

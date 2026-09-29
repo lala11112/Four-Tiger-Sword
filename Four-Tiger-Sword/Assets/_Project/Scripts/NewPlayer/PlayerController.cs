@@ -73,11 +73,11 @@ public class PlayerController : MonoBehaviour, IDamageable
     public float KnockbackDuration => Mathf.Max(0f, _knockbackDuration);
 
     [Header("CombatData")]
-    [SerializeField] private WeaponActionDataSO _FireFormActionData;
-    [SerializeField] private WeaponActionDataSO _WaterFormActionData;
-    [SerializeField] private WeaponActionDataSO _WoodFormActionData;
-    [SerializeField] private WeaponActionDataSO _IronFormActionData;
-    [SerializeField] private WeaponActionDataSO _EarthFormActionData;
+    [SerializeField] private FireFormActionDataSO _FireFormActionData;
+    [SerializeField] private WaterFormActionDataSO _WaterFormActionData;
+    [SerializeField] private WoodFormActionDataSO _WoodFormActionData;
+    [SerializeField] private IronFormActionDataSO _IronFormActionData;
+    [SerializeField] private EarthFormActionDataSO _EarthFormActionData;
 
     [Tooltip("넉백 저항값. 이 값보다 작은 힘은 밀리지 않음")]
     [SerializeField] private float _knockbackResistance = 3f;
@@ -136,8 +136,20 @@ public class PlayerController : MonoBehaviour, IDamageable
         UpdateParryCooldown();
         StatManager.UpdateStamina(Time.deltaTime);
         StatManager.UpdateSpRegen(Time.deltaTime);
+        TryDeactivateUltimate();
         StateMachine.Update();
         FormManager.Update();
+    }
+
+    private void TryDeactivateUltimate()
+    {
+        // Turning a stance off remains available while attacking, dashing or reacting to a hit.
+        if (Input.UltimateBuffer.IsActive && FormManager.CurrentForm is IToggleUltimateForm toggle
+            && toggle.IsUltimateActive)
+        {
+            Input.UltimateBuffer.Consume();
+            toggle.DeactivateUltimate();
+        }
     }
 
     private void UpdateCoyoteTimer()
@@ -219,6 +231,7 @@ public class PlayerController : MonoBehaviour, IDamageable
         }
 
         Debug.Log("플레이어 피격!");
+        damage *= (FormManager.CurrentForm as BaseForm)?.IncomingDamageMultiplier ?? 1f;
         var result = StatManager.TakeDamage(damage, damageType, isCritical);
         if (result.Applied && !result.Killed && result.HealthDamage + result.ShieldDamage > 0f)
             RequestHitReaction(power, poiseDamage, staggerResistLevel);
