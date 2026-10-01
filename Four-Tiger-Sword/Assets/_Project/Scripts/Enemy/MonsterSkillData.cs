@@ -30,6 +30,10 @@ public abstract class MonsterSkillData : ScriptableObject
     [Min(0.01f)]
     public float attackSpeed = 1.0f;
 
+    [Header("경직 강도")]
+    [Tooltip("플레이어의 Hit Stagger Resistance보다 높을 때만 피격/경직/넉백을 일으킵니다. 같거나 낮으면 피해만 줍니다.")]
+    public StaggerResistLevel staggerLevel = StaggerResistLevel.LOW;
+
     [Header("패링")]
     [Tooltip("false로 설정하면 플레이어의 패링으로 이 공격을 막을 수 없습니다.")]
     public bool isParryable = true;

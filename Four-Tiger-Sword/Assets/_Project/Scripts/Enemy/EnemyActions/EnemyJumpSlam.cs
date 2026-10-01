@@ -182,7 +182,7 @@ public class EnemyJumpSlam : EnemyAction
             Vector3 knockback = GetKnockbackDirection(col) * _data.knockbackForce;
             DamageManager.Apply(
                 new HitInfo(_data.damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
-                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: knockback, isParryable: _data.isParryable, source: this),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: knockback, staggerResistLevel: _data.staggerLevel, isParryable: _data.isParryable, source: this),
                 damageable, col.gameObject);
         }
     }

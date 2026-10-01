@@ -62,7 +62,7 @@ public class EnemyComboAttack : EnemyAction
             if (damageable == null || !_hitTargets[index].Add(damageable)) continue;
             DamageManager.Apply(
                 new HitInfo(damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
-                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: GetKnockbackDirection(col) * _data.knockbackForce, isParryable: _data.isParryable, source: this),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: GetKnockbackDirection(col) * _data.knockbackForce, staggerResistLevel: _data.staggerLevel, isParryable: _data.isParryable, source: this),
                 damageable, col.gameObject);
         }
     }

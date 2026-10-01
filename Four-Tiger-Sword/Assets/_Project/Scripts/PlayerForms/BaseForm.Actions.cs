@@ -26,9 +26,8 @@ public abstract partial class BaseForm
         _timer += Time.deltaTime * AttackSpeed;
         WeaponActionData currentStep = _weaponActionData.ComboSteps[_comboStep];
 
-        ProcessHit(currentStep);
-
         MoveForward(currentStep);
+        ProcessHit(currentStep);
 
         if (_timer >= currentStep.Duration)
             isComplete = true;
@@ -140,8 +139,8 @@ public abstract partial class BaseForm
 
         _timer += Time.deltaTime * AttackSpeed;
         WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
-        ProcessHit(step);
         MoveForward(step);
+        ProcessHit(step);
 
         if (_timer >= step.Duration)
         {
@@ -184,8 +183,8 @@ public abstract partial class BaseForm
 
         _timer += Time.deltaTime * AttackSpeed;
         WeaponActionData step = _weaponActionData.UltimateSteps[_ultimateStep];
-        ProcessHit(step);
         MoveForward(step);
+        ProcessHit(step);
 
         if (_timer >= step.Duration)
         {
@@ -208,6 +207,7 @@ public abstract partial class BaseForm
     {
         _currentAction = ActionType.Counter;
         _timer = 0f;
+        _motionStep = null;
         FindSoftTarget();
         ClearHitTargets();
         _playerController.Animator.speed = AttackSpeed;
@@ -228,8 +228,8 @@ public abstract partial class BaseForm
         if (step == null) { isComplete = true; return; }
 
         _timer += Time.deltaTime * AttackSpeed;
-        ProcessHit(step);
         MoveForward(step);
+        ProcessHit(step);
 
         if (_timer >= step.Duration)
             isComplete = true;
@@ -242,78 +242,4 @@ public abstract partial class BaseForm
         _playerController.Animator.speed = 1f;
     }
 
-    // ── 공통 이동 헬퍼 ────────────────────────────────────────────────────────
-
-    private Collider _softTargetCollider;
-    private bool _approachingTarget;
-    private float _approachTravel;
-    private float _previousMoveTime;
-
-    private void ResetTargetApproach(WeaponActionData step)
-    {
-        _approachTravel = 0f;
-        _previousMoveTime = 0f;
-        FindSoftTarget(step.UseTargetApproach);
-        _approachingTarget = step.UseTargetApproach && _softTargetCollider != null;
-    }
-
-    private static float LimitApproachDistance(float requested, float surfaceGap, float stopDistance, float remainingBudget)
-        => Mathf.Min(Mathf.Max(0f, requested), Mathf.Max(0f, surfaceGap - stopDistance), Mathf.Max(0f, remainingBudget));
-
-    protected void MoveForward(WeaponActionData step)
-    {
-        if (step.Duration <= 0f) return;
-
-        // Basic/heavy attacks share approach limits; skills retain their own dash movement.
-        bool useApproach = (_currentAction == ActionType.Attack || _currentAction == ActionType.HeavyAttack)
-            && step.UseTargetApproach && _approachingTarget;
-        bool targetAlive = _softTarget != null && _softTargetCollider != null
-            && _softTargetCollider.enabled && _softTargetCollider.gameObject.activeInHierarchy;
-        float previousTime = _previousMoveTime;
-        _previousMoveTime = _timer;
-
-        if (!useApproach)
-            RotateTowardSoftTarget();
-        else if (targetAlive && _timer <= step.RotationEndTime)
-        {
-            Vector3 toTarget = Vector3.ProjectOnPlane(_softTarget.position - _playerController.transform.position, Vector3.up);
-            if (Vector3.Dot(_playerController.transform.forward, toTarget) > 0f)
-                RotateTowardSoftTarget();
-        }
-
-        // 1. 현재 애니메이션이 몇 % 진행되었는지 구함 (0.0 ~ 1.0)
-        float normalizedTime = Mathf.Clamp01(_timer / step.Duration);
-
-        // 2. 커브에서 현재 %에 해당하는 값을 빼와서 Multiplier를 곱함
-        float currentThrust = (step.ThrustCurve?.Evaluate(normalizedTime) ?? 0f) * step.ThrustMultiplier;
-
-        float distance = currentThrust * Time.deltaTime;
-        if (useApproach && distance > 0f)
-        {
-            if (!targetAlive || previousTime >= step.ApproachEndTime)
-                distance = 0f;
-            else
-            {
-                // 종료 시점을 넘는 프레임은 남은 구간만 사용합니다.
-                float interval = _timer - previousTime;
-                if (interval > 0f)
-                    distance *= Mathf.Clamp01((step.ApproachEndTime - previousTime) / interval);
-                CharacterController controller = _playerController.Controller;
-                Vector3 center = controller.bounds.center;
-                Vector3 closest = _softTargetCollider.ClosestPoint(center);
-                float radius = controller.radius * Mathf.Max(Mathf.Abs(controller.transform.lossyScale.x), Mathf.Abs(controller.transform.lossyScale.z));
-                float gap = Vector3.ProjectOnPlane(closest - center, Vector3.up).magnitude - radius;
-                distance = LimitApproachDistance(distance, gap, step.StopDistance, step.MaxApproachDistance - _approachTravel);
-                if (Vector3.Dot(_playerController.transform.forward, Vector3.ProjectOnPlane(_softTarget.position - center, Vector3.up)) <= 0f)
-                    distance = 0f;
-            }
-        }
-
-        Vector3 before = _playerController.transform.position;
-        Vector3 delta = _playerController.transform.forward * distance;
-        delta.y = _playerController.VerticalVelocity * Time.deltaTime;
-        _playerController.Controller.Move(delta);
-        if (useApproach && distance > 0f)
-            _approachTravel += Vector3.ProjectOnPlane(_playerController.transform.position - before, Vector3.up).magnitude;
-    }
 }

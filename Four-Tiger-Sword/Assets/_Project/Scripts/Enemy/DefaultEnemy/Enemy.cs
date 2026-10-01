@@ -33,6 +33,8 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool HasSelectedAttack { get; set; }
 
     private StateMachine _stateMachine;
+    private EnemySelfDestructState _selfDestructState;
+    public bool IsSelfDestructing { get; private set; }
     private IEnemySensor _sensor;
     private NavMeshAgent _navMeshAgent;
     private Coroutine _knockbackCoroutine;
@@ -127,6 +129,7 @@ public class Enemy : MonoBehaviour, IDamageable
             var dieState = new EnemyDieState(this);
             var groggyState = new EnemyGroggyState(this);
             var rootState = new EnemyRootState(this);
+            _selfDestructState = new EnemySelfDestructState(this);
             // Idle → Trace: 플레이어 감지 또는 피격 어그로
             _stateMachine.AddTransition(idleState, traceState, () => DetectedTarget != null || HasTargetMemory);
 
@@ -155,6 +158,7 @@ public class Enemy : MonoBehaviour, IDamageable
             _stateMachine.AddTransition(groggyState, traceState, () => !IsGroggy);
 
             _stateMachine.AddAnyTransition(dieState, () => _isDie);
+            _stateMachine.AddAnyTransition(_selfDestructState, () => IsSelfDestructing);
             _stateMachine.AddAnyTransition(hurtState, () => IsHurt && !IsGroggy);
             _stateMachine.AddAnyTransition(groggyState, () => IsGroggy);
             _stateMachine.AddAnyTransition(rootState, () => IsRoot);
@@ -185,6 +189,7 @@ public class Enemy : MonoBehaviour, IDamageable
             }
             return;
         }
+        TryStartSelfDestruct();
         _sensor?.DetectTarget();
         if (DetectedTarget != null) RememberTargetPosition(DetectedTarget.position);
         _stateMachine.Update();
@@ -223,7 +228,9 @@ public class Enemy : MonoBehaviour, IDamageable
         float healthDamage = hpBefore - EnemyStat.CurrentHp;
         OnDamaged?.Invoke(healthDamage, damageType, isCritical);
 
-        if (power != Vector3.zero)
+        if (EnemyStat.CurrentHp > 0f) TryStartSelfDestruct();
+
+        if (power != Vector3.zero && !IsSelfDestructing)
             ApplyKnockback(power);
 
         if (EnemyStat.CurrentHp <= 0)
@@ -232,6 +239,26 @@ public class Enemy : MonoBehaviour, IDamageable
             OnDied?.Invoke();
         }
         return new DamageResult(DamageOutcome.Applied, healthDamage, killed: EnemyStat.CurrentHp <= 0f);
+    }
+
+    private void TryStartSelfDestruct()
+    {
+        if (_isDie || IsSelfDestructing || _stateMachine == null || _selfDestructState == null) return;
+        var data = EnemyStat.MonsterSkillData?.selfDestruct;
+        if (data == null || !data.ShouldTrigger(EnemyStat)) return;
+        IsSelfDestructing = true;
+        StopKnockback();
+        _stateMachine.ChangeState(_selfDestructState);
+    }
+
+    public void CompleteSelfDestruct(EnemySelfDestruct action)
+    {
+        if (_isDie || !IsSelfDestructing || CurrentAction != action) return;
+        float remainingHp = EnemyStat.CurrentHp;
+        EnemyStat.CurrentHp = 0f;
+        Die();
+        OnDamaged?.Invoke(remainingHp, Element, false);
+        OnDied?.Invoke();
     }
 
     /// <summary>
@@ -316,7 +343,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public float GetAttackSelectionWeight(MonsterSkillData skill, float distance)
     {
-        if (skill == null || skill.weight <= 0f || distance < skill.minimumRange
+        if (skill == null || skill is MonsterSelfDestructSO || skill.weight <= 0f || distance < skill.minimumRange
             || distance > skill.engageRange || skill.minimumRange > skill.executeRange
             || (_skillReadyAt.TryGetValue(skill, out float readyAt) && Time.time < readyAt))
             return 0f;

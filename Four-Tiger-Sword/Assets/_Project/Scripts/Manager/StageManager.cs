@@ -24,6 +24,27 @@ public class StageManager : MonoBehaviour
     public event Action OnStageClear;
     public event Action OnStageStart;
 
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (_spawnEntries == null) return;
+
+        for (int i = 0; i < _spawnEntries.Length; i++)
+        {
+            GameObject source = _spawnEntries[i].Prefab;
+            if (source == null || !source.scene.IsValid()) continue;
+
+            // Clone the asset, never a scene enemy whose death/dash can disable its collider.
+            string path = UnityEditor.PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(source);
+            GameObject prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (prefab != null)
+                _spawnEntries[i].Prefab = prefab;
+            else
+                Debug.LogWarning($"[StageManager] {source.name}은 씬 오브젝트입니다. 스폰 목록에는 Project 창의 몬스터 프리팹을 지정하세요.", this);
+        }
+    }
+#endif
+
     private void Start()
     {
         SpawnAll();

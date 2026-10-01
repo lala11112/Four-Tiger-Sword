@@ -85,20 +85,37 @@ public class WeaponActionData
     [Tooltip("휘두르는 사운드")]
     public AudioClip SwingSound;
 
-    [Tooltip("시간에 따른 전진 속도 그래프 (X축: 0~1 진행도, Y축: 속도 비율)")]
+    [Header("Attack Movement")]
+    [Tooltip("켜면 아래 거리/시간/누적 커브 사용. 끄면 기존 Thrust 속도 커브를 누적 거리로 자동 변환합니다.")]
+    public bool UseDistanceMovement;
+    [Min(0f), Tooltip("충돌과 타깃 정지 제한이 없을 때의 총 전진 거리 (m)")]
+    public float ForwardDistance = 2f;
+    [Min(0f), Tooltip("전진 시작 시점 (공격 시간). 시작 전 타깃 방향으로 회전합니다.")]
+    public float MovementStartTime = 0.08f;
+    [Min(0f), Tooltip("전진 종료 시점 (공격 시간). Duration 이내로 제한됩니다.")]
+    public float MovementEndTime = 0.3f;
+    [Tooltip("누적 이동 진행률: (0,0)에서 (1,1)로 증가. 속도 커브가 아닙니다.")]
+    public AnimationCurve MovementProgress = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+    [Range(0f, 1f), Tooltip("공격 시작 시 타깃이 없을 때 거리 배율. 0=제자리, 1=동일 거리")]
+    public float UntargetedDistanceMultiplier = 1f;
+    [Range(0f, 90f), Tooltip("접근 이동을 허용하는 타깃과의 최대 방향 차이 (도). 타깃 선택 각도와는 무관합니다.")]
+    public float ApproachAlignmentAngle = 15f;
+
+    [Header("Legacy Movement (Use Distance Movement off)")]
+    [Tooltip("기존 전진 속도 커브. 공격 시작 시 적분하여 누적 이동 데이터로 사용합니다.")]
     public AnimationCurve ThrustCurve = AnimationCurve.Constant(0, 1, 0); // 기본값: 0
     
     [Tooltip("커브 값에 곱해줄 최대 속도")]
     public float ThrustMultiplier = 10f; 
 
     [Header("Soft Target Approach")]
-    [Tooltip("타깃이 있으면 전진 커브에 거리/시간 제한을 적용합니다.")]
+    [Tooltip("일반/공통 강공격에 타깃 접근과 정지 간격 적용. 최대 거리는 타깃이 없어도 적용됩니다.")]
     public bool UseTargetApproach;
     [Min(0f), Tooltip("플레이어 몸체와 적 콜라이더 표면 사이에 남길 간격 (m)")]
     public float StopDistance = 0.25f;
-    [Min(0f), Tooltip("자동 전진 종료 시점 (공격 데이터 기준 초)")]
+    [Min(0f), Tooltip("기존 Thrust 모드의 접근 종료 시점. 거리 모드에서는 Movement End Time 사용")]
     public float ApproachEndTime = 0.3f;
-    [Min(0f), Tooltip("타깃 방향 회전 보정 종료 시점 (공격 데이터 기준 초)")]
+    [Min(0f), Tooltip("회전 종료 시점. 이동 시작/첫 타격보다 늦으면 앞당깁니다. 0이면 시작 시 방향을 즉시 맞춥니다.")]
     public float RotationEndTime = 0.2f;
     [Min(0f), Tooltip("한 타수에서 자동 전진할 수 있는 최대 거리 (m)")]
     public float MaxApproachDistance = 2f;

@@ -21,7 +21,7 @@ public abstract partial class BaseForm
         _playerController.Input.AttackBuffer.Consume();
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.ComboSteps[_comboStep];
-        ResetTargetApproach(step);
+        ResetTargetApproach(step, _comboStep > 0);
         PlayActionAnimation(step.AnimationName, 0.1f);
         SpawnStepVFX(_weaponActionData.ComboSteps, _comboStep);
         PlayStepSound(_weaponActionData.ComboSteps, _comboStep);
@@ -33,6 +33,7 @@ public abstract partial class BaseForm
         _timer = 0;
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
+        ResetMotion(step);
         PlayActionAnimation(step.AnimationName, 0.01f);
         SpawnStepVFX(_weaponActionData.SkillSteps, _skillStep);
         PlayStepSound(_weaponActionData.SkillSteps, _skillStep);
@@ -44,6 +45,7 @@ public abstract partial class BaseForm
         _timer = 0;
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.UltimateSteps[_ultimateStep];
+        ResetMotion(step);
         PlayActionAnimation(step.AnimationName, 0.01f);
         SpawnStepVFX(_weaponActionData.UltimateSteps, _ultimateStep);
         PlayStepSound(_weaponActionData.UltimateSteps, _ultimateStep);
@@ -92,43 +94,93 @@ public abstract partial class BaseForm
 
     // ── 소프트 타겟팅 ────────────────────────────────────────────────────────
 
-    protected void FindSoftTarget(bool frontOnly = false)
+    private Component _softTargetOwner;
+    private Collider[] _targetSearchBuffer = new Collider[32];
+    private RaycastHit[] _targetSightBuffer = new RaycastHit[16];
+
+    private void ClearSoftTarget()
     {
         _softTarget = null;
         _softTargetCollider = null;
+        _softTargetOwner = null;
+    }
 
-        Collider[] hits = Physics.OverlapSphere(
-            _playerController.transform.position, SoftTargetSearchRadius, _enemyLayer);
+    private bool IsTargetValid(Component owner, Collider collider)
+    {
+        if (owner == null || !owner.gameObject.activeInHierarchy || collider == null
+            || !collider.enabled || !collider.gameObject.activeInHierarchy) return false;
+        var stats = owner.GetComponentInParent<EnemyStat>();
+        if (stats != null && stats.IsDead) return false;
+        Vector3 offset = owner.transform.position - _playerController.transform.position;
+        if (Mathf.Abs(offset.y) > SoftTargetMaxHeight || offset.sqrMagnitude > SoftTargetSearchRadius * SoftTargetSearchRadius)
+            return false;
 
-        float   bestDist   = float.MaxValue;
-        Transform bestTr   = null;
-
-        foreach (var hit in hits)
+        Vector3 origin = _playerController.Controller.bounds.center;
+        Vector3 direction = collider.bounds.center - origin;
+        float distance = direction.magnitude;
+        if (distance < 0.001f) return true;
+        int count;
+        while (true)
         {
-            if (hit.GetComponentInParent<IDamageable>() == null) continue;
-            var enemyStats = hit.GetComponentInParent<EnemyStat>();
-            if (enemyStats != null && enemyStats.IsDead) continue;
-            Vector3 toEnemy = hit.transform.position - _playerController.transform.position;
+            count = Physics.RaycastNonAlloc(origin, direction / distance, _targetSightBuffer,
+                distance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            if (count < _targetSightBuffer.Length) break;
+            System.Array.Resize(ref _targetSightBuffer, _targetSightBuffer.Length * 2);
+        }
+        for (int i = 0; i < count; i++)
+        {
+            var blocker = _targetSightBuffer[i].collider;
+            if (blocker.transform.IsChildOf(_playerController.transform)) continue;
+            // Other monsters may overlap the line of sight; only level geometry blocks assistance.
+            if (blocker.GetComponentInParent<IDamageable>() != null) continue;
+            return false;
+        }
+        return true;
+    }
+
+    protected void FindSoftTarget(bool keepCurrent = false)
+    {
+        if (keepCurrent && _softTarget != null && IsTargetValid(_softTargetOwner, _softTargetCollider)) return;
+        ClearSoftTarget();
+        int count;
+        while (true)
+        {
+            count = Physics.OverlapSphereNonAlloc(_playerController.transform.position,
+                SoftTargetSearchRadius, _targetSearchBuffer, _enemyLayer, QueryTriggerInteraction.Collide);
+            if (count < _targetSearchBuffer.Length) break;
+            System.Array.Resize(ref _targetSearchBuffer, _targetSearchBuffer.Length * 2);
+        }
+
+        float bestDistanceSquared = float.MaxValue;
+
+        for (int i = 0; i < count; i++)
+        {
+            var hit = _targetSearchBuffer[i];
+            var owner = hit.GetComponentInParent<IDamageable>() as Component;
+            if (!IsTargetValid(owner, hit)) continue;
+            Vector3 toEnemy = owner.transform.position - _playerController.transform.position;
             toEnemy.y = 0f;
 
-            float angle = Vector3.Angle(_playerController.transform.forward, toEnemy);
-            if (angle > (frontOnly ? 80f : SoftTargetAngle)) continue;
-
-            float dist = toEnemy.magnitude;
-            if (dist < bestDist)
+            // Select the closest valid target in every direction, including directly behind.
+            float distanceSquared = toEnemy.sqrMagnitude;
+            if (distanceSquared < bestDistanceSquared)
             {
-                bestDist = dist;
-                bestTr   = hit.transform;
+                bestDistanceSquared = distanceSquared;
+                _softTargetOwner = owner;
+                _softTarget = owner.transform;
                 _softTargetCollider = hit;
             }
         }
-
-        _softTarget = bestTr;
     }
 
-    protected void RotateTowardSoftTarget()
+    protected void RotateTowardSoftTarget(float animationDelta = -1f)
     {
         if (_softTarget == null) return;
+        if (!IsTargetValid(_softTargetOwner, _softTargetCollider))
+        {
+            ClearSoftTarget();
+            return;
+        }
 
         Vector3 dir = _softTarget.position - _playerController.transform.position;
         dir.y = 0f;
@@ -138,6 +190,6 @@ public abstract partial class BaseForm
         _playerController.transform.rotation = Quaternion.RotateTowards(
             _playerController.transform.rotation,
             targetRot,
-            SoftTargetRotationSpeed * Time.deltaTime);
+            SoftTargetRotationSpeed * (animationDelta >= 0f ? animationDelta : Time.deltaTime * AttackSpeed));
     }
 }

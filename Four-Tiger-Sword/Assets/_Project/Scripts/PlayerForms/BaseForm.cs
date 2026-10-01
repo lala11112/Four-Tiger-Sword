@@ -21,7 +21,7 @@ public abstract partial class BaseForm : IForm
 
     protected Transform _softTarget;
     private const float SoftTargetSearchRadius = 10f;
-    private const float SoftTargetAngle = 180f;
+    private const float SoftTargetMaxHeight = 2f;
     private const float SoftTargetRotationSpeed = 540f; // degrees/sec
 
     public virtual ElementType Element => ElementType.ELEMENT_NONE;

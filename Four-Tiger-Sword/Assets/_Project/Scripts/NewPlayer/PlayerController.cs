@@ -63,6 +63,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     [Min(0f)] public float StaggerDuration = 0.4f;
     [Tooltip("이 강인도 피해 이상이면 짧은 피격 대신 경직됩니다. 누적 게이지가 아닌 1회 타격 기준입니다.")]
     [Min(0f)] public float StaggerPoiseThreshold = 20f;
+    [Tooltip("공격의 경직 강도가 이 저항보다 높을 때만 피격/경직/넉백됩니다. 같거나 낮으면 피해만 받습니다.")]
     public StaggerResistLevel HitStaggerResistance = StaggerResistLevel.NONE;
     public string HitAnimationName = "Hit";
     public string StaggerAnimationName = "Stagger";
@@ -224,7 +225,8 @@ public class PlayerController : MonoBehaviour, IDamageable
             if (parryState != null)
                 parryState.OnHitParried(source);
 
-            ApplyKnockback(power);
+            if (CanReactToHit(staggerResistLevel))
+                ApplyKnockback(power);
             OnParrySuccess();
             (source as EnemyAction)?.OnParried();
             return new DamageResult(DamageOutcome.Parried);
@@ -238,9 +240,13 @@ public class PlayerController : MonoBehaviour, IDamageable
         return result;
     }
 
+    private bool CanReactToHit(StaggerResistLevel attackLevel)
+        => HitStaggerResistance != StaggerResistLevel.SUPER_ARMOR
+            && attackLevel > HitStaggerResistance;
+
     private void RequestHitReaction(Vector3 power, float poiseDamage, StaggerResistLevel attackLevel)
     {
-        if (HitStaggerResistance == StaggerResistLevel.SUPER_ARMOR || attackLevel < HitStaggerResistance)
+        if (!CanReactToHit(attackLevel))
             return;
 
         Vector3 velocity = GetKnockbackVelocity(power);

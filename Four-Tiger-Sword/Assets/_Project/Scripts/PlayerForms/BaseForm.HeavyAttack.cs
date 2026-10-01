@@ -25,8 +25,8 @@ public abstract partial class BaseForm
     {
         if (HeavyAttackStep == null) { isComplete = true; return; }
         _timer += Time.deltaTime * AttackSpeed;
-        ProcessHit(HeavyAttackStep);
         MoveForward(HeavyAttackStep);
+        ProcessHit(HeavyAttackStep);
         isComplete = _timer >= HeavyAttackStep.Duration;
     }
 
