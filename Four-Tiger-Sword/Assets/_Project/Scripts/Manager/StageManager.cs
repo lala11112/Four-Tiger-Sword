@@ -45,14 +45,26 @@ public class StageManager : MonoBehaviour
     }
 #endif
 
+    private void Awake()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
     private void Start()
     {
-        SpawnAll();
+        //SpawnAll();
         OnStageStart?.Invoke();
     }
 
     private void SpawnAll()
     {
+        if (_spawnEntries == null || _spawnEntries.Length == 0)
+        {
+            Debug.LogWarning("[StageManager] 스폰 목록이 비어 있어 스폰을 중단합니다.", this);
+            return;
+        }
+
         foreach (var entry in _spawnEntries)
         {
             if (entry.Prefab == null)
@@ -82,8 +94,8 @@ public class StageManager : MonoBehaviour
 
         if (_aliveEnemies.Count == 0)
         {
-            Debug.LogWarning("[StageManager] 스폰된 적이 없습니다. 즉시 스테이지 클리어 처리합니다.");
-            HandleStageClear();
+            // No wave started: clearing here would synchronously call SpawnAll again forever.
+            Debug.LogWarning("[StageManager] 생성된 적이 없어 스폰을 중단합니다. 프리팹과 스폰 위치를 확인하세요.", this);
         }
     }
 

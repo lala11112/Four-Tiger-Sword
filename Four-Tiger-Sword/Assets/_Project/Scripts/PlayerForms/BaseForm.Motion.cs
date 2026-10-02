@@ -9,6 +9,7 @@ public abstract partial class BaseForm
     private float _previousMoveTime;
     private float _motionDistanceScale;
     private float _rotationDeadline;
+    private float _followEndTime;
     private bool _hadMotionTarget;
     private bool _motionTargetLost;
 
@@ -33,7 +34,7 @@ public abstract partial class BaseForm
         _motionDistanceScale = _hadMotionTarget ? 1f : Mathf.Clamp01(step.UntargetedDistanceMultiplier);
         _rotationDeadline = Mathf.Clamp(step.RotationEndTime, 0f, Mathf.Max(0f, step.Duration));
         // Finish facing the target before translation and before the first active hit.
-        if (_motionProfile.TotalDistance > 0f)
+        if (_motionProfile.TotalDistance > 0f || (UsesApproach(step) && step.FollowMovingTarget))
             _rotationDeadline = Mathf.Min(_rotationDeadline, _motionProfile.StartTime);
         if (step.HitEvents != null && step.HitEvents.Count > 0)
         {
@@ -43,6 +44,29 @@ public abstract partial class BaseForm
         }
         else if (step.HitDuration > 0f)
             _rotationDeadline = Mathf.Min(_rotationDeadline, Mathf.Max(0f, step.HitStartTime));
+
+        // Multi-hit steps keep following through their last active hit, not just the first lunge.
+        _followEndTime = _motionProfile.EndTime;
+        if (step.HitEvents != null && step.HitEvents.Count > 0)
+        {
+            foreach (var hit in step.HitEvents)
+                if (hit != null && hit.Duration > 0f)
+                    _followEndTime = Mathf.Max(_followEndTime, hit.StartTime + hit.Duration);
+        }
+        else if (step.HitDuration > 0f)
+            _followEndTime = Mathf.Max(_followEndTime, step.HitStartTime + step.HitDuration);
+        _followEndTime = Mathf.Clamp(_followEndTime, 0f, Mathf.Max(0f, step.Duration));
+    }
+
+    private void FollowAttackTarget(WeaponActionData step, float previousTime, float currentTime)
+    {
+        float elapsed = Mathf.Max(0f, Mathf.Min(currentTime, _followEndTime)
+            - Mathf.Max(previousTime, _rotationDeadline));
+        if (elapsed <= 0f) return;
+        Vector3 direction = Vector3.ProjectOnPlane(_softTarget.position - _playerController.transform.position, Vector3.up);
+        if (direction.sqrMagnitude < 0.001f) return;
+        _playerController.transform.rotation = Quaternion.RotateTowards(_playerController.transform.rotation,
+            Quaternion.LookRotation(direction), Mathf.Max(0f, step.TargetFollowRotationSpeed) * elapsed);
     }
 
     private void UpdateAttackFacing(float previousTime, float currentTime)
@@ -95,7 +119,16 @@ public abstract partial class BaseForm
         }
 
         UpdateAttackFacing(previousTime, currentTime);
+        bool followTarget = useApproach && step.FollowMovingTarget && targetAlive && !_motionTargetLost;
+        if (followTarget) FollowAttackTarget(step, previousTime, currentTime);
         float distance = _motionProfile.Delta(previousTime, currentTime) * _motionDistanceScale;
+        if (followTarget)
+        {
+            // Only this frame's chase time is spent. Stopping/turning never banks a later burst.
+            float elapsed = Mathf.Max(0f, Mathf.Min(currentTime, _followEndTime)
+                - Mathf.Max(previousTime, _motionProfile.StartTime));
+            distance = Mathf.Max(0f, step.TargetFollowSpeed) * elapsed;
+        }
         Vector3 direction = _playerController.transform.forward;
         if (useApproach)
         {

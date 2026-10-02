@@ -44,6 +44,7 @@ public static class PlayerTargetingRegression
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
         var objects = new List<GameObject>();
         WeaponActionDataSO data = null;
+        WaterFormActionDataSO waterData = null;
         int checks = 0;
         Action<bool, string> check = (ok, message) => { if (!ok) throw new Exception(message); checks++; };
         Func<string, Vector3, GameObject> make = (name, pos) =>
@@ -63,7 +64,7 @@ public static class PlayerTargetingRegression
             typeof(PlayerController).GetProperty("Controller").SetValue(player, controller);
             typeof(PlayerController).GetProperty("StatManager").SetValue(player, playerGo.GetComponent<PlayerStatManager>());
             data = ScriptableObject.CreateInstance<EarthFormActionDataSO>();
-            var step = new WeaponActionData { Duration = 1f, UseTargetApproach = true,
+            var step = new WeaponActionData { Duration = 1f, UseTargetApproach = true, FollowMovingTarget = false,
                 RotationEndTime = 0.1f, ApproachEndTime = 0.1f, HitStartTime = 0.1f, HitDuration = 0.2f };
             data.ComboSteps = new List<WeaponActionData> { step };
             var probe = new Probe(data);
@@ -77,16 +78,24 @@ public static class PlayerTargetingRegression
                 go.AddComponent<BoxCollider>();
                 return go;
             };
+            var view = make("Targeting Camera", origin).AddComponent<Camera>();
+            view.fieldOfView = 120f;
+            view.aspect = 1f;
+            player.CameraTransform = view.transform;
             var front = enemy("Front", Vector3.forward * 3f);
             var rear = enemy("Rear", Vector3.back);
             Physics.SyncTransforms(); probe.Select();
-            check(probe.Target == rear.transform, "Closest rear target was excluded.");
+            check(probe.Target == front.transform, "Closer rear enemy overrode the camera-center target.");
             probe.Prepare(step);
-            check(probe.Target == rear.transform, "Approach attack excluded the rear target.");
+            check(probe.Target == front.transform, "Approach attack ignored the camera-center target.");
             rear.SetActive(false); probe.Select();
             var side = enemy("Side", new Vector3(1f, 0f, 1f));
             Physics.SyncTransforms(); probe.Select(true);
             check(probe.Target == front.transform, "Combo changed to a newly closer enemy.");
+            view.transform.rotation = Quaternion.LookRotation(side.transform.position - view.transform.position);
+            probe.Select(true);
+            check(probe.Target == side.transform, "Combo did not reselect after the camera turned.");
+            view.transform.rotation = Quaternion.identity;
             front.GetComponent<EnemyStat>().CurrentHp = 0f;
             probe.Select(true);
             check(probe.Target == side.transform, "Dead target was retained.");
@@ -106,7 +115,10 @@ public static class PlayerTargetingRegression
             front.GetComponent<BoxCollider>().enabled = true;
             front.transform.position = origin + Quaternion.Euler(0, 70, 0) * Vector3.forward * 3;
             Physics.SyncTransforms(); probe.Prepare(step);
-            check(probe.Target == front.transform, "Rotation budget incorrectly restricted target selection.");
+            check(probe.Target == null, "Target outside the view cone was selected.");
+            view.transform.rotation = Quaternion.LookRotation(front.transform.position - view.transform.position);
+            probe.Prepare(step);
+            check(probe.Target == front.transform, "Camera direction did not override player facing.");
             front.transform.position = origin + Quaternion.Euler(0, 50, 0) * Vector3.forward * 3;
             Physics.SyncTransforms(); probe.Prepare(step); probe.MoveAt(step, 0.12f);
             check(Vector3.Angle(playerGo.transform.forward, front.transform.position - origin) < 0.1f,
@@ -114,6 +126,7 @@ public static class PlayerTargetingRegression
             playerGo.transform.rotation = Quaternion.identity;
             probe.Prepare(step); probe.AttackAt(0.12f);
             check(probe.HitAngle >= 0f && probe.HitAngle < 0.1f, "Hit query preceded rotation.");
+
             front.GetComponent<EnemyStat>().CurrentHp = 0f; probe.Rotate(0.1f);
             check(probe.Target == null, "Dead target survived rotation validation.");
             front.GetComponent<EnemyStat>().CurrentHp = 100f; probe.Select();
@@ -157,6 +170,7 @@ public static class PlayerTargetingRegression
 
             front.SetActive(true);
             front.transform.position = origin + Vector3.back * 5f;
+            view.transform.rotation = Quaternion.LookRotation(Vector3.back);
             playerGo.transform.SetPositionAndRotation(origin, Quaternion.identity);
             Physics.SyncTransforms(); probe.Prepare(step);
             probe.MoveAt(step, 0.04f);
@@ -167,6 +181,7 @@ public static class PlayerTargetingRegression
             check(Mathf.Abs(playerGo.transform.position.z - origin.z + 2f) < 0.03f, "Rear approach failed.");
 
             front.transform.position = origin + Vector3.forward * 2.5f;
+            view.transform.rotation = Quaternion.identity;
             controller.radius = 0.5f;
             playerGo.transform.SetPositionAndRotation(origin, Quaternion.identity);
             Physics.SyncTransforms(); probe.Prepare(step); probe.MoveAt(step, 0.5f);
@@ -175,6 +190,7 @@ public static class PlayerTargetingRegression
             playerGo.transform.position = origin;
             Physics.SyncTransforms(); probe.Prepare(step); probe.MoveAt(step, 0.12f);
             Vector3 deathPosition = playerGo.transform.position;
+
             front.GetComponent<EnemyStat>().CurrentHp = 0f;
             probe.MoveAt(step, 0.3f);
             check(Vector3.Distance(deathPosition, playerGo.transform.position) < 0.001f, "Lost target caused forward lunge.");
@@ -188,6 +204,64 @@ public static class PlayerTargetingRegression
             wall.SetActive(false); Physics.SyncTransforms(); probe.MoveAt(step, 0.8f);
             check(Vector3.Distance(blockedPosition, playerGo.transform.position) < 0.001f, "Blocked movement accumulated catch-up motion.");
 
+            // Chase moving targets after the old movement/rotation cutoff, through the last hit.
+            var follow = new WeaponActionData { Duration = 1f, UseTargetApproach = true,
+                UseDistanceMovement = true, ForwardDistance = 0f, MovementStartTime = 0.08f,
+                MovementEndTime = 0.2f, RotationEndTime = 0.08f, MaxApproachDistance = 2f,
+                TargetFollowSpeed = 6f, HitEvents = new List<HitEvent> {
+                    new HitEvent { StartTime = 0.3f, Duration = 0.05f },
+                    new HitEvent { StartTime = 0.7f, Duration = 0.1f } } };
+            front.SetActive(true); front.GetComponent<EnemyStat>().CurrentHp = 100f;
+            front.transform.position = origin + Vector3.forward * 1.25f;
+            playerGo.transform.SetPositionAndRotation(origin, Quaternion.identity);
+            Physics.SyncTransforms(); probe.Prepare(follow); probe.MoveAt(follow, 0.25f);
+            check(Vector3.Distance(playerGo.transform.position, origin) < 0.02f, "Following ignored stop distance.");
+            front.transform.position = origin + new Vector3(2f, 0f, 2f);
+            Physics.SyncTransforms();
+            for (int frame = 26; frame <= 55; frame++) probe.MoveAt(follow, frame / 100f);
+            check(playerGo.transform.position.x > origin.x + 0.3f, "Lateral target was not followed after original movement cutoff.");
+            check(Vector3.Angle(playerGo.transform.forward, front.transform.position - playerGo.transform.position) < 2f,
+                "Follow rotation stopped at the initial rotation deadline.");
+            Vector3 beforeRetreat = playerGo.transform.position;
+            front.transform.position += Vector3.forward * 2f;
+            Physics.SyncTransforms(); probe.MoveAt(follow, 0.65f);
+            check(playerGo.transform.position.z > beforeRetreat.z, "Stopped chase did not resume when target retreated.");
+            probe.MoveAt(follow, 0.8f);
+            Vector3 followEnd = playerGo.transform.position;
+            front.transform.position += Vector3.right;
+            Physics.SyncTransforms(); probe.MoveAt(follow, 1f);
+            check(Vector3.Distance(followEnd, playerGo.transform.position) < 0.001f, "Chase continued during recovery.");
+            probe.Prepare(follow); probe.MoveAt(follow, 0.3f);
+            check(Vector3.Distance(followEnd, playerGo.transform.position) > 0.1f, "Next hit did not reset chase budget/time.");
+            front.GetComponent<EnemyStat>().CurrentHp = 0f;
+            Vector3 followDeath = playerGo.transform.position;
+            probe.MoveAt(follow, 0.7f);
+            check(Vector3.Distance(followDeath, playerGo.transform.position) < 0.001f, "Chase continued after target death.");
+
+            front.GetComponent<EnemyStat>().CurrentHp = 100f;
+            foreach (int fps in new[] { 15, 30, 60, 144 })
+            foreach (float speed in new[] { 0.5f, 1f, 2f })
+            {
+                playerGo.transform.SetPositionAndRotation(origin, Quaternion.identity);
+                front.transform.position = origin + Vector3.forward * 5f;
+                Physics.SyncTransforms(); probe.Prepare(follow);
+                float time = 0f;
+                while (time < follow.Duration) { time += speed / fps; probe.MoveAt(follow, time); }
+                check(Mathf.Abs(playerGo.transform.position.z - origin.z - 2f) < 0.04f,
+                    "Follow budget changed at " + fps + " FPS / speed " + speed);
+            }
+            playerGo.transform.SetPositionAndRotation(origin, Quaternion.identity);
+            Physics.SyncTransforms(); probe.Prepare(follow);
+            wall.SetActive(true);
+            Physics.SyncTransforms(); probe.MoveAt(follow, 0.5f);
+            check(playerGo.transform.position.z < origin.z + 0.6f, "Follow crossed an obstacle.");
+            wall.SetActive(false);
+            front.SetActive(false);
+            playerGo.transform.position = origin;
+            Physics.SyncTransforms(); probe.Prepare(follow); probe.MoveAt(follow, 1f);
+            check(Vector3.Distance(playerGo.transform.position, origin) < 0.001f,
+                "Follow speed caused an untargeted lunge despite zero forward distance.");
+
             var profile = new AttackMotionProfile();
             step.UseDistanceMovement = false;
             step.ThrustCurve = AnimationCurve.Constant(0f, 1f, 1f);
@@ -198,12 +272,49 @@ public static class PlayerTargetingRegression
             check(Mathf.Abs(profile.Delta(0f, 100f) - 2f) < 0.001f, "Large frame overshot legacy movement.");
             step.Duration = 0f; profile.Reset(step, true);
             check(profile.Delta(0f, 1f) == 0f, "Zero duration produced motion.");
+
+            waterData = ScriptableObject.CreateInstance<WaterFormActionDataSO>();
+            var water = new WaterForm(waterData);
+            typeof(BaseForm).GetField("_playerController", Hidden).SetValue(water, player);
+            typeof(BaseForm).GetField("_enemyLayer", Hidden).SetValue(water, (LayerMask)LayerMask.GetMask("Enemy"));
+            var input = playerGo.GetComponent<PlayerInputHandler>();
+            var movement = playerGo.GetComponent<PlayerMovement>();
+            typeof(PlayerController).GetProperty("Input").SetValue(player, input);
+            typeof(PlayerController).GetProperty("Movement").SetValue(player, movement);
+            movement.Initialize(player);
+            var selectDash = typeof(WaterForm).GetMethod("SelectHeavyDashDirection", Hidden);
+            var dashDirection = typeof(WaterForm).GetField("_heavyDashDirection", Hidden);
+            playerGo.transform.SetPositionAndRotation(origin, Quaternion.identity);
+            front.SetActive(true); front.GetComponent<EnemyStat>().CurrentHp = 100f;
+            foreach (float angle in new[] { 0f, 45f, 90f, 135f, 180f, 225f, 270f, 315f })
+            {
+                Vector3 direction = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
+                front.transform.position = origin + direction * 3f;
+                view.transform.rotation = Quaternion.LookRotation(direction);
+                Physics.SyncTransforms(); selectDash.Invoke(water, new object[] { false });
+                check(Vector3.Angle((Vector3)dashDirection.GetValue(water), direction) < 0.1f,
+                    "Water initial dash excluded angle " + angle);
+            }
+            view.transform.rotation = Quaternion.identity;
+            typeof(PlayerInputHandler).GetProperty("MoveInput").SetValue(input, Vector2.down);
+            front.transform.position = origin + Vector3.forward * 3f;
+            Physics.SyncTransforms(); selectDash.Invoke(water, new object[] { false });
+            check(Vector3.Angle((Vector3)dashDirection.GetValue(water), Vector3.back) < 0.1f,
+                "Water dash ignored rear movement input.");
+            typeof(WaterForm).GetField("_heavyChainTarget", Hidden).SetValue(water, front.GetComponent<TargetingRegressionReceiver>());
+            typeof(WaterForm).GetField("_heavyChainTargetCollider", Hidden).SetValue(water, front.GetComponent<BoxCollider>());
+            front.transform.position = origin + Vector3.back * 3f;
+            typeof(PlayerInputHandler).GetProperty("MoveInput").SetValue(input, Vector2.up);
+            Physics.SyncTransforms(); selectDash.Invoke(water, new object[] { true });
+            check(Vector3.Angle((Vector3)dashDirection.GetValue(water), Vector3.back) < 0.1f,
+                "Water chained dash failed to turn 180 degrees toward remembered target.");
             return checks + " targeting / attack movement checks passed.";
         }
         finally
         {
             foreach (var go in objects) if (go != null) UnityEngine.Object.DestroyImmediate(go);
             if (data != null) UnityEngine.Object.DestroyImmediate(data);
+            if (waterData != null) UnityEngine.Object.DestroyImmediate(waterData);
             SceneManager.SetActiveScene(original);
             EditorSceneManager.CloseScene(scene, true);
         }

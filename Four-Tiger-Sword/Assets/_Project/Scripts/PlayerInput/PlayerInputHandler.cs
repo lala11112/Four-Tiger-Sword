@@ -20,7 +20,6 @@ public class PlayerInputHandler : MonoBehaviour
     [SerializeField] private InputActionReference _parryAction;
 
     public Vector2 MoveInput { get; private set; }
-    public bool IsDashHeld { get; private set; }
     public bool IsAttackHeld { get; private set; }
     public float AttackHeldTime { get; private set; }
     public uint AttackPressId { get; private set; }
@@ -57,7 +56,6 @@ public class PlayerInputHandler : MonoBehaviour
     private void OnDisable()
     {
         MoveInput = Vector2.zero;
-        IsDashHeld = false;
         IsAttackHeld = false;
         AttackHeldTime = 0f;
         IsForm1Pressed = IsForm2Pressed = IsForm3Pressed = IsForm4Pressed = IsForm5Pressed = IsFastFormPressed = false;
@@ -85,7 +83,6 @@ public class PlayerInputHandler : MonoBehaviour
     private void Update()
     {
         MoveInput = _moveAction?.action?.ReadValue<Vector2>() ?? Vector2.zero;
-        IsDashHeld = _dashAction?.action?.IsPressed() ?? false;
         IsForm1Pressed = _form1Action?.action?.WasPressedThisFrame() ?? false;
         IsForm2Pressed = _form2Action?.action?.WasPressedThisFrame() ?? false;
         IsForm3Pressed = (_form3Action?.action?.WasPressedThisFrame() ?? false);

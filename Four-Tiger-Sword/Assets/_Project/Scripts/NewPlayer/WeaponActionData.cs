@@ -68,7 +68,7 @@ public class WeaponActionData
     [Tooltip("캡슐 히트박스 높이")]
     public float HitBoxHeight = 2f;
 
-    [Tooltip("적에게 가하는 넉백 힘 (단위: 유닛/초). 값이 클수록 멀리 밀림")]
+    [Tooltip("적에게 가하는 넉백 초기 속도 (m/s). 공격력과 무관합니다. 적의 저항을 뺀 뒤 감속하며 이동합니다.")]
     public float KnockbackForce = 8f;
 
     [Tooltip("경직 저항 값")]
@@ -111,6 +111,12 @@ public class WeaponActionData
     [Header("Soft Target Approach")]
     [Tooltip("일반/공통 강공격에 타깃 접근과 정지 간격 적용. 최대 거리는 타깃이 없어도 적용됩니다.")]
     public bool UseTargetApproach;
+    [Tooltip("각 타수의 마지막 타격이 끝날 때까지 적의 현재 위치로 회전하고 접근합니다.")]
+    public bool FollowMovingTarget = true;
+    [Min(0f), Tooltip("타깃 추적 속도 (공격 속도 1 기준 m/s). 기존 전진 커브 대신 사용합니다.")]
+    public float TargetFollowSpeed = 6f;
+    [Min(0f), Tooltip("초기 방향 정렬 이후 타깃을 따라 회전하는 속도 (도/초, 공격 속도 1 기준)")]
+    public float TargetFollowRotationSpeed = 720f;
     [Min(0f), Tooltip("플레이어 몸체와 적 콜라이더 표면 사이에 남길 간격 (m)")]
     public float StopDistance = 0.25f;
     [Min(0f), Tooltip("기존 Thrust 모드의 접근 종료 시점. 거리 모드에서는 Movement End Time 사용")]

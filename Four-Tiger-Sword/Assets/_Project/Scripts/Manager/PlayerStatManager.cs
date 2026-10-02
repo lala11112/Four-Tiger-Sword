@@ -34,14 +34,6 @@ public class PlayerStatManager : MonoBehaviour
     /// <summary>필살기 게이지가 변경될 때마다 발생합니다. (현재량, 최대량) UI 갱신용.</summary>
     public event Action<float, float> OnUltimateGaugeChanged;
 
-    // ── 런타임 스테미나 상태 ──────────────────────────────────────────────────────
-    private float _currentStamina;
-    private float _staminaRegenTimer;
-
-    public float CurrentStamina       => _currentStamina;
-    public bool  HasEnoughStaminaForDash => _currentStamina >= (baseData != null ? baseData.dashStaminaCost : 25f);
-    public bool  CanRun               => _currentStamina > 0f;
-
     /// <summary>피해를 받을 때마다 발생합니다. EarthForm 흡수 스탯 등이 구독합니다.</summary>
     public event Action<float, ElementType, bool> OnDamageTaken;
 
@@ -61,7 +53,6 @@ public class PlayerStatManager : MonoBehaviour
 
         baseValues[StatType.ST_HP] = baseData.baseHP;   // 체력
         baseValues[StatType.ST_SP] = baseData.baseSP;   // 영력
-        baseValues[StatType.ST_STM] = baseData.baseSTM;   // 스테미나
         baseValues[StatType.ST_SP_REGEN] = baseData.baseSpRegen;    // 영력 회복
         baseValues[StatType.ST_ATK] = baseData.baseATK; // 공격력
         baseValues[StatType.ST_DEF] = baseData.baseDEF; // 방어력
@@ -92,7 +83,6 @@ public class PlayerStatManager : MonoBehaviour
 
         _currentHp             = GetStat(StatType.ST_HP);
         _currentSp             = GetStat(StatType.ST_SP);
-        _currentStamina        = GetStat(StatType.ST_STM);
         _currentUltimateGauge  = 0f;
     }
 
@@ -243,38 +233,6 @@ public class PlayerStatManager : MonoBehaviour
     {
         _currentUltimateGauge = 0f;
         OnUltimateGaugeChanged?.Invoke(_currentUltimateGauge, MaxUltimateGauge);
-    }
-
-    // ── 스테미나 메서드 ──────────────────────────────────────────────────────────
-
-    /// <summary>PlayerController.Update()에서 매 프레임 호출. 스테미나 자동 회복을 처리합니다.</summary>
-    public void UpdateStamina(float deltaTime)
-    {
-        if (_staminaRegenTimer > 0f)
-        {
-            _staminaRegenTimer -= deltaTime;
-            return;
-        }
-
-        float maxStamina = GetStat(StatType.ST_STM);
-        if (_currentStamina < maxStamina)
-            _currentStamina = Mathf.Min(_currentStamina + (baseData != null ? baseData.staminaRegenRate : 20f) * deltaTime, maxStamina);
-    }
-
-    /// <summary>대쉬 1회 시 PlayerDashState에서 호출됩니다.</summary>
-    public void ConsumeStaminaForDash()
-    {
-        float cost = baseData != null ? baseData.dashStaminaCost : 25f;
-        _currentStamina    = Mathf.Max(0f, _currentStamina - cost);
-        _staminaRegenTimer = baseData != null ? baseData.staminaRegenDelay : 2f;
-    }
-
-    /// <summary>달리기 중 매 프레임 PlayerRunState에서 호출됩니다.</summary>
-    public void ConsumeStaminaForRun(float deltaTime)
-    {
-        float costPerSec   = baseData != null ? baseData.runStaminaCostPerSecond : 10f;
-        _currentStamina    = Mathf.Max(0f, _currentStamina - costPerSec * deltaTime);
-        _staminaRegenTimer = baseData != null ? baseData.staminaRegenDelay : 2f;
     }
 
     // ── HUD 단축 속성 ────────────────────────────────────────────────────────────

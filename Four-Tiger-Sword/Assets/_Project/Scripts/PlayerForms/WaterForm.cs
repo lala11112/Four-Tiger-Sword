@@ -120,7 +120,26 @@ public class WaterForm : BaseForm, IHeavyAttackForm
             _heavyChainTarget = null;
             _heavyChainTargetCollider = null;
         }
-        _heavyDashDirection = _playerController.Input.MoveInput.sqrMagnitude > 0.01f
+        SelectHeavyDashDirection(continuing);
+        _heavyAttackDuration = HeavyAttackStep.Duration;
+        _heavyDashDuration = Mathf.Clamp(_waterData.WaterHeavyDashDuration, 0.01f, _heavyAttackDuration);
+        _heavyAttackFinished = false;
+        _heavyDashDirection = Vector3.ProjectOnPlane(_heavyDashDirection, Vector3.up).normalized;
+        if (_heavyDashDirection.sqrMagnitude < 0.001f) _heavyDashDirection = _playerController.transform.forward;
+        _playerController.transform.rotation = Quaternion.LookRotation(_heavyDashDirection);
+        BeginHeavyAttack();
+        _softTarget = null;
+        _heavySavedExcludeLayers = _playerController.Controller.excludeLayers;
+        _heavyCollisionOverride = true;
+        _playerController.Controller.excludeLayers |= LayerMask.GetMask("Enemy");
+        _heavyDashTargets.Clear();
+        return true;
+    }
+
+    private void SelectHeavyDashDirection(bool continuing)
+    {
+        bool hasMoveInput = _playerController.Input.MoveInput.sqrMagnitude > 0.01f;
+        _heavyDashDirection = hasMoveInput
             ? _playerController.Movement.GetMoveDirection().normalized
             : _playerController.transform.forward;
         _heavyDashDistance = Mathf.Max(0f, _waterData.WaterHeavyDashDistance);
@@ -135,19 +154,17 @@ public class WaterForm : BaseForm, IHeavyAttackForm
                     toTarget.magnitude + Mathf.Max(0f, _waterData.WaterHeavyTargetOvershoot));
             }
         }
-        _heavyAttackDuration = HeavyAttackStep.Duration;
-        _heavyDashDuration = Mathf.Clamp(_waterData.WaterHeavyDashDuration, 0.01f, _heavyAttackDuration);
-        _heavyAttackFinished = false;
-        _heavyDashDirection = Vector3.ProjectOnPlane(_heavyDashDirection, Vector3.up).normalized;
-        if (_heavyDashDirection.sqrMagnitude < 0.001f) _heavyDashDirection = _playerController.transform.forward;
-        _playerController.transform.rotation = Quaternion.LookRotation(_heavyDashDirection);
-        BeginHeavyAttack();
-        _softTarget = null;
-        _heavySavedExcludeLayers = _playerController.Controller.excludeLayers;
-        _heavyCollisionOverride = true;
-        _playerController.Controller.excludeLayers |= LayerMask.GetMask("Enemy");
-        _heavyDashTargets.Clear();
-        return true;
+        else if (!hasMoveInput)
+        {
+            // Initial and fallback targets follow the camera view cone.
+            FindSoftTarget();
+            if (_softTarget != null)
+            {
+                Vector3 toTarget = Vector3.ProjectOnPlane(
+                    _softTarget.position - _playerController.transform.position, Vector3.up);
+                if (toTarget.sqrMagnitude > 0.001f) _heavyDashDirection = toTarget.normalized;
+            }
+        }
     }
 
     public override void UpdateHeavyAttack(out bool isComplete)
@@ -187,7 +204,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
                     _playerController.StatManager.GetStat(StatType.ST_CRT) / 100f,
                     _playerController.StatManager.GetStat(StatType.ST_CRTD) / 100f,
                     source: _playerController,
-                    power: _heavyDashDirection * step.KnockbackForce * (1f + attack * 0.01f),
+                    power: KnockbackMotion.Power(_heavyDashDirection, step.KnockbackForce),
                     poiseDamage: step.PoiseDamage, staggerResistLevel: step.StaggerResistLevel);
                 var result = DamageManager.Apply(hit, target, component.gameObject);
                 if (!result.Applied) continue;

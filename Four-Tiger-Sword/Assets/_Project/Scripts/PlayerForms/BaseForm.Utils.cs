@@ -140,8 +140,15 @@ public abstract partial class BaseForm
 
     protected void FindSoftTarget(bool keepCurrent = false)
     {
-        if (keepCurrent && _softTarget != null && IsTargetValid(_softTargetOwner, _softTargetCollider)) return;
+        // Re-evaluate the view at each attack/chain boundary. Never switch mid-swing.
+        Component previousOwner = keepCurrent ? _softTargetOwner : null;
         ClearSoftTarget();
+        Transform view = _playerController.CameraTransform;
+        if (view == null && Camera.main != null) view = Camera.main.transform;
+        Vector3 viewOrigin = view != null ? view.position : _playerController.Controller.bounds.center;
+        Vector3 viewForward = view != null ? view.forward : _playerController.transform.forward;
+        Camera camera = view != null ? view.GetComponent<Camera>() : null;
+        float minAlignment = Mathf.Cos(Mathf.Clamp(_playerController.TargetingHalfAngle, 1f, 89f) * Mathf.Deg2Rad);
         int count;
         while (true)
         {
@@ -152,19 +159,36 @@ public abstract partial class BaseForm
         }
 
         float bestDistanceSquared = float.MaxValue;
+        float bestAlignment = -1f;
 
         for (int i = 0; i < count; i++)
         {
             var hit = _targetSearchBuffer[i];
             var owner = hit.GetComponentInParent<IDamageable>() as Component;
             if (!IsTargetValid(owner, hit)) continue;
+            Vector3 aimPoint = hit.bounds.center;
+            Vector3 viewOffset = aimPoint - viewOrigin;
+            if (viewOffset.sqrMagnitude < 0.0001f) continue;
+            float alignment = Vector3.Dot(viewForward, viewOffset.normalized);
+            if (alignment < minAlignment) continue;
+            if (camera != null)
+            {
+                Vector3 viewport = camera.WorldToViewportPoint(aimPoint);
+                if (viewport.z <= 0f || viewport.x < 0f || viewport.x > 1f
+                    || viewport.y < 0f || viewport.y > 1f) continue;
+            }
             Vector3 toEnemy = owner.transform.position - _playerController.transform.position;
             toEnemy.y = 0f;
 
-            // Select the closest valid target in every direction, including directly behind.
+            // Prefer the camera's center ray; world distance only breaks equal-angle ties.
             float distanceSquared = toEnemy.sqrMagnitude;
-            if (distanceSquared < bestDistanceSquared)
+            bool sameAlignment = Mathf.Abs(alignment - bestAlignment) <= 0.00001f;
+            bool sameDistance = Mathf.Abs(distanceSquared - bestDistanceSquared) <= 0.0001f;
+            if (alignment > bestAlignment + 0.00001f
+                || (sameAlignment && (distanceSquared < bestDistanceSquared
+                    || (sameDistance && owner == previousOwner))))
             {
+                bestAlignment = alignment;
                 bestDistanceSquared = distanceSquared;
                 _softTargetOwner = owner;
                 _softTarget = owner.transform;

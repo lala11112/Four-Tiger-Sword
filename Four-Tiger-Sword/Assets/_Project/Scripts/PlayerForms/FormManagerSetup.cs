@@ -15,7 +15,7 @@ public class FormManagerSetup
 
         formManager.CanTransition = () =>
             _playerController.StateMachine.CurrentState is PlayerIdleState ||
-            _playerController.StateMachine.CurrentState is PlayerMoveState;
+            _playerController.StateMachine.CurrentState is PlayerRunState;
 
         formManager.AddTransition(fireForm,  () => _playerController.Input.IsForm1Pressed);
         formManager.AddTransition(waterForm, () => _playerController.Input.IsForm2Pressed);

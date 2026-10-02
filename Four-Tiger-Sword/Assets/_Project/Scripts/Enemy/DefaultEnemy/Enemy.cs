@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(EnemyStat), typeof(PoiseHandler))]
@@ -37,7 +36,11 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool IsSelfDestructing { get; private set; }
     private IEnemySensor _sensor;
     private NavMeshAgent _navMeshAgent;
-    private Coroutine _knockbackCoroutine;
+    public bool IsKnockbacking { get; private set; }
+    private Vector3 _knockbackVelocity;
+    private float _knockbackElapsed;
+    private float _knockbackDurationSnapshot;
+    private bool _knockbackRootMotion;
     private int _moveLockCount = 0;
 
     [Header("AI 기억 및 접근")]
@@ -55,7 +58,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private bool _isTargetOutOfCombatRange => DetectedTarget == null
         || Vector3.Distance(transform.position, DetectedTarget.position) > CombatExitRange;
     // 현재 선택한 공격의 실행 사거리(executeRange) 안에 플레이어가 들어왔는지
-    public bool IsInExecuteRange => CurrentAction != null && DetectedTarget != null
+    public bool IsInExecuteRange => !IsKnockbacking && CurrentAction != null && DetectedTarget != null
         && Vector3.Distance(transform.position, DetectedTarget.position) >= CurrentAction.SkillData.minimumRange
         && Vector3.Distance(transform.position, DetectedTarget.position) <= CurrentAction.SkillData.executeRange;
     public Transform DetectedTarget
@@ -73,7 +76,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private bool _isDie = false;
 
     public bool IsSilenced => GetComponent<StatusEffectHandler>()?.Get<SilenceEffect>() is { IsExpired: false };
-    public bool CanAttack => !IsSilenced && _attackCooldownTimer <= 0f;
+    public bool CanAttack => !IsKnockbacking && !IsSilenced && _attackCooldownTimer <= 0f;
     public bool IsAttackFinished => CurrentAction?.IsFinished ?? true;
 
     public Animator Animator { get; private set; }
@@ -190,6 +193,7 @@ public class Enemy : MonoBehaviour, IDamageable
             return;
         }
         TryStartSelfDestruct();
+        UpdateKnockback(Time.deltaTime);
         _sensor?.DetectTarget();
         if (DetectedTarget != null) RememberTargetPosition(DetectedTarget.position);
         _stateMachine.Update();
@@ -230,7 +234,8 @@ public class Enemy : MonoBehaviour, IDamageable
 
         if (EnemyStat.CurrentHp > 0f) TryStartSelfDestruct();
 
-        if (power != Vector3.zero && !IsSelfDestructing)
+        // Preserve the enemy's existing equal-level reaction rule; super armor resists displacement.
+        if (power != Vector3.zero && CanReceiveKnockback(staggerResistLevel) && !IsSelfDestructing && EnemyStat.CurrentHp > 0f)
             ApplyKnockback(power);
 
         if (EnemyStat.CurrentHp <= 0)
@@ -264,43 +269,57 @@ public class Enemy : MonoBehaviour, IDamageable
     /// <summary>
     /// 넉백을 적용합니다. 저항값을 뺀 유효 힘이 0보다 클 때만 실제로 밀립니다.
     /// </summary>
+    private bool CanReceiveKnockback(StaggerResistLevel attackLevel)
+        => StaggerResistLevel != StaggerResistLevel.SUPER_ARMOR
+            && (IsGroggy || PendingGroggy || attackLevel >= StaggerResistLevel);
+
     private void ApplyKnockback(Vector3 power)
     {
-        float effectiveForce = power.magnitude - EnemyStat.GetStat(EnemyStatType.KnockbackResistance);
-        if (effectiveForce <= 0f) return;
+        Vector3 velocity = KnockbackMotion.Velocity(power, KnockbackResistance);
+        float duration = KnockbackDuration;
+        if (velocity.sqrMagnitude <= 0f || !KnockbackMotion.IsFinite(duration) || duration <= 0f) return;
+        // Stop manual dash/jump displacement before taking ownership of movement.
+        if (CurrentAction?.IsActive == true) CurrentAction.Exit();
+        if (_navMeshAgent == null) _navMeshAgent = GetComponent<NavMeshAgent>();
+        // Do not teleport through geometry when navigation is unavailable.
+        if (_navMeshAgent == null || !_navMeshAgent.enabled || !_navMeshAgent.isOnNavMesh) return;
+        _navMeshAgent.ResetPath();
+        _navMeshAgent.velocity = Vector3.zero;
+        BeginKnockback(velocity, duration);
+    }
 
-        Vector3 velocity = power.normalized * effectiveForce;
-
-        if (_knockbackCoroutine != null)
-            StopCoroutine(_knockbackCoroutine);
-
-        _knockbackCoroutine = StartCoroutine(KnockbackRoutine(velocity));
+    private void BeginKnockback(Vector3 velocity, float duration)
+    {
+        if (!IsKnockbacking)
+        {
+            IsKnockbacking = true;
+            LockMovement();
+            if (Animator != null)
+            {
+                _knockbackRootMotion = Animator.applyRootMotion;
+                Animator.applyRootMotion = false;
+            }
+        }
+        _knockbackVelocity = velocity;
+        _knockbackElapsed = 0f;
+        _knockbackDurationSnapshot = duration;
     }
 
     /// <summary>
     /// 초기 속도에서 0으로 감속하며 NavMesh 위에서 적을 밀어냅니다.
     /// </summary>
-    private IEnumerator KnockbackRoutine(Vector3 initialVelocity)
+    private void UpdateKnockback(float deltaTime)
     {
-        if (_navMeshAgent != null && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
-            _navMeshAgent.ResetPath();
-
-        float elapsed = 0f;
-        while (elapsed < EnemyStat.GetStat(EnemyStatType.KnockbackDuration))
+        if (!IsKnockbacking) return;
+        if (_navMeshAgent == null || !_navMeshAgent.enabled || !_navMeshAgent.isOnNavMesh)
         {
-            float t = 1f - (elapsed / EnemyStat.GetStat(EnemyStatType.KnockbackDuration)); // 선형 감속
-            Vector3 delta = initialVelocity * t * Time.deltaTime;
-
-            if (_navMeshAgent != null && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
-                _navMeshAgent.Move(delta);
-            else
-                transform.position += delta;
-
-            elapsed += Time.deltaTime;
-            yield return null;
+            StopKnockback();
+            return;
         }
-
-        _knockbackCoroutine = null;
+        Vector3 delta = KnockbackMotion.Displacement(_knockbackVelocity, _knockbackElapsed, deltaTime, _knockbackDurationSnapshot);
+        _navMeshAgent.Move(delta);
+        _knockbackElapsed += Mathf.Max(0f, deltaTime);
+        if (_knockbackElapsed >= _knockbackDurationSnapshot) StopKnockback();
     }
 
     private void Die()
@@ -322,9 +341,11 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void StopKnockback()
     {
-        if (_knockbackCoroutine == null) return;
-        StopCoroutine(_knockbackCoroutine);
-        _knockbackCoroutine = null;
+        if (!IsKnockbacking) return;
+        IsKnockbacking = false;
+        _knockbackVelocity = Vector3.zero;
+        if (Animator != null) Animator.applyRootMotion = _knockbackRootMotion;
+        UnlockMovement();
     }
 
     public void UpdateAttackCooldown()

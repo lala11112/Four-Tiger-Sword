@@ -12,7 +12,7 @@ public class EnemyHurtState : IPlayerState
         //피격 애니메이션 재생
         _enemy.Animator.CrossFade("Hit", 0.1f);
         _enemy.LockMovement();
-        _remaining = 1f;
+        _remaining = 1.5f;
     }
 
     public void Update()

@@ -3,8 +3,7 @@ public enum StatType
     // ① 생존 및 자원
     ST_HP,           // 최대 체력
     ST_SP,           // 최대 영력
-    ST_STM,          // 최대 스테미나
-    ST_SP_REGEN,     // 영력 회복 효율
+    ST_SP_REGEN = 3, // 영력 회복 효율. 제거된 자원 ID 2를 비워 기존 에셋의 스탯 번호를 유지합니다.
 
     // ② 핵심 전투
     ST_ATK,          // 기본 공격력

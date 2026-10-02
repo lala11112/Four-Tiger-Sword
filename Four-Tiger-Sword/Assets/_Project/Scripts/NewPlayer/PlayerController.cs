@@ -15,13 +15,16 @@ public class PlayerController : MonoBehaviour, IDamageable
     public Transform CameraTransform;
 
     [Header("Player Settings")]
-    public float MoveSpeed = 5.0f;
     public float RunSpeed = 7.0f;
     public float DashSpeed = 10.0f;
     public float JumpForce = 2.0f;
     public float Gravity = -9.81f;
     public float VerticalVelocity;
     public float RotateSpeed = 0.15f;
+
+    [Header("Targeting")]
+    [Range(1f, 89f), Tooltip("카메라 시선을 중심으로 타깃을 선택하는 콘의 반각 (도)")]
+    public float TargetingHalfAngle = 60f;
 
     [Header("Jump Settings")]
     public float CoyoteTime = 0.15f;
@@ -31,7 +34,7 @@ public class PlayerController : MonoBehaviour, IDamageable
     [Header("Dash Settings")]
     public float DashCooldown = 1.0f;
     private float _dashCooldownTimer;
-    public bool CanDash => _dashCooldownTimer <= 0f && StatManager.HasEnoughStaminaForDash;
+    public bool CanDash => _dashCooldownTimer <= 0f;
     public bool IsDashing => StateMachine.CurrentState is PlayerDashState;
 
     [Header("Parry Settings")]
@@ -46,9 +49,6 @@ public class PlayerController : MonoBehaviour, IDamageable
     /// <summary>쿨타임 없음 + 지상 + 적의 예고가 활성 상태일 때만 패링 가능합니다.</summary>
     public bool CanParry => _parryCooldownTimer <= 0f && IsGround() && ParryEventBus.IsAnyTelegraphActive;
 
-    public float CurrentStamina          => StatManager.CurrentStamina;
-    public bool  HasEnoughStaminaForDash => StatManager.HasEnoughStaminaForDash;
-    public bool  CanRun                  => StatManager.CanRun;
 
     // CanSkill / CanUltimate 는 현재 폼의 쿨타임과 SP를 함께 검사합니다.
     public bool CanSkill => FormManager?.CurrentForm?.CanSkill ?? false;
@@ -135,7 +135,6 @@ public class PlayerController : MonoBehaviour, IDamageable
         UpdateCoyoteTimer();
         UpdateDashCooldown();
         UpdateParryCooldown();
-        StatManager.UpdateStamina(Time.deltaTime);
         StatManager.UpdateSpRegen(Time.deltaTime);
         TryDeactivateUltimate();
         StateMachine.Update();
@@ -173,8 +172,6 @@ public class PlayerController : MonoBehaviour, IDamageable
             _parryCooldownTimer -= Time.deltaTime;
     }
 
-    public void ConsumeStaminaForDash() => StatManager.ConsumeStaminaForDash();
-    public void ConsumeStaminaForRun()  => StatManager.ConsumeStaminaForRun(Time.deltaTime);
 
     public void StartParryCooldown() => _parryCooldownTimer = ParryCooldown;
 
@@ -273,23 +270,19 @@ public class PlayerController : MonoBehaviour, IDamageable
     }
 
     private Vector3 GetKnockbackVelocity(Vector3 power)
-    {
-        if (float.IsNaN(power.sqrMagnitude) || float.IsInfinity(power.sqrMagnitude)) return Vector3.zero;
-        float effectiveForce = Mathf.Max(0f, power.magnitude - _knockbackResistance);
-        Vector3 horizontal = Vector3.ProjectOnPlane(power, Vector3.up);
-        return horizontal.sqrMagnitude > 0f ? horizontal.normalized * effectiveForce : Vector3.zero;
-    }
+        => KnockbackMotion.Velocity(power, _knockbackResistance);
 
     // 패링 성공 시에는 반격 상태를 유지한 채 밀림만 적용합니다.
     private void ApplyKnockback(Vector3 power)
     {
         Vector3 velocity = GetKnockbackVelocity(power);
-        if (velocity.sqrMagnitude <= 0f || KnockbackDuration <= 0f) return;
+        if (velocity.sqrMagnitude <= 0f || !KnockbackMotion.IsFinite(KnockbackDuration) || KnockbackDuration <= 0f
+            || Controller == null || !Controller.enabled || StatManager.CurrentHp <= 0f) return;
 
         if (_knockbackCoroutine != null)
             StopCoroutine(_knockbackCoroutine);
 
-        _knockbackCoroutine = StartCoroutine(KnockbackRoutine(velocity));
+        _knockbackCoroutine = StartCoroutine(KnockbackRoutine(velocity, KnockbackDuration));
     }
 
     public void StopParryKnockback()
@@ -334,20 +327,15 @@ public class PlayerController : MonoBehaviour, IDamageable
         ConsumeHitReaction();
     }
 
-    private IEnumerator KnockbackRoutine(Vector3 initialVelocity)
+    private IEnumerator KnockbackRoutine(Vector3 initialVelocity, float duration)
     {
-        // y를 제거하되 원래 속력(magnitude)은 XZ 평면에서 그대로 유지
-        float magnitude = initialVelocity.magnitude;
-        initialVelocity.y = 0f;
-        if (initialVelocity != Vector3.zero)
-            initialVelocity = initialVelocity.normalized * magnitude;
-
+        // Defer the first move so a completed iterator cannot leave a stale coroutine handle.
+        yield return null;
         float elapsed = 0f;
-        while (elapsed < _knockbackDuration)
+        while (elapsed < duration)
         {
             if (!Controller.enabled || StatManager.CurrentHp <= 0f) break;
-            float t = 1f - (elapsed / _knockbackDuration); // 선형 감속
-            Vector3 delta = initialVelocity * t * Time.deltaTime;
+            Vector3 delta = KnockbackMotion.Displacement(initialVelocity, elapsed, Time.deltaTime, duration);
             Controller.Move(delta);
 
             elapsed += Time.deltaTime;

@@ -65,9 +65,8 @@ public abstract partial class BaseForm
             if (enemyStats != null && enemyStats.IsDead) continue;
             if (!hitTargets.Add(damageable)) continue;
 
-            float attackMult = 1f + _playerController.StatManager.GetStat(StatType.ST_ATK) * 0.01f;
-            Vector3 knockbackDir = (hit.transform.position - _playerController.transform.position).normalized;
-            Vector3 knockback = knockbackDir * step.KnockbackForce * attackMult; //아아
+            Vector3 knockback = KnockbackMotion.Power(target.transform.position - _playerController.transform.position,
+                step.KnockbackForce);
             float critChance = _playerController.StatManager.GetStat(StatType.ST_CRT)/100f;
             float critMultiplier = _playerController.StatManager.GetStat(StatType.ST_CRTD)/100f;
             var result = DamageManager.Apply(
