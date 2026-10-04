@@ -9,6 +9,8 @@ public abstract partial class BaseForm
 
     private void ClearHitTargets()
     {
+        _playerController.StopAttackTrails();
+        ClearSlashEffects();
         foreach (var targets in _hitEventTargets.Values) targets.Clear();
         _previousHitTime = 0f;
     }
@@ -19,6 +21,8 @@ public abstract partial class BaseForm
 
     protected virtual void ProcessHit(WeaponActionData step)
     {
+        UpdateSlashEffects(step);
+        UpdateAttackCamera(step);
         float previousTime = _previousHitTime;
         float currentTime = Mathf.Min(_timer, step.Duration);
         _previousHitTime = currentTime;
@@ -34,7 +38,7 @@ public abstract partial class BaseForm
                 //PlayStepSound();
 
                 if (!_hitEventTargets.ContainsKey(i)) _hitEventTargets[i] = new HashSet<IDamageable>();
-                ExecuteHit(step, e.Damage > 0 ? e.Damage : step.Damage, e.PoiseDamage > 0 ? e.PoiseDamage : step.PoiseDamage, _hitEventTargets[i]);
+                ExecuteHit(step, e.Damage > 0 ? e.Damage : step.Damage, e.PoiseDamage > 0 ? e.PoiseDamage : step.PoiseDamage, _hitEventTargets[i], e);
             }
         }
         else
@@ -46,7 +50,7 @@ public abstract partial class BaseForm
         }
     }
 
-    protected virtual void ExecuteHit(WeaponActionData step, float baseDamage, float poiseDamage, HashSet<IDamageable> hitTargets)
+    protected virtual void ExecuteHit(WeaponActionData step, float baseDamage, float poiseDamage, HashSet<IDamageable> hitTargets, HitEvent hitEvent = null)
     {
         Vector3 center = _playerController.transform.position
                        + _playerController.transform.rotation * step.HitBoxOffset;
@@ -77,10 +81,11 @@ public abstract partial class BaseForm
             if (firstHit)
             {
                 _playerController.StartHitStop();
+                if (!NotifyCameraHit(step, target.transform, _playerController.transform.forward))
+                    _playerController.PlayAttackCameraShake(step);
                 firstHit = false;
             }
-            _playerController.ImpulseSource?.GenerateImpulse();
-            OnDamageDealt(target, result);
+            OnDamageDealt(target, result, step, hitEvent);
         }
     }
 

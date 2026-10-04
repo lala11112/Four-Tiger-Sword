@@ -10,6 +10,17 @@ public enum HitBoxShape
 }
 
 [Serializable]
+public class HitVfxSettings
+{
+    [Tooltip("비워두면 공격 기본 프리팹, 그 다음 폼의 HitVFX를 사용합니다.")]
+    public GameObject Prefab;
+    [Tooltip("프리팹 원본 크기에 곱할 XYZ 배율. 기본값은 (1, 1, 1)입니다.")]
+    public Vector3 Scale = Vector3.one;
+    [Tooltip("몬스터의 Spawn Point 회전에 더할 로컬 회전 (도)")]
+    public Vector3 Rotation;
+}
+
+[Serializable]
 public class HitEvent
 {
     [Tooltip("이 히트가 발동되는 시작 시점 (초)")]
@@ -25,6 +36,11 @@ public class HitEvent
     
     [Tooltip("이 히트의 경직 저항 값")]
     public StaggerResistLevel StaggerResistLevel = StaggerResistLevel.NONE;
+
+    [Header("Hit VFX")]
+    [Tooltip("켜면 이 히트의 크기/회전을 아래 설정으로 덮어씁니다. 끄면 공격의 Hit Effect 설정을 사용합니다.")]
+    public bool OverrideHitVFX;
+    public HitVfxSettings HitEffect = new HitVfxSettings();
 }
 
 [Serializable]
@@ -78,12 +94,46 @@ public class WeaponActionData
     [Tooltip("여러 번 히트시키려면 여기에 추가하세요. 비어있으면 위의 HitStartTime/HitDuration/Damage를 사용합니다.")]
     public List<HitEvent> HitEvents = new List<HitEvent>();
 
+    [Header("Hit VFX (피격 이펙트)")]
+    [Tooltip("이 공격의 기본 피격 이펙트. HitEvents가 없어도 적용됩니다.")]
+    public HitVfxSettings HitEffect = new HitVfxSettings();
+
+    [Header("Attack Trail Timing")]
+    [Tooltip("켜면 이 공격에서는 Trail을 재생하지 않습니다.")]
+    public bool DisableTrail;
+    [Tooltip("끄면 공격 시작부터 Duration까지 재생합니다. 켜면 아래 시작/종료 시간을 사용합니다. 타격 판정 시간과 무관합니다.")]
+    public bool UseCustomTrailTiming;
+    [Min(0f), Tooltip("공격 시작 기준 Trail 시작 시간 (공격 속도 1 기준 초)")]
+    public float TrailStartTime;
+    [Min(0f), Tooltip("공격 시작 기준 Trail 종료 시간 (공격 속도 1 기준 초). Duration 이내로 제한됩니다. 시작 이하이면 재생하지 않습니다.")]
+    public float TrailEndTime = 0.5f;
+
     [Header("Effects (선택사항)")]
     [Tooltip("검기 또는 타격 이펙트 프리팹")]
     public GameObject SlashVFX;
+
+    [Tooltip("음수면 각 Hit Event 시작에 재생, 0 이상이면 지정한 공격 시간에 한 번 재생")]
+    public float SlashVFXStartTime = -1f;
+    [Tooltip("히트박스 위치에 더할 로컬 위치")]
+    public Vector3 SlashVFXOffset = new Vector3(0f, 1f, 0f);
+    public Vector3 SlashVFXRotation;
+    [Min(0.01f)] public float SlashVFXScale = 1f;
+    [Min(0.01f), Tooltip("공격 속도 1 기준 이펙트 수명 (초)")]
+    public float SlashVFXLifetime = 0.22f;
     
     [Tooltip("휘두르는 사운드")]
     public AudioClip SwingSound;
+
+    [Header("Camera Direction (optional)")]
+    public AttackCameraProfile CameraProfile;
+
+    [Header("Camera Shake")]
+    [Min(0f), Tooltip("적중 시 화면 흔들림 배율. 0=끄기, 1=Impulse Source 기본 세기, 2=2배")]
+    public float CameraShakeStrength = 1f;
+    [Tooltip("켜면 이 공격의 방향을 사용하고, 끄면 Impulse Source의 Default Velocity 방향을 사용합니다.")]
+    public bool OverrideCameraShakeDirection;
+    [Tooltip("방향만 사용합니다. Listener의 Use Camera Space가 켜져 있으면 X=화면 좌우, Y=상하, Z=앞뒤. 꺼져 있으면 월드 축입니다.")]
+    public Vector3 CameraShakeDirection = Vector3.down;
 
     [Header("Attack Movement")]
     [Tooltip("켜면 아래 거리/시간/누적 커브 사용. 끄면 기존 Thrust 속도 커브를 누적 거리로 자동 변환합니다.")]

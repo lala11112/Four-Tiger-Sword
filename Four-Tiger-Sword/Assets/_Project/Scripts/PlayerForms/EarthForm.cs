@@ -62,9 +62,9 @@ public class EarthForm : BaseForm
         (attackSource as EnemyAction)?.OnParried();
         return true;
     }
-    protected override void OnHitEnemy(GameObject target)
+    protected override void OnHitEnemy(GameObject target, WeaponActionData step = null, HitEvent hitEvent = null)
     {
-        base.OnHitEnemy(target);
+        base.OnHitEnemy(target, step, hitEvent);
         if (_currentAction == ActionType.Counter)
         {
             var effects = target.GetComponent<StatusEffectHandler>() ?? target.AddComponent<StatusEffectHandler>();

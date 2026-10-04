@@ -73,9 +73,9 @@ public abstract partial class BaseForm : IForm
     }
 
     protected virtual void OnTick(float deltaTime) { }
-    protected virtual void OnHitEnemy(GameObject enemy)
+    protected virtual void OnHitEnemy(GameObject enemy, WeaponActionData step = null, HitEvent hitEvent = null)
     {
-        SpawnHitVFX(enemy.transform.position);
+        SpawnHitVFX(enemy, step, hitEvent);
         PlayHitSound(enemy.transform.position);
         _playerController.StatManager.AddUltimateGauge(1);
 

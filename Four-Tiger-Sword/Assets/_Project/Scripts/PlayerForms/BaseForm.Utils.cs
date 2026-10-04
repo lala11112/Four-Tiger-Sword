@@ -22,8 +22,9 @@ public abstract partial class BaseForm
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.ComboSteps[_comboStep];
         ResetTargetApproach(step, _comboStep > 0);
-        PlayActionAnimation(step.AnimationName, 0.1f);
-        SpawnStepVFX(_weaponActionData.ComboSteps, _comboStep);
+        BeginAttackCamera(step, _comboStep > 0);
+        PlayActionAnimation(step.AnimationName, 0.01f);
+        _playerController.UpdateAttackTrails(step, 0f);
         PlayStepSound(_weaponActionData.ComboSteps, _comboStep);
         Debug.Log($"공격이름 : {step.AnimationName}  타수 : {_comboStep}");
     }
@@ -34,8 +35,9 @@ public abstract partial class BaseForm
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
         ResetMotion(step);
+        BeginAttackCamera(step, _skillStep > 0);
         PlayActionAnimation(step.AnimationName, 0.01f);
-        SpawnStepVFX(_weaponActionData.SkillSteps, _skillStep);
+        _playerController.UpdateAttackTrails(step, 0f);
         PlayStepSound(_weaponActionData.SkillSteps, _skillStep);
         Debug.Log($"스킬 단계 : {step.AnimationName} ({_skillStep})");
     }
@@ -46,27 +48,34 @@ public abstract partial class BaseForm
         ClearHitTargets();
         WeaponActionData step = _weaponActionData.UltimateSteps[_ultimateStep];
         ResetMotion(step);
+        BeginAttackCamera(step, _ultimateStep > 0);
         PlayActionAnimation(step.AnimationName, 0.01f);
-        SpawnStepVFX(_weaponActionData.UltimateSteps, _ultimateStep);
+        _playerController.UpdateAttackTrails(step, 0f);
         PlayStepSound(_weaponActionData.UltimateSteps, _ultimateStep);
         Debug.Log($"궁극기 단계 : {step.AnimationName} ({_ultimateStep})");
     }
 
-    protected void SpawnStepVFX(List<WeaponActionData> steps, int index)
+    protected void SpawnHitVFX(GameObject target, WeaponActionData step = null, HitEvent hitEvent = null)
     {
-        if (steps == null || index >= steps.Count) return;
-        WeaponActionData step = steps[index];
-        if (step.SlashVFX == null) return;
+        if (target == null) return;
+        HitVfxSettings settings = hitEvent != null && hitEvent.OverrideHitVFX && hitEvent.HitEffect != null
+            ? hitEvent.HitEffect : step?.HitEffect;
+        GameObject prefab = settings?.Prefab;
+        if (prefab == null) prefab = step?.HitEffect?.Prefab;
+        if (prefab == null) prefab = _weaponActionData?.HitVFX;
+        if (prefab == null) return;
 
-        Vector3 pos = _playerController.transform.position
-                    + _playerController.transform.rotation * step.HitBoxOffset;
-        Object.Instantiate(step.SlashVFX, pos, _playerController.transform.rotation);
-    }
-
-    protected void SpawnHitVFX(Vector3 position)
-    {
-        if (_weaponActionData?.HitVFX == null) return;
-        Object.Instantiate(_weaponActionData.HitVFX, position, Quaternion.identity);
+        var anchor = target.GetComponentInParent<HitVfxAnchor>();
+        Transform point = anchor != null ? anchor.SpawnPoint : target.transform;
+        Quaternion rotation = point.rotation * Quaternion.Euler(settings?.Rotation ?? Vector3.zero);
+        // Spawn independently so knockback or death does not move/remove the impact effect.
+        GameObject effect = Object.Instantiate(prefab, point.position, rotation);
+        effect.transform.localScale = Vector3.Scale(effect.transform.localScale, settings?.Scale ?? Vector3.one);
+        foreach (var particles in effect.GetComponentsInChildren<ParticleSystem>(true))
+        {
+            var main = particles.main;
+            main.scalingMode = ParticleSystemScalingMode.Hierarchy;
+        }
     }
 
     protected void PlayHitSound(Vector3 position)

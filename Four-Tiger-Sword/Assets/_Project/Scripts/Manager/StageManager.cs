@@ -49,6 +49,7 @@ public class StageManager : MonoBehaviour
     {
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+        Application.targetFrameRate = 144;
     }
 
     private void Start()

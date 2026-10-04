@@ -29,8 +29,47 @@ MonoBehaviour:
     KnockbackForce: 3
     StaggerResistLevel: 0
     HitEvents: []
-    SlashVFX: {fileID: 0}
+    SlashVFX: {fileID: 9015710735375805842, guid: 1b6d02aebe857d945a89798ffcebcfbf, type: 3}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: -18}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 1
+    OverrideCameraShakeDirection: 0
+    CameraShakeDirection: {x: 0, y: -1, z: 0}
+    UseDistanceMovement: 0
+    ForwardDistance: 2
+    MovementStartTime: 0.08
+    MovementEndTime: 0.3
+    MovementProgress:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    UntargetedDistanceMultiplier: 1
+    ApproachAlignmentAngle: 15
     ThrustCurve:
       serializedVersion: 2
       m_Curve:
@@ -57,6 +96,9 @@ MonoBehaviour:
       m_RotationOrder: 4
     ThrustMultiplier: 0
     UseTargetApproach: 1
+    FollowMovingTarget: 1
+    TargetFollowSpeed: 6
+    TargetFollowRotationSpeed: 720
     StopDistance: 0.25
     ApproachEndTime: 0.2
     RotationEndTime: 0.2
@@ -76,8 +118,47 @@ MonoBehaviour:
     KnockbackForce: 3
     StaggerResistLevel: 0
     HitEvents: []
-    SlashVFX: {fileID: 0}
+    SlashVFX: {fileID: 9015710735375805842, guid: 1b6d02aebe857d945a89798ffcebcfbf, type: 3}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: 18}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 1
+    OverrideCameraShakeDirection: 0
+    CameraShakeDirection: {x: 0, y: -1, z: 0}
+    UseDistanceMovement: 0
+    ForwardDistance: 2
+    MovementStartTime: 0.08
+    MovementEndTime: 0.3
+    MovementProgress:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    UntargetedDistanceMultiplier: 1
+    ApproachAlignmentAngle: 15
     ThrustCurve:
       serializedVersion: 2
       m_Curve:
@@ -104,6 +185,9 @@ MonoBehaviour:
       m_RotationOrder: 4
     ThrustMultiplier: 0
     UseTargetApproach: 1
+    FollowMovingTarget: 1
+    TargetFollowSpeed: 6
+    TargetFollowRotationSpeed: 720
     StopDistance: 0.25
     ApproachEndTime: 0.2
     RotationEndTime: 0.2
@@ -123,8 +207,47 @@ MonoBehaviour:
     KnockbackForce: 3
     StaggerResistLevel: 0
     HitEvents: []
-    SlashVFX: {fileID: 0}
+    SlashVFX: {fileID: 9015710735375805842, guid: 1b6d02aebe857d945a89798ffcebcfbf, type: 3}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: -18}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 1
+    OverrideCameraShakeDirection: 0
+    CameraShakeDirection: {x: 0, y: -1, z: 0}
+    UseDistanceMovement: 0
+    ForwardDistance: 2
+    MovementStartTime: 0.08
+    MovementEndTime: 0.3
+    MovementProgress:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    UntargetedDistanceMultiplier: 1
+    ApproachAlignmentAngle: 15
     ThrustCurve:
       serializedVersion: 2
       m_Curve:
@@ -151,6 +274,9 @@ MonoBehaviour:
       m_RotationOrder: 4
     ThrustMultiplier: 0
     UseTargetApproach: 1
+    FollowMovingTarget: 1
+    TargetFollowSpeed: 6
+    TargetFollowRotationSpeed: 720
     StopDistance: 0.25
     ApproachEndTime: 0.2
     RotationEndTime: 0.2
@@ -176,7 +302,46 @@ MonoBehaviour:
     StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: 0}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 1
+    OverrideCameraShakeDirection: 0
+    CameraShakeDirection: {x: 0, y: -1, z: 0}
+    UseDistanceMovement: 0
+    ForwardDistance: 2
+    MovementStartTime: 0.08
+    MovementEndTime: 0.3
+    MovementProgress:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    UntargetedDistanceMultiplier: 1
+    ApproachAlignmentAngle: 15
     ThrustCurve:
       serializedVersion: 2
       m_Curve:
@@ -203,6 +368,9 @@ MonoBehaviour:
       m_RotationOrder: 4
     ThrustMultiplier: 10
     UseTargetApproach: 0
+    FollowMovingTarget: 1
+    TargetFollowSpeed: 6
+    TargetFollowRotationSpeed: 720
     StopDistance: 0.25
     ApproachEndTime: 0.3
     RotationEndTime: 0.2
@@ -224,7 +392,46 @@ MonoBehaviour:
     StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: 0}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 1
+    OverrideCameraShakeDirection: 0
+    CameraShakeDirection: {x: 0, y: -1, z: 0}
+    UseDistanceMovement: 0
+    ForwardDistance: 2
+    MovementStartTime: 0.08
+    MovementEndTime: 0.3
+    MovementProgress:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    UntargetedDistanceMultiplier: 1
+    ApproachAlignmentAngle: 15
     ThrustCurve:
       serializedVersion: 2
       m_Curve:
@@ -251,6 +458,9 @@ MonoBehaviour:
       m_RotationOrder: 4
     ThrustMultiplier: 10
     UseTargetApproach: 0
+    FollowMovingTarget: 1
+    TargetFollowSpeed: 6
+    TargetFollowRotationSpeed: 720
     StopDistance: 0.25
     ApproachEndTime: 0.3
     RotationEndTime: 0.2
@@ -272,7 +482,46 @@ MonoBehaviour:
     StaggerResistLevel: 0
     HitEvents: []
     SlashVFX: {fileID: 0}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: 0}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 1
+    OverrideCameraShakeDirection: 0
+    CameraShakeDirection: {x: 0, y: -1, z: 0}
+    UseDistanceMovement: 0
+    ForwardDistance: 2
+    MovementStartTime: 0.08
+    MovementEndTime: 0.3
+    MovementProgress:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    UntargetedDistanceMultiplier: 1
+    ApproachAlignmentAngle: 15
     ThrustCurve:
       serializedVersion: 2
       m_Curve:
@@ -299,6 +548,9 @@ MonoBehaviour:
       m_RotationOrder: 4
     ThrustMultiplier: 0
     UseTargetApproach: 1
+    FollowMovingTarget: 1
+    TargetFollowSpeed: 6
+    TargetFollowRotationSpeed: 720
     StopDistance: 0.25
     ApproachEndTime: 0.5
     RotationEndTime: 0.5
@@ -345,7 +597,46 @@ MonoBehaviour:
       PoiseDamage: 10
       StaggerResistLevel: 0
     SlashVFX: {fileID: 0}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: 0}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 1
+    OverrideCameraShakeDirection: 0
+    CameraShakeDirection: {x: 0, y: -1, z: 0}
+    UseDistanceMovement: 0
+    ForwardDistance: 2
+    MovementStartTime: 0.08
+    MovementEndTime: 0.3
+    MovementProgress:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    UntargetedDistanceMultiplier: 1
+    ApproachAlignmentAngle: 15
     ThrustCurve:
       serializedVersion: 2
       m_Curve:
@@ -372,6 +663,9 @@ MonoBehaviour:
       m_RotationOrder: 4
     ThrustMultiplier: 0
     UseTargetApproach: 1
+    FollowMovingTarget: 1
+    TargetFollowSpeed: 6
+    TargetFollowRotationSpeed: 720
     StopDistance: 0.25
     ApproachEndTime: 0.2
     RotationEndTime: 0.2

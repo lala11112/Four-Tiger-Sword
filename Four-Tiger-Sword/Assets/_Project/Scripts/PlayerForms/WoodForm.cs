@@ -25,9 +25,9 @@ public class WoodForm : BaseForm
     }
     private static WoodTargetEffects WoodEffects(GameObject target)
         => target.GetComponent<WoodTargetEffects>() ?? target.AddComponent<WoodTargetEffects>();
-    protected override void OnHitEnemy(GameObject enemy)
+    protected override void OnHitEnemy(GameObject enemy, WeaponActionData step = null, HitEvent hitEvent = null)
     {
-        base.OnHitEnemy(enemy);
+        base.OnHitEnemy(enemy, step, hitEvent);
         WoodEffects(enemy).AddStacks(_woodData);
     }
     public override void BeginSkill()
@@ -58,7 +58,7 @@ public class WoodForm : BaseForm
             if (target.GetComponent<EnemyStat>()?.IsDead == true) continue;
             var result = DamageManager.Apply(EffectHit(Mathf.Max(0f, _woodData.SkillDamageMultiplier)), (IDamageable)target, target.gameObject);
             if (!result.Applied || result.Killed) continue;
-            base.OnHitEnemy(target.gameObject);
+            base.OnHitEnemy(target.gameObject, _woodData.SkillSteps[0]);
             var effects = WoodEffects(target.gameObject);
             effects.AddStacks(_woodData, true);
             effects.Pull(center, _woodData.PullDuration, _woodData.PullSpeed, _woodData.PullStopDistance);

@@ -26,6 +26,7 @@ public abstract partial class BaseForm
         _timer += Time.deltaTime * AttackSpeed;
         WeaponActionData currentStep = _weaponActionData.ComboSteps[_comboStep];
 
+        _playerController.UpdateAttackTrails(currentStep, _timer);
         MoveForward(currentStep);
         ProcessHit(currentStep);
 
@@ -46,6 +47,7 @@ public abstract partial class BaseForm
 
     public virtual void EndAttack()
     {
+        EndAttackCamera();
         _comboStep = 0;
         _softTarget = null;
         ClearHitTargets();
@@ -96,9 +98,11 @@ public abstract partial class BaseForm
     {
         _timer = 0f;
         FindSoftTarget();
+        BeginAttackCamera(_weaponActionData?.AirAttackStep);
         ClearHitTargets();
         _playerController.Animator.speed = AttackSpeed;
         PlayActionAnimation(_weaponActionData?.AirAttackStep?.AnimationName, 0.05f);
+        _playerController.UpdateAttackTrails(_weaponActionData?.AirAttackStep, 0f);
     }
 
     public virtual void UpdateAirAttack(out bool isComplete)
@@ -109,12 +113,14 @@ public abstract partial class BaseForm
         _playerController.Animator.speed = AttackSpeed;
         _timer += Time.deltaTime * AttackSpeed;
         RotateTowardSoftTarget();
+        _playerController.UpdateAttackTrails(_weaponActionData.AirAttackStep, _timer);
         ProcessHit(_weaponActionData.AirAttackStep);
         isComplete = _timer >= _weaponActionData.AirAttackStep.Duration;
     }
 
     public virtual void EndAirAttack()
     {
+        EndAttackCamera();
         _softTarget = null;
         ClearHitTargets();
         _playerController.Animator.speed = 1f;
@@ -139,6 +145,7 @@ public abstract partial class BaseForm
 
         _timer += Time.deltaTime * AttackSpeed;
         WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
+        _playerController.UpdateAttackTrails(step, _timer);
         MoveForward(step);
         ProcessHit(step);
 
@@ -151,6 +158,7 @@ public abstract partial class BaseForm
 
     public virtual void EndSkill()
     {
+        EndAttackCamera();
         _skillStep = 0;
         _softTarget = null;
         ClearHitTargets();
@@ -183,6 +191,7 @@ public abstract partial class BaseForm
 
         _timer += Time.deltaTime * AttackSpeed;
         WeaponActionData step = _weaponActionData.UltimateSteps[_ultimateStep];
+        _playerController.UpdateAttackTrails(step, _timer);
         MoveForward(step);
         ProcessHit(step);
 
@@ -195,6 +204,7 @@ public abstract partial class BaseForm
 
     public virtual void EndUltimate()
     {
+        EndAttackCamera();
         _ultimateStep = 0;
         _softTarget = null;
         ClearHitTargets();
@@ -209,6 +219,8 @@ public abstract partial class BaseForm
         _timer = 0f;
         _motionStep = null;
         FindSoftTarget();
+        BeginAttackCamera(_weaponActionData?.CounterStep
+            ?? (_weaponActionData?.ComboSteps?.Count > 0 ? _weaponActionData.ComboSteps[0] : null));
         ClearHitTargets();
         _playerController.Animator.speed = AttackSpeed;
         // CounterStep이 없으면 첫 번째 콤보 스텝을 폴백으로 사용
@@ -216,6 +228,8 @@ public abstract partial class BaseForm
             PlayActionAnimation(_weaponActionData.CounterStep.AnimationName, 0.05f);
         else if (_weaponActionData?.ComboSteps?.Count > 0 && _weaponActionData.ComboSteps[0] != null)
             PlayActionAnimation(_weaponActionData.ComboSteps[0].AnimationName, 0.05f);
+        _playerController.UpdateAttackTrails(_weaponActionData?.CounterStep
+            ?? (_weaponActionData?.ComboSteps?.Count > 0 ? _weaponActionData.ComboSteps[0] : null), 0f);
     }
 
     public virtual void UpdateCounter(out bool isComplete)
@@ -228,6 +242,7 @@ public abstract partial class BaseForm
         if (step == null) { isComplete = true; return; }
 
         _timer += Time.deltaTime * AttackSpeed;
+        _playerController.UpdateAttackTrails(step, _timer);
         MoveForward(step);
         ProcessHit(step);
 
@@ -237,6 +252,7 @@ public abstract partial class BaseForm
 
     public virtual void EndCounter()
     {
+        EndAttackCamera();
         _softTarget = null;
         ClearHitTargets();
         _playerController.Animator.speed = 1f;

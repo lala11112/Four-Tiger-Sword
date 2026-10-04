@@ -38,6 +38,22 @@ public static class KnockbackRegression
         check(KnockbackMotion.Displacement(Vector3.one, 0, 1, 0) == Vector3.zero, "Zero duration.");
         check(KnockbackMotion.Displacement(Vector3.one, 0, 1, float.PositiveInfinity) == Vector3.zero, "Infinite duration.");
 
+        foreach (float duration in new[] { 0.01f, 0.16f, 0.25f })
+        foreach (int fps in new[] { 5, 15, 30, 60, 144 })
+        {
+            Vector3 total = Vector3.zero;
+            for (float time = 0f; time < duration + 0.1f; time += 1f / fps)
+                total += KnockbackMotion.ImpactDisplacement(Vector3.right * 8f, time, 1f / fps, duration);
+            check(Mathf.Abs(total.x - 8f * duration / 3f) < 0.0001f, "Impact distance depends on FPS.");
+        }
+        float impactTotal = KnockbackMotion.ImpactDisplacement(Vector3.right * 8f, 0f, 1f, 0.16f).x;
+        check(KnockbackMotion.ImpactDisplacement(Vector3.right * 8f, 0f, 0.08f, 0.16f).x > impactTotal * 0.85f,
+            "Impact retains too much late sliding.");
+        check(KnockbackMotion.ImpactDisplacement(Vector3.right * 8f, 0.16f, 0.5f, 0.16f) == Vector3.zero,
+            "Impact continued moving during recovery.");
+        check(KnockbackMotion.ImpactDisplacement(Vector3.one, 0f, 1f, 0f) == Vector3.zero, "Zero impact duration moved.");
+        check(KnockbackMotion.ImpactDisplacement(Vector3.one, 0f, 1f, float.NaN) == Vector3.zero, "NaN impact duration moved.");
+
         var original = SceneManager.GetActiveScene();
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
         MonsterDefaultAttackSO skill = null;
@@ -81,6 +97,8 @@ public static class KnockbackRegression
             start();
             check(enemy.IsKnockbacking && !animator.applyRootMotion && !enemy.CanAttack, "Movement ownership missing.");
             check(locks() == 2, "Knockback lock missing.");
+            check((float)typeof(Enemy).GetField("_knockbackMoveDuration", Hidden).GetValue(enemy) <= 0.16f,
+                "Monster movement lasts beyond impact window.");
             start();
             check(locks() == 2, "Repeated hit leaked a lock.");
             values[EnemyStatType.KnockbackDuration] = 10f;
@@ -92,6 +110,32 @@ public static class KnockbackRegression
             stop.Invoke(enemy, null);
             check(locks() == 1, "Double stop released another owner's lock.");
             enemy.UnlockMovement();
+            begin.Invoke(enemy, new object[] { Vector3.right * 1000f, 1f });
+            var cappedVelocity = (Vector3)typeof(Enemy).GetField("_knockbackVelocity", Hidden).GetValue(enemy);
+            float moveTime = (float)typeof(Enemy).GetField("_knockbackMoveDuration", Hidden).GetValue(enemy);
+            check(KnockbackMotion.ImpactDisplacement(cappedVelocity, 0f, 1f, moveTime).magnitude <= enemy.KnockbackMaxDistance + 0.001f,
+                "Heavy hit exceeded distance cap.");
+            stop.Invoke(enemy, null);
+
+            // Missing Hit controllers freeze locomotion, re-hits refresh recovery, Exit restores playback.
+            animator.speed = 0.75f;
+            var hurt = new EnemyHurtState(enemy);
+            hurt.Enter();
+            check(animator.speed == 0f && locks() == 1, "Missing-hit fallback kept walking or failed to lock.");
+            typeof(EnemyHurtState).GetField("_remaining", Hidden).SetValue(hurt, 0.01f);
+            uint revision = enemy.HurtVersion;
+            hit(StaggerResistLevel.HIGH);
+            hurt.Update();
+            check(enemy.HurtVersion == revision + 1
+                && (float)typeof(EnemyHurtState).GetField("_remaining", Hidden).GetValue(hurt) > 0.1f,
+                "Repeated hit did not refresh recovery.");
+            hurt.Exit();
+            check(animator.speed == 0.75f && locks() == 0, "Reaction fallback leaked animator speed/lock.");
+            enemy.StaggerResistLevel = StaggerResistLevel.SUPER_ARMOR;
+            revision = enemy.HurtVersion;
+            hit(StaggerResistLevel.HIGH);
+            check(enemy.HurtVersion == revision && !enemy.IsHurt, "Super armor entered a hit animation.");
+            enemy.StaggerResistLevel = StaggerResistLevel.NONE;
             values[EnemyStatType.KnockbackDuration] = 0.25f;
             start(); go.SetActive(false);
             // Non-ExecuteAlways behaviours do not receive normal lifecycle callbacks in Edit Mode.

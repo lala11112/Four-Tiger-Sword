@@ -4,7 +4,7 @@ using Unity.Cinemachine;
 
 [RequireComponent(typeof(CharacterController), typeof(PlayerInputHandler), typeof(PlayerMovement))]
 [RequireComponent(typeof(PlayerStatManager))]
-public class PlayerController : MonoBehaviour, IDamageable
+public partial class PlayerController : MonoBehaviour, IDamageable
 {
     public CharacterController Controller { get; private set; }
     public PlayerInputHandler Input { get; private set; }
@@ -13,6 +13,23 @@ public class PlayerController : MonoBehaviour, IDamageable
     public StateMachine StateMachine { get; private set; }
     public PlayerStatManager StatManager { get; private set; }
     public Transform CameraTransform;
+    [Header("Combat Camera")]
+    [SerializeField] private CombatCameraDirector _combatCamera;
+    public CombatCameraDirector CombatCamera
+    {
+        get
+        {
+            if (_combatCamera != null) return _combatCamera;
+            foreach (var camera in FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None))
+            {
+                if (camera.Follow == null || !camera.Follow.IsChildOf(transform)) continue;
+                _combatCamera = camera.GetComponent<CombatCameraDirector>();
+                if (_combatCamera == null) _combatCamera = camera.gameObject.AddComponent<CombatCameraDirector>();
+                break;
+            }
+            return _combatCamera;
+        }
+    }
 
     [Header("Player Settings")]
     public float RunSpeed = 7.0f;
@@ -182,6 +199,23 @@ public class PlayerController : MonoBehaviour, IDamageable
         StatManager.AddUltimateGauge(ParryUltimateGaugeReward);
     }
 
+    public void PlayAttackCameraShake(WeaponActionData step)
+    {
+        if (ImpulseSource == null) return;
+        float strength = step != null ? step.CameraShakeStrength : 1f;
+        if (!KnockbackMotion.IsFinite(strength) || strength <= 0f) return;
+        Vector3 velocity = ImpulseSource.DefaultVelocity;
+        if (step != null && step.OverrideCameraShakeDirection)
+        {
+            Vector3 direction = step.CameraShakeDirection;
+            if (!KnockbackMotion.IsFinite(direction.sqrMagnitude) || direction.sqrMagnitude <= 0f) return;
+            velocity = direction.normalized * velocity.magnitude;
+        }
+        velocity *= strength;
+        if (!KnockbackMotion.IsFinite(velocity.sqrMagnitude) || velocity.sqrMagnitude <= 0f) return;
+        ImpulseSource.GenerateImpulseWithVelocity(velocity);
+    }
+
 
     private void OnDrawGizmos()
     {
@@ -315,6 +349,8 @@ public class PlayerController : MonoBehaviour, IDamageable
 
     private void OnDisable()
     {
+        StopAttackTrails(true);
+        _combatCamera?.Cancel(this, true);
         FormManager?.CleanupTransientEffects();
         if (_hitStopCoroutine != null)
         {

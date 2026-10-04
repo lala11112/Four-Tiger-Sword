@@ -26,4 +26,18 @@ public static class KnockbackMotion
         // Exact integral of a linearly decaying velocity; clips the final frame.
         return initialVelocity * ((end - start) * (1f - (start + end) / (2f * duration)));
     }
+
+    /// <summary>Short monster impact: squared speed falloff, then a completely stationary recovery.</summary>
+    public static Vector3 ImpactDisplacement(Vector3 initialVelocity, float elapsed, float deltaTime, float moveDuration)
+    {
+        if (!IsFinite(moveDuration) || !IsFinite(elapsed) || !IsFinite(deltaTime)
+            || !IsFinite(initialVelocity.sqrMagnitude) || moveDuration <= 0f || deltaTime <= 0f)
+            return Vector3.zero;
+        float start = Mathf.Clamp01(elapsed / moveDuration);
+        float end = Mathf.Clamp01((elapsed + deltaTime) / moveDuration);
+        // Exact integral of v0 * (1-t/T)^2. No frame-rate-dependent drag or long velocity tail.
+        float a = 1f - start;
+        float b = 1f - end;
+        return initialVelocity * (moveDuration / 3f * (a * a * a - b * b * b));
+    }
 }

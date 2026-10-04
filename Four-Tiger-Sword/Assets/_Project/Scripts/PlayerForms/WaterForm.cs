@@ -38,6 +38,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
     private float _heavyDashDuration;
     private float _heavyAttackDuration;
     private bool _heavyAttackFinished;
+    private bool _heavyFeedbackPlayed;
     private Component _heavyChainTarget;
     private Collider _heavyChainTargetCollider;
     public Transform HeavyAttackTarget => HasHeavyChainTarget ? _heavyChainTarget.transform : null;
@@ -67,9 +68,9 @@ public class WaterForm : BaseForm, IHeavyAttackForm
         CleanupActionEffects();
         PlayerUIManager.Instance?.WaterElement?.SetActive(true);
     }
-    protected override void OnHitEnemy(GameObject enemy)
+    protected override void OnHitEnemy(GameObject enemy, WeaponActionData step = null, HitEvent hitEvent = null)
     {
-        base.OnHitEnemy(enemy);
+        base.OnHitEnemy(enemy, step, hitEvent);
         if (_currentAction == ActionType.Attack)
             _flow.Charge(_waterData.WaterNormalHitGain);
     }
@@ -127,7 +128,8 @@ public class WaterForm : BaseForm, IHeavyAttackForm
         _heavyDashDirection = Vector3.ProjectOnPlane(_heavyDashDirection, Vector3.up).normalized;
         if (_heavyDashDirection.sqrMagnitude < 0.001f) _heavyDashDirection = _playerController.transform.forward;
         _playerController.transform.rotation = Quaternion.LookRotation(_heavyDashDirection);
-        BeginHeavyAttack();
+        BeginHeavyAttack(continuing, HeavyAttackTarget, _heavyDashDirection);
+        _heavyFeedbackPlayed = false;
         _softTarget = null;
         _heavySavedExcludeLayers = _playerController.Controller.excludeLayers;
         _heavyCollisionOverride = true;
@@ -180,6 +182,10 @@ public class WaterForm : BaseForm, IHeavyAttackForm
         movement.y = _playerController.VerticalVelocity * Time.deltaTime;
         _playerController.Controller.Move(movement);
         Vector3 to = _playerController.transform.position + offset;
+        UpdateAttackCamera(step);
+        UpdateSlashEffects(step);
+        // Trail timing follows the full attack motion, including the dash recovery.
+        _playerController.UpdateAttackTrails(step, _timer);
 
         // Sweep the actual path, including enemies crossed entirely in one frame.
         float hitStart = Mathf.Max(previous, step.HitStartTime);
@@ -189,7 +195,6 @@ public class WaterForm : BaseForm, IHeavyAttackForm
             float moveInterval = Mathf.Min(_timer, _heavyDashDuration) - previous;
             Vector3 start = Vector3.Lerp(from, to, (hitStart - previous) / moveInterval);
             Vector3 end = Vector3.Lerp(from, to, (hitEnd - previous) / moveInterval);
-            bool firstHit = true;
             var hits = Physics.OverlapCapsule(start, end, Mathf.Max(0.1f, step.HitBoxRadius), _enemyLayer);
             System.Array.Sort(hits, (a, b) => (a.ClosestPoint(start) - start).sqrMagnitude.CompareTo(
                 (b.ClosestPoint(start) - start).sqrMagnitude));
@@ -213,9 +218,14 @@ public class WaterForm : BaseForm, IHeavyAttackForm
                     _heavyChainTarget = component;
                     _heavyChainTargetCollider = collider;
                 }
-                if (firstHit) { _playerController.StartHitStop(); firstHit = false; }
-                _playerController.ImpulseSource?.GenerateImpulse();
-                OnHitEnemy(component.gameObject);
+                if (!_heavyFeedbackPlayed)
+                {
+                    _playerController.StartHitStop();
+                    if (!NotifyCameraHit(step, component.transform, _heavyDashDirection))
+                        _playerController.PlayAttackCameraShake(step);
+                    _heavyFeedbackPlayed = true;
+                }
+                OnHitEnemy(component.gameObject, step);
             }
         }
         // Movement can finish earlier; queued attacks wait for the entire attack motion.
@@ -225,6 +235,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
 
     public override void EndHeavyAttack()
     {
+        EndAttackCamera(!_heavyAttackFinished);
         RestoreHeavyCollision();
         _heavyChainTarget = null;
         _heavyChainTargetCollider = null;
@@ -250,10 +261,10 @@ public class WaterForm : BaseForm, IHeavyAttackForm
         _trailStart = _playerController.Controller.bounds.center;
         _dashHitTargets.Clear();
     }
-    protected override void ExecuteHit(WeaponActionData step, float damage, float poiseDamage, HashSet<IDamageable> targets)
+    protected override void ExecuteHit(WeaponActionData step, float damage, float poiseDamage, HashSet<IDamageable> targets, HitEvent hitEvent = null)
         => base.ExecuteHit(step,
             damage * (_currentAction == ActionType.HeavyAttack ? HeavyAttackDamageMultiplier : 1f),
-            poiseDamage, _currentAction == ActionType.Skill ? _dashHitTargets : targets);
+            poiseDamage, _currentAction == ActionType.Skill ? _dashHitTargets : targets, hitEvent);
 
     public override void UpdateSkill(out bool isComplete)
     {
@@ -267,7 +278,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
             var target = collider.GetComponentInParent<IDamageable>();
             if (!(target is Component component) || !_dashHitTargets.Add(target)) continue;
             var result = DamageManager.Apply(EffectHit(step.Damage), target, component.gameObject);
-            if (result.Applied) OnHitEnemy(component.gameObject);
+            if (result.Applied) OnHitEnemy(component.gameObject, step);
         }
         _trailStart = end;
     }
@@ -317,9 +328,10 @@ public class WaterForm : BaseForm, IHeavyAttackForm
                 if (firstHit)
                 {
                     _playerController.StartHitStop();
+                    var steps = _weaponActionData.UltimateSteps;
+                    _playerController.PlayAttackCameraShake(steps != null && steps.Count > 0 ? steps[0] : null);
                     firstHit = false;
                 }
-                _playerController.ImpulseSource?.GenerateImpulse();
             }
             _ultimateHits++;
         }

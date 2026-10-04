@@ -16,7 +16,8 @@ public abstract partial class BaseForm
     protected virtual bool DealsTrueDamage => false;
     public virtual float OutgoingDamageMultiplier => 1f;
     public virtual float IncomingDamageMultiplier => 1f;
-    protected virtual void OnDamageDealt(GameObject target, DamageResult result) => OnHitEnemy(target);
+    protected virtual void OnDamageDealt(GameObject target, DamageResult result, WeaponActionData step = null, HitEvent hitEvent = null)
+        => OnHitEnemy(target, step, hitEvent);
     public virtual bool BlocksIncomingDamage(float damage, Vector3 incomingPower, object source = null) => false;
     public virtual void CleanupTransientEffects() { }
 

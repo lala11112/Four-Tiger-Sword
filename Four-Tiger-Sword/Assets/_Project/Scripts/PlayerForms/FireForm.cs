@@ -32,14 +32,14 @@ public class FireForm : BaseForm, IToggleUltimateForm
         PlayerUIManager.Instance?.FireElement?.SetActive(true);
         player.WeaponManager?.FireWeapon?.SetActive(false);
     }
-    protected override void OnHitEnemy(GameObject enemy)
+    protected override void OnHitEnemy(GameObject enemy, WeaponActionData step = null, HitEvent hitEvent = null)
     {
-        base.OnHitEnemy(enemy);
+        base.OnHitEnemy(enemy, step, hitEvent);
         TargetEffects(enemy).AddFireStack(EffectHit(2.5f), _fireData.FireExplosionDelay);
     }
-    protected override void OnDamageDealt(GameObject target, DamageResult result)
+    protected override void OnDamageDealt(GameObject target, DamageResult result, WeaponActionData step = null, HitEvent hitEvent = null)
     {
-        base.OnDamageDealt(target, result);
+        base.OnDamageDealt(target, result, step, hitEvent);
         if (!IsUltimateActive || !result.Applied) return;
         float rate = _currentAction == ActionType.Attack ? _normalLifeSteal
             : _currentAction == ActionType.Skill ? _skillLifeSteal : 0f;

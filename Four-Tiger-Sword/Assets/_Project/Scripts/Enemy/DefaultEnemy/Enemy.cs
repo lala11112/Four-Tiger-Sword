@@ -16,8 +16,15 @@ public class Enemy : MonoBehaviour, IDamageable
     [Header("넉백 설정")]
     [Tooltip("넉백 저항값. 이 값보다 작은 힘은 밀리지 않음")]
     public float KnockbackResistance => EnemyStat.GetStat(EnemyStatType.KnockbackResistance); //몬스터의 넉백 저항력
-    [Tooltip("넉백 지속 시간 (초)")]
+    [Tooltip("넉백의 이동과 제자리 회복을 합한 행동 제한 시간 (초)")]
     public float KnockbackDuration => EnemyStat.GetStat(EnemyStatType.KnockbackDuration); //몬스터의 넉백 지속 시간
+    [Min(0f), Tooltip("실제로 밀려나는 시간의 상한. 나머지 넉백 시간에는 제자리에서 회복합니다.")]
+    public float KnockbackMoveTime = 0.16f;
+    [Min(0f), Tooltip("한 번 피격으로 밀려날 수 있는 최대 거리 (m)")]
+    public float KnockbackMaxDistance = 1.2f;
+    [Min(0f), Tooltip("마지막 피격 후 행동을 멈추는 시간 (초)")]
+    public float HurtDuration = 0.5f;
+    public uint HurtVersion { get; private set; }
 
     public float AttackCooldown => EnemyStat.GetStat(EnemyStatType.AttackCooldown); //몬스터의 공격 쿨타임
 
@@ -40,6 +47,8 @@ public class Enemy : MonoBehaviour, IDamageable
     private Vector3 _knockbackVelocity;
     private float _knockbackElapsed;
     private float _knockbackDurationSnapshot;
+    private float _knockbackMoveDuration;
+    private bool _knockbackUpdateRotation;
     private bool _knockbackRootMotion;
     private int _moveLockCount = 0;
 
@@ -199,7 +208,7 @@ public class Enemy : MonoBehaviour, IDamageable
         _stateMachine.Update();
         stateName = _stateMachine.CurrentState.GetType().ToString(); //디버그 전용
 
-        Vector3 worldVelocity = _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh
+        Vector3 worldVelocity = !IsKnockbacking && !IsHurt && !IsGroggy && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh
             ? _navMeshAgent.velocity : Vector3.zero;
         Vector3 localVelocity = transform.InverseTransformDirection(worldVelocity);
         Animator.SetFloat("DirY", localVelocity.z);
@@ -223,11 +232,13 @@ public class Enemy : MonoBehaviour, IDamageable
         var attacker = GameObject.FindGameObjectWithTag("Player");
         if (attacker != null) RememberTargetPosition(attacker.transform.position);
 
-        if (!IsGroggy && (staggerResistLevel >= StaggerResistLevel || PendingGroggy))
+        if (!IsGroggy && StaggerResistLevel != StaggerResistLevel.SUPER_ARMOR
+            && (staggerResistLevel >= StaggerResistLevel || PendingGroggy))
         {
             IsHurt = true;
+            HurtVersion++;
         }
-            
+
         EnemyStat.CurrentHp = Mathf.Max(0f, EnemyStat.CurrentHp - damage);
         float healthDamage = hpBefore - EnemyStat.CurrentHp;
         OnDamaged?.Invoke(healthDamage, damageType, isCritical);
@@ -294,19 +305,28 @@ public class Enemy : MonoBehaviour, IDamageable
         {
             IsKnockbacking = true;
             LockMovement();
+            if (_navMeshAgent != null)
+            {
+                _knockbackUpdateRotation = _navMeshAgent.updateRotation;
+                _navMeshAgent.updateRotation = false;
+            }
             if (Animator != null)
             {
                 _knockbackRootMotion = Animator.applyRootMotion;
                 Animator.applyRootMotion = false;
             }
         }
-        _knockbackVelocity = velocity;
+        _knockbackMoveDuration = Mathf.Min(duration, Mathf.Max(0f, KnockbackMoveTime));
+        // Integral of the impact profile is v0*T/3. Cap distance without extending sliding time.
+        float maxSpeed = _knockbackMoveDuration > 0f
+            ? Mathf.Max(0f, KnockbackMaxDistance) * 3f / _knockbackMoveDuration : 0f;
+        _knockbackVelocity = Vector3.ClampMagnitude(velocity, maxSpeed);
         _knockbackElapsed = 0f;
         _knockbackDurationSnapshot = duration;
     }
 
     /// <summary>
-    /// 초기 속도에서 0으로 감속하며 NavMesh 위에서 적을 밀어냅니다.
+    /// 짧게 밀린 뒤 급감속하고, 남은 넉백 시간에는 제자리에서 회복합니다.
     /// </summary>
     private void UpdateKnockback(float deltaTime)
     {
@@ -316,7 +336,8 @@ public class Enemy : MonoBehaviour, IDamageable
             StopKnockback();
             return;
         }
-        Vector3 delta = KnockbackMotion.Displacement(_knockbackVelocity, _knockbackElapsed, deltaTime, _knockbackDurationSnapshot);
+        Vector3 delta = KnockbackMotion.ImpactDisplacement(_knockbackVelocity, _knockbackElapsed, deltaTime, _knockbackMoveDuration);
+        _navMeshAgent.velocity = Vector3.zero;
         _navMeshAgent.Move(delta);
         _knockbackElapsed += Mathf.Max(0f, deltaTime);
         if (_knockbackElapsed >= _knockbackDurationSnapshot) StopKnockback();
@@ -344,6 +365,12 @@ public class Enemy : MonoBehaviour, IDamageable
         if (!IsKnockbacking) return;
         IsKnockbacking = false;
         _knockbackVelocity = Vector3.zero;
+        if (_navMeshAgent != null)
+        {
+            _navMeshAgent.updateRotation = _knockbackUpdateRotation;
+            if (_navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
+                _navMeshAgent.velocity = Vector3.zero;
+        }
         if (Animator != null) Animator.applyRootMotion = _knockbackRootMotion;
         UnlockMovement();
     }

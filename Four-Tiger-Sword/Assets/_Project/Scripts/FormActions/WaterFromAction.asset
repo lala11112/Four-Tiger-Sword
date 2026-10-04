@@ -26,7 +26,7 @@ MonoBehaviour:
     HitBoxRadius: 1
     HitBoxSize: {x: 2, y: 1, z: 1}
     HitBoxHeight: 0
-    KnockbackForce: 15
+    KnockbackForce: 12
     StaggerResistLevel: 2
     HitEvents:
     - StartTime: 0.43
@@ -34,17 +34,44 @@ MonoBehaviour:
       Damage: 1
       PoiseDamage: 20
       StaggerResistLevel: 3
+      OverrideHitVFX: 1
+      HitEffect:
+        Prefab: {fileID: 0}
+        Scale: {x: 1, y: 1, z: 1}
+        Rotation: {x: 0, y: 90, z: 0}
     - StartTime: 0.63
       Duration: 0.05
       Damage: 1
       PoiseDamage: 20
       StaggerResistLevel: 3
+      OverrideHitVFX: 1
+      HitEffect:
+        Prefab: {fileID: 0}
+        Scale: {x: 1, y: 1, z: 1}
+        Rotation: {x: 0, y: 90, z: 0}
+    HitEffect:
+      Prefab: {fileID: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: 0, z: 0}
+    DisableTrail: 0
+    UseCustomTrailTiming: 1
+    TrailStartTime: 0.16
+    TrailEndTime: 0.6
     SlashVFX: {fileID: 0}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: -18}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 0
+    OverrideCameraShakeDirection: 1
+    CameraShakeDirection: {x: -1, y: 0, z: 0}
     UseDistanceMovement: 0
     ForwardDistance: 2
     MovementStartTime: 0
-    MovementEndTime: 1.3
+    MovementEndTime: 0.42
     MovementProgress:
       serializedVersion: 2
       m_Curve:
@@ -125,7 +152,7 @@ MonoBehaviour:
     HitBoxRadius: 1
     HitBoxSize: {x: 2, y: 1, z: 1}
     HitBoxHeight: 0
-    KnockbackForce: 8
+    KnockbackForce: 12
     StaggerResistLevel: 2
     HitEvents:
     - StartTime: 0.33
@@ -133,17 +160,44 @@ MonoBehaviour:
       Damage: 0.6
       PoiseDamage: 10
       StaggerResistLevel: 2
+      OverrideHitVFX: 0
+      HitEffect:
+        Prefab: {fileID: 0}
+        Scale: {x: 1, y: 1, z: 1}
+        Rotation: {x: 0, y: 0, z: 0}
     - StartTime: 0.56
       Duration: 0.04
       Damage: 0.6
       PoiseDamage: 10
       StaggerResistLevel: 2
+      OverrideHitVFX: 0
+      HitEffect:
+        Prefab: {fileID: 0}
+        Scale: {x: 1, y: 1, z: 1}
+        Rotation: {x: 0, y: 0, z: 0}
+    HitEffect:
+      Prefab: {fileID: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: 0, z: 0}
+    DisableTrail: 0
+    UseCustomTrailTiming: 1
+    TrailStartTime: 0.1
+    TrailEndTime: 0.6
     SlashVFX: {fileID: 0}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: 18}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 0.05
+    OverrideCameraShakeDirection: 1
+    CameraShakeDirection: {x: 1, y: 0, z: 0}
     UseDistanceMovement: 0
     ForwardDistance: 2
     MovementStartTime: 0
-    MovementEndTime: 0.13
+    MovementEndTime: 0.32
     MovementProgress:
       serializedVersion: 2
       m_Curve:
@@ -224,7 +278,7 @@ MonoBehaviour:
     HitBoxRadius: 1
     HitBoxSize: {x: 0, y: 0, z: 0}
     HitBoxHeight: 0
-    KnockbackForce: 8
+    KnockbackForce: 12
     StaggerResistLevel: 2
     HitEvents:
     - StartTime: 0.43
@@ -232,17 +286,44 @@ MonoBehaviour:
       Damage: 0.6
       PoiseDamage: 10
       StaggerResistLevel: 2
+      OverrideHitVFX: 0
+      HitEffect:
+        Prefab: {fileID: 0}
+        Scale: {x: 1, y: 1, z: 1}
+        Rotation: {x: 0, y: 0, z: 0}
     - StartTime: 1
       Duration: 0.04
       Damage: 0.6
       PoiseDamage: 10
       StaggerResistLevel: 3
+      OverrideHitVFX: 0
+      HitEffect:
+        Prefab: {fileID: 0}
+        Scale: {x: 1, y: 1, z: 1}
+        Rotation: {x: 0, y: 0, z: 0}
+    HitEffect:
+      Prefab: {fileID: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: 0, z: 0}
+    DisableTrail: 0
+    UseCustomTrailTiming: 1
+    TrailStartTime: 0.16
+    TrailEndTime: 1
     SlashVFX: {fileID: 0}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: -18}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 0.15
+    OverrideCameraShakeDirection: 1
+    CameraShakeDirection: {x: 0, y: 1, z: 0}
     UseDistanceMovement: 0
     ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
+    MovementStartTime: 0
+    MovementEndTime: 0.42
     MovementProgress:
       serializedVersion: 2
       m_Curve:
@@ -358,8 +439,25 @@ MonoBehaviour:
     KnockbackForce: 1
     StaggerResistLevel: 0
     HitEvents: []
+    HitEffect:
+      Prefab: {fileID: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: 0, z: 0}
+    DisableTrail: 0
+    UseCustomTrailTiming: 0
+    TrailStartTime: 0
+    TrailEndTime: 0.5
     SlashVFX: {fileID: 0}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: 0}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 1
+    OverrideCameraShakeDirection: 0
+    CameraShakeDirection: {x: 0, y: -1, z: 0}
     UseDistanceMovement: 0
     ForwardDistance: 2
     MovementStartTime: 0.08
@@ -439,8 +537,25 @@ MonoBehaviour:
     KnockbackForce: 8
     StaggerResistLevel: 0
     HitEvents: []
+    HitEffect:
+      Prefab: {fileID: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: 0, z: 0}
+    DisableTrail: 0
+    UseCustomTrailTiming: 0
+    TrailStartTime: 0
+    TrailEndTime: 0.5
     SlashVFX: {fileID: 0}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: 0}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 0.05
+    OverrideCameraShakeDirection: 0
+    CameraShakeDirection: {x: 0, y: -1, z: 0}
     UseDistanceMovement: 0
     ForwardDistance: 2
     MovementStartTime: 0.08
@@ -529,8 +644,25 @@ MonoBehaviour:
     KnockbackForce: 3
     StaggerResistLevel: 2
     HitEvents: []
+    HitEffect:
+      Prefab: {fileID: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: 0, z: 0}
+    DisableTrail: 0
+    UseCustomTrailTiming: 0
+    TrailStartTime: 0
+    TrailEndTime: 0.5
     SlashVFX: {fileID: 0}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: 0}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 0.05
+    OverrideCameraShakeDirection: 0
+    CameraShakeDirection: {x: 0, y: -1, z: 0}
     UseDistanceMovement: 0
     ForwardDistance: 2
     MovementStartTime: 0.08
@@ -619,8 +751,25 @@ MonoBehaviour:
     KnockbackForce: 3
     StaggerResistLevel: 0
     HitEvents: []
+    HitEffect:
+      Prefab: {fileID: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: 0, z: 0}
+    DisableTrail: 0
+    UseCustomTrailTiming: 0
+    TrailStartTime: 0
+    TrailEndTime: 0.5
     SlashVFX: {fileID: 0}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: 0}
+    SlashVFXScale: 1
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 0}
+    CameraShakeStrength: 0.05
+    OverrideCameraShakeDirection: 0
+    CameraShakeDirection: {x: 0, y: -1, z: 0}
     UseDistanceMovement: 0
     ForwardDistance: 2
     MovementStartTime: 0.08
@@ -684,7 +833,7 @@ MonoBehaviour:
     ApproachEndTime: 0.2
     RotationEndTime: 0.2
     MaxApproachDistance: 2
-  HitVFX: {fileID: 0}
+  HitVFX: {fileID: 1367524815892938, guid: 40f5e004d2504a04db181f5453658776, type: 3}
   HitSound: {fileID: 0}
   UltimateCooldown: 25
   HeavyAttackStep:
@@ -703,8 +852,25 @@ MonoBehaviour:
     KnockbackForce: 0
     StaggerResistLevel: 2
     HitEvents: []
+    HitEffect:
+      Prefab: {fileID: 0}
+      Scale: {x: 1, y: 1, z: 1}
+      Rotation: {x: 0, y: 0, z: 0}
+    DisableTrail: 0
+    UseCustomTrailTiming: 0
+    TrailStartTime: 0
+    TrailEndTime: 0.5
     SlashVFX: {fileID: 0}
+    SlashVFXStartTime: -1
+    SlashVFXOffset: {x: 0, y: 1, z: 0}
+    SlashVFXRotation: {x: 0, y: 0, z: -18}
+    SlashVFXScale: 1.2
+    SlashVFXLifetime: 0.22
     SwingSound: {fileID: 0}
+    CameraProfile: {fileID: 11400000, guid: c7df7891149b9b143a3c2d68e269e751, type: 2}
+    CameraShakeStrength: 0.25
+    OverrideCameraShakeDirection: 0
+    CameraShakeDirection: {x: 0, y: -1, z: 0}
     UseDistanceMovement: 0
     ForwardDistance: 2
     MovementStartTime: 0.08

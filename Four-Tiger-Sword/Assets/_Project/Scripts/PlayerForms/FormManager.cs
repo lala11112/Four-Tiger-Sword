@@ -38,6 +38,8 @@ public class FormManager
 
     public void CleanupTransientEffects()
     {
+        _playerController.StopAttackTrails(true);
+        _playerController.CombatCamera?.Cancel(_playerController, true);
         // Buffs may belong to an unequipped form; clear every registered owner on shutdown/death.
         foreach (var form in _registeredForms)
             (form as BaseForm)?.CleanupTransientEffects();
@@ -67,6 +69,8 @@ public class FormManager
     public void ChangeForm(IForm form)
     {
         if(CurrentForm == form) return;
+        _playerController.StopAttackTrails(true);
+        _playerController.CombatCamera?.Cancel(_playerController);
         if (form != null) _registeredForms.Add(form);
 
         CurrentForm?.Unequip(_playerController);

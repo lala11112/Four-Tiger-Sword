@@ -14,9 +14,9 @@ public class IronForm : BaseForm
     }
     public override void Unequip(PlayerController player)
         => PlayerUIManager.Instance?.IronElement?.SetActive(true);
-    protected override void OnHitEnemy(GameObject enemy)
+    protected override void OnHitEnemy(GameObject enemy, WeaponActionData step = null, HitEvent hitEvent = null)
     {
-        base.OnHitEnemy(enemy);
+        base.OnHitEnemy(enemy, step, hitEvent);
         if (_currentAction == ActionType.Attack) TargetEffects(enemy).ApplyArmorShred(false);
         if (_currentAction == ActionType.Skill) TargetEffects(enemy).ApplyArmorShred(true);
         // TODO: 집중 찌르기/철쇄 격파/금강 파동포 Animator 모션 제작 후 연결.
