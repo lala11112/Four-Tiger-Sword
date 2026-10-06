@@ -1,0 +1,128 @@
+.automator-inspector {
+    flex-grow: 1;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    min-width: 0;
+}
+
+.automator-action-manager > .chart-guru-inspector__header {
+    margin-bottom: 8px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.automator-step-header,
+.automator-step-card__header,
+.automator-action-row,
+.automator-file-toolbar {
+    flex-direction: row;
+    align-items: center;
+    min-width: 0;
+}
+
+.automator-step-header {
+    min-height: 28px;
+    margin-bottom: 5px;
+}
+
+.automator-step-list {
+    flex-shrink: 0;
+    margin-bottom: 8px;
+}
+
+.automator-step-card,
+.automator-action-row {
+    margin-bottom: 5px;
+    padding-left: 9px;
+    padding-right: 9px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-width: 1px;
+    border-color: rgba(128, 128, 128, 0.28);
+    border-radius: 4px;
+    background-color: rgba(128, 128, 128, 0.06);
+}
+
+.automator-step-card__header {
+    margin-bottom: 7px;
+}
+
+.automator-step-card__title,
+.automator-action-row__title {
+    -unity-font-style: bold;
+    font-size: 13px;
+}
+
+.automator-step-card .unity-base-field {
+    margin-bottom: 4px;
+}
+
+.automator-action-list {
+    flex-grow: 1;
+    min-height: 0;
+    margin-top: 7px;
+}
+
+.common-inspector-section .automator-step-card,
+.common-inspector-section .automator-action-row {
+    border-width: 0;
+}
+
+.automator-file-toolbar {
+    min-height: 28px;
+    margin-bottom: 5px;
+}
+
+.automator-empty {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+}
+
+.automator-empty__title {
+    -unity-font-style: bold;
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+.automator-inspector.common-inspector--compact .automator-step-card__header,
+.automator-inspector.common-inspector--compact .automator-action-row {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.automator-steps-title { -unity-font-style: bold; margin-top: 8px; margin-bottom: 4px; }
+.automator-step-row { flex-direction: row; align-items: center; height: 28px; min-width: 0; }
+.automator-step-row__name { width: 210px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; }
+.automator-step-row__summary { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0; opacity: 0.72; overflow: hidden; text-overflow: ellipsis; }
+.automator-step-details { margin-top: 8px; margin-bottom: 12px; }
+.automator-action-editor-footer { flex-wrap: wrap; }
+.automator-action-editor-footer > Button { min-height: 30px; min-width: 120px; }
+
+.automator-inspector-pane { border-left-width: 1px; border-left-color: rgba(128, 128, 128, 0.35); }
+.automator-step-details .unity-base-field { flex-direction: column; align-items: stretch; margin-bottom: 8px; }
+.automator-step-details .unity-base-field__label { min-width: 0; margin-bottom: 3px; }
+.automator-step-details .automator-step-card__header { flex-direction: column; align-items: stretch; }
+.automator-step-details .automator-step-card__header Button { align-self: flex-end; margin-top: 6px; }
+
+.automator-details-pane { min-width: 0; min-height: 0; background-color: rgba(128, 128, 128, 0.06); }
+.automator-details-header { flex-direction: row; min-height: 30px; border-bottom-width: 1px; border-bottom-color: rgba(128, 128, 128, 0.3); }
+.automator-details-tabs { flex-direction: row; flex-grow: 1; justify-content: center; min-width: 0; }
+.automator-details-tab { flex-grow: 1; min-width: 0; height: 29px; background-color: transparent; border-width: 0; border-radius: 0; padding-left: 12px; padding-right: 12px; margin: 0; }
+.automator-details-tab--selected { border-bottom-width: 2px; border-bottom-color: rgb(69, 142, 235); -unity-font-style: bold; }
+.automator-details-host { padding-left: 8px; }
+.automator-details-divider { align-items: center; justify-content: center; cursor: resize-horizontal; }
+.automator-details-divider-line { width: 1px; height: 100%; background-color: rgba(128, 128, 128, 0.3); }
+.automator-details-divider:hover .automator-details-divider-line,
+.automator-details-divider:focus .automator-details-divider-line,
+.automator-details-collapsed .automator-details-divider-line { width: 2px; background-color: rgb(69, 142, 235); }
+
+.automator-step-row__enabled { flex-shrink: 0; margin-right: 6px; }
+.automator-step-row__disabled { flex-shrink: 0; margin-left: 6px; margin-right: 6px; opacity: 0.65; }
+.automator-step-row--disabled .automator-step-row__name,
+.automator-step-row--disabled .automator-step-row__summary { opacity: 0.5; }

@@ -1,0 +1,32 @@
+{
+    "name": "ShapesEditor",
+    "rootNamespace": "",
+    "references": [
+        "ShapesRuntime",
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Universal.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "17.0",
+            "define": "URP_INSTALLED"
+        },
+        {
+            "name": "com.unity.render-pipelines.high-definition",
+            "expression": "17.0",
+            "define": "HDRP_INSTALLED"
+        }
+    ],
+    "noEngineReferences": false
+}

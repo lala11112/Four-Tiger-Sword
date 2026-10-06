@@ -1,0 +1,27 @@
+{
+    "name": "AssetInventory.Integration.UnityAIAssistant.Editor",
+    "rootNamespace": "AssetInventory.Integration.UnityAIAssistant",
+    "references": [
+        "AssetInventory.Editor",
+        "Unity.AI.MCP.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "ASSET_INVENTORY_UNITY_AI_ASSISTANT"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.ai.assistant",
+            "expression": "2.0.0-pre.1",
+            "define": "ASSET_INVENTORY_UNITY_AI_ASSISTANT"
+        }
+    ],
+    "noEngineReferences": false
+}

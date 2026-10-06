@@ -1,0 +1,464 @@
+.at-root {
+    flex-grow: 1;
+    min-width: 0;
+    --at-accent: rgb(54, 157, 235);
+    --at-accent-strong: rgb(42, 131, 218);
+    --at-warning: rgb(232, 174, 67);
+    --at-danger: rgb(219, 82, 74);
+}
+
+.at-theme-dark {
+    --at-panel: rgb(42, 45, 51);
+    --at-panel-raised: rgb(49, 53, 60);
+    --at-canvas: rgb(24, 27, 32);
+    --at-border: rgba(142, 159, 181, 0.24);
+    --at-text: rgb(231, 236, 242);
+    --at-muted: rgb(159, 172, 188);
+}
+
+.at-theme-light {
+    --at-panel: rgb(235, 238, 242);
+    --at-panel-raised: rgb(247, 248, 250);
+    --at-canvas: rgb(215, 220, 227);
+    --at-border: rgba(57, 74, 94, 0.24);
+    --at-text: rgb(32, 39, 48);
+    --at-muted: rgb(85, 99, 116);
+}
+
+.at-root Label {
+    color: var(--at-text);
+}
+
+.at-workspace {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.at-scroll {
+    flex-grow: 1;
+    min-height: 0;
+}
+
+.at-workspace-body {
+    flex-direction: column;
+    padding: 12px;
+    min-width: 0;
+}
+
+.at-workspace-body.at-wide {
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.at-editing-column {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.at-wide .at-editing-column {
+    margin-right: 12px;
+}
+
+.at-processing-panel {
+    min-width: 0;
+}
+
+.at-wide .at-processing-panel {
+    width: 320px;
+    flex-shrink: 0;
+}
+
+.at-source-header {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    min-height: 68px;
+    padding: 10px 12px;
+    background-color: var(--at-panel);
+    border-bottom-width: 1px;
+    border-bottom-color: var(--at-border);
+}
+
+.at-source-identity {
+    flex-grow: 1;
+    min-width: 160px;
+}
+
+.at-source-title {
+    font-size: 16px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.at-source-details,
+.at-card-description,
+.at-effect-description,
+.at-export-details,
+.at-drop-hint,
+.at-secondary-value,
+.at-effect-status {
+    color: var(--at-muted);
+    white-space: normal;
+}
+
+.at-source-details {
+    margin-top: 3px;
+}
+
+.at-metrics {
+    flex-direction: row;
+    margin-left: 12px;
+    margin-right: 8px;
+}
+
+.at-metric {
+    flex-shrink: 0;
+    min-width: 104px;
+    min-height: 42px;
+    margin-left: 8px;
+    padding: 5px 8px;
+    background-color: var(--at-panel-raised);
+    border-radius: 5px;
+}
+
+.at-metric-label {
+    color: var(--at-muted);
+    font-size: 9px;
+    -unity-font-style: bold;
+}
+
+.at-metric-value {
+    margin-top: 2px;
+    -unity-font-style: bold;
+}
+
+.at-export-actions,
+.at-empty-actions,
+.at-quick-actions,
+.at-transport {
+    flex-direction: row;
+    align-items: center;
+}
+
+.at-export-actions > *,
+.at-empty-actions > *,
+.at-quick-actions > *,
+.at-transport > * {
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.at-card,
+.at-processing-panel {
+    margin-bottom: 12px;
+    padding: 12px;
+    background-color: var(--at-panel);
+    border-width: 1px;
+    border-color: var(--at-border);
+    border-radius: 7px;
+    min-width: 0;
+}
+
+.at-card-title {
+    font-size: 15px;
+    -unity-font-style: bold;
+}
+
+.at-card-description {
+    margin-top: 2px;
+    margin-bottom: 9px;
+}
+
+.at-waveform-layout {
+    min-width: 0;
+    flex-shrink: 0;
+}
+
+.at-waveform {
+    height: 260px;
+    min-height: 190px;
+    flex-shrink: 0;
+    background-color: var(--at-canvas);
+    border-width: 1px;
+    border-color: rgba(80, 150, 210, 0.42);
+    border-radius: 5px;
+}
+
+.at-wide .at-waveform {
+    height: 320px;
+}
+
+.at-compact .at-waveform {
+    height: 190px;
+}
+
+.at-waveform-timeline {
+    position: relative;
+    height: 54px;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.at-waveform-time {
+    position: absolute;
+    width: 62px;
+    height: 16px;
+    font-size: 10px;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.at-waveform-boundary {
+    color: var(--at-muted);
+}
+
+.at-waveform-selection-time {
+    color: rgb(94, 195, 255);
+    -unity-font-style: bold;
+}
+
+.at-waveform-duration {
+    color: rgb(235, 185, 83);
+}
+
+.at-waveform-playhead-time {
+    color: rgb(239, 105, 93);
+}
+
+.at-waveform-duration-connector {
+    position: absolute;
+    top: 16px;
+    width: 1px;
+    height: 4px;
+    background-color: rgba(235, 185, 83, 0.55);
+}
+
+.at-button {
+    min-height: 27px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 4px;
+}
+
+.at-primary-button {
+    background-color: var(--at-accent-strong);
+    color: white;
+    -unity-font-style: bold;
+}
+
+.at-transport-button {
+    min-width: 72px;
+}
+
+.at-quiet-button {
+    background-color: transparent;
+    border-color: var(--at-border);
+}
+
+.at-danger-button {
+    border-color: rgba(219, 82, 74, 0.8);
+    color: rgb(235, 112, 103);
+}
+
+.at-quick-actions {
+    margin-top: 9px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.at-effect-card {
+    margin-top: 7px;
+    padding: 9px;
+    background-color: var(--at-panel-raised);
+    border-left-width: 3px;
+    border-left-color: rgba(54, 157, 235, 0.7);
+    border-radius: 5px;
+    min-width: 0;
+}
+
+.at-processing-panel .at-effect-card {
+    border-left-width: 0;
+}
+
+.at-effect-title {
+    -unity-font-style: bold;
+}
+
+.at-effect-description {
+    margin-top: 2px;
+    margin-bottom: 5px;
+}
+
+.at-secondary-value,
+.at-effect-status {
+    margin-top: 5px;
+}
+
+.at-export-footer {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    min-height: 74px;
+    padding: 9px 12px;
+    background-color: var(--at-panel);
+    border-top-width: 1px;
+    border-top-color: var(--at-border);
+}
+
+.at-export-summary {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 180px;
+}
+
+.at-export-title {
+    -unity-font-style: bold;
+}
+
+.at-export-details {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.at-export-actions {
+    flex-shrink: 0;
+}
+
+.at-footer-message {
+    max-width: 380px;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.at-empty-state {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+    background-color: var(--at-canvas);
+}
+
+.at-empty-logo {
+    width: 90px;
+    height: 90px;
+    margin-bottom: 12px;
+}
+
+.at-empty-title {
+    font-size: 23px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.at-empty-description {
+    max-width: 620px;
+    margin-top: 8px;
+    margin-bottom: 18px;
+    color: var(--at-muted);
+    white-space: normal;
+    -unity-text-align: middle-center;
+}
+
+.at-source-field {
+    width: 420px;
+    max-width: 100%;
+}
+
+.at-empty-actions {
+    margin-top: 12px;
+}
+
+.at-drop-hint {
+    margin-top: 12px;
+    -unity-text-align: middle-center;
+}
+
+.at-message {
+    white-space: normal;
+    margin-top: 8px;
+}
+
+.at-compact.at-workspace-body {
+    padding: 8px;
+}
+
+.at-compact .at-transport,
+.at-compact .at-export-actions {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.at-compact .at-transport > *,
+.at-compact .at-export-actions > * {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 4px;
+    width: auto;
+}
+
+.at-compact .at-processing-panel {
+    width: auto;
+}
+
+.at-workspace.at-compact .at-source-header,
+.at-workspace.at-compact .at-export-footer {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.at-workspace.at-compact .at-source-header {
+    min-height: 112px;
+}
+
+.at-workspace.at-compact .at-export-footer {
+    min-height: 132px;
+}
+
+.at-workspace.at-compact .at-source-identity,
+.at-workspace.at-compact .at-export-summary {
+    flex-shrink: 0;
+    width: 100%;
+    margin-bottom: 7px;
+}
+
+.at-workspace.at-compact .at-metrics {
+    flex-shrink: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.at-workspace.at-compact .at-metric {
+    flex-grow: 1;
+    margin-left: 0;
+    margin-right: 6px;
+}
+
+.at-workspace.at-compact .at-export-actions {
+    width: 100%;
+    margin-top: 7px;
+}
+
+.at-workspace.at-compact .at-export-actions > * {
+    flex-grow: 1;
+}
+
+.at-root .unity-foldout,
+.at-root .unity-foldout__toggle,
+.at-root .unity-foldout__content {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    min-width: 0;
+}
+
+.at-root .unity-base-field,
+.at-root .unity-base-field__input,
+.at-root .unity-base-field__label {
+    min-width: 0;
+}
