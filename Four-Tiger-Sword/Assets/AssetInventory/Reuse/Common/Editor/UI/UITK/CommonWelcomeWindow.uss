@@ -1,0 +1,389 @@
+.common-welcome-root {
+    flex-grow: 1;
+    min-width: 0;
+    background-color: rgb(37, 39, 43);
+    color: rgb(230, 232, 235);
+}
+
+.common-welcome-theme-light {
+    background-color: rgb(236, 239, 242);
+    color: rgb(36, 39, 43);
+}
+
+.common-welcome-scroll {
+    flex-grow: 1;
+    min-height: 0;
+}
+
+.common-welcome-content {
+    width: 100%;
+    max-width: 720px;
+    min-width: 0;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-top: 22px;
+    padding-bottom: 20px;
+    align-self: center;
+}
+
+.common-welcome-hero {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    min-width: 0;
+    padding-left: 18px;
+    padding-right: 18px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    background-color: rgb(48, 51, 58);
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgb(69, 74, 82);
+    border-right-color: rgb(69, 74, 82);
+    border-top-color: rgb(69, 74, 82);
+    border-bottom-color: rgb(69, 74, 82);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.common-welcome-theme-light .common-welcome-hero {
+    background-color: rgb(255, 255, 255);
+    border-left-color: rgb(203, 208, 214);
+    border-right-color: rgb(203, 208, 214);
+    border-top-color: rgb(203, 208, 214);
+    border-bottom-color: rgb(203, 208, 214);
+}
+
+.common-welcome-logo {
+    width: 98px;
+    height: 98px;
+    flex-shrink: 0;
+    margin-right: 18px;
+}
+
+.common-welcome-hero-copy {
+    flex-grow: 1;
+    min-width: 0;
+    justify-content: center;
+}
+
+.common-welcome-eyebrow {
+    min-width: 0;
+    margin-bottom: 4px;
+    font-size: 10px;
+    -unity-font-style: bold;
+    letter-spacing: 1.4px;
+    white-space: normal;
+}
+
+.common-welcome-title {
+    min-width: 0;
+    margin-bottom: 6px;
+    color: rgb(241, 243, 245);
+    font-size: 22px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.common-welcome-theme-light .common-welcome-title {
+    color: rgb(32, 35, 40);
+}
+
+.common-welcome-intro {
+    min-width: 0;
+    color: rgb(174, 180, 189);
+    font-size: 12px;
+    white-space: normal;
+}
+
+.common-welcome-theme-light .common-welcome-intro {
+    color: rgb(98, 105, 115);
+}
+
+.common-welcome-heading {
+    flex-shrink: 0;
+    min-width: 0;
+    margin-left: 2px;
+    margin-right: 2px;
+    margin-bottom: 11px;
+}
+
+.common-welcome-section-title {
+    min-width: 0;
+    margin-bottom: 3px;
+    color: rgb(230, 232, 235);
+    font-size: 15px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.common-welcome-theme-light .common-welcome-section-title {
+    color: rgb(36, 39, 43);
+}
+
+.common-welcome-section-description {
+    min-width: 0;
+    color: rgb(157, 164, 174);
+    white-space: normal;
+}
+
+.common-welcome-theme-light .common-welcome-section-description {
+    color: rgb(98, 105, 115);
+}
+
+.common-welcome-steps {
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.common-welcome-step {
+    flex-direction: row;
+    align-items: flex-start;
+    flex-shrink: 0;
+    min-width: 0;
+    min-height: 72px;
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+    background-color: rgba(48, 51, 58, 0.72);
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-color: rgb(65, 70, 78);
+    border-right-color: rgb(65, 70, 78);
+    border-top-color: rgb(65, 70, 78);
+    border-bottom-color: rgb(65, 70, 78);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.common-welcome-theme-light .common-welcome-step {
+    background-color: rgba(255, 255, 255, 0.72);
+    border-left-color: rgb(203, 208, 214);
+    border-right-color: rgb(203, 208, 214);
+    border-top-color: rgb(203, 208, 214);
+    border-bottom-color: rgb(203, 208, 214);
+}
+
+.common-welcome-step-badge {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    margin-right: 13px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-top-left-radius: 17px;
+    border-top-right-radius: 17px;
+    border-bottom-left-radius: 17px;
+    border-bottom-right-radius: 17px;
+}
+
+.common-welcome-step-number {
+    font-size: 13px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.common-welcome-step-copy {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.common-welcome-step-title {
+    min-width: 0;
+    margin-bottom: 3px;
+    color: rgb(230, 232, 235);
+    font-size: 13px;
+    -unity-font-style: bold;
+    white-space: normal;
+}
+
+.common-welcome-theme-light .common-welcome-step-title {
+    color: rgb(36, 39, 43);
+}
+
+.common-welcome-step-description {
+    min-width: 0;
+    color: rgb(157, 164, 174);
+    white-space: normal;
+}
+
+.common-welcome-theme-light .common-welcome-step-description {
+    color: rgb(98, 105, 115);
+}
+
+.common-welcome-footer {
+    min-height: 58px;
+}
+
+.common-welcome-footer > .common-welcome-action {
+    min-height: 30px;
+    flex-shrink: 0;
+    padding-left: 14px;
+    padding-right: 14px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.common-welcome-action--primary {
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+}
+
+.common-welcome-accent--blue .common-welcome-eyebrow,
+.common-welcome-accent--blue .common-welcome-step-number {
+    color: rgb(121, 185, 250);
+}
+
+.common-welcome-accent--blue .common-welcome-step-badge {
+    background-color: rgba(75, 155, 242, 0.17);
+    border-left-color: rgba(98, 170, 245, 0.58);
+    border-right-color: rgba(98, 170, 245, 0.58);
+    border-top-color: rgba(98, 170, 245, 0.58);
+    border-bottom-color: rgba(98, 170, 245, 0.58);
+}
+
+.common-welcome-accent--blue .common-welcome-action--primary {
+    background-color: rgb(53, 116, 185);
+}
+
+.common-welcome-theme-light.common-welcome-accent--blue .common-welcome-eyebrow,
+.common-welcome-theme-light.common-welcome-accent--blue .common-welcome-step-number {
+    color: rgb(36, 105, 173);
+}
+
+.common-welcome-theme-light.common-welcome-accent--blue .common-welcome-step-badge {
+    background-color: rgba(53, 116, 185, 0.10);
+    border-left-color: rgba(36, 105, 173, 0.48);
+    border-right-color: rgba(36, 105, 173, 0.48);
+    border-top-color: rgba(36, 105, 173, 0.48);
+    border-bottom-color: rgba(36, 105, 173, 0.48);
+}
+
+.common-welcome-accent--cyan .common-welcome-eyebrow,
+.common-welcome-accent--cyan .common-welcome-step-number {
+    color: rgb(102, 208, 221);
+}
+
+.common-welcome-accent--cyan .common-welcome-step-badge {
+    background-color: rgba(59, 177, 192, 0.17);
+    border-left-color: rgba(102, 208, 221, 0.58);
+    border-right-color: rgba(102, 208, 221, 0.58);
+    border-top-color: rgba(102, 208, 221, 0.58);
+    border-bottom-color: rgba(102, 208, 221, 0.58);
+}
+
+.common-welcome-accent--cyan .common-welcome-action--primary {
+    background-color: rgb(43, 129, 146);
+}
+
+.common-welcome-theme-light.common-welcome-accent--cyan .common-welcome-eyebrow,
+.common-welcome-theme-light.common-welcome-accent--cyan .common-welcome-step-number {
+    color: rgb(28, 111, 124);
+}
+
+.common-welcome-theme-light.common-welcome-accent--cyan .common-welcome-step-badge {
+    background-color: rgba(43, 129, 146, 0.10);
+    border-left-color: rgba(28, 111, 124, 0.48);
+    border-right-color: rgba(28, 111, 124, 0.48);
+    border-top-color: rgba(28, 111, 124, 0.48);
+    border-bottom-color: rgba(28, 111, 124, 0.48);
+}
+
+.common-welcome-accent--violet .common-welcome-eyebrow,
+.common-welcome-accent--violet .common-welcome-step-number {
+    color: rgb(202, 146, 244);
+}
+
+.common-welcome-accent--violet .common-welcome-step-badge {
+    background-color: rgba(158, 90, 211, 0.17);
+    border-left-color: rgba(202, 146, 244, 0.58);
+    border-right-color: rgba(202, 146, 244, 0.58);
+    border-top-color: rgba(202, 146, 244, 0.58);
+    border-bottom-color: rgba(202, 146, 244, 0.58);
+}
+
+.common-welcome-accent--violet .common-welcome-action--primary {
+    background-color: rgb(123, 77, 164);
+}
+
+.common-welcome-theme-light.common-welcome-accent--violet .common-welcome-eyebrow,
+.common-welcome-theme-light.common-welcome-accent--violet .common-welcome-step-number {
+    color: rgb(118, 54, 154);
+}
+
+.common-welcome-theme-light.common-welcome-accent--violet .common-welcome-step-badge {
+    background-color: rgba(123, 77, 164, 0.10);
+    border-left-color: rgba(118, 54, 154, 0.48);
+    border-right-color: rgba(118, 54, 154, 0.48);
+    border-top-color: rgba(118, 54, 154, 0.48);
+    border-bottom-color: rgba(118, 54, 154, 0.48);
+}
+
+.common-welcome-accent--amber .common-welcome-eyebrow,
+.common-welcome-accent--amber .common-welcome-step-number {
+    color: rgb(232, 184, 94);
+}
+
+.common-welcome-accent--amber .common-welcome-step-badge {
+    background-color: rgba(185, 126, 40, 0.17);
+    border-left-color: rgba(232, 184, 94, 0.58);
+    border-right-color: rgba(232, 184, 94, 0.58);
+    border-top-color: rgba(232, 184, 94, 0.58);
+    border-bottom-color: rgba(232, 184, 94, 0.58);
+}
+
+.common-welcome-accent--amber .common-welcome-action--primary {
+    background-color: rgb(148, 99, 31);
+}
+
+.common-welcome-theme-light.common-welcome-accent--amber .common-welcome-eyebrow,
+.common-welcome-theme-light.common-welcome-accent--amber .common-welcome-step-number {
+    color: rgb(142, 88, 18);
+}
+
+.common-welcome-theme-light.common-welcome-accent--amber .common-welcome-step-badge {
+    background-color: rgba(148, 99, 31, 0.10);
+    border-left-color: rgba(142, 88, 18, 0.48);
+    border-right-color: rgba(142, 88, 18, 0.48);
+    border-top-color: rgba(142, 88, 18, 0.48);
+    border-bottom-color: rgba(142, 88, 18, 0.48);
+}
+
+.common-welcome--compact .common-welcome-content {
+    padding-left: 18px;
+    padding-right: 18px;
+    padding-top: 18px;
+}
+
+.common-welcome--compact .common-welcome-hero {
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+.common-welcome--compact .common-welcome-logo {
+    width: 80px;
+    height: 80px;
+    margin-right: 14px;
+}
+
+.common-welcome--compact .common-welcome-title {
+    font-size: 20px;
+}

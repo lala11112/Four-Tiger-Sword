@@ -1,0 +1,127 @@
+using ImpossibleRobert.Common;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using SQLite;
+using UnityEditor;
+
+namespace AssetInventory
+{
+    /// <summary>Indexed file record with package ownership, project and source paths, media metadata, and preview state.</summary>
+    [Serializable]
+    public class AssetFile : TreeElement
+    {
+        public enum PreviewOptions
+        {
+            None = 0,
+            Provided = 1,
+            Redo = 2, // implies there is a valid preview already to which can be reverted
+            Custom = 3,
+            Error = 4,
+            NotApplicable = 5,
+            RedoMissing = 6, // no valid preview yet
+            UseOriginal = 7 // no extra preview, original file is the preview (e.g. image files)
+        }
+
+        [PrimaryKey, AutoIncrement] public int Id { get; set; }
+        [Indexed] public int AssetId { get; set; }
+        [Indexed] public string Guid { get; set; }
+        [Collation("NOCASE")] public string Path { get; set; } // index created manually for collation
+        [Collation("NOCASE")] public string FileName { get; set; } // index created manually for collation
+        public string SourcePath { get; set; }
+        public string FileVersion { get; set; }
+        public string FileStatus { get; set; }
+        [Indexed] public string Type { get; set; }
+        [Indexed] public PreviewOptions PreviewState { get; set; }
+        public float Hue { get; set; } = -1f;
+        public long Size { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public float Length { get; set; }
+        public string AICaption { get; set; }
+        [Indexed] public bool Hidden { get; set; }
+        public string FileData { get; set; }
+
+        // runtime
+        [Ignore] public string ProjectPath { get; set; }
+        [Ignore] public bool InProject => !string.IsNullOrWhiteSpace(ProjectPath) && !ProjectPath.Contains(AI.TEMP_FOLDER) && !ProjectPath.Contains(UnityPreviewGenerator.PREVIEW_FOLDER);
+        [Ignore] public bool IsVirtual => Id < 0;
+        [Ignore] public HashSet<string> ParentGuids { get; set; }
+
+        [Ignore] public string ShortPath => !string.IsNullOrEmpty(Path) && Path.StartsWith("Assets/") ? Path.Substring(7) : Path;
+
+        /// <summary>Checks whether the indexed file is already present in the open Unity project and updates its transient import state.</summary>
+        public void CheckIfInProject()
+        {
+            // check if file already exists in project, and work-around issue that Unity reports deleted assets still back
+            ProjectPath = AssetDatabase.GUIDToAssetPath(Guid);
+            if (!string.IsNullOrEmpty(ProjectPath) && (ProjectPath.StartsWith($"Assets/{AI.TEMP_FOLDER}") || !File.Exists(ProjectPath))) ProjectPath = null;
+        }
+
+        /// <summary>Reports whether a usable cached preview exists, optionally accepting Unity's built-in preview cache.</summary>
+        public bool HasPreview(bool allowScheduled = false)
+        {
+            return
+                PreviewState == PreviewOptions.UseOriginal ||
+                PreviewState == PreviewOptions.Custom ||
+                PreviewState == PreviewOptions.Provided ||
+                (allowScheduled && PreviewState == PreviewOptions.Redo);
+        }
+
+        /// <summary>Reports whether the indexed path represents a Unity package archive.</summary>
+        public bool IsUnityPackage()
+        {
+            return Type == "unitypackage";
+        }
+
+        /// <summary>Reports whether the indexed path has a supported archive format.</summary>
+        public bool IsArchive()
+        {
+            return Type == "zip" || Type == "rar" || Type == "7z";
+        }
+
+        /// <summary>Returns the package-specific directory used to store cached previews for this file.</summary>
+        public string GetPreviewFolder(string previewFolder)
+        {
+            return IOUtils.ToLongPath(System.IO.Path.Combine(previewFolder, AssetId.ToString()));
+        }
+
+        /// <summary>Returns the cached preview path, optionally requiring the file to exist.</summary>
+        public string GetPreviewFile(string previewFolder, bool animated = false)
+        {
+            if (!animated && PreviewState == PreviewOptions.UseOriginal) return GetSourcePath(true);
+
+            string aniSign = animated ? "a" : string.Empty;
+
+            // inline for performance
+            return IOUtils.ToLongPath(System.IO.Path.Combine(previewFolder, AssetId.ToString(), $"af{aniSign}-{Id}.png"));
+        }
+
+        /// <summary>Returns the materialized or source path for this file according to the requested path policy.</summary>
+        public string GetPath(bool expanded)
+        {
+            return expanded ? Paths.DeRel(Path) : Path;
+        }
+
+        internal void SetPath(string path)
+        {
+            Path = path?.Replace("\\", "/");
+        }
+
+        /// <summary>Returns the original indexed source path, optionally resolving package-relative storage.</summary>
+        public string GetSourcePath(bool expanded)
+        {
+            return expanded ? Paths.DeRel(SourcePath) : SourcePath;
+        }
+
+        internal void SetSourcePath(string sourcePath)
+        {
+            SourcePath = sourcePath?.Replace("\\", "/");
+        }
+
+        public override string ToString()
+        {
+            return $"Asset File '{Path}' ({EditorUtility.FormatBytes(Size)}, Asset {AssetId})";
+        }
+    }
+}
