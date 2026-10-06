@@ -24,7 +24,7 @@ public class FireForm : BaseForm, IToggleUltimateForm
     {
         base.Equip(player);
         PlayerUIManager.Instance?.FireElement?.SetActive(false);
-        player.WeaponManager?.FireWeapon?.SetActive(true);
+        //player.WeaponManager?.FireWeapon?.SetActive(true);
     }
     public override void Unequip(PlayerController player)
     {

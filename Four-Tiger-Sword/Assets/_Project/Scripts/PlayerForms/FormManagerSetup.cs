@@ -29,7 +29,7 @@ public class FormManagerSetup
         formManager.AddFastTransition(ironForm, earthForm, () => _playerController.Input.IsFastFormPressed);
         formManager.AddFastTransition(earthForm, fireForm, () => _playerController.Input.IsFastFormPressed);
 
-        formManager.ChangeForm(fireForm);
+        formManager.ChangeForm(waterForm);
         return formManager;
     }
 }
