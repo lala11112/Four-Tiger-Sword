@@ -16,10 +16,12 @@ MonoBehaviour:
   maxHp: 1000000
   baseAtk: 100
   baseDef: 100
+  criticalChance: 0
+  criticalDamage: 0
   combatRange: 5
   combatExitRange: 7
-  knockbackResistance: 3
-  knockbackDuration: 0.25
+  knockbackMoveTime: 0.16
+  knockbackMaxDistance: 1.2
   attackCooldown: 3
   monsterSkillData: {fileID: 11400000, guid: fe89308e8b5707147aa28bf93f886f3e, type: 2}
   staggerResistLevel: 2

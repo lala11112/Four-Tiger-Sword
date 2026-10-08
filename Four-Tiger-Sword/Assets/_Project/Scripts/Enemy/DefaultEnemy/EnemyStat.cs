@@ -24,6 +24,8 @@ public class EnemyStat : MonoBehaviour
     public ElementType ElementType => baseData != null ? baseData.elementType : ElementType.ELEMENT_NONE;
     public StaggerResistLevel StaggerResistLevel => baseData != null ? baseData.staggerResistLevel : StaggerResistLevel.NONE;
     public MonsterSkillDataSO MonsterSkillData => baseData != null ? baseData.monsterSkillData : null;
+    public float KnockbackMoveTime => baseData != null ? Mathf.Max(0f, baseData.knockbackMoveTime) : 0f;
+    public float KnockbackMaxDistance => baseData != null ? Mathf.Max(0f, baseData.knockbackMaxDistance) : 0f;
 
     public event Action<float, ElementType, bool> OnDamageTaken;
 
@@ -44,8 +46,6 @@ public class EnemyStat : MonoBehaviour
         baseValues[EnemyStatType.CriticalDamage]      = baseData.criticalDamage;
         baseValues[EnemyStatType.CombatRange]         = baseData.combatRange;
         baseValues[EnemyStatType.CombatExitRange]     = baseData.combatExitRange;
-        baseValues[EnemyStatType.KnockbackResistance] = baseData.knockbackResistance;
-        baseValues[EnemyStatType.KnockbackDuration]   = baseData.knockbackDuration;
         baseValues[EnemyStatType.AttackCooldown]      = baseData.attackCooldown;
 
         foreach (EnemyStatType stat in Enum.GetValues(typeof(EnemyStatType)))
@@ -115,8 +115,6 @@ public class EnemyStat : MonoBehaviour
         return stat switch
         {
             EnemyStatType.HP                  => Mathf.Max(value, 0f),
-            EnemyStatType.KnockbackResistance => Mathf.Max(value, 0f),
-            EnemyStatType.KnockbackDuration   => Mathf.Max(value, 0f),
             EnemyStatType.AttackCooldown      => Mathf.Max(value, 0.1f), // 0 이하 방지
             _ => value
         };

@@ -13,663 +13,884 @@ MonoBehaviour:
   m_Name: IronFormAction
   m_EditorClassIdentifier: Assembly-CSharp::WeaponActionDataSO
   WeaponName: 
-  ComboSteps:
-  - AnimationName: 
-    Duration: 0.6
-    ComboTransitionTime: 0.3
-    Damage: 1
-    PoiseDamage: 20
-    HitStartTime: 0.2
-    HitDuration: 0.1
-    HitBoxOffset: {x: 0, y: 1, z: 1.5}
-    HitBoxShape: 1
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 0.6, y: 1, z: 2}
-    HitBoxHeight: 2
-    KnockbackForce: 3
-    StaggerResistLevel: 0
-    HitEvents: []
-    SlashVFX: {fileID: 9015710735375805842, guid: 1b6d02aebe857d945a89798ffcebcfbf, type: 3}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: -18}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 1
-    OverrideCameraShakeDirection: 0
-    CameraShakeDirection: {x: 0, y: -1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 0
-    UseTargetApproach: 1
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 6
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.2
-    RotationEndTime: 0.2
-    MaxApproachDistance: 2
-  - AnimationName: 
-    Duration: 0.6
-    ComboTransitionTime: 0.3
-    Damage: 1.2
-    PoiseDamage: 20
-    HitStartTime: 0.2
-    HitDuration: 0.1
-    HitBoxOffset: {x: 0, y: 1, z: 1.5}
-    HitBoxShape: 1
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 0.6, y: 1, z: 2}
-    HitBoxHeight: 2
-    KnockbackForce: 3
-    StaggerResistLevel: 0
-    HitEvents: []
-    SlashVFX: {fileID: 9015710735375805842, guid: 1b6d02aebe857d945a89798ffcebcfbf, type: 3}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: 18}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 1
-    OverrideCameraShakeDirection: 0
-    CameraShakeDirection: {x: 0, y: -1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 0
-    UseTargetApproach: 1
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 6
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.2
-    RotationEndTime: 0.2
-    MaxApproachDistance: 2
-  - AnimationName: 
-    Duration: 0.6
-    ComboTransitionTime: 0.3
-    Damage: 1.8
-    PoiseDamage: 20
-    HitStartTime: 0.2
-    HitDuration: 0.1
-    HitBoxOffset: {x: 0, y: 1, z: 1.5}
-    HitBoxShape: 1
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 0.6, y: 1, z: 2}
-    HitBoxHeight: 2
-    KnockbackForce: 3
-    StaggerResistLevel: 0
-    HitEvents: []
-    SlashVFX: {fileID: 9015710735375805842, guid: 1b6d02aebe857d945a89798ffcebcfbf, type: 3}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: -18}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 1
-    OverrideCameraShakeDirection: 0
-    CameraShakeDirection: {x: 0, y: -1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 0
-    UseTargetApproach: 1
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 6
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.2
-    RotationEndTime: 0.2
-    MaxApproachDistance: 2
-  ParryAnimationName: Parry
-  AirAttackStartAnimationName: 
-  AirAttackStartDuration: 0.15
-  AirAttackLoopAnimationName: 
-  AirAttackStep:
-    AnimationName: 
-    Duration: 0.5
-    ComboTransitionTime: 0.3
-    Damage: 10
-    PoiseDamage: 10
-    HitStartTime: 0.1
-    HitDuration: 0.1
-    HitBoxOffset: {x: 0, y: 0, z: 1}
-    HitBoxShape: 0
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 1, y: 1, z: 1}
-    HitBoxHeight: 2
-    KnockbackForce: 8
-    StaggerResistLevel: 0
-    HitEvents: []
-    SlashVFX: {fileID: 0}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: 0}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 1
-    OverrideCameraShakeDirection: 0
-    CameraShakeDirection: {x: 0, y: -1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 10
-    UseTargetApproach: 0
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 6
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.3
-    RotationEndTime: 0.2
-    MaxApproachDistance: 2
-  CounterStep:
-    AnimationName: 
-    Duration: 0.5
-    ComboTransitionTime: 0.3
-    Damage: 10
-    PoiseDamage: 10
-    HitStartTime: 0.1
-    HitDuration: 0.1
-    HitBoxOffset: {x: 0, y: 0, z: 1}
-    HitBoxShape: 0
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 1, y: 1, z: 1}
-    HitBoxHeight: 2
-    KnockbackForce: 8
-    StaggerResistLevel: 0
-    HitEvents: []
-    SlashVFX: {fileID: 0}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: 0}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 1
-    OverrideCameraShakeDirection: 0
-    CameraShakeDirection: {x: 0, y: -1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 10
-    UseTargetApproach: 0
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 6
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.3
-    RotationEndTime: 0.2
-    MaxApproachDistance: 2
-  SkillSteps:
-  - AnimationName: 
-    Duration: 1.2166667
-    ComboTransitionTime: 0.6333333
-    Damage: 3
-    PoiseDamage: 20
-    HitStartTime: 0.5
-    HitDuration: 0.13333334
-    HitBoxOffset: {x: 0, y: 1, z: 1.5}
-    HitBoxShape: 1
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 0.6, y: 1, z: 2}
-    HitBoxHeight: 2
-    KnockbackForce: 3
-    StaggerResistLevel: 0
-    HitEvents: []
-    SlashVFX: {fileID: 0}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: 0}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 1
-    OverrideCameraShakeDirection: 0
-    CameraShakeDirection: {x: 0, y: -1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 0
-    UseTargetApproach: 1
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 6
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.5
-    RotationEndTime: 0.5
-    MaxApproachDistance: 2
-  UltimateSteps:
-  - AnimationName: 
-    Duration: 2.05
-    ComboTransitionTime: 2
-    Damage: 2
-    PoiseDamage: 20
-    HitStartTime: 0.2
-    HitDuration: 1.8
-    HitBoxOffset: {x: 0, y: 1, z: 6}
-    HitBoxShape: 1
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 0.7, y: 1, z: 6}
-    HitBoxHeight: 2
-    KnockbackForce: 3
-    StaggerResistLevel: 0
-    HitEvents:
-    - StartTime: 0.2
-      Duration: 0.05
-      Damage: 2
-      PoiseDamage: 10
-      StaggerResistLevel: 0
-    - StartTime: 0.6
-      Duration: 0.05
-      Damage: 2
-      PoiseDamage: 10
-      StaggerResistLevel: 0
-    - StartTime: 1
-      Duration: 0.05
-      Damage: 2
-      PoiseDamage: 10
-      StaggerResistLevel: 0
-    - StartTime: 1.4
-      Duration: 0.05
-      Damage: 2
-      PoiseDamage: 10
-      StaggerResistLevel: 0
-    - StartTime: 1.8000001
-      Duration: 0.05
-      Damage: 2
-      PoiseDamage: 10
-      StaggerResistLevel: 0
-    SlashVFX: {fileID: 0}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: 0}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 1
-    OverrideCameraShakeDirection: 0
-    CameraShakeDirection: {x: 0, y: -1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 0
-    UseTargetApproach: 1
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 6
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.2
-    RotationEndTime: 0.2
-    MaxApproachDistance: 2
-  HitVFX: {fileID: 0}
-  HitSound: {fileID: 0}
-  UltimateCooldown: 30
+  Actions:
+    ComboSteps:
+    - Balance:
+        Damage: 1
+        PoiseDamage: 20
+        KnockbackForce: 3
+        StaggerResistLevel: 0
+      Execution:
+        AnimationName: 
+        Duration: 0.6
+        ComboTransitionTime: 0.3
+        HitStartTime: 0.2
+        HitDuration: 0.1
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 1, z: 1.5}
+          HitBoxShape: 1
+          HitBoxRadius: 1.5
+          HitBoxSize: {x: 0.6, y: 1, z: 2}
+          HitBoxHeight: 2
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0.08
+          MovementEndTime: 0.3
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 0
+          TargetApproach:
+            UseTargetApproach: 1
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 6
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.25
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.2
+            RotationEndTime: 0.2
+            MaxApproachDistance: 2
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 0
+          TrailStartTime: 0
+          TrailEndTime: 0.5
+        Slash:
+          SlashVFX: {fileID: 9015710735375805842, guid: 1b6d02aebe857d945a89798ffcebcfbf, type: 3}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: -18}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.1
+          OverrideCameraShakeDirection: 0
+          CameraShakeDirection: {x: 0, y: -1, z: 0}
+      HitEvents: []
+    - Balance:
+        Damage: 1.2
+        PoiseDamage: 20
+        KnockbackForce: 3
+        StaggerResistLevel: 0
+      Execution:
+        AnimationName: 
+        Duration: 0.6
+        ComboTransitionTime: 0.3
+        HitStartTime: 0.2
+        HitDuration: 0.1
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 1, z: 1.5}
+          HitBoxShape: 1
+          HitBoxRadius: 1.5
+          HitBoxSize: {x: 0.6, y: 1, z: 2}
+          HitBoxHeight: 2
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0.08
+          MovementEndTime: 0.3
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 0
+          TargetApproach:
+            UseTargetApproach: 1
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 6
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.25
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.2
+            RotationEndTime: 0.2
+            MaxApproachDistance: 2
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 0
+          TrailStartTime: 0
+          TrailEndTime: 0.5
+        Slash:
+          SlashVFX: {fileID: 9015710735375805842, guid: 1b6d02aebe857d945a89798ffcebcfbf, type: 3}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: 18}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.1
+          OverrideCameraShakeDirection: 0
+          CameraShakeDirection: {x: 0, y: -1, z: 0}
+      HitEvents: []
+    - Balance:
+        Damage: 1.8
+        PoiseDamage: 20
+        KnockbackForce: 3
+        StaggerResistLevel: 0
+      Execution:
+        AnimationName: 
+        Duration: 0.6
+        ComboTransitionTime: 0.3
+        HitStartTime: 0.2
+        HitDuration: 0.1
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 1, z: 1.5}
+          HitBoxShape: 1
+          HitBoxRadius: 1.5
+          HitBoxSize: {x: 0.6, y: 1, z: 2}
+          HitBoxHeight: 2
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0.08
+          MovementEndTime: 0.3
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 0
+          TargetApproach:
+            UseTargetApproach: 1
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 6
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.25
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.2
+            RotationEndTime: 0.2
+            MaxApproachDistance: 2
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 0
+          TrailStartTime: 0
+          TrailEndTime: 0.5
+        Slash:
+          SlashVFX: {fileID: 9015710735375805842, guid: 1b6d02aebe857d945a89798ffcebcfbf, type: 3}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: -18}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.1
+          OverrideCameraShakeDirection: 0
+          CameraShakeDirection: {x: 0, y: -1, z: 0}
+      HitEvents: []
+    AirAttackStep:
+      Balance:
+        Damage: 10
+        PoiseDamage: 10
+        KnockbackForce: 8
+        StaggerResistLevel: 0
+      Execution:
+        AnimationName: 
+        Duration: 0.5
+        ComboTransitionTime: 0.3
+        HitStartTime: 0.1
+        HitDuration: 0.1
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 0, z: 1}
+          HitBoxShape: 0
+          HitBoxRadius: 1.5
+          HitBoxSize: {x: 1, y: 1, z: 1}
+          HitBoxHeight: 2
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0.08
+          MovementEndTime: 0.3
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 10
+          TargetApproach:
+            UseTargetApproach: 0
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 6
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.25
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.3
+            RotationEndTime: 0.2
+            MaxApproachDistance: 2
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 0
+          TrailStartTime: 0
+          TrailEndTime: 0.5
+        Slash:
+          SlashVFX: {fileID: 0}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: 0}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.1
+          OverrideCameraShakeDirection: 0
+          CameraShakeDirection: {x: 0, y: -1, z: 0}
+      HitEvents: []
+    CounterStep:
+      Balance:
+        Damage: 10
+        PoiseDamage: 10
+        KnockbackForce: 8
+        StaggerResistLevel: 0
+      Execution:
+        AnimationName: 
+        Duration: 0.5
+        ComboTransitionTime: 0.3
+        HitStartTime: 0.1
+        HitDuration: 0.1
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 0, z: 1}
+          HitBoxShape: 0
+          HitBoxRadius: 1.5
+          HitBoxSize: {x: 1, y: 1, z: 1}
+          HitBoxHeight: 2
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0.08
+          MovementEndTime: 0.3
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 10
+          TargetApproach:
+            UseTargetApproach: 0
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 6
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.25
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.3
+            RotationEndTime: 0.2
+            MaxApproachDistance: 2
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 0
+          TrailStartTime: 0
+          TrailEndTime: 0.5
+        Slash:
+          SlashVFX: {fileID: 0}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: 0}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.1
+          OverrideCameraShakeDirection: 0
+          CameraShakeDirection: {x: 0, y: -1, z: 0}
+      HitEvents: []
+    SkillSteps:
+    - Balance:
+        Damage: 3
+        PoiseDamage: 20
+        KnockbackForce: 3
+        StaggerResistLevel: 0
+      Execution:
+        AnimationName: 
+        Duration: 1.2166667
+        ComboTransitionTime: 0.6333333
+        HitStartTime: 0.5
+        HitDuration: 0.13333334
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 1, z: 1.5}
+          HitBoxShape: 1
+          HitBoxRadius: 1.5
+          HitBoxSize: {x: 0.6, y: 1, z: 2}
+          HitBoxHeight: 2
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0.08
+          MovementEndTime: 0.3
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 0
+          TargetApproach:
+            UseTargetApproach: 1
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 6
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.25
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.5
+            RotationEndTime: 0.5
+            MaxApproachDistance: 2
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 0
+          TrailStartTime: 0
+          TrailEndTime: 0.5
+        Slash:
+          SlashVFX: {fileID: 0}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: 0}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.1
+          OverrideCameraShakeDirection: 0
+          CameraShakeDirection: {x: 0, y: -1, z: 0}
+      HitEvents: []
+    UltimateSteps:
+    - Balance:
+        Damage: 2
+        PoiseDamage: 20
+        KnockbackForce: 3
+        StaggerResistLevel: 0
+      Execution:
+        AnimationName: 
+        Duration: 2.05
+        ComboTransitionTime: 2
+        HitStartTime: 0.2
+        HitDuration: 1.8
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 1, z: 6}
+          HitBoxShape: 1
+          HitBoxRadius: 1.5
+          HitBoxSize: {x: 0.7, y: 1, z: 6}
+          HitBoxHeight: 2
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0.08
+          MovementEndTime: 0.3
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 0
+          TargetApproach:
+            UseTargetApproach: 1
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 6
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.25
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.2
+            RotationEndTime: 0.2
+            MaxApproachDistance: 2
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 0
+          TrailStartTime: 0
+          TrailEndTime: 0.5
+        Slash:
+          SlashVFX: {fileID: 0}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: 0}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.1
+          OverrideCameraShakeDirection: 0
+          CameraShakeDirection: {x: 0, y: -1, z: 0}
+      HitEvents:
+      - Balance:
+          Damage: 2
+          PoiseDamage: 10
+          StaggerResistLevel: 0
+          OverrideKnockbackForce: 0
+          KnockbackForce: 8
+        Execution:
+          StartTime: 0.2
+          Duration: 0.05
+        Feedback:
+          OverrideHitVFX: 0
+          HitEffect:
+            Prefab: {fileID: 0}
+            Scale: {x: 1, y: 1, z: 1}
+            Rotation: {x: 0, y: 0, z: 0}
+          HitStop:
+            OverrideHitStop: 0
+            HitStopDuration: 0.08
+            HitStopTimeScale: 0.05
+      - Balance:
+          Damage: 2
+          PoiseDamage: 10
+          StaggerResistLevel: 0
+          OverrideKnockbackForce: 0
+          KnockbackForce: 8
+        Execution:
+          StartTime: 0.6
+          Duration: 0.05
+        Feedback:
+          OverrideHitVFX: 0
+          HitEffect:
+            Prefab: {fileID: 0}
+            Scale: {x: 1, y: 1, z: 1}
+            Rotation: {x: 0, y: 0, z: 0}
+          HitStop:
+            OverrideHitStop: 0
+            HitStopDuration: 0.08
+            HitStopTimeScale: 0.05
+      - Balance:
+          Damage: 2
+          PoiseDamage: 10
+          StaggerResistLevel: 0
+          OverrideKnockbackForce: 0
+          KnockbackForce: 8
+        Execution:
+          StartTime: 1
+          Duration: 0.05
+        Feedback:
+          OverrideHitVFX: 0
+          HitEffect:
+            Prefab: {fileID: 0}
+            Scale: {x: 1, y: 1, z: 1}
+            Rotation: {x: 0, y: 0, z: 0}
+          HitStop:
+            OverrideHitStop: 0
+            HitStopDuration: 0.08
+            HitStopTimeScale: 0.05
+      - Balance:
+          Damage: 2
+          PoiseDamage: 10
+          StaggerResistLevel: 0
+          OverrideKnockbackForce: 0
+          KnockbackForce: 8
+        Execution:
+          StartTime: 1.4
+          Duration: 0.05
+        Feedback:
+          OverrideHitVFX: 0
+          HitEffect:
+            Prefab: {fileID: 0}
+            Scale: {x: 1, y: 1, z: 1}
+            Rotation: {x: 0, y: 0, z: 0}
+          HitStop:
+            OverrideHitStop: 0
+            HitStopDuration: 0.08
+            HitStopTimeScale: 0.05
+      - Balance:
+          Damage: 2
+          PoiseDamage: 10
+          StaggerResistLevel: 0
+          OverrideKnockbackForce: 0
+          KnockbackForce: 8
+        Execution:
+          StartTime: 1.8000001
+          Duration: 0.05
+        Feedback:
+          OverrideHitVFX: 0
+          HitEffect:
+            Prefab: {fileID: 0}
+            Scale: {x: 1, y: 1, z: 1}
+            Rotation: {x: 0, y: 0, z: 0}
+          HitStop:
+            OverrideHitStop: 0
+            HitStopDuration: 0.08
+            HitStopTimeScale: 0.05
+  CommonBalance:
+    UltimateCooldown: 30
+  CommonExecution:
+    ParryAnimationName: Parry
+    AirAttackStartAnimationName: 
+    AirAttackStartDuration: 0.15
+    AirAttackLoopAnimationName: 
+  CommonFeedback:
+    HitVFX: {fileID: 0}
+    HitSound: {fileID: 0}

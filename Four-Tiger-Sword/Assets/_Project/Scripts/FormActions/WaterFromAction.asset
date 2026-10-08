@@ -13,936 +13,1101 @@ MonoBehaviour:
   m_Name: WaterFromAction
   m_EditorClassIdentifier: Assembly-CSharp::WeaponActionDataSO
   WeaponName: 
-  ComboSteps:
-  - AnimationName: Water1
-    Duration: 1.433
-    ComboTransitionTime: 1
-    Damage: 0
-    PoiseDamage: 0
-    HitStartTime: 0
-    HitDuration: 0
-    HitBoxOffset: {x: 0, y: 0, z: 0.6}
-    HitBoxShape: 1
-    HitBoxRadius: 1
-    HitBoxSize: {x: 2, y: 1, z: 1}
-    HitBoxHeight: 0
-    KnockbackForce: 12
-    StaggerResistLevel: 2
-    HitEvents:
-    - StartTime: 0.43
-      Duration: 0.05
-      Damage: 1
-      PoiseDamage: 20
-      StaggerResistLevel: 3
-      OverrideHitVFX: 1
-      HitEffect:
-        Prefab: {fileID: 0}
-        Scale: {x: 1, y: 1, z: 1}
-        Rotation: {x: 0, y: 90, z: 0}
-    - StartTime: 0.63
-      Duration: 0.05
-      Damage: 1
-      PoiseDamage: 20
-      StaggerResistLevel: 3
-      OverrideHitVFX: 1
-      HitEffect:
-        Prefab: {fileID: 0}
-        Scale: {x: 1, y: 1, z: 1}
-        Rotation: {x: 0, y: 90, z: 0}
-    HitEffect:
-      Prefab: {fileID: 0}
-      Scale: {x: 1, y: 1, z: 1}
-      Rotation: {x: 0, y: 0, z: 0}
-    DisableTrail: 0
-    UseCustomTrailTiming: 1
-    TrailStartTime: 0.16
-    TrailEndTime: 0.6
-    SlashVFX: {fileID: 0}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: -18}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 0
-    OverrideCameraShakeDirection: 1
-    CameraShakeDirection: {x: -1, y: 0, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0
-    MovementEndTime: 0.42
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: -4.0621963
-        outSlope: -4.0621963
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.24476042
-        value: 0.00573509
-        inSlope: -4.0621963
-        outSlope: 0.00016879958
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 1.0085902
-        value: 0.005864024
-        inSlope: 0.00016879958
-        outSlope: 0.00016879958
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 15
-    UseTargetApproach: 1
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 15
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.3
-    RotationEndTime: 0.3
-    MaxApproachDistance: 10
-  - AnimationName: Water2
-    Duration: 1.4
-    ComboTransitionTime: 1
-    Damage: 0.6
-    PoiseDamage: 0
-    HitStartTime: 0
-    HitDuration: 0
-    HitBoxOffset: {x: 0, y: 0, z: 0.6}
-    HitBoxShape: 1
-    HitBoxRadius: 1
-    HitBoxSize: {x: 2, y: 1, z: 1}
-    HitBoxHeight: 0
-    KnockbackForce: 12
-    StaggerResistLevel: 2
-    HitEvents:
-    - StartTime: 0.33
-      Duration: 0.04
-      Damage: 0.6
-      PoiseDamage: 10
-      StaggerResistLevel: 2
-      OverrideHitVFX: 0
-      HitEffect:
-        Prefab: {fileID: 0}
-        Scale: {x: 1, y: 1, z: 1}
-        Rotation: {x: 0, y: 0, z: 0}
-    - StartTime: 0.56
-      Duration: 0.04
-      Damage: 0.6
-      PoiseDamage: 10
-      StaggerResistLevel: 2
-      OverrideHitVFX: 0
-      HitEffect:
-        Prefab: {fileID: 0}
-        Scale: {x: 1, y: 1, z: 1}
-        Rotation: {x: 0, y: 0, z: 0}
-    HitEffect:
-      Prefab: {fileID: 0}
-      Scale: {x: 1, y: 1, z: 1}
-      Rotation: {x: 0, y: 0, z: 0}
-    DisableTrail: 0
-    UseCustomTrailTiming: 1
-    TrailStartTime: 0.1
-    TrailEndTime: 0.6
-    SlashVFX: {fileID: 0}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: 18}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 0.05
-    OverrideCameraShakeDirection: 1
-    CameraShakeDirection: {x: 1, y: 0, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0
-    MovementEndTime: 0.32
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: -2.492821
-        outSlope: -2.492821
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.3988513
-        value: 0.00573509
-        inSlope: -2.492821
-        outSlope: 0.00021145797
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 1.0085902
-        value: 0.005864024
-        inSlope: 0.00021145797
-        outSlope: 0.00021145797
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 15
-    UseTargetApproach: 1
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 15
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.13333334
-    RotationEndTime: 0.13333334
-    MaxApproachDistance: 10
-  - AnimationName: Water3
-    Duration: 1.7
-    ComboTransitionTime: 0
-    Damage: 0.6
-    PoiseDamage: 0
-    HitStartTime: 0
-    HitDuration: 0
-    HitBoxOffset: {x: 0, y: 0, z: 0.6}
-    HitBoxShape: 0
-    HitBoxRadius: 1
-    HitBoxSize: {x: 0, y: 0, z: 0}
-    HitBoxHeight: 0
-    KnockbackForce: 12
-    StaggerResistLevel: 2
-    HitEvents:
-    - StartTime: 0.43
-      Duration: 0.04
-      Damage: 0.6
-      PoiseDamage: 10
-      StaggerResistLevel: 2
-      OverrideHitVFX: 0
-      HitEffect:
-        Prefab: {fileID: 0}
-        Scale: {x: 1, y: 1, z: 1}
-        Rotation: {x: 0, y: 0, z: 0}
-    - StartTime: 1
-      Duration: 0.04
-      Damage: 0.6
-      PoiseDamage: 10
-      StaggerResistLevel: 3
-      OverrideHitVFX: 0
-      HitEffect:
-        Prefab: {fileID: 0}
-        Scale: {x: 1, y: 1, z: 1}
-        Rotation: {x: 0, y: 0, z: 0}
-    HitEffect:
-      Prefab: {fileID: 0}
-      Scale: {x: 1, y: 1, z: 1}
-      Rotation: {x: 0, y: 0, z: 0}
-    DisableTrail: 0
-    UseCustomTrailTiming: 1
-    TrailStartTime: 0.16
-    TrailEndTime: 1
-    SlashVFX: {fileID: 0}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: -18}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 0.15
-    OverrideCameraShakeDirection: 1
-    CameraShakeDirection: {x: 0, y: 1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0
-    MovementEndTime: 0.42
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: -4.0423717
-        outSlope: -4.0423717
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.24476042
-        value: 0.010587385
-        inSlope: -4.0423717
-        outSlope: -0.023701403
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.46502894
-        value: 0.005366712
-        inSlope: -0.0061837854
-        outSlope: -0.0061837854
-        tangentMode: 1
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.5127001
-        value: 1.001651
-        inSlope: -0.0023588869
-        outSlope: -0.0023588869
-        tangentMode: 1
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.6737121
-        value: 0.014565486
-        inSlope: -6.13051
-        outSlope: -0.025983965
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 1.0085902
-        value: 0.005864024
-        inSlope: -0.025983965
-        outSlope: -0.025983965
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 15
-    UseTargetApproach: 1
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 15
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.13333334
-    RotationEndTime: 0.13333334
-    MaxApproachDistance: 10
-  ParryAnimationName: WaterParry
-  AirAttackStartAnimationName: WaterAirStart
-  AirAttackStartDuration: 0.3
-  AirAttackLoopAnimationName: WaterAtrIdle
-  AirAttackStep:
-    AnimationName: WaterAirEnd
-    Duration: 0.5
-    ComboTransitionTime: 0.3
-    Damage: 10
-    PoiseDamage: 10
-    HitStartTime: 0.1
-    HitDuration: 0.1
-    HitBoxOffset: {x: 0, y: 0, z: 1}
-    HitBoxShape: 0
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 1, y: 1, z: 1}
-    HitBoxHeight: 2
-    KnockbackForce: 1
-    StaggerResistLevel: 0
-    HitEvents: []
-    HitEffect:
-      Prefab: {fileID: 0}
-      Scale: {x: 1, y: 1, z: 1}
-      Rotation: {x: 0, y: 0, z: 0}
-    DisableTrail: 0
-    UseCustomTrailTiming: 0
-    TrailStartTime: 0
-    TrailEndTime: 0.5
-    SlashVFX: {fileID: 0}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: 0}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 1
-    OverrideCameraShakeDirection: 0
-    CameraShakeDirection: {x: 0, y: -1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 10
-    UseTargetApproach: 0
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 6
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.3
-    RotationEndTime: 0.2
-    MaxApproachDistance: 2
-  CounterStep:
-    AnimationName: WaterSkill
-    Duration: 1.2
-    ComboTransitionTime: 0
-    Damage: 10
-    PoiseDamage: 10
-    HitStartTime: 0.5
-    HitDuration: 0.1
-    HitBoxOffset: {x: 0, y: 0, z: 1}
-    HitBoxShape: 0
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 1, y: 1, z: 1}
-    HitBoxHeight: 2
-    KnockbackForce: 8
-    StaggerResistLevel: 0
-    HitEvents: []
-    HitEffect:
-      Prefab: {fileID: 0}
-      Scale: {x: 1, y: 1, z: 1}
-      Rotation: {x: 0, y: 0, z: 0}
-    DisableTrail: 0
-    UseCustomTrailTiming: 0
-    TrailStartTime: 0
-    TrailEndTime: 0.5
-    SlashVFX: {fileID: 0}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: 0}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 0.05
-    OverrideCameraShakeDirection: 0
-    CameraShakeDirection: {x: 0, y: -1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0.00630641
-        value: 1.0001788
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 0.3494375
-        value: 0.0012263656
-        inSlope: -2.9112852
-        outSlope: -0.0018850849
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 20
-    UseTargetApproach: 1
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 6
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.3
-    RotationEndTime: 0.2
-    MaxApproachDistance: 2
-  SkillSteps:
-  - AnimationName: WaterSkill
-    Duration: 1.2
-    ComboTransitionTime: 0
-    Damage: 2
-    PoiseDamage: 10
-    HitStartTime: 0.15
-    HitDuration: 1.7
-    HitBoxOffset: {x: 0, y: 0, z: 2}
-    HitBoxShape: 1
-    HitBoxRadius: 0
-    HitBoxSize: {x: 2, y: 1, z: 2}
-    HitBoxHeight: 0
-    KnockbackForce: 3
-    StaggerResistLevel: 2
-    HitEvents: []
-    HitEffect:
-      Prefab: {fileID: 0}
-      Scale: {x: 1, y: 1, z: 1}
-      Rotation: {x: 0, y: 0, z: 0}
-    DisableTrail: 0
-    UseCustomTrailTiming: 0
-    TrailStartTime: 0
-    TrailEndTime: 0.5
-    SlashVFX: {fileID: 0}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: 0}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 0.05
-    OverrideCameraShakeDirection: 0
-    CameraShakeDirection: {x: 0, y: -1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0.0015296936
-        value: 0.9990349
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0
-      - serializedVersion: 3
-        time: 0.25804508
-        value: -0.00044369698
-        inSlope: -3.896369
-        outSlope: 0.032639302
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 1
-        value: 0.023773193
-        inSlope: 0.032639302
-        outSlope: 0.032639302
-        tangentMode: 34
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 20
-    UseTargetApproach: 0
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 6
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.3
-    RotationEndTime: 0.2
-    MaxApproachDistance: 2
-  UltimateSteps:
-  - AnimationName: 
-    Duration: 2.1
-    ComboTransitionTime: 2
-    Damage: 1.2
-    PoiseDamage: 20
-    HitStartTime: 0.2
-    HitDuration: 1.8
-    HitBoxOffset: {x: 0, y: 1, z: 1.5}
-    HitBoxShape: 1
-    HitBoxRadius: 1.5
-    HitBoxSize: {x: 0.6, y: 1, z: 2}
-    HitBoxHeight: 2
-    KnockbackForce: 3
-    StaggerResistLevel: 0
-    HitEvents: []
-    HitEffect:
-      Prefab: {fileID: 0}
-      Scale: {x: 1, y: 1, z: 1}
-      Rotation: {x: 0, y: 0, z: 0}
-    DisableTrail: 0
-    UseCustomTrailTiming: 0
-    TrailStartTime: 0
-    TrailEndTime: 0.5
-    SlashVFX: {fileID: 0}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: 0}
-    SlashVFXScale: 1
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 0}
-    CameraShakeStrength: 0.05
-    OverrideCameraShakeDirection: 0
-    CameraShakeDirection: {x: 0, y: -1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 0
-    UseTargetApproach: 1
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 6
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.2
-    RotationEndTime: 0.2
-    MaxApproachDistance: 2
-  HitVFX: {fileID: 1367524815892938, guid: 40f5e004d2504a04db181f5453658776, type: 3}
-  HitSound: {fileID: 0}
-  UltimateCooldown: 25
+  Actions:
+    ComboSteps:
+    - Balance:
+        Damage: 0
+        PoiseDamage: 0
+        KnockbackForce: 12
+        StaggerResistLevel: 2
+      Execution:
+        AnimationName: Water1
+        Duration: 1.433
+        ComboTransitionTime: 1
+        HitStartTime: 0
+        HitDuration: 0
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 0, z: 0.6}
+          HitBoxShape: 1
+          HitBoxRadius: 1
+          HitBoxSize: {x: 2, y: 1, z: 1}
+          HitBoxHeight: 0
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0
+          MovementEndTime: 0.42
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 1
+              inSlope: -4.0621963
+              outSlope: -4.0621963
+              tangentMode: 34
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0.33333334
+            - serializedVersion: 3
+              time: 0.24476042
+              value: 0.00573509
+              inSlope: -4.0621963
+              outSlope: 0.00016879958
+              tangentMode: 69
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0.33333334
+            - serializedVersion: 3
+              time: 1.0085902
+              value: 0.005864024
+              inSlope: 0.00016879958
+              outSlope: 0.00016879958
+              tangentMode: 34
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 15
+          TargetApproach:
+            UseTargetApproach: 1
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 15
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.5
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.3
+            RotationEndTime: 0.3
+            MaxApproachDistance: 10
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 1
+          TrailStartTime: 0.16
+          TrailEndTime: 0.6
+        Slash:
+          SlashVFX: {fileID: 0}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: -18}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.005
+          OverrideCameraShakeDirection: 1
+          CameraShakeDirection: {x: -1, y: 0, z: 0}
+      HitEvents:
+      - Balance:
+          Damage: 1
+          PoiseDamage: 20
+          StaggerResistLevel: 3
+          OverrideKnockbackForce: 1
+          KnockbackForce: 25
+        Execution:
+          StartTime: 0.43
+          Duration: 0.05
+        Feedback:
+          OverrideHitVFX: 1
+          HitEffect:
+            Prefab: {fileID: 0}
+            Scale: {x: 1, y: 1, z: 1}
+            Rotation: {x: 0, y: 90, z: 0}
+          HitStop:
+            OverrideHitStop: 0
+            HitStopDuration: 0.08
+            HitStopTimeScale: 0.05
+      - Balance:
+          Damage: 1
+          PoiseDamage: 20
+          StaggerResistLevel: 3
+          OverrideKnockbackForce: 1
+          KnockbackForce: 30
+        Execution:
+          StartTime: 0.63
+          Duration: 0.05
+        Feedback:
+          OverrideHitVFX: 1
+          HitEffect:
+            Prefab: {fileID: 0}
+            Scale: {x: 1, y: 1, z: 1}
+            Rotation: {x: 0, y: 90, z: 0}
+          HitStop:
+            OverrideHitStop: 0
+            HitStopDuration: 0.08
+            HitStopTimeScale: 0.05
+    - Balance:
+        Damage: 0.6
+        PoiseDamage: 0
+        KnockbackForce: 12
+        StaggerResistLevel: 2
+      Execution:
+        AnimationName: Water2
+        Duration: 1.4
+        ComboTransitionTime: 1
+        HitStartTime: 0
+        HitDuration: 0
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 0, z: 0.6}
+          HitBoxShape: 1
+          HitBoxRadius: 1
+          HitBoxSize: {x: 2, y: 1, z: 1}
+          HitBoxHeight: 0
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0
+          MovementEndTime: 0.32
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 1
+              inSlope: -2.492821
+              outSlope: -2.492821
+              tangentMode: 34
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0.33333334
+            - serializedVersion: 3
+              time: 0.3988513
+              value: 0.00573509
+              inSlope: -2.492821
+              outSlope: 0.00021145797
+              tangentMode: 69
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0.33333334
+            - serializedVersion: 3
+              time: 1.0085902
+              value: 0.005864024
+              inSlope: 0.00021145797
+              outSlope: 0.00021145797
+              tangentMode: 34
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 15
+          TargetApproach:
+            UseTargetApproach: 1
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 15
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.5
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.13333334
+            RotationEndTime: 0.13333334
+            MaxApproachDistance: 10
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 1
+          TrailStartTime: 0.1
+          TrailEndTime: 0.6
+        Slash:
+          SlashVFX: {fileID: 0}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: 18}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.007
+          OverrideCameraShakeDirection: 1
+          CameraShakeDirection: {x: 1, y: 0, z: 0}
+      HitEvents:
+      - Balance:
+          Damage: 0.6
+          PoiseDamage: 10
+          StaggerResistLevel: 2
+          OverrideKnockbackForce: 1
+          KnockbackForce: 20
+        Execution:
+          StartTime: 0.33
+          Duration: 0.04
+        Feedback:
+          OverrideHitVFX: 0
+          HitEffect:
+            Prefab: {fileID: 0}
+            Scale: {x: 1, y: 1, z: 1}
+            Rotation: {x: 0, y: 0, z: 0}
+          HitStop:
+            OverrideHitStop: 0
+            HitStopDuration: 0.08
+            HitStopTimeScale: 0.05
+      - Balance:
+          Damage: 0.6
+          PoiseDamage: 10
+          StaggerResistLevel: 2
+          OverrideKnockbackForce: 1
+          KnockbackForce: 30
+        Execution:
+          StartTime: 0.56
+          Duration: 0.04
+        Feedback:
+          OverrideHitVFX: 0
+          HitEffect:
+            Prefab: {fileID: 0}
+            Scale: {x: 1, y: 1, z: 1}
+            Rotation: {x: 0, y: 0, z: 0}
+          HitStop:
+            OverrideHitStop: 0
+            HitStopDuration: 0.08
+            HitStopTimeScale: 0.05
+    - Balance:
+        Damage: 0.6
+        PoiseDamage: 0
+        KnockbackForce: 12
+        StaggerResistLevel: 2
+      Execution:
+        AnimationName: Water3
+        Duration: 1.55
+        ComboTransitionTime: 0
+        HitStartTime: 0
+        HitDuration: 0
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 0, z: 0.6}
+          HitBoxShape: 0
+          HitBoxRadius: 1
+          HitBoxSize: {x: 0, y: 0, z: 0}
+          HitBoxHeight: 0
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0
+          MovementEndTime: 0.42
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 1
+              inSlope: -4.0423717
+              outSlope: -4.0423717
+              tangentMode: 34
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0.33333334
+            - serializedVersion: 3
+              time: 0.24476042
+              value: 0.010587385
+              inSlope: -4.0423717
+              outSlope: -0.023701403
+              tangentMode: 69
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0.33333334
+            - serializedVersion: 3
+              time: 0.46502894
+              value: 0.005366712
+              inSlope: -0.0061837854
+              outSlope: -0.0061837854
+              tangentMode: 1
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0.33333334
+            - serializedVersion: 3
+              time: 0.5127001
+              value: 1.001651
+              inSlope: -0.0023588869
+              outSlope: -0.0023588869
+              tangentMode: 1
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0.33333334
+            - serializedVersion: 3
+              time: 0.6737121
+              value: 0.014565486
+              inSlope: -6.13051
+              outSlope: -0.025983965
+              tangentMode: 69
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0.33333334
+            - serializedVersion: 3
+              time: 1.0085902
+              value: 0.005864024
+              inSlope: -0.025983965
+              outSlope: -0.025983965
+              tangentMode: 34
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 15
+          TargetApproach:
+            UseTargetApproach: 1
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 15
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.5
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.13333334
+            RotationEndTime: 0.13333334
+            MaxApproachDistance: 10
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 1
+          TrailStartTime: 0.16
+          TrailEndTime: 1
+        Slash:
+          SlashVFX: {fileID: 0}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: -18}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.03
+          OverrideCameraShakeDirection: 1
+          CameraShakeDirection: {x: 0, y: 1, z: 0}
+      HitEvents:
+      - Balance:
+          Damage: 0.6
+          PoiseDamage: 10
+          StaggerResistLevel: 2
+          OverrideKnockbackForce: 1
+          KnockbackForce: 25
+        Execution:
+          StartTime: 0.43
+          Duration: 0.04
+        Feedback:
+          OverrideHitVFX: 0
+          HitEffect:
+            Prefab: {fileID: 0}
+            Scale: {x: 1, y: 1, z: 1}
+            Rotation: {x: 0, y: 0, z: 0}
+          HitStop:
+            OverrideHitStop: 0
+            HitStopDuration: 0.08
+            HitStopTimeScale: 0.05
+      - Balance:
+          Damage: 0.6
+          PoiseDamage: 10
+          StaggerResistLevel: 3
+          OverrideKnockbackForce: 1
+          KnockbackForce: 35
+        Execution:
+          StartTime: 1
+          Duration: 0.04
+        Feedback:
+          OverrideHitVFX: 0
+          HitEffect:
+            Prefab: {fileID: 0}
+            Scale: {x: 1, y: 1, z: 1}
+            Rotation: {x: 0, y: 0, z: 0}
+          HitStop:
+            OverrideHitStop: 0
+            HitStopDuration: 0.08
+            HitStopTimeScale: 0.05
+    AirAttackStep:
+      Balance:
+        Damage: 10
+        PoiseDamage: 10
+        KnockbackForce: 1
+        StaggerResistLevel: 0
+      Execution:
+        AnimationName: WaterAirEnd
+        Duration: 0.5
+        ComboTransitionTime: 0.3
+        HitStartTime: 0.1
+        HitDuration: 0.1
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 0, z: 1}
+          HitBoxShape: 0
+          HitBoxRadius: 1.5
+          HitBoxSize: {x: 1, y: 1, z: 1}
+          HitBoxHeight: 2
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0.08
+          MovementEndTime: 0.3
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 10
+          TargetApproach:
+            UseTargetApproach: 0
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 6
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.25
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.3
+            RotationEndTime: 0.2
+            MaxApproachDistance: 2
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 0
+          TrailStartTime: 0
+          TrailEndTime: 0.5
+        Slash:
+          SlashVFX: {fileID: 0}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: 0}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 1
+          OverrideCameraShakeDirection: 0
+          CameraShakeDirection: {x: 0, y: -1, z: 0}
+      HitEvents: []
+    CounterStep:
+      Balance:
+        Damage: 10
+        PoiseDamage: 10
+        KnockbackForce: 8
+        StaggerResistLevel: 0
+      Execution:
+        AnimationName: WaterSkill
+        Duration: 1.2
+        ComboTransitionTime: 0
+        HitStartTime: 0.5
+        HitDuration: 0.1
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 0, z: 1}
+          HitBoxShape: 0
+          HitBoxRadius: 1.5
+          HitBoxSize: {x: 1, y: 1, z: 1}
+          HitBoxHeight: 2
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0.08
+          MovementEndTime: 0.3
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0.00630641
+              value: 1.0001788
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 0.3494375
+              value: 0.0012263656
+              inSlope: -2.9112852
+              outSlope: -0.0018850849
+              tangentMode: 69
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0.33333334
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 20
+          TargetApproach:
+            UseTargetApproach: 1
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 6
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.25
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.3
+            RotationEndTime: 0.2
+            MaxApproachDistance: 2
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 0
+          TrailStartTime: 0
+          TrailEndTime: 0.5
+        Slash:
+          SlashVFX: {fileID: 0}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: 0}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.05
+          OverrideCameraShakeDirection: 0
+          CameraShakeDirection: {x: 0, y: -1, z: 0}
+      HitEvents: []
+    SkillSteps:
+    - Balance:
+        Damage: 2
+        PoiseDamage: 10
+        KnockbackForce: 3
+        StaggerResistLevel: 2
+      Execution:
+        AnimationName: WaterSkill
+        Duration: 0.9
+        ComboTransitionTime: 0
+        HitStartTime: 0.15
+        HitDuration: 1.7
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 0, z: 2}
+          HitBoxShape: 1
+          HitBoxRadius: 0
+          HitBoxSize: {x: 2, y: 1, z: 2}
+          HitBoxHeight: 0
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0.08
+          MovementEndTime: 0.3
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0.0015296936
+              value: 0.9990349
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0
+            - serializedVersion: 3
+              time: 0.25804508
+              value: -0.00044369698
+              inSlope: -3.896369
+              outSlope: 0.032639302
+              tangentMode: 69
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0.33333334
+            - serializedVersion: 3
+              time: 1
+              value: 0.023773193
+              inSlope: 0.032639302
+              outSlope: 0.032639302
+              tangentMode: 34
+              weightedMode: 0
+              inWeight: 0.33333334
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 20
+          TargetApproach:
+            UseTargetApproach: 0
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 6
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.25
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.3
+            RotationEndTime: 0.2
+            MaxApproachDistance: 2
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 0
+          TrailStartTime: 0
+          TrailEndTime: 0.5
+        Slash:
+          SlashVFX: {fileID: 0}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: 0}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.05
+          OverrideCameraShakeDirection: 0
+          CameraShakeDirection: {x: 0, y: -1, z: 0}
+      HitEvents: []
+    UltimateSteps:
+    - Balance:
+        Damage: 1.2
+        PoiseDamage: 20
+        KnockbackForce: 3
+        StaggerResistLevel: 0
+      Execution:
+        AnimationName: 
+        Duration: 2.1
+        ComboTransitionTime: 2
+        HitStartTime: 0.2
+        HitDuration: 1.8
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 1, z: 1.5}
+          HitBoxShape: 1
+          HitBoxRadius: 1.5
+          HitBoxSize: {x: 0.6, y: 1, z: 2}
+          HitBoxHeight: 2
+        Movement:
+          UseDistanceMovement: 0
+          ForwardDistance: 2
+          MovementStartTime: 0.08
+          MovementEndTime: 0.3
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 0
+          TargetApproach:
+            UseTargetApproach: 1
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 6
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.25
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.2
+            RotationEndTime: 0.2
+            MaxApproachDistance: 2
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingSound: {fileID: 0}
+        HitStop:
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 0
+          TrailStartTime: 0
+          TrailEndTime: 0.5
+        Slash:
+          SlashVFX: {fileID: 0}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: 0}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+        Camera:
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.05
+          OverrideCameraShakeDirection: 0
+          CameraShakeDirection: {x: 0, y: -1, z: 0}
+      HitEvents: []
+  CommonBalance:
+    UltimateCooldown: 25
+  CommonExecution:
+    ParryAnimationName: WaterParry
+    AirAttackStartAnimationName: WaterAirStart
+    AirAttackStartDuration: 0.3
+    AirAttackLoopAnimationName: WaterAtrIdle
+  CommonFeedback:
+    HitVFX: {fileID: 1367524815892938, guid: 40f5e004d2504a04db181f5453658776, type: 3}
+    HitSound: {fileID: 0}
+  FormBalance:
+    WaterGaugePerSegment: 100
+    WaterNormalHitGain: 12
+    WaterSkillUseGain: 100
+    WaterSkillBuffDuration: 6
+    WaterSkillAttackBonusPercent: 20
+    WaterSkillHeavyDamageBonusPercent: 30
+  FormExecution:
+    HeavyAttackHoldTime: 0.35
+    WaterHeavyDashDistance: 6
+    WaterHeavyDashDuration: 0.35
+    WaterHeavyTargetOvershoot: 1
+    AreaRadius: 4
+  FormFeedback:
+    DelayedHitVFX: {fileID: 0}
   HeavyAttackStep:
-    AnimationName: WaterSkill
-    Duration: 0.8
-    ComboTransitionTime: 0
-    Damage: 2.4
-    PoiseDamage: 40
-    HitStartTime: 0
-    HitDuration: 0.35
-    HitBoxOffset: {x: 0, y: 0.8, z: 0}
-    HitBoxShape: 0
-    HitBoxRadius: 0.8
-    HitBoxSize: {x: 0, y: 0, z: 0}
-    HitBoxHeight: 0
-    KnockbackForce: 0
-    StaggerResistLevel: 2
+    Balance:
+      Damage: 2.4
+      PoiseDamage: 40
+      KnockbackForce: 0
+      StaggerResistLevel: 2
+    Execution:
+      AnimationName: WaterSkill
+      Duration: 0.8
+      ComboTransitionTime: 0
+      HitStartTime: 0
+      HitDuration: 0.35
+      Hitbox:
+        HitBoxOffset: {x: 0, y: 0.8, z: 0}
+        HitBoxShape: 0
+        HitBoxRadius: 0.8
+        HitBoxSize: {x: 0, y: 0, z: 0}
+        HitBoxHeight: 0
+      Movement:
+        UseDistanceMovement: 0
+        ForwardDistance: 2
+        MovementStartTime: 0.08
+        MovementEndTime: 0.3
+        MovementProgress:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UntargetedDistanceMultiplier: 1
+        ThrustCurve:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        ThrustMultiplier: 0
+        TargetApproach:
+          UseTargetApproach: 0
+          FollowMovingTarget: 1
+          TargetFollowSpeed: 6
+          TargetFollowRotationSpeed: 720
+          StopDistance: 0.25
+          ApproachAlignmentAngle: 15
+          ApproachEndTime: 0.13333334
+          RotationEndTime: 0.13333334
+          MaxApproachDistance: 2
+    Feedback:
+      HitEffect:
+        Prefab: {fileID: 0}
+        Scale: {x: 1, y: 1, z: 1}
+        Rotation: {x: 0, y: 0, z: 0}
+      SwingSound: {fileID: 0}
+      HitStop:
+        OverrideHitStop: 0
+        HitStopDuration: 0.08
+        HitStopTimeScale: 0.05
+      Trail:
+        DisableTrail: 0
+        UseCustomTrailTiming: 0
+        TrailStartTime: 0
+        TrailEndTime: 0.5
+      Slash:
+        SlashVFX: {fileID: 0}
+        SlashVFXStartTime: -1
+        SlashVFXOffset: {x: 0, y: 1, z: 0}
+        SlashVFXRotation: {x: 0, y: 0, z: -18}
+        SlashVFXScale: 1.2
+        SlashVFXLifetime: 0.22
+      Camera:
+        CameraProfile: {fileID: -7035174540172365033, guid: dc12e17fd6bded24a9ea3dd48fba2ccc, type: 2}
+        CameraShakeStrength: 0.25
+        OverrideCameraShakeDirection: 0
+        CameraShakeDirection: {x: 0, y: -1, z: 0}
     HitEvents: []
-    HitEffect:
-      Prefab: {fileID: 0}
-      Scale: {x: 1, y: 1, z: 1}
-      Rotation: {x: 0, y: 0, z: 0}
-    DisableTrail: 0
-    UseCustomTrailTiming: 0
-    TrailStartTime: 0
-    TrailEndTime: 0.5
-    SlashVFX: {fileID: 0}
-    SlashVFXStartTime: -1
-    SlashVFXOffset: {x: 0, y: 1, z: 0}
-    SlashVFXRotation: {x: 0, y: 0, z: -18}
-    SlashVFXScale: 1.2
-    SlashVFXLifetime: 0.22
-    SwingSound: {fileID: 0}
-    CameraProfile: {fileID: 11400000, guid: c7df7891149b9b143a3c2d68e269e751, type: 2}
-    CameraShakeStrength: 0.25
-    OverrideCameraShakeDirection: 0
-    CameraShakeDirection: {x: 0, y: -1, z: 0}
-    UseDistanceMovement: 0
-    ForwardDistance: 2
-    MovementStartTime: 0.08
-    MovementEndTime: 0.3
-    MovementProgress:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    UntargetedDistanceMultiplier: 1
-    ApproachAlignmentAngle: 15
-    ThrustCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ThrustMultiplier: 0
-    UseTargetApproach: 0
-    FollowMovingTarget: 1
-    TargetFollowSpeed: 6
-    TargetFollowRotationSpeed: 720
-    StopDistance: 0.25
-    ApproachEndTime: 0.13333334
-    RotationEndTime: 0.13333334
-    MaxApproachDistance: 2
-  HeavyAttackHoldTime: 0.35
-  WaterHeavyDashDistance: 6
-  WaterHeavyDashDuration: 0.35
-  WaterHeavyTargetOvershoot: 1
-  WaterGaugePerSegment: 100
-  WaterNormalHitGain: 12
-  WaterSkillUseGain: 100
-  WaterSkillBuffDuration: 6
-  WaterSkillAttackBonusPercent: 20
-  WaterSkillHeavyDamageBonusPercent: 30
-  DelayedHitVFX: {fileID: 0}
-  AreaRadius: 4

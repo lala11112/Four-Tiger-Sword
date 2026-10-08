@@ -73,11 +73,6 @@ public class PlayerAttackState : IPlayerState
             && input.AttackPressId != _pressId && _heavy?.CanHeavyAttack == true)
             CapturePress();
 
-        if (_normalStarted && !_normalComplete)
-            _form.UpdateAttack(out _normalComplete);
-        else
-            _playerController.Controller.Move(Vector3.up * _playerController.VerticalVelocity * Time.deltaTime);
-
         if (_pending)
         {
             bool samePress = input.AttackPressId == _pressId;
@@ -87,19 +82,18 @@ public class PlayerAttackState : IPlayerState
 
             if (_heavyRequested)
             {
-                if (!_normalStarted || _normalComplete || _form.CanChainAttack)
+                // Cancel before updating the normal attack so it cannot hit again this frame.
+                if (_normalStarted) _form.EndAttack();
+                if (_heavy.TryBeginHeavyAttack())
                 {
-                    if (_normalStarted) _form.EndAttack();
-                    if (_heavy.TryBeginHeavyAttack())
-                    {
-                        _pending = false;
-                        _heavyStarted = true;
-                        return;
-                    }
-                    // The resource may have become unavailable before execution.
-                    _normalStarted = false;
-                    BeginNormalAttack();
+                    _pending = false;
+                    _heavyStarted = true;
+                    IsAttackComplete = false;
+                    return;
                 }
+                // The resource may have become unavailable before execution.
+                _normalStarted = false;
+                BeginNormalAttack();
             }
             else if (!_heavy.CanHeavyAttack || !samePress || !input.IsAttackHeld)
             {
@@ -108,6 +102,11 @@ public class PlayerAttackState : IPlayerState
                 else input.AttackBuffer.Set(0.5f);
             }
         }
+
+        if (_normalStarted && !_normalComplete)
+            _form.UpdateAttack(out _normalComplete);
+        else
+            _playerController.Controller.Move(Vector3.up * _playerController.VerticalVelocity * Time.deltaTime);
 
         if (_normalStarted && !_pending && input.AttackBuffer.IsActive && _form.TryContinueAttack())
         {

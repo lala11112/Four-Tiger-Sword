@@ -26,7 +26,7 @@ public class PlayerStateMachineSetup
         GroundTransitions(stateMachine, idle, move, jump, fall, dash, attack);
         AirTransitions(stateMachine, idle, move, jump, fall);
         DashTransitions(stateMachine, idle, move, dash);
-        AttackTransitions(stateMachine, idle, move, jump, attack, parry, dash);
+        AttackTransitions(stateMachine, idle, move, jump, attack, parry, dash, skill, ultimate);
         AirAttackTransitions(stateMachine, idle, move, jump, fall, airAttack);
         SkillTransitions(stateMachine, idle, move, skill, jump);
         UltimateTransitions(stateMachine, idle, move, ultimate);
@@ -78,7 +78,7 @@ public class PlayerStateMachineSetup
         stateMachine.AddTransition(dash, move, () => dash.IsDashComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
 
-    private void AttackTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerRunState move, PlayerJumpState jump, PlayerAttackState attack, PlayerParryState parry, PlayerDashState dash)
+    private void AttackTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerRunState move, PlayerJumpState jump, PlayerAttackState attack, PlayerParryState parry, PlayerDashState dash, PlayerSkillState skill, PlayerUltimateState ultimate)
     {
         stateMachine.AddTransition(idle, attack, () => _playerController.Input.AttackBuffer.IsActive);
         stateMachine.AddTransition(move, attack, () => _playerController.Input.AttackBuffer.IsActive);
@@ -87,6 +87,13 @@ public class PlayerStateMachineSetup
         stateMachine.AddTransition(attack, jump, () => _playerController.Input.JumpBuffer.IsActive && _playerController.CanJump());
         stateMachine.AddTransition(attack, parry, () => _playerController.Input.ParryBuffer.IsActive && _playerController.CanParry);
         stateMachine.AddTransition(attack, dash, () => _playerController.Input.DashBuffer.IsActive && _playerController.CanDash);
+
+        // 일반 공격은 콤보 가능 시점/종료를 기다리지 않고 스킬로 캔슬합니다.
+        // 완료 프레임에도 즉시 발동하도록 Idle/Move 복귀보다 먼저 검사합니다.
+        stateMachine.AddTransition(attack, skill, () => !attack.IsHeavyAttack
+            && _playerController.Input.SkillBuffer.IsActive && _playerController.CanSkill);
+        stateMachine.AddTransition(attack, ultimate, () => !attack.IsHeavyAttack
+            && _playerController.Input.UltimateBuffer.IsActive && _playerController.CanUltimate);
 
         stateMachine.AddTransition(attack, idle, () => attack.IsAttackComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(attack, move, () => attack.IsAttackComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);

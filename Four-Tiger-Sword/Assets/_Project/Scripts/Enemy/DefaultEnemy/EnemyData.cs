@@ -11,9 +11,13 @@ public class EnemyData : ScriptableObject
     public float criticalDamage; //크리티컬 데미지
     public float combatRange; //전투 사거리
     public float combatExitRange; //전투 종료 사거리
-    public float knockbackResistance; //넉백 저항력
-    [Tooltip("넉백 이동 + 제자리 회복의 총 시간. 실제 이동 시간은 Enemy의 Knockback Move Time 이하입니다.")]
-    public float knockbackDuration;
+    [Header("넉백 설정")]
+    [Min(0f), Tooltip("넉백으로 실제 이동하는 시간 (초). 0이면 넉백 이동 없음. 피격 경직 시간은 Enemy의 Hurt Duration에서 설정합니다.")]
+    public float knockbackMoveTime = 0.16f;
+    [Min(0f), Tooltip("한 번 피격으로 밀려날 수 있는 최대 거리 (m). 0이면 넉백 이동 없음.")]
+    public float knockbackMaxDistance = 1.2f;
+
+    [Header("공격 설정")]
     public float attackCooldown; //공격 쿨타임
     public MonsterSkillDataSO monsterSkillData; //몬스터 스킬 데이터
     public StaggerResistLevel staggerResistLevel; //경직 저항 등급

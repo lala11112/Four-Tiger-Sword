@@ -13,15 +13,10 @@ public class Enemy : MonoBehaviour, IDamageable
     public float CombatRange => EnemyStat.GetStat(EnemyStatType.CombatRange); //몬스터의 전투상태 진입거리
     public float CombatExitRange => EnemyStat.GetStat(EnemyStatType.CombatExitRange); //몬스터의 전투상태 종료거리
 
-    [Header("넉백 설정")]
-    [Tooltip("넉백 저항값. 이 값보다 작은 힘은 밀리지 않음")]
-    public float KnockbackResistance => EnemyStat.GetStat(EnemyStatType.KnockbackResistance); //몬스터의 넉백 저항력
-    [Tooltip("넉백의 이동과 제자리 회복을 합한 행동 제한 시간 (초)")]
-    public float KnockbackDuration => EnemyStat.GetStat(EnemyStatType.KnockbackDuration); //몬스터의 넉백 지속 시간
-    [Min(0f), Tooltip("실제로 밀려나는 시간의 상한. 나머지 넉백 시간에는 제자리에서 회복합니다.")]
-    public float KnockbackMoveTime = 0.16f;
-    [Min(0f), Tooltip("한 번 피격으로 밀려날 수 있는 최대 거리 (m)")]
-    public float KnockbackMaxDistance = 1.2f;
+    public float KnockbackMoveTime => EnemyStat.KnockbackMoveTime;
+    public float KnockbackMaxDistance => EnemyStat.KnockbackMaxDistance;
+
+    [Header("피격 설정")]
     [Min(0f), Tooltip("마지막 피격 후 행동을 멈추는 시간 (초)")]
     public float HurtDuration = 0.5f;
     public uint HurtVersion { get; private set; }
@@ -46,7 +41,6 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool IsKnockbacking { get; private set; }
     private Vector3 _knockbackVelocity;
     private float _knockbackElapsed;
-    private float _knockbackDurationSnapshot;
     private float _knockbackMoveDuration;
     private bool _knockbackUpdateRotation;
     private bool _knockbackRootMotion;
@@ -278,7 +272,7 @@ public class Enemy : MonoBehaviour, IDamageable
     }
 
     /// <summary>
-    /// 넉백을 적용합니다. 저항값을 뺀 유효 힘이 0보다 클 때만 실제로 밀립니다.
+    /// 공격의 경직 등급에 따라 넉백 허용 여부를 확인합니다.
     /// </summary>
     private bool CanReceiveKnockback(StaggerResistLevel attackLevel)
         => StaggerResistLevel != StaggerResistLevel.SUPER_ARMOR
@@ -286,9 +280,11 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void ApplyKnockback(Vector3 power)
     {
-        Vector3 velocity = KnockbackMotion.Velocity(power, KnockbackResistance);
-        float duration = KnockbackDuration;
-        if (velocity.sqrMagnitude <= 0f || !KnockbackMotion.IsFinite(duration) || duration <= 0f) return;
+        Vector3 velocity = KnockbackMotion.Power(power, power.magnitude);
+        float duration = KnockbackMoveTime;
+        float maxDistance = KnockbackMaxDistance;
+        if (velocity.sqrMagnitude <= 0f || !KnockbackMotion.IsFinite(duration) || duration <= 0f
+            || !KnockbackMotion.IsFinite(maxDistance) || maxDistance <= 0f) return;
         // Stop manual dash/jump displacement before taking ownership of movement.
         if (CurrentAction?.IsActive == true) CurrentAction.Exit();
         if (_navMeshAgent == null) _navMeshAgent = GetComponent<NavMeshAgent>();
@@ -296,10 +292,10 @@ public class Enemy : MonoBehaviour, IDamageable
         if (_navMeshAgent == null || !_navMeshAgent.enabled || !_navMeshAgent.isOnNavMesh) return;
         _navMeshAgent.ResetPath();
         _navMeshAgent.velocity = Vector3.zero;
-        BeginKnockback(velocity, duration);
+        BeginKnockback(velocity, duration, maxDistance);
     }
 
-    private void BeginKnockback(Vector3 velocity, float duration)
+    private void BeginKnockback(Vector3 velocity, float duration, float maxDistance)
     {
         if (!IsKnockbacking)
         {
@@ -316,17 +312,16 @@ public class Enemy : MonoBehaviour, IDamageable
                 Animator.applyRootMotion = false;
             }
         }
-        _knockbackMoveDuration = Mathf.Min(duration, Mathf.Max(0f, KnockbackMoveTime));
+        _knockbackMoveDuration = duration;
         // Integral of the impact profile is v0*T/3. Cap distance without extending sliding time.
         float maxSpeed = _knockbackMoveDuration > 0f
-            ? Mathf.Max(0f, KnockbackMaxDistance) * 3f / _knockbackMoveDuration : 0f;
+            ? maxDistance * 3f / _knockbackMoveDuration : 0f;
         _knockbackVelocity = Vector3.ClampMagnitude(velocity, maxSpeed);
         _knockbackElapsed = 0f;
-        _knockbackDurationSnapshot = duration;
     }
 
     /// <summary>
-    /// 짧게 밀린 뒤 급감속하고, 남은 넉백 시간에는 제자리에서 회복합니다.
+    /// SO의 이동 시간 동안 급감속하며 밀립니다. 피격 경직은 HurtDuration으로 별도 처리합니다.
     /// </summary>
     private void UpdateKnockback(float deltaTime)
     {
@@ -340,7 +335,7 @@ public class Enemy : MonoBehaviour, IDamageable
         _navMeshAgent.velocity = Vector3.zero;
         _navMeshAgent.Move(delta);
         _knockbackElapsed += Mathf.Max(0f, deltaTime);
-        if (_knockbackElapsed >= _knockbackDurationSnapshot) StopKnockback();
+        if (_knockbackElapsed >= _knockbackMoveDuration) StopKnockback();
     }
 
     private void Die()

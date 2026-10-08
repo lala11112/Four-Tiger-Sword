@@ -105,8 +105,10 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     private Coroutine _hitStopCoroutine;
     private float _timeScaleBeforeHitStop;
 
-    [Header("Hit Stop Settings")]
+    [Header("Default Hit Stop Settings")]
+    [Min(0f), Tooltip("패링 및 개별 히트스탑이 설정되지 않은 공격의 기본 지속 시간(실제 시간 기준 초)")]
     [SerializeField] private float _hitStopDuration  = 0.25f;
+    [Range(0f, 1f), Tooltip("패링 및 개별 히트스탑이 설정되지 않은 공격의 기본 시간 배율")]
     [SerializeField] private float _hitStopTimeScale = 0f;
 
     public CinemachineImpulseSource ImpulseSource;
@@ -330,10 +332,22 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     public void StartHitStop()
         => StartHitStop(_hitStopDuration, _hitStopTimeScale);
 
+    /// <summary>히트별 설정, 타수별 설정, 플레이어 기본값 순서로 히트스탑을 적용합니다.</summary>
+    public void StartHitStop(WeaponActionData step, HitEvent hitEvent = null)
+    {
+        if (hitEvent != null && hitEvent.OverrideHitStop)
+            StartHitStop(hitEvent.HitStopDuration, hitEvent.HitStopTimeScale);
+        else if (step != null && step.OverrideHitStop)
+            StartHitStop(step.HitStopDuration, step.HitStopTimeScale);
+        else
+            StartHitStop();
+    }
+
     /// <summary>히트스탑 지속시간과 타임스케일을 직접 지정합니다. 퍼펙트 패링 등 특수 연출에 사용합니다.</summary>
     public void StartHitStop(float duration, float timeScale)
     {
-        if (!isActiveAndEnabled || duration <= 0f) return;
+        if (!isActiveAndEnabled || !KnockbackMotion.IsFinite(duration) || duration <= 0f
+            || !KnockbackMotion.IsFinite(timeScale)) return;
         if (_hitStopCoroutine != null) StopCoroutine(_hitStopCoroutine);
         else _timeScaleBeforeHitStop = Time.timeScale;
         _hitStopCoroutine = StartCoroutine(HitStopRoutine(duration, timeScale));

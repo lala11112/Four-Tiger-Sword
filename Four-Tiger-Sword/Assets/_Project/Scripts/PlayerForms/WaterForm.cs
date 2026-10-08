@@ -145,28 +145,31 @@ public class WaterForm : BaseForm, IHeavyAttackForm
             ? _playerController.Movement.GetMoveDirection().normalized
             : _playerController.transform.forward;
         _heavyDashDistance = Mathf.Max(0f, _waterData.WaterHeavyDashDistance);
-        if (continuing && HasHeavyChainTarget)
+        if (!continuing || !HasHeavyChainTarget)
         {
-            Vector3 toTarget = Vector3.ProjectOnPlane(
-                _heavyChainTargetCollider.bounds.center - _playerController.transform.position, Vector3.up);
-            if (toTarget.sqrMagnitude > 0.001f)
-            {
-                _heavyDashDirection = toTarget.normalized;
-                _heavyDashDistance = Mathf.Max(_heavyDashDistance,
-                    toTarget.magnitude + Mathf.Max(0f, _waterData.WaterHeavyTargetOvershoot));
-            }
-        }
-        else if (!hasMoveInput)
-        {
-            // Initial and fallback targets follow the camera view cone.
             FindSoftTarget();
-            if (_softTarget != null)
-            {
-                Vector3 toTarget = Vector3.ProjectOnPlane(
-                    _softTarget.position - _playerController.transform.position, Vector3.up);
-                if (toTarget.sqrMagnitude > 0.001f) _heavyDashDirection = toTarget.normalized;
-            }
+            _heavyChainTarget = _softTarget != null ? _softTarget.GetComponent<IDamageable>() as Component : null;
+            _heavyChainTargetCollider = SoftTargetCollider;
         }
+        if (!HasHeavyChainTarget) return;
+
+        // Snapshot the selected target at dash start; movement input only steers untargeted dashes.
+        Bounds targetBounds = _heavyChainTargetCollider.bounds;
+        Vector3 toTarget = Vector3.ProjectOnPlane(
+            targetBounds.center - _playerController.Controller.bounds.center, Vector3.up);
+        _heavyDashDirection = toTarget.sqrMagnitude > 0.001f
+            ? toTarget.normalized : Vector3.ProjectOnPlane(_playerController.transform.forward, Vector3.up).normalized;
+        if (_heavyDashDirection.sqrMagnitude < 0.001f) _heavyDashDirection = Vector3.forward;
+
+        // Clear both bodies, then leave the configurable gap beyond the target's far side.
+        Vector3 extents = targetBounds.extents;
+        float targetExtent = Mathf.Abs(_heavyDashDirection.x) * extents.x
+            + Mathf.Abs(_heavyDashDirection.z) * extents.z;
+        var controller = _playerController.Controller;
+        float playerRadius = controller.radius * Mathf.Max(
+            Mathf.Abs(controller.transform.lossyScale.x), Mathf.Abs(controller.transform.lossyScale.z));
+        _heavyDashDistance = toTarget.magnitude + targetExtent + playerRadius
+            + Mathf.Max(0f, _waterData.WaterHeavyTargetOvershoot);
     }
 
     public override void UpdateHeavyAttack(out bool isComplete)
@@ -220,7 +223,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
                 }
                 if (!_heavyFeedbackPlayed)
                 {
-                    _playerController.StartHitStop();
+                    _playerController.StartHitStop(step);
                     if (!NotifyCameraHit(step, component.transform, _heavyDashDirection))
                         _playerController.PlayAttackCameraShake(step);
                     _heavyFeedbackPlayed = true;
@@ -327,9 +330,13 @@ public class WaterForm : BaseForm, IHeavyAttackForm
                 // 일반 공격과 동일하게 실제 적중 시에만 타격 피드백을 재생합니다.
                 if (firstHit)
                 {
-                    _playerController.StartHitStop();
                     var steps = _weaponActionData.UltimateSteps;
-                    _playerController.PlayAttackCameraShake(steps != null && steps.Count > 0 ? steps[0] : null);
+                    var step = steps != null && steps.Count > 0 ? steps[0] : null;
+                    // 고정 10연타의 순서에 맞춰 첫 단계의 Hit Events에서 히트스탑만 가져옵니다.
+                    var hitEvent = step?.HitEvents != null && _ultimateHits < step.HitEvents.Count
+                        ? step.HitEvents[_ultimateHits] : null;
+                    _playerController.StartHitStop(step, hitEvent);
+                    _playerController.PlayAttackCameraShake(step);
                     firstHit = false;
                 }
             }

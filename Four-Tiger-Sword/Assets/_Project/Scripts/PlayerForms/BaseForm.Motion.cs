@@ -3,6 +3,7 @@ using UnityEngine;
 public abstract partial class BaseForm
 {
     private Collider _softTargetCollider;
+    protected Collider SoftTargetCollider => _softTargetCollider;
     private readonly AttackMotionProfile _motionProfile = new AttackMotionProfile();
     private WeaponActionData _motionStep;
     private float _approachTravel;
@@ -45,16 +46,17 @@ public abstract partial class BaseForm
         else if (step.HitDuration > 0f)
             _rotationDeadline = Mathf.Min(_rotationDeadline, Mathf.Max(0f, step.HitStartTime));
 
-        // Multi-hit steps keep following through their last active hit, not just the first lunge.
-        _followEndTime = _motionProfile.EndTime;
+        // Chase only while a hit has yet to start. Never chase the final hit's knockback.
+        // Do not extend this deadline to the hit duration or the movement profile's end.
+        _followEndTime = 0f;
         if (step.HitEvents != null && step.HitEvents.Count > 0)
         {
             foreach (var hit in step.HitEvents)
-                if (hit != null && hit.Duration > 0f)
-                    _followEndTime = Mathf.Max(_followEndTime, hit.StartTime + hit.Duration);
+                if (hit != null && hit.Duration > 0f && hit.StartTime <= step.Duration)
+                    _followEndTime = Mathf.Max(_followEndTime, hit.StartTime);
         }
-        else if (step.HitDuration > 0f)
-            _followEndTime = Mathf.Max(_followEndTime, step.HitStartTime + step.HitDuration);
+        else if (step.HitDuration > 0f && step.HitStartTime <= step.Duration)
+            _followEndTime = step.HitStartTime;
         _followEndTime = Mathf.Clamp(_followEndTime, 0f, Mathf.Max(0f, step.Duration));
     }
 

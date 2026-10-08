@@ -169,12 +169,29 @@ public abstract partial class BaseForm
 
         float bestDistanceSquared = float.MaxValue;
         float bestAlignment = -1f;
+        Component nearestOwner = null;
+        Collider nearestCollider = null;
+        float nearestDistanceSquared = float.MaxValue;
 
         for (int i = 0; i < count; i++)
         {
             var hit = _targetSearchBuffer[i];
             var owner = hit.GetComponentInParent<IDamageable>() as Component;
             if (!IsTargetValid(owner, hit)) continue;
+            Vector3 toEnemy = owner.transform.position - _playerController.transform.position;
+            toEnemy.y = 0f;
+            float distanceSquared = toEnemy.sqrMagnitude;
+
+            // Keep a nearest valid fallback before applying camera visibility filters.
+            bool sameNearestDistance = Mathf.Abs(distanceSquared - nearestDistanceSquared) <= 0.0001f;
+            if (distanceSquared < nearestDistanceSquared
+                || (sameNearestDistance && owner == previousOwner))
+            {
+                nearestOwner = owner;
+                nearestCollider = hit;
+                nearestDistanceSquared = distanceSquared;
+            }
+
             Vector3 aimPoint = hit.bounds.center;
             Vector3 viewOffset = aimPoint - viewOrigin;
             if (viewOffset.sqrMagnitude < 0.0001f) continue;
@@ -186,11 +203,7 @@ public abstract partial class BaseForm
                 if (viewport.z <= 0f || viewport.x < 0f || viewport.x > 1f
                     || viewport.y < 0f || viewport.y > 1f) continue;
             }
-            Vector3 toEnemy = owner.transform.position - _playerController.transform.position;
-            toEnemy.y = 0f;
-
             // Prefer the camera's center ray; world distance only breaks equal-angle ties.
-            float distanceSquared = toEnemy.sqrMagnitude;
             bool sameAlignment = Mathf.Abs(alignment - bestAlignment) <= 0.00001f;
             bool sameDistance = Mathf.Abs(distanceSquared - bestDistanceSquared) <= 0.0001f;
             if (alignment > bestAlignment + 0.00001f
@@ -203,6 +216,14 @@ public abstract partial class BaseForm
                 _softTarget = owner.transform;
                 _softTargetCollider = hit;
             }
+        }
+
+        // Camera candidates always win; only fall back when none qualified.
+        if (_softTarget == null && nearestOwner != null)
+        {
+            _softTargetOwner = nearestOwner;
+            _softTarget = nearestOwner.transform;
+            _softTargetCollider = nearestCollider;
         }
     }
 

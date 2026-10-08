@@ -54,6 +54,8 @@ public abstract partial class BaseForm
     {
         Vector3 center = _playerController.transform.position
                        + _playerController.transform.rotation * step.HitBoxOffset;
+        float knockbackForce = hitEvent != null && hitEvent.OverrideKnockbackForce
+            ? hitEvent.KnockbackForce : step.KnockbackForce;
 
         bool firstHit = true;
         int hitCount = GetOverlap(step, center);
@@ -70,7 +72,7 @@ public abstract partial class BaseForm
             if (!hitTargets.Add(damageable)) continue;
 
             Vector3 knockback = KnockbackMotion.Power(target.transform.position - _playerController.transform.position,
-                step.KnockbackForce);
+                knockbackForce);
             float critChance = _playerController.StatManager.GetStat(StatType.ST_CRT)/100f;
             float critMultiplier = _playerController.StatManager.GetStat(StatType.ST_CRTD)/100f;
             var result = DamageManager.Apply(
@@ -80,7 +82,7 @@ public abstract partial class BaseForm
             if (!result.Applied) continue;
             if (firstHit)
             {
-                _playerController.StartHitStop();
+                _playerController.StartHitStop(step, hitEvent);
                 if (!NotifyCameraHit(step, target.transform, _playerController.transform.forward))
                     _playerController.PlayAttackCameraShake(step);
                 firstHit = false;

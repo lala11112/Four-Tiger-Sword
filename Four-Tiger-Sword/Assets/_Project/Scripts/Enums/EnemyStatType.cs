@@ -14,7 +14,4 @@ public enum EnemyStatType
     CombatRange,      // 전투 사거리
     CombatExitRange,  // 전투 종료 사거리
 
-    // 물리 제어
-    KnockbackResistance, // 넉백 저항력
-    KnockbackDuration,   // 넉백 지속 시간 (초)
 }
