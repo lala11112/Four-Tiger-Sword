@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 480388ab5bde78e4eafa57e552161ee8, type: 3}
+  m_Name: DungeonSettings
+  m_EditorClassIdentifier: StudioBaekho.Maps::StudioBaekho.BaekhoDungeonSettings
+  maps:
+  - {fileID: 1862916654406880162, guid: a4352e64921d28748866d9168736c64e, type: 3}
+  - {fileID: 988641062085485799, guid: 3ea9c899051abf540ab60f0aad363168, type: 3}
+  - {fileID: 8617294199288654833, guid: 89a9c3994ac4ebf458bad23c2d7e30a8, type: 3}
+  startRoom: {fileID: 1862916654406880162, guid: 7530587be4dcc0d4bb93562e51129be2, type: 3}
+  endRoom: {fileID: 988641062085485799, guid: b1112e5a705c9904da2930ebfbe0ac1d, type: 3}
+  bossRoom: {fileID: 0}
+  cornerRoom: {fileID: 6521510642564884506, guid: 6be213c0bc6798048ab8ec76b9e86161, type: 3}
+  style: {fileID: 11400000, guid: 385aec3f7b4de574cb48c6f1209e5e7e, type: 2}
+  mapCount: 6
+  randomizeSeed: 1
+  seed: 12345
+  gridSize: 0.5
+  minimumMapGap: 4
+  maximumConnectionLength: 60
+  corridorWidth: 2
+  minimumDoorWidth: 1
+  placementAttempts: 64
+  layoutAttempts: 8
+  maxSearchNodes: 60000

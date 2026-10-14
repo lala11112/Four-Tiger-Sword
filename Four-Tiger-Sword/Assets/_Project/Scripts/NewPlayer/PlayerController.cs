@@ -156,7 +156,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         UpdateParryCooldown();
         StatManager.UpdateSpRegen(Time.deltaTime);
         TryDeactivateUltimate();
-        StateMachine.Update();
+        StateMachine.Update();  
         FormManager.Update();
     }
 

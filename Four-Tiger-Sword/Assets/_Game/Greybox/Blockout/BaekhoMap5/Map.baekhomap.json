@@ -1,0 +1,9741 @@
+{
+  "schemaVersion": 5,
+  "name": "FlankingArena",
+  "width": 14,
+  "height": 14,
+  "cellSize": 2,
+  "placements": [
+    {
+      "id": "wall-0-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": -4,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "cliff-0-0-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-1-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-1-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -11,
+        "y": -4,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-2-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-2-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -9,
+        "y": -4,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-3-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-3-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -7,
+        "y": -4,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-4-0",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-4-0",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 8,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "door-4-0",
+      "role": "door",
+      "prefabGuid": "aee29b7d9f8304544a860e81798d336a",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-5-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-5-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -3,
+        "y": -4,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-6-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -1,
+        "y": 2,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 6
+    },
+    {
+      "id": "cliff-6-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -1,
+        "y": -2,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-7-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 1,
+        "y": 2,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 6
+    },
+    {
+      "id": "cliff-7-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 1,
+        "y": -2,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-8-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 3,
+        "y": 2,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 6
+    },
+    {
+      "id": "cliff-8-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 3,
+        "y": -2,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-9-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 5,
+        "y": 2,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 6
+    },
+    {
+      "id": "cliff-9-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 5,
+        "y": -2,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-10-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 7,
+        "y": 2,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 6
+    },
+    {
+      "id": "cliff-10-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 7,
+        "y": -2,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-11-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 9,
+        "y": 2,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 6
+    },
+    {
+      "id": "cliff-11-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 9,
+        "y": -2,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-12-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-12-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 11,
+        "y": -4,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-13-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-0-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": -4,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "cliff-13-0-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-0-1",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-1-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-1-1",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-1-1",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 8,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-2-1",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-2-1",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 8,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-3-1",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-3-1",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 8,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-4-1",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-4-1",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 8,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-5-1",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-5-1",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 8,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-6-1",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 2,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-1",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-7-1",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 2,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-7-1",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 8,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-8-1",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 2,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-8-1",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 8,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-9-1",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 2,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-9-1",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 8,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-10-1",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 2,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-10-1",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 8,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-11-1",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 2,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-11-1",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 8,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-12-1",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-12-1",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 8,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-13-1",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-1-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-0-2",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-2-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-1-2",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-1-2",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 8,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-2-2",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-2-2",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 8,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-3-2",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-3-2",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 8,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-4-2",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-4-2",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 8,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-5-2",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-5-2",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 8,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-6-2",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 2,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-2",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-7-2",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 2,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-7-2",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 8,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "ceiling-8-2",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 8,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "ceiling-9-2",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 8,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-10-2",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 2,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-10-2",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 8,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-11-2",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 2,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-11-2",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 8,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-12-2",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-12-2",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 8,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-13-2",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-2-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-0-3",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-3-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-1-3",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-1-3",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 8,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-2-3",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-2-3",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 8,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-3-3",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-3-3",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 8,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-4-3",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-4-3",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 8,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-5-3",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-5-3",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 8,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-6-3",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 2,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-3",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-7-3",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 2,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-7-3",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 8,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "ceiling-8-3",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 8,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "ceiling-9-3",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 8,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-10-3",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 2,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-10-3",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 8,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-11-3",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 2,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-11-3",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 8,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-12-3",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-12-3",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 8,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-13-3",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-3-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-0-4",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-4-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-1-4",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-1-4",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 8,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-2-4",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-2-4",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 8,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-3-4",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-3-4",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 8,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-4-4",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-4-4",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 8,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-5-4",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-5-4",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 8,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-6-4",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 2,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-4",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-7-4",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 2,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-7-4",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 8,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "bridge-8-4",
+      "role": "bridge",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 2,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-8-4",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 8,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "bridge-9-4",
+      "role": "bridge",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 2,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-9-4",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 8,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-10-4",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 2,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-10-4",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 8,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-11-4",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 2,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-11-4",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 8,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-12-4",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-12-4",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 8,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-13-4",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-4-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-0-5",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-5-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-1-5",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-1-5",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 8,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-2-5",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-2-5",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 8,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-3-5",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-3-5",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 8,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-4-5",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-4-5",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 8,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-5-5",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-5-5",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 8,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-6-5",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 2,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-5",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-7-5",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 2,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-7-5",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 8,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "ceiling-8-5",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 8,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "ceiling-9-5",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 8,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-10-5",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 2,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-10-5",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 8,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-11-5",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 2,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-11-5",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 8,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-12-5",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-12-5",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 8,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-13-5",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-5-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-0-6",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-6-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-1-6",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-1-6",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 8,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-2-6",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-2-6",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 8,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-3-6",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-3-6",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 8,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-4-6",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-4-6",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 8,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-5-6",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-5-6",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 8,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-6-6",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 0,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-6",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "stair-6-6",
+      "role": "stair",
+      "prefabGuid": "a0b56e7f0a62df34a888a8b7d8030442",
+      "position": {
+        "x": -1,
+        "y": 0,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 2,
+        "z": 2
+      },
+      "surface": "pivot"
+    },
+    {
+      "id": "floor-7-6",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 2,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-7-6",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 8,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "ceiling-8-6",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 8,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "ceiling-9-6",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 8,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-10-6",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 2,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-10-6",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 8,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-11-6",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 2,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-11-6",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 8,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-12-6",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-12-6",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 8,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-13-6",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-6-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-0-7",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-7-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-1-7",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-1-7",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 8,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-2-7",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-2-7",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 8,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-3-7",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-3-7",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 8,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-4-7",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-4-7",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 8,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-5-7",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-5-7",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 8,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-6-7",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 0,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-7",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-7-7",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 2,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-7-7",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 8,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-8-7",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 2,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-8-7",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 8,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-9-7",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 2,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-9-7",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 8,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-10-7",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 2,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-10-7",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 8,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-11-7",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 2,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-11-7",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 8,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-12-7",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-12-7",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 8,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-13-7",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-7-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-0-8",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-8-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-1-8",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-1-8",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 8,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-2-8",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-2-8",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 8,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-3-8",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-3-8",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 8,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-4-8",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "wall-5-8",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "floor-6-8",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-8",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-7-8",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-7-8",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 8,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-8-8",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-8-8",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 8,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-9-8",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-9-8",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 8,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-10-8",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-10-8",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 8,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "stair-10-8",
+      "role": "stair",
+      "prefabGuid": "a0b56e7f0a62df34a888a8b7d8030442",
+      "position": {
+        "x": 7,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 2,
+        "z": 2
+      },
+      "surface": "pivot"
+    },
+    {
+      "id": "floor-11-8",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-11-8",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 8,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-12-8",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-12-8",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 8,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-13-8",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-8-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": -3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-0-9",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-0-9",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -13,
+        "y": 8,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "door-0-9",
+      "role": "door",
+      "prefabGuid": "aee29b7d9f8304544a860e81798d336a",
+      "position": {
+        "x": -14,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-1-9",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-1-9",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 8,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-2-9",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-2-9",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 8,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-3-9",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-3-9",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 8,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-4-9",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "wall-5-9",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "floor-6-9",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-9",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-7-9",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-7-9",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 8,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-8-9",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-8-9",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 8,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-9-9",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-9-9",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 8,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-10-9",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-10-9",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 8,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-11-9",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-11-9",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 8,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-12-9",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-12-9",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 8,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-13-9",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-9-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-0-10",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-10-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-1-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-1-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-2-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-2-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-3-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-3-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-4-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-4-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-5-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-5-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-6-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-7-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-7-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-8-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-8-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-9-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-9-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-10-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-10-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-11-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-11-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-12-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-12-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-13-10",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-13-10",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 13,
+        "y": 8,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "door-13-10",
+      "role": "door",
+      "prefabGuid": "aee29b7d9f8304544a860e81798d336a",
+      "position": {
+        "x": 14,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-0-11",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-11-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-1-11",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-1-11",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 8,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-2-11",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-2-11",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 8,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "prop-2-11",
+      "role": "prop",
+      "prefabGuid": "5f9c02098a8736f4eae460a0630913db",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-3-11",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-3-11",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 8,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-4-11",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-4-11",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 8,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-5-11",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-5-11",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 8,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-6-11",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-11",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-7-11",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-7-11",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 8,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-8-11",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-8-11",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 8,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-9-11",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-9-11",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 8,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-10-11",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-10-11",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 8,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-11-11",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-11-11",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 8,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "prop-11-11",
+      "role": "prop",
+      "prefabGuid": "5f9c02098a8736f4eae460a0630913db",
+      "position": {
+        "x": 9,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-12-11",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-12-11",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 8,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-13-11",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-11-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": -9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-0-12",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-12-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-1-12",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-1-12",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -11,
+        "y": 8,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-2-12",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-2-12",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -9,
+        "y": 8,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-3-12",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-3-12",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -7,
+        "y": 8,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-4-12",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-4-12",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -5,
+        "y": 8,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-5-12",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-5-12",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -3,
+        "y": 8,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-6-12",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-12",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-7-12",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-7-12",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 1,
+        "y": 8,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-8-12",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-8-12",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 3,
+        "y": 8,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-9-12",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-9-12",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 5,
+        "y": 8,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-10-12",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-10-12",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 7,
+        "y": 8,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-11-12",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-11-12",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 9,
+        "y": 8,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "floor-12-12",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-12-12",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": 11,
+        "y": 8,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-13-12",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-12-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-0-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-0-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "cliff-0-13-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -14,
+        "y": -4,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-1-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-1-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -11,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-2-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -9,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-2-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -9,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-3-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -7,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-3-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -7,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-4-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-4-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -5,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-5-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -3,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-5-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -3,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "floor-6-13",
+      "role": "floor",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "top"
+    },
+    {
+      "id": "ceiling-6-13",
+      "role": "ceiling",
+      "prefabGuid": "7a22bf672d8b55d418641113ffb7edef",
+      "position": {
+        "x": -1,
+        "y": 8,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "door-6-13",
+      "role": "door",
+      "prefabGuid": "aee29b7d9f8304544a860e81798d336a",
+      "position": {
+        "x": -1,
+        "y": 0,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom"
+    },
+    {
+      "id": "wall-7-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 1,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-7-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 1,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-8-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-8-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 3,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-9-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-9-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 5,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-10-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 7,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-10-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 7,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-11-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 9,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-11-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 9,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-12-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-12-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 11,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "wall-13-13",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 0,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 8
+    },
+    {
+      "id": "cliff-13-13-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 14,
+        "y": -4,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "cliff-13-13-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": -4,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "bottom",
+      "fitHeight": 4
+    },
+    {
+      "id": "fill-pitSide-8-1-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": 10.1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 4,
+        "z": 0.2
+      }
+    },
+    {
+      "id": "fill-pitSide-7-2-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 1.9,
+        "y": 0,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 4,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-pitSide-9-1-180",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": 10.1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 4,
+        "z": 0.2
+      }
+    },
+    {
+      "id": "fill-pitSide-10-2-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 6.1,
+        "y": 0,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 4,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-pitSide-7-3-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 1.9,
+        "y": 0,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 4,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-pitSide-10-3-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 6.1,
+        "y": 0,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 4,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-pitSide-7-4-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 1.9,
+        "y": 0,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 4,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-pitSide-10-4-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 6.1,
+        "y": 0,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 4,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-pitSide-7-5-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 1.9,
+        "y": 0,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 4,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-pitSide-10-5-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 6.1,
+        "y": 0,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 4,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-pitSide-8-7-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 3,
+        "y": 0,
+        "z": -0.09999999999999998
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 4,
+        "z": 0.2
+      }
+    },
+    {
+      "id": "fill-pitSide-7-6-90",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 1.9,
+        "y": 0,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 4,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-pitSide-10-6-270",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 6.1,
+        "y": 0,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 4,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-pitSide-9-7-0",
+      "role": "cliff",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": -0.09999999999999998
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 4,
+        "z": 0.2
+      }
+    },
+    {
+      "id": "fill-heightGap-6-1-270",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -1.9,
+        "y": 1,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-11-1-90",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 9.9,
+        "y": 1,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-6-2-270",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -1.9,
+        "y": 1,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-11-2-90",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 9.9,
+        "y": 1,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-6-3-270",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -1.9,
+        "y": 1,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-11-3-90",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 9.9,
+        "y": 1,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-6-4-270",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -1.9,
+        "y": 1,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-11-4-90",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 9.9,
+        "y": 1,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-6-5-270",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -1.9,
+        "y": 1,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-11-5-90",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 9.9,
+        "y": 1,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-7-6-270",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 0.09999999999999998,
+        "y": 1,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-11-6-90",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 9.9,
+        "y": 1,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-7-7-180",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 1,
+        "y": 1,
+        "z": -1.9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 2,
+        "z": 0.2
+      }
+    },
+    {
+      "id": "fill-heightGap-7-7-270",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 0.09999999999999998,
+        "y": 1,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-8-7-180",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 3,
+        "y": 1,
+        "z": -1.9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 2,
+        "z": 0.2
+      }
+    },
+    {
+      "id": "fill-heightGap-9-7-180",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 5,
+        "y": 1,
+        "z": -1.9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 2,
+        "z": 0.2
+      }
+    },
+    {
+      "id": "fill-heightGap-11-7-90",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 9.9,
+        "y": 1,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 2,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-heightGap-11-7-180",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 9,
+        "y": 1,
+        "z": -1.9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 2,
+        "z": 0.2
+      }
+    },
+    {
+      "id": "fill-doorTop-N1-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -5,
+        "y": 5.5,
+        "z": 13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 5,
+        "z": 0.2
+      }
+    },
+    {
+      "id": "fill-doorTop-E1-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": 13,
+        "y": 5.5,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 5,
+        "z": 2
+      }
+    },
+    {
+      "id": "fill-doorTop-S1-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -1,
+        "y": 5.5,
+        "z": -13
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 5,
+        "z": 0.2
+      }
+    },
+    {
+      "id": "fill-doorTop-W1-0",
+      "role": "wall",
+      "prefabGuid": "df95c6552f5e1fa40b36f586568128a5",
+      "position": {
+        "x": -13,
+        "y": 5.5,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 0.2,
+        "y": 5,
+        "z": 2
+      }
+    },
+    {
+      "id": "pit-8-2",
+      "role": "deadzone",
+      "prefabGuid": "538b0ef936830924faedd181f76cba81",
+      "position": {
+        "x": 3,
+        "y": -2.5,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      }
+    },
+    {
+      "id": "pit-9-2",
+      "role": "deadzone",
+      "prefabGuid": "538b0ef936830924faedd181f76cba81",
+      "position": {
+        "x": 5,
+        "y": -2.5,
+        "z": 9
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      }
+    },
+    {
+      "id": "pit-8-3",
+      "role": "deadzone",
+      "prefabGuid": "538b0ef936830924faedd181f76cba81",
+      "position": {
+        "x": 3,
+        "y": -2.5,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      }
+    },
+    {
+      "id": "pit-9-3",
+      "role": "deadzone",
+      "prefabGuid": "538b0ef936830924faedd181f76cba81",
+      "position": {
+        "x": 5,
+        "y": -2.5,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      }
+    },
+    {
+      "id": "pit-8-4",
+      "role": "deadzone",
+      "prefabGuid": "538b0ef936830924faedd181f76cba81",
+      "position": {
+        "x": 3,
+        "y": -2.5,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      }
+    },
+    {
+      "id": "pit-9-4",
+      "role": "deadzone",
+      "prefabGuid": "538b0ef936830924faedd181f76cba81",
+      "position": {
+        "x": 5,
+        "y": -2.5,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      }
+    },
+    {
+      "id": "pit-8-5",
+      "role": "deadzone",
+      "prefabGuid": "538b0ef936830924faedd181f76cba81",
+      "position": {
+        "x": 3,
+        "y": -2.5,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      }
+    },
+    {
+      "id": "pit-9-5",
+      "role": "deadzone",
+      "prefabGuid": "538b0ef936830924faedd181f76cba81",
+      "position": {
+        "x": 5,
+        "y": -2.5,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      }
+    },
+    {
+      "id": "pit-8-6",
+      "role": "deadzone",
+      "prefabGuid": "538b0ef936830924faedd181f76cba81",
+      "position": {
+        "x": 3,
+        "y": -2.5,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      }
+    },
+    {
+      "id": "pit-9-6",
+      "role": "deadzone",
+      "prefabGuid": "538b0ef936830924faedd181f76cba81",
+      "position": {
+        "x": 5,
+        "y": -2.5,
+        "z": 1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "surface": "pivot",
+      "fitSize": {
+        "x": 2,
+        "y": 1,
+        "z": 2
+      }
+    }
+  ],
+  "markers": [
+    {
+      "id": "enemy-1",
+      "label": "enemy 1",
+      "kind": "enemy",
+      "contentKey": "",
+      "position": {
+        "x": 3,
+        "y": 2,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "enemy-2",
+      "label": "enemy 2",
+      "kind": "enemy",
+      "contentKey": "",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "enemy-3",
+      "label": "enemy 3",
+      "kind": "enemy",
+      "contentKey": "",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": -11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "enemy-4",
+      "label": "enemy 4",
+      "kind": "enemy",
+      "contentKey": "",
+      "position": {
+        "x": -11,
+        "y": 0,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "enemy-5",
+      "label": "enemy 5",
+      "kind": "enemy",
+      "contentKey": "",
+      "position": {
+        "x": 1,
+        "y": 2,
+        "z": -1
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "enemy-6",
+      "label": "enemy 6",
+      "kind": "enemy",
+      "contentKey": "",
+      "position": {
+        "x": 11,
+        "y": 0,
+        "z": 3
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "reward-1",
+      "label": "reward 1",
+      "kind": "reward",
+      "contentKey": "",
+      "position": {
+        "x": 5,
+        "y": 2,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "reward-2",
+      "label": "reward 2",
+      "kind": "reward",
+      "contentKey": "",
+      "position": {
+        "x": 1,
+        "y": 2,
+        "z": 11
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "N1",
+      "label": "North",
+      "kind": "door",
+      "width": 2,
+      "height": 3,
+      "position": {
+        "x": -5,
+        "y": 0,
+        "z": 14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    {
+      "id": "E1",
+      "label": "East",
+      "kind": "door",
+      "width": 2,
+      "height": 3,
+      "position": {
+        "x": 14,
+        "y": 0,
+        "z": -7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 90,
+        "z": 0
+      }
+    },
+    {
+      "id": "S1",
+      "label": "South",
+      "kind": "door",
+      "width": 2,
+      "height": 3,
+      "position": {
+        "x": -1,
+        "y": 0,
+        "z": -14
+      },
+      "rotation": {
+        "x": 0,
+        "y": 180,
+        "z": 0
+      }
+    },
+    {
+      "id": "W1",
+      "label": "West",
+      "kind": "door",
+      "width": 2,
+      "height": 3,
+      "position": {
+        "x": -14,
+        "y": 0,
+        "z": -5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 270,
+        "z": 0
+      }
+    }
+  ]
+}

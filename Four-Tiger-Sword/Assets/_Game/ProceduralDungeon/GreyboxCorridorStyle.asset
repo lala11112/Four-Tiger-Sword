@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb25fcbed6befe047a20dfda21156c6e, type: 3}
+  m_Name: GreyboxCorridorStyle
+  m_EditorClassIdentifier: StudioBaekho.Maps::StudioBaekho.BaekhoCorridorStyle
+  floor:
+    prefab: {fileID: 4757454418877266561, guid: 7a22bf672d8b55d418641113ffb7edef, type: 3}
+    localBounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    placement: 0
+    repeatLength: 2
+  wall:
+    prefab: {fileID: 2995154396233288331, guid: df95c6552f5e1fa40b36f586568128a5, type: 3}
+    localBounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    placement: 0
+    repeatLength: 2
+  cap:
+    prefab: {fileID: 2995154396233288331, guid: df95c6552f5e1fa40b36f586568128a5, type: 3}
+    localBounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    placement: 0
+    repeatLength: 2
+  wallThickness: 0.25
+  wallHeight: 3
+  floorThickness: 0.2
+  groundLayer: Ground

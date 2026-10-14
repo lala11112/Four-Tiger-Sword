@@ -482,16 +482,25 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                     _pulsePhase = 0;
                     _nextPressAt = Time.realtimeSinceStartup + 0.08f;
                 }
-                else if (target != null && nearTarget && Time.realtimeSinceStartup >= _nextPressAt)
+                else if (Time.realtimeSinceStartup >= _nextPressAt)
                 {
                     bool normalPolicy = _isNormal || (_ultimateFollowUp && _actionExecutions > 0);
-                    if (normalPolicy && (locomotion || (_actionId == "normal-combo" || _ultimateFollowUp)
-                        && _player.StateMachine.CurrentState is PlayerAttackState attack && !attack.IsHeavyAttack && _form.CanChainAttack))
+                    bool startAction = locomotion && target != null && nearTarget;
+                    // Range gates the start of a new action only. Knockback or a defeated target
+                    // must not suppress the remaining inputs of an already-started full combo.
+                    // CanChainAttack also returns true on the final step, so check that a next
+                    // step exists instead of leaving an extra buffered tap for a new first hit.
+                    bool continueCombo = normalPolicy && (_actionId == "normal-combo" || _ultimateFollowUp)
+                        && _player.StateMachine.CurrentState is PlayerAttackState attack
+                        && !attack.IsCharging && !attack.IsHeavyAttack
+                        && _lastActionStep >= 0 && _lastActionStep < _data.Actions.ComboSteps.Count - 1
+                        && _form.CanChainAttack;
+                    if (normalPolicy && (startAction || continueCombo))
                     {
                         pressed = true;
                         RequestInput("Virtual mouse tap", _ultimateFollowUp ? "follow-up-request" : "attack-request");
                     }
-                    else if (_isHeavy && locomotion)
+                    else if (_isHeavy && startAction)
                     {
                         if ((_form as IHeavyAttackForm)?.CanHeavyAttack == true)
                         {
@@ -505,12 +514,12 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                             AddEvent("resource-wait", "Heavy-attack charges exhausted; no normal-attack fallback.");
                         }
                     }
-                    else if (_isSkill && locomotion && _form.CanSkill)
+                    else if (_isSkill && startAction && _form.CanSkill)
                     {
                         keys.Add(Key.E);
                         RequestInput("Virtual E press", "skill-request");
                     }
-                    else if (_isUltimate && _actionExecutions == 0 && locomotion && _form.CanUltimate)
+                    else if (_isUltimate && _actionExecutions == 0 && startAction && _form.CanUltimate)
                     {
                         keys.Add(Key.R);
                         RequestInput("Virtual R press", "ultimate-request");

@@ -23,7 +23,7 @@ public abstract partial class BaseForm
         WeaponActionData step = _weaponActionData.ComboSteps[_comboStep];
         ResetTargetApproach(step, _comboStep > 0);
         BeginAttackCamera(step, _comboStep > 0);
-        PlayActionAnimation(step.AnimationName, 0.01f);
+        PlayActionAnimation(step.AnimationName, 0.1f);
         _playerController.UpdateAttackTrails(step, 0f);
         PlayStepSound(_weaponActionData.ComboSteps, _comboStep);
         Debug.Log($"공격이름 : {step.AnimationName}  타수 : {_comboStep}");
