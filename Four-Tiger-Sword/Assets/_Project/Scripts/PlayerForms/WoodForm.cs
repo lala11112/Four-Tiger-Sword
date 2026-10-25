@@ -33,42 +33,65 @@ public class WoodForm : BaseForm
     public override void BeginSkill()
     {
         base.BeginSkill();
+        PrepareSkillAttack();
+    }
+    public override void BeginSwitchAttack()
+    {
+        base.BeginSwitchAttack();
+        PrepareSkillAttack();
+    }
+    private void PrepareSkillAttack()
+    {
         _skillApplied = false;
         _skillActive = true;
         _softTarget = null;
     }
-    public override void UpdateSkill(out bool isComplete) => AdvanceSkill(Time.deltaTime, out isComplete);
+    public override void UpdateSkill(out bool isComplete) => AdvanceSkill(_playerController.ActionDeltaTime, out isComplete);
     private void AdvanceSkill(float dt, out bool isComplete)
     {
         var step = _woodData.SkillSteps[0];
         if (!_skillActive) { isComplete = true; return; }
+        _playerController.SetAnimationSpeed(AttackSpeed);
         _timer += Mathf.Max(0f, dt) * AttackSpeed;
+        if (HasCameraV2(step))
+            UpdateAttackCamera(step, _timer / Mathf.Max(0.01f, step.Duration));
         if (!_skillApplied && _timer >= FirstHitTime(step))
         {
             _skillApplied = true;
+            HitEvent hitEvent = FirstHitEvent(step, out int eventIndex);
+            PlaySwingSound(step, hitEvent, eventIndex);
             ApplyGather();
         }
         isComplete = _timer >= Mathf.Max(step.Duration, FirstHitTime(step));
     }
     private void ApplyGather()
     {
+        WeaponActionData step = _woodData.SkillSteps[0];
+        HitEvent hitEvent = FirstHitEvent(step, out int hitIndex);
         Vector3 center = _playerController.transform.position + _playerController.transform.rotation * _woodData.SkillCenterOffset;
         foreach (var target in FormEffectRunner.Targets(center, Mathf.Max(0.1f, _woodData.SkillRadius)))
         {
             if (target.GetComponent<EnemyStat>()?.IsDead == true) continue;
-            var result = DamageManager.Apply(EffectHit(Mathf.Max(0f, _woodData.SkillDamageMultiplier)), (IDamageable)target, target.gameObject);
-            if (!result.Applied || result.Killed) continue;
+            var result = DamageManager.Apply(EffectHit(Mathf.Max(0f, _woodData.SkillDamageMultiplier),
+                step: step, hitEvent: hitEvent, power: CustomKnockbackPower(step, hitEvent, target.transform)),
+                (IDamageable)target, target.gameObject);
+            if (!result.Applied) continue;
+            ConfirmHitFeedback(step, target, result, hitEvent, hitIndex, legacyFeedbackDisabled: true);
+            if (result.Killed) continue;
             base.OnHitEnemy(target.gameObject, _woodData.SkillSteps[0]);
             var effects = WoodEffects(target.gameObject);
-            effects.AddStacks(_woodData, true);
-            effects.Pull(center, _woodData.PullDuration, _woodData.PullSpeed, _woodData.PullStopDistance);
+            effects.AddStacks(_woodData, _currentAction == ActionType.Skill);
+            if (_currentAction == ActionType.Skill)
+                effects.Pull(center, _woodData.PullDuration, _woodData.PullSpeed, _woodData.PullStopDistance);
         }
     }
     public override void EndSkill() { _skillActive = false; base.EndSkill(); }
+    public override void EndSwitchAttack() { _skillActive = false; base.EndSwitchAttack(); }
     public override void BeginUltimate()
     {
         ConsumeUltimateResources();
         _currentAction = ActionType.Ultimate;
+        PlayUltimateActivationSound();
         RemoveElementBuff();
         ElementBuffRemaining = Mathf.Max(0f, _woodData.ElementBuffDuration);
         if (ElementBuffRemaining > 0f)
@@ -115,5 +138,12 @@ public class WoodForm : BaseForm
         _skillActive = false;
         UltimateFieldRemaining = 0f;
         RemoveElementBuff();
+    }
+
+    public override void CleanupStageEffects()
+    {
+        _skillActive = false;
+        UltimateFieldRemaining = 0f;
+        base.CleanupStageEffects();
     }
 }

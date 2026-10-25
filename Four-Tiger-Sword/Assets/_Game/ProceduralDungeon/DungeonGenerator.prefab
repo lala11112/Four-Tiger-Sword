@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2940679880168003520}
   - component: {fileID: 7249376253694532376}
+  - component: {fileID: 1130971886052346909}
   m_Layer: 0
   m_Name: DungeonGenerator
   m_TagString: Untagged
@@ -46,3 +47,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: StudioBaekho.Maps::StudioBaekho.BaekhoDungeonGenerator
   settings: {fileID: 11400000, guid: 774dec20692a3934fb5f1ade0e8e1a08, type: 2}
   generateOnStart: 1
+--- !u!114 &1130971886052346909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4522668341180372285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0629b97faed5e834f931cf17f27264dd, type: 3}
+  m_Name: ""
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonEncounterDirector
+  catalog: {fileID: 11400000, guid: 293a61d1e717d1542861311e50ee96c3, type: 2}
+  doorPrefab: {fileID: 6677973572391970232, guid: d7f2450a2bcff9e4fa57a7c43da1407a, type: 3}
+  spawnRadius: 3
+  player: {fileID: 0}

@@ -34,6 +34,40 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool HasSelectedAttack { get; set; }
 
     private StateMachine _stateMachine;
+    private IPlayerState _passiveState;
+    private bool _combatLabPassive;
+    /// <summary>Experiment policy only: retain hit reactions and motion while suppressing autonomous actions.</summary>
+    public bool CombatLabPassive
+    {
+        get => _combatLabPassive;
+        set
+        {
+            if (_combatLabPassive == value) return;
+            _combatLabPassive = value;
+            if (value)
+            {
+                var activeBodyColliders = new List<Collider>();
+                foreach (var collider in GetComponentsInChildren<Collider>(true))
+                    if (collider.enabled && collider.GetComponentInParent<Enemy>() == this)
+                        activeBodyColliders.Add(collider);
+                if (CurrentAction?.IsActive == true) CurrentAction.Exit();
+                CurrentAction = null;
+                HasSelectedAttack = false;
+                IsSelfDestructing = false;
+                if (_stateMachine != null && !_isDie && !IsHurt && !IsGroggy && !IsRoot)
+                    _stateMachine.ChangeState(_passiveState);
+                if (_navMeshAgent != null && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
+                { _navMeshAgent.ResetPath(); _navMeshAgent.velocity = Vector3.zero; }
+                // Action Exit restores its own earlier collider snapshot. Passive mode must
+                // retain body colliders that were live immediately before this transition.
+                if (!_isDie && EnemyStat?.IsDead != true)
+                    foreach (var collider in activeBodyColliders) if (collider != null) collider.enabled = true;
+            }
+            else if (_stateMachine != null && _passiveState != null && _stateMachine.CurrentState == _passiveState)
+                _stateMachine.ChangeState(new EnemyIdleState(this));
+            SyncMovementLock();
+        }
+    }
     private EnemySelfDestructState _selfDestructState;
     public bool IsSelfDestructing { get; private set; }
     private IEnemySensor _sensor;
@@ -44,6 +78,8 @@ public class Enemy : MonoBehaviour, IDamageable
     private float _knockbackMoveDuration;
     private bool _knockbackUpdateRotation;
     private bool _knockbackRootMotion;
+    private GameObject _knockbackFeedbackOwner;
+    private float _knockbackRequestedDistance, _knockbackMovedDistance;
     private int _moveLockCount = 0;
 
     [Header("AI 기억 및 접근")]
@@ -83,6 +119,19 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool IsAttackFinished => CurrentAction?.IsFinished ?? true;
 
     public Animator Animator { get; private set; }
+    private RuntimeAnimatorController _directionController;
+    private bool _directionParametersCached, _hasDirectionX, _hasDirectionY;
+    private static readonly int DirectionX = UnityEngine.Animator.StringToHash("DirX");
+    private static readonly int DirectionY = UnityEngine.Animator.StringToHash("DirY");
+    public CombatActorClock ActorClock { get; private set; }
+    public float ActionDeltaTime => ActorClock != null ? ActorClock.DeltaTime : Time.deltaTime;
+    public float ActionTimeScale => ActorClock != null ? ActorClock.TimeScale : 1f;
+    public float ActionTime => ActorClock != null ? ActorClock.Time : Time.time;
+    public void SetAnimationSpeed(float speed)
+    {
+        if (ActorClock != null) ActorClock.SetAnimationSpeed(speed);
+        else if (Animator != null) Animator.speed = speed;
+    }
 
     public float GroggyDuration = 5f;
 
@@ -103,6 +152,7 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         EnemyStat = GetComponent<EnemyStat>();
         Animator = GetComponentInChildren<Animator>();
+        ActorClock = CombatActorClock.GetOrCreate(this);
         if (Animator == null)
         {
             Debug.LogError("Animator is null");
@@ -125,6 +175,7 @@ public class Enemy : MonoBehaviour, IDamageable
         // 상태 머신 초기화
         {
             _stateMachine = new StateMachine();
+            _passiveState = new PassiveState();
 
             var idleState = new EnemyIdleState(this);
             var traceState = new EnemyTraceState(this);
@@ -169,7 +220,12 @@ public class Enemy : MonoBehaviour, IDamageable
             _stateMachine.AddAnyTransition(groggyState, () => IsGroggy);
             _stateMachine.AddAnyTransition(rootState, () => IsRoot);
 
-            _stateMachine.ChangeState(idleState);
+            _stateMachine.ChangeState(CombatLabPassive ? _passiveState : idleState);
+            if (CombatLabPassive)
+            {
+                if (_navMeshAgent.enabled && _navMeshAgent.isOnNavMesh) _navMeshAgent.ResetPath();
+                SyncMovementLock();
+            }
         }
 
         _rigs = GetComponentsInChildren<Rigidbody>();
@@ -190,28 +246,62 @@ public class Enemy : MonoBehaviour, IDamageable
             {
                 _stateMachine.Update();
                 stateName = _stateMachine.CurrentState.GetType().ToString();
-                Animator.SetFloat("DirY", 0f);
-                Animator.SetFloat("DirX", 0f);
+                SetDirectionAnimation(0f, 0f);
             }
             return;
         }
-        TryStartSelfDestruct();
-        UpdateKnockback(Time.deltaTime);
-        _sensor?.DetectTarget();
-        if (DetectedTarget != null) RememberTargetPosition(DetectedTarget.position);
-        _stateMachine.Update();
+        UpdateAttackCooldown(); // World clock: local impact stops never lengthen cooldowns.
+        bool canAct = ActionDeltaTime > 0f;
+        if (canAct)
+        {
+            UpdateKnockback(ActionDeltaTime);
+            if (!CombatLabPassive)
+            {
+                TryStartSelfDestruct();
+                _sensor?.DetectTarget();
+                if (DetectedTarget != null) RememberTargetPosition(DetectedTarget.position);
+            }
+        }
+        _stateMachine.Update(canAct && !CombatLabPassive, canAct && !CombatLabPassive);
+        if (CombatLabPassive && canAct)
+        {
+            if (_stateMachine.CurrentState is EnemyHurtState || _stateMachine.CurrentState is EnemyGroggyState
+                || _stateMachine.CurrentState is EnemyRootState)
+                _stateMachine.CurrentState.Update();
+            if (!IsHurt && !IsGroggy && !IsRoot && !_isDie && _stateMachine.CurrentState != _passiveState)
+                _stateMachine.ChangeState(_passiveState);
+        }
         stateName = _stateMachine.CurrentState.GetType().ToString(); //디버그 전용
 
         Vector3 worldVelocity = !IsKnockbacking && !IsHurt && !IsGroggy && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh
             ? _navMeshAgent.velocity : Vector3.zero;
         Vector3 localVelocity = transform.InverseTransformDirection(worldVelocity);
-        Animator.SetFloat("DirY", localVelocity.z);
-        Animator.SetFloat("DirX", localVelocity.x);
-        UpdateAttackCooldown();
+        SetDirectionAnimation(localVelocity.x, localVelocity.z);
 
         //Debug.Log(_stateMachine.CurrentState.GetType().ToString());
 
 
+    }
+
+    private void SetDirectionAnimation(float x, float y)
+    {
+        if (Animator == null) return;
+        if (!_directionParametersCached || _directionController != Animator.runtimeAnimatorController)
+        {
+            _directionParametersCached = true;
+            _directionController = Animator.runtimeAnimatorController;
+            _hasDirectionX = _hasDirectionY = false;
+            foreach (var parameter in Animator.parameters)
+            {
+                if (parameter.type != AnimatorControllerParameterType.Float) continue;
+                if (parameter.nameHash == DirectionX) _hasDirectionX = true;
+                if (parameter.nameHash == DirectionY) _hasDirectionY = true;
+            }
+            if (!_hasDirectionX || !_hasDirectionY)
+                Debug.LogWarning($"{name}: Animator has no float parameter(s) {(!_hasDirectionX ? "DirX " : "")}{(!_hasDirectionY ? "DirY" : "")}; unavailable direction channels are skipped.", Animator);
+        }
+        if (_hasDirectionX) Animator.SetFloat(DirectionX, x);
+        if (_hasDirectionY) Animator.SetFloat(DirectionY, y);
     }
 
     public virtual DamageResult TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 100f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE, bool isParryable = true, object source = null)
@@ -241,7 +331,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
         // Preserve the enemy's existing equal-level reaction rule; super armor resists displacement.
         if (power != Vector3.zero && CanReceiveKnockback(staggerResistLevel) && !IsSelfDestructing && EnemyStat.CurrentHp > 0f)
-            ApplyKnockback(power);
+            ApplyKnockback(power, source);
 
         if (EnemyStat.CurrentHp <= 0)
         {
@@ -253,7 +343,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void TryStartSelfDestruct()
     {
-        if (_isDie || IsSelfDestructing || _stateMachine == null || _selfDestructState == null) return;
+        if (_isDie || CombatLabPassive || IsSelfDestructing || _stateMachine == null || _selfDestructState == null) return;
         var data = EnemyStat.MonsterSkillData?.selfDestruct;
         if (data == null || !data.ShouldTrigger(EnemyStat)) return;
         IsSelfDestructing = true;
@@ -278,8 +368,10 @@ public class Enemy : MonoBehaviour, IDamageable
         => StaggerResistLevel != StaggerResistLevel.SUPER_ARMOR
             && (IsGroggy || PendingGroggy || attackLevel >= StaggerResistLevel);
 
-    private void ApplyKnockback(Vector3 power)
+    private void ApplyKnockback(Vector3 power, object source = null)
     {
+        var feedbackOwner = source is Component component ? component.gameObject
+            : source is EnemyAction action && action.Owner != null ? action.Owner.gameObject : null;
         Vector3 velocity = KnockbackMotion.Power(power, power.magnitude);
         float duration = KnockbackMoveTime;
         float maxDistance = KnockbackMaxDistance;
@@ -292,6 +384,8 @@ public class Enemy : MonoBehaviour, IDamageable
         if (_navMeshAgent == null || !_navMeshAgent.enabled || !_navMeshAgent.isOnNavMesh) return;
         _navMeshAgent.ResetPath();
         _navMeshAgent.velocity = Vector3.zero;
+        if (IsKnockbacking) RecordKnockback("interrupted");
+        _knockbackFeedbackOwner = feedbackOwner;
         BeginKnockback(velocity, duration, maxDistance);
     }
 
@@ -317,6 +411,11 @@ public class Enemy : MonoBehaviour, IDamageable
         float maxSpeed = _knockbackMoveDuration > 0f
             ? maxDistance * 3f / _knockbackMoveDuration : 0f;
         _knockbackVelocity = Vector3.ClampMagnitude(velocity, maxSpeed);
+        _knockbackRequestedDistance = velocity.magnitude * duration / 3f;
+        _knockbackMovedDistance = 0f;
+        float limitedDistance = _knockbackVelocity.magnitude * duration / 3f;
+        if (limitedDistance + .0001f < _knockbackRequestedDistance)
+            RecordKnockbackLimit(_knockbackRequestedDistance, limitedDistance, "enemy-knockback-max-distance");
         _knockbackElapsed = 0f;
     }
 
@@ -333,14 +432,21 @@ public class Enemy : MonoBehaviour, IDamageable
         }
         Vector3 delta = KnockbackMotion.ImpactDisplacement(_knockbackVelocity, _knockbackElapsed, deltaTime, _knockbackMoveDuration);
         _navMeshAgent.velocity = Vector3.zero;
+        Vector3 before = _navMeshAgent.nextPosition;
         _navMeshAgent.Move(delta);
+        float actual = Vector3.ProjectOnPlane(_navMeshAgent.nextPosition - before, Vector3.up).magnitude;
+        _knockbackMovedDistance += actual;
+        if (delta.magnitude > .0001f && actual + .001f < Vector3.ProjectOnPlane(delta, Vector3.up).magnitude)
+            RecordKnockbackLimit(delta.magnitude, actual, "navmesh-boundary");
         _knockbackElapsed += Mathf.Max(0f, deltaTime);
-        if (_knockbackElapsed >= _knockbackMoveDuration) StopKnockback();
+        if (_knockbackElapsed >= _knockbackMoveDuration) StopKnockback("completed");
     }
 
     private void Die()
     {
         _isDie = true;
+        CombatHitStopService.ReleaseOwner(this);
+        ActorClock?.ClearStops();
         StopKnockback();
         // 다음 Update 전에도 패링 예고와 공격 판정의 생명주기를 종료합니다.
         if (CurrentAction?.IsActive == true) CurrentAction.Exit();
@@ -348,6 +454,8 @@ public class Enemy : MonoBehaviour, IDamageable
 
     protected virtual void OnDisable()
     {
+        CombatHitStopService.ReleaseOwner(this);
+        ActorClock?.ClearStops();
         if (CurrentAction?.IsActive == true) CurrentAction.Exit();
         CurrentAction = null;
         HasSelectedAttack = false;
@@ -355,9 +463,10 @@ public class Enemy : MonoBehaviour, IDamageable
         OnTelegraphEnd(null);
     }
 
-    private void StopKnockback()
+    private void StopKnockback(string reason = "interrupted")
     {
         if (!IsKnockbacking) return;
+        RecordKnockback(reason);
         IsKnockbacking = false;
         _knockbackVelocity = Vector3.zero;
         if (_navMeshAgent != null)
@@ -368,6 +477,20 @@ public class Enemy : MonoBehaviour, IDamageable
         }
         if (Animator != null) Animator.applyRootMotion = _knockbackRootMotion;
         UnlockMovement();
+    }
+
+    private void RecordKnockbackLimit(float requested, float applied, string reason)
+    {
+        CombatFeedbackTelemetry.Emit("value-limited", _knockbackFeedbackOwner, gameObject,
+            detail: FormattableString.Invariant($"channel=knockback.distance;requested={requested:R};applied={applied:R};reason={reason};unit=m"),
+            value: applied, position: transform.position);
+    }
+
+    private void RecordKnockback(string reason)
+    {
+        CombatFeedbackTelemetry.Emit("knockback-complete", _knockbackFeedbackOwner, gameObject,
+            detail: FormattableString.Invariant($"channel=knockback.distance;requested={_knockbackRequestedDistance:R};applied={_knockbackMovedDistance:R};reason={reason};unit=m"),
+            value: _knockbackMovedDistance, position: transform.position);
     }
 
     public void UpdateAttackCooldown()
@@ -427,7 +550,7 @@ public class Enemy : MonoBehaviour, IDamageable
     public void UnlockMovement()
     {
         _moveLockCount = Mathf.Max(0, _moveLockCount - 1);
-        if (_moveLockCount == 0 && _navMeshAgent != null && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
+        if (_moveLockCount == 0 && !CombatLabPassive && _navMeshAgent != null && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
             _navMeshAgent.isStopped = false;
     }
 
@@ -435,7 +558,7 @@ public class Enemy : MonoBehaviour, IDamageable
     public void SyncMovementLock()
     {
         if (_navMeshAgent != null && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
-            _navMeshAgent.isStopped = _moveLockCount > 0;
+            _navMeshAgent.isStopped = _moveLockCount > 0 || CombatLabPassive;
     }
 
     protected void ResetAttackCooldown()
@@ -447,12 +570,19 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         if (_telegraphInstance != null) Destroy(_telegraphInstance);
         if (_telegraphEffect != null)
-            _telegraphInstance = Instantiate(_telegraphEffect, transform.position, transform.rotation);
+            _telegraphInstance = StageTransientObject.Track(Instantiate(_telegraphEffect, transform.position, transform.rotation));
     }
 
     public virtual void OnTelegraphEnd(EnemyAction action)
     {
         if (_telegraphInstance != null) Destroy(_telegraphInstance);
         _telegraphInstance = null;
+    }
+
+    private sealed class PassiveState : IPlayerState
+    {
+        public void Enter() { }
+        public void Update() { }
+        public void Exit() { }
     }
 }

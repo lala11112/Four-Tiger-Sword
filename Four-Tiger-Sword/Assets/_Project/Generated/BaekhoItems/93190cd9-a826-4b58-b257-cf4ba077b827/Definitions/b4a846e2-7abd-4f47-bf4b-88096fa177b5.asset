@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: IT_FIRE_04
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: 93190cd9-a826-4b58-b257-cf4ba077b827
+  candidateKey: b4a846e2-7abd-4f47-bf4b-88096fa177b5
+  itemId: IT_FIRE_04
+  displayName: "\uC774\uC5B4\uC9C0\uB294 \uBD88\uAF43"
+  description: "\uC804\uD658 \uC131\uACF5 \uD6C4 3\uCD08 \uB3D9\uC548 \uBAA8\uB4E0
+    \uD3FC \uC77C\uBC18 \uACF5\uACA9 \uD53C\uD574 +30%"
+  element: 2
+  grade: 4
+  purchasePrice: 160
+  effects:
+  - stat: 3
+    amount: 0.3
+    trigger: 1
+    allForms: 1
+    targetForms: 
+    durationSeconds: 3
+  icon: {fileID: 21300000, guid: 1fe49a86d8381fd4c944261d0a2ca27a, type: 3}
+  contentStatus: draft
+  contentRevision: 1
+  sourceJson: "{\"candidateKey\":\"b4a846e2-7abd-4f47-bf4b-88096fa177b5\",\"itemId\":\"IT_FIRE_04\",\"name\":\"\uC774\uC5B4\uC9C0\uB294
+    \uBD88\uAF43\",\"description\":\"\uC804\uD658 \uC131\uACF5 \uD6C4 3\uCD08 \uB3D9\uC548
+    \uBAA8\uB4E0 \uD3FC \uC77C\uBC18 \uACF5\uACA9 \uD53C\uD574 +30%\",\"descriptionStale\":false,\"element\":\"fire\",\"grade\":4,\"purchasePrice\":160,\"effects\":[{\"stat\":\"normalDamage\",\"operation\":\"addRatio\",\"amount\":0.3,\"unit\":\"ratio\",\"trigger\":\"formSwitchSucceeded\",\"targetForms\":\"all\",\"durationSeconds\":3,\"stackLimit\":1,\"refreshPolicy\":\"refresh\",\"removeOnItemLoss\":true}],\"synergyTags\":[\"ITEM_FIRE\"],\"unsupportedEffectNotes\":\"\",\"contentRevision\":1,\"review\":{\"state\":\"draft\",\"dataRevision\":null,\"iconVersion\":null,\"iconContentRevision\":null,\"policyRevision\":null,\"note\":\"\",\"updatedAt\":\"2026-10-12T11:31:40.978Z\"},\"iconPath\":\"icons/b4a846e2-7abd-4f47-bf4b-88096fa177b5.png\",\"icon\":{\"versionId\":\"v-fe129849-879a-45ef-8aa3-fc8d18e02aa5\",\"sourceContentRevision\":1,\"sourceSha256\":\"4d13bf7db089ac7352662de3ef9ecce4160167de3093a6549d999798ae85c259\",\"thumbnailSha256\":\"bc754aa4b7fa4aac11373adfcb7012d8bae487bc9836a057cebec6cc732c6e20\",\"tool\":\"imagegen\",\"observedModel\":null,\"createdAt\":\"2026-10-12T11:31:40.978Z\"}}"

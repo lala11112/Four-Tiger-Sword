@@ -43,8 +43,10 @@ public sealed class WoodTargetEffects : MonoBehaviour
         StackRemaining = Mathf.Max(0f, StackRemaining - dt);
         if (StackRemaining <= 0f) Stacks = 0;
         if (_pullRemaining <= 0f) return;
-        float interval = Mathf.Min(dt, _pullRemaining);
-        _pullRemaining = Mathf.Max(0f, _pullRemaining - dt);
+        float actionDelta = _enemy != null ? dt * _enemy.ActionTimeScale : dt;
+        if (actionDelta <= 0f) return;
+        float interval = Mathf.Min(actionDelta, _pullRemaining);
+        _pullRemaining = Mathf.Max(0f, _pullRemaining - actionDelta);
         Vector3 direction = Vector3.ProjectOnPlane(_pullCenter - transform.position, Vector3.up);
         Vector3 motion = direction.normalized * Mathf.Min(_pullSpeed * interval, Mathf.Max(0f, direction.magnitude - _stopDistance));
         var nav = GetComponent<NavMeshAgent>();

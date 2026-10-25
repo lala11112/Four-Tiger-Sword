@@ -34,35 +34,88 @@ namespace StudioBaekho.AutoHitTimer
 
         public static JObject Search(JObject request)
         {
-            var query = ((string)request["query"] ?? "").Trim();
-            Animator actor = string.IsNullOrEmpty((string)request["actorId"]) ? null : AutoHitTimerScene.ResolveAnimator((string)request["actorId"]);
+            var query = ((string)request?["query"] ?? "").Trim();
+            var offset = PageArgument(request, "offset", 0, 0, int.MaxValue);
+            var limit = PageArgument(request, "limit", 1000, 1, 1000);
+            Animator actor = string.IsNullOrEmpty((string)request?["actorId"]) ? null : AutoHitTimerScene.ResolveAnimator((string)request["actorId"]);
             var clips = new JArray();
+            // One extra candidate distinguishes a full final page from a truncated page. Expensive
+            // dependency hashes and rig checks are only evaluated for the rows being returned.
+            var page = SearchCandidates(actor, query).Skip(offset).Take(limit + 1).ToArray();
+            foreach (var candidate in page.Take(limit))
+            {
+                var row = Describe(candidate.clip, actor);
+                if (candidate.state)
+                {
+                    row["stateName"] = candidate.stateName;
+                    var reason = StateReason(candidate.state, candidate.layer);
+                    if (reason != null) { row["compatible"] = false; row["reason"] = reason; }
+                }
+                clips.Add(row);
+            }
+            var truncated = page.Length > limit;
+            return new JObject { ["clips"] = clips, ["truncated"] = truncated, ["nextOffset"] = truncated ? new JValue((long)offset + clips.Count) : JValue.CreateNull() };
+        }
+
+        sealed class SearchCandidate
+        {
+            public AnimationClip clip;
+            public AnimatorState state;
+            public string stateName;
+            public int layer;
+            public string identity;
+            public long localId;
+        }
+
+        static int PageArgument(JObject request, string name, int fallback, int minimum, int maximum)
+        {
+            var value = request?[name];
+            if (value == null) return fallback;
+            if (value.Type != JTokenType.Integer || !long.TryParse(value.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out var number) || number < minimum || number > maximum)
+                throw new AutoHitTimerException("INVALID_SEARCH", name + " 값은 " + minimum + "부터 " + maximum + " 사이의 정수여야 합니다.");
+            return (int)number;
+        }
+
+        static SearchCandidate Candidate(AnimationClip clip)
+        {
+            if (!clip || clip.name.StartsWith("__preview__", StringComparison.Ordinal) || !AssetDatabase.TryGetGUIDAndLocalFileIdentifier(clip, out string guid, out long id)) return null;
+            return new SearchCandidate { clip = clip, identity = guid + ":" + id.ToString(CultureInfo.InvariantCulture), localId = id };
+        }
+
+        static IEnumerable<SearchCandidate> SearchCandidates(Animator actor, string query)
+        {
             var seen = new HashSet<string>();
             var controller = actor ? actor.runtimeAnimatorController as AnimatorController : null;
             if (actor && actor.runtimeAnimatorController is AnimatorOverrideController) controller = null;
             if (controller)
                 for (var layerIndex = 0; layerIndex < controller.layers.Length; layerIndex++)
-                    foreach (var item in EnumerateStates(controller.layers[layerIndex].stateMachine, controller.layers[layerIndex].name))
+                    foreach (var item in EnumerateStates(controller.layers[layerIndex].stateMachine, controller.layers[layerIndex].name).OrderBy(x => x.path, StringComparer.Ordinal))
                     {
                         if (!(item.state.motion is AnimationClip clip)) continue;
-                        if (!Matches(item.path, query) && !Matches(clip.name, query)) continue;
-                        var row = Describe(clip, actor);
-                        row["stateName"] = item.path;
-                        var reason = StateReason(item.state, layerIndex);
-                        if (reason != null) { row["compatible"] = false; row["reason"] = reason; }
-                        clips.Add(row);
-                        seen.Add((string)row["guid"] + ":" + (string)row["localId"]);
+                        if (!Matches(item.path, query) && !Matches(clip.name, query) && !Matches(AssetDatabase.GetAssetPath(clip), query)) continue;
+                        var candidate = Candidate(clip);
+                        if (candidate == null) continue;
+                        candidate.state = item.state;
+                        candidate.stateName = item.path;
+                        candidate.layer = layerIndex;
+                        // Keep each state context: a shared clip can be compatible in one state
+                        // and incompatible in another, or have different searchable state names.
+                        seen.Add(candidate.identity);
+                        yield return candidate;
                     }
-            // AssetDatabase's name search can omit sub-clips of an FBX, so inspect all clip-containing assets.
-            foreach (var guid in AssetDatabase.FindAssets("t:AnimationClip"))
-                foreach (var clip in AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GUIDToAssetPath(guid)).OfType<AnimationClip>())
+            // Include model assets explicitly and inspect their sub-assets: name/type searches
+            // alone can omit animation takes embedded in imported FBX files.
+            var paths = AssetDatabase.FindAssets("t:AnimationClip").Concat(AssetDatabase.FindAssets("t:Model"))
+                .Select(AssetDatabase.GUIDToAssetPath).Where(path => !string.IsNullOrEmpty(path))
+                .Distinct(StringComparer.Ordinal).OrderBy(path => path, StringComparer.Ordinal);
+            foreach (var path in paths)
+                foreach (var candidate in AssetDatabase.LoadAllAssetsAtPath(path).OfType<AnimationClip>()
+                    .Select(Candidate).Where(item => item != null)
+                    .OrderBy(item => item.clip.name, StringComparer.Ordinal).ThenBy(item => item.localId))
                 {
-                    if (clip.name.StartsWith("__preview__", StringComparison.Ordinal) || !Matches(clip.name, query)) continue;
-                    var row = Describe(clip, actor);
-                    if (seen.Add((string)row["guid"] + ":" + (string)row["localId"])) clips.Add(row);
-                    if (clips.Count >= 1000) return new JObject { ["clips"] = clips, ["truncated"] = true };
+                    if (!Matches(candidate.clip.name, query) && !Matches(path, query)) continue;
+                    if (seen.Add(candidate.identity)) yield return candidate;
                 }
-            return new JObject { ["clips"] = clips, ["truncated"] = false };
         }
 
         public static JObject Import(JObject request)

@@ -1,0 +1,38 @@
+{
+  "unit": "meter",
+  "asset_count": 1,
+  "dimension_basis": "User requested 1m x 1m in Unity meters. Footprint width/depth are 1m; height is assumed 1m as stated during creation. Earlier global 1.5x enlargement does not apply to this explicitly sized module.",
+  "assets": [
+    {
+      "id": 32,
+      "name": "industrial_staircase_1m",
+      "label": "Industrial staircase (1m module)",
+      "dimensions_m": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "position_m": [
+        0,
+        0,
+        0
+      ],
+      "root_pivot": "bottom footprint center",
+      "root_scale": [
+        1,
+        1,
+        1
+      ],
+      "front": "-Y in Blender",
+      "ascent_direction_blender": "+Y",
+      "steps": 5,
+      "riser_m": 0.2,
+      "tread_run_m": 0.2,
+      "fbx": "models_fbx/32_industrial_staircase_1m.fbx",
+      "glb": "models_glb/32_industrial_staircase_1m.glb",
+      "emission_mask": "emission_masks/32_industrial_staircase_1m_emission.png",
+      "emission_mask_uv_channel": 1,
+      "emission_mask_applied": false
+    }
+  ]
+}

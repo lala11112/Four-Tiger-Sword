@@ -1,0 +1,902 @@
+{
+  "unit": "meter",
+  "dimension_basis": "Meters, with a 2m reference floor grid. The initial 1.25x calibration assumed a 2m hatch and was an artistic estimate, not a measured reconstruction. The v2 rack, terminal and drum proportion corrections are retained. V3 combines desk 15 and monitors 16/17 into one workstation, enlarges projector 14 by 2.5/2.26 in response to size feedback, then enlarges every prop by 1.5. The floor grid remains 2m; the floor hatch is now 3m square.",
+  "reference_tile_size_m": 2.0,
+  "asset_scale_from_original": 1.875,
+  "asset_count": 27,
+  "assets": [
+    {
+      "id": 1,
+      "name": "power_cabinet",
+      "label": "Power cabinet",
+      "dimensions_m": [
+        1.7812,
+        1.1447,
+        2.1562
+      ],
+      "triangles_evaluated": 4114,
+      "parts": 44,
+      "position_m": [
+        -7.5,
+        6.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/01_power_cabinet.glb",
+      "fbx": "models_fbx/01_power_cabinet.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/01_power_cabinet_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 2,
+      "name": "terminal_kiosk",
+      "label": "Armored terminal kiosk",
+      "dimensions_m": [
+        1.5563,
+        1.2094,
+        2.7244
+      ],
+      "triangles_evaluated": 5094,
+      "parts": 57,
+      "position_m": [
+        -4.5,
+        6.0,
+        0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/02_terminal_kiosk.glb",
+      "fbx": "models_fbx/02_terminal_kiosk.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/02_terminal_kiosk_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 3,
+      "name": "server_rack",
+      "label": "Server rack",
+      "dimensions_m": [
+        1.5,
+        1.3697,
+        3.8438
+      ],
+      "triangles_evaluated": 13766,
+      "parts": 160,
+      "position_m": [
+        -1.5,
+        6.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/03_server_rack.glb",
+      "fbx": "models_fbx/03_server_rack.fbx",
+      "proportion_revision": "2026-10-20_proportions_v2",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/03_server_rack_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 4,
+      "name": "control_server_rack",
+      "label": "Control server rack",
+      "dimensions_m": [
+        1.5,
+        1.4128,
+        3.8438
+      ],
+      "triangles_evaluated": 11704,
+      "parts": 134,
+      "position_m": [
+        1.5,
+        6.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/04_control_server_rack.glb",
+      "fbx": "models_fbx/04_control_server_rack.fbx",
+      "proportion_revision": "2026-10-20_proportions_v2",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/04_control_server_rack_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 5,
+      "name": "green_specimen_tank",
+      "label": "Green specimen tank",
+      "dimensions_m": [
+        1.7812,
+        1.7812,
+        4.0312
+      ],
+      "triangles_evaluated": 8866,
+      "parts": 34,
+      "position_m": [
+        4.5,
+        6.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/05_green_specimen_tank.glb",
+      "fbx": "models_fbx/05_green_specimen_tank.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/05_green_specimen_tank_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 6,
+      "name": "standing_terminal",
+      "label": "Standing terminal",
+      "dimensions_m": [
+        1.1625,
+        0.7969,
+        2.025
+      ],
+      "triangles_evaluated": 2226,
+      "parts": 24,
+      "position_m": [
+        7.5,
+        6.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/06_standing_terminal.glb",
+      "fbx": "models_fbx/06_standing_terminal.fbx",
+      "proportion_revision": "2026-10-20_proportions_v2",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/06_standing_terminal_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 7,
+      "name": "wall_control_panel",
+      "label": "Wall control panel",
+      "dimensions_m": [
+        0.8438,
+        0.3328,
+        1.2188
+      ],
+      "triangles_evaluated": 2274,
+      "parts": 25,
+      "position_m": [
+        -7.5,
+        3.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/07_wall_control_panel.glb",
+      "fbx": "models_fbx/07_wall_control_panel.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/07_wall_control_panel_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 10,
+      "name": "blue_storage_case",
+      "label": "Blue storage case",
+      "dimensions_m": [
+        1.3125,
+        0.825,
+        0.6037
+      ],
+      "triangles_evaluated": 2064,
+      "parts": 20,
+      "position_m": [
+        -4.5,
+        3.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/10_blue_storage_case.glb",
+      "fbx": "models_fbx/10_blue_storage_case.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/10_blue_storage_case_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 11,
+      "name": "toolbox",
+      "label": "Ochre toolbox",
+      "dimensions_m": [
+        0.9188,
+        0.5363,
+        0.567
+      ],
+      "triangles_evaluated": 1404,
+      "parts": 13,
+      "position_m": [
+        -1.5,
+        3.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/11_toolbox.glb",
+      "fbx": "models_fbx/11_toolbox.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/11_toolbox_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 12,
+      "name": "green_gas_cylinder",
+      "label": "Green gas cylinder",
+      "dimensions_m": [
+        0.3937,
+        0.3938,
+        1.3125
+      ],
+      "triangles_evaluated": 2628,
+      "parts": 19,
+      "position_m": [
+        1.5,
+        3.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/12_green_gas_cylinder.glb",
+      "fbx": "models_fbx/12_green_gas_cylinder.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/12_green_gas_cylinder_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 13,
+      "name": "brown_gas_cylinder",
+      "label": "Brown gas cylinder",
+      "dimensions_m": [
+        0.3938,
+        0.3938,
+        1.3125
+      ],
+      "triangles_evaluated": 2628,
+      "parts": 19,
+      "position_m": [
+        4.5,
+        3.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/13_brown_gas_cylinder.glb",
+      "fbx": "models_fbx/13_brown_gas_cylinder.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/13_brown_gas_cylinder_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 14,
+      "name": "hologram_projector",
+      "label": "Hologram projector",
+      "dimensions_m": [
+        3.75,
+        3.3375,
+        2.6906
+      ],
+      "triangles_evaluated": 11702,
+      "parts": 89,
+      "position_m": [
+        7.5,
+        3.0,
+        0.03991250693798065
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/14_hologram_projector.glb",
+      "fbx": "models_fbx/14_hologram_projector.fbx",
+      "physical_dimensions_m": [
+        3.75,
+        3.3375,
+        1.1848
+      ],
+      "effect_mesh": "HologramFX",
+      "effect_note": "Separate static translucent hologram, not animated shader logic.",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "projector_specific_factor": 1.106194690265487,
+      "emission_mask": "emission_masks/14_hologram_projector_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 15,
+      "name": "computer_desk",
+      "label": "Desk with dual monitors",
+      "dimensions_m": [
+        2.625,
+        1.2188,
+        2.3363
+      ],
+      "triangles_evaluated": 5300,
+      "parts": 50,
+      "position_m": [
+        -7.5,
+        0.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/15_computer_desk.glb",
+      "fbx": "models_fbx/15_computer_desk.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "components": [
+        15,
+        16,
+        17
+      ],
+      "assembly_note": "Two monitors permanently placed on desk; one model and prefab.",
+      "emission_mask": "emission_masks/15_computer_desk_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 18,
+      "name": "lab_chair",
+      "label": "Laboratory chair",
+      "dimensions_m": [
+        1.2622,
+        1.2401,
+        1.7719
+      ],
+      "triangles_evaluated": 6024,
+      "parts": 30,
+      "position_m": [
+        1.5,
+        0.0,
+        0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/18_lab_chair.glb",
+      "fbx": "models_fbx/18_lab_chair.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/18_lab_chair_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 19,
+      "name": "slanted_control_console",
+      "label": "Slanted control console",
+      "dimensions_m": [
+        2.2313,
+        1.4062,
+        2.0025
+      ],
+      "triangles_evaluated": 4338,
+      "parts": 50,
+      "position_m": [
+        4.5,
+        0.0,
+        0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/19_slanted_control_console.glb",
+      "fbx": "models_fbx/19_slanted_control_console.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/19_slanted_control_console_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 20,
+      "name": "heavy_control_console",
+      "label": "Heavy control console",
+      "dimensions_m": [
+        1.8,
+        1.5844,
+        2.0667
+      ],
+      "triangles_evaluated": 6502,
+      "parts": 72,
+      "position_m": [
+        7.5,
+        0.0,
+        0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/20_heavy_control_console.glb",
+      "fbx": "models_fbx/20_heavy_control_console.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/20_heavy_control_console_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 21,
+      "name": "gray_hazard_drum",
+      "label": "Gray hazard drum",
+      "dimensions_m": [
+        1.0875,
+        1.0941,
+        1.3125
+      ],
+      "triangles_evaluated": 4002,
+      "parts": 14,
+      "position_m": [
+        -7.5,
+        -3.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/21_gray_hazard_drum.glb",
+      "fbx": "models_fbx/21_gray_hazard_drum.fbx",
+      "proportion_revision": "2026-10-20_proportions_v2",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/21_gray_hazard_drum_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 22,
+      "name": "red_hazard_drum",
+      "label": "Red hazard drum",
+      "dimensions_m": [
+        1.0875,
+        1.0941,
+        1.3125
+      ],
+      "triangles_evaluated": 4002,
+      "parts": 14,
+      "position_m": [
+        -4.5,
+        -3.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/22_red_hazard_drum.glb",
+      "fbx": "models_fbx/22_red_hazard_drum.fbx",
+      "proportion_revision": "2026-10-20_proportions_v2",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/22_red_hazard_drum_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 23,
+      "name": "blue_hazard_drum",
+      "label": "Blue hazard drum",
+      "dimensions_m": [
+        1.0875,
+        1.0941,
+        1.3125
+      ],
+      "triangles_evaluated": 4002,
+      "parts": 14,
+      "position_m": [
+        -1.5,
+        -3.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/23_blue_hazard_drum.glb",
+      "fbx": "models_fbx/23_blue_hazard_drum.fbx",
+      "proportion_revision": "2026-10-20_proportions_v2",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/23_blue_hazard_drum_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 24,
+      "name": "floor_hatch",
+      "label": "Floor hatch",
+      "dimensions_m": [
+        3.0,
+        3.0,
+        0.1763
+      ],
+      "triangles_evaluated": 1520,
+      "parts": 18,
+      "position_m": [
+        1.5,
+        -3.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/24_floor_hatch.glb",
+      "fbx": "models_fbx/24_floor_hatch.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/24_floor_hatch_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 25,
+      "name": "ladder",
+      "label": "Hook top ladder",
+      "dimensions_m": [
+        0.9487,
+        0.3244,
+        4.3125
+      ],
+      "triangles_evaluated": 2224,
+      "parts": 28,
+      "position_m": [
+        4.5,
+        -3.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/25_ladder.glb",
+      "fbx": "models_fbx/25_ladder.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/25_ladder_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 26,
+      "name": "safety_railing",
+      "label": "Safety railing",
+      "dimensions_m": [
+        3.7875,
+        0.225,
+        2.0625
+      ],
+      "triangles_evaluated": 1320,
+      "parts": 6,
+      "position_m": [
+        7.5,
+        -3.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/26_safety_railing.glb",
+      "fbx": "models_fbx/26_safety_railing.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/26_safety_railing_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 27,
+      "name": "coiled_cable",
+      "label": "Loose coiled cable",
+      "dimensions_m": [
+        2.1986,
+        1.2865,
+        0.1669
+      ],
+      "triangles_evaluated": 3924,
+      "parts": 15,
+      "position_m": [
+        -7.5,
+        -6.0,
+        0.007500000298023224
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/27_coiled_cable.glb",
+      "fbx": "models_fbx/27_coiled_cable.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/27_coiled_cable_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 28,
+      "name": "wall_vent",
+      "label": "Circular louver wall vent",
+      "dimensions_m": [
+        0.8438,
+        0.1987,
+        0.8438
+      ],
+      "triangles_evaluated": 2360,
+      "parts": 11,
+      "position_m": [
+        -4.5,
+        -6.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/28_wall_vent.glb",
+      "fbx": "models_fbx/28_wall_vent.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/28_wall_vent_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 29,
+      "name": "red_warning_beacon",
+      "label": "Red warning beacon",
+      "dimensions_m": [
+        0.3375,
+        0.3375,
+        0.45
+      ],
+      "triangles_evaluated": 3212,
+      "parts": 9,
+      "position_m": [
+        -1.5,
+        -6.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/29_red_warning_beacon.glb",
+      "fbx": "models_fbx/29_red_warning_beacon.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/29_red_warning_beacon_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 30,
+      "name": "wall_numeric_display",
+      "label": "Numeric wall display",
+      "dimensions_m": [
+        0.6562,
+        0.1725,
+        0.4125
+      ],
+      "triangles_evaluated": 762,
+      "parts": 11,
+      "position_m": [
+        1.5,
+        -6.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/30_wall_numeric_display.glb",
+      "fbx": "models_fbx/30_wall_numeric_display.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/30_wall_numeric_display_emission.png",
+      "emission_mask_uv_channel": 1
+    },
+    {
+      "id": 31,
+      "name": "handheld_device",
+      "label": "Handheld scanner device",
+      "dimensions_m": [
+        0.2625,
+        0.3731,
+        0.4125
+      ],
+      "triangles_evaluated": 1190,
+      "parts": 12,
+      "position_m": [
+        4.5,
+        -6.0,
+        -0.0
+      ],
+      "root_pivot": "bottom center",
+      "front": "-Y",
+      "glb": "models_glb/31_handheld_device.glb",
+      "fbx": "models_fbx/31_handheld_device.fbx",
+      "revision_v3": "2026-10-20_workstation_scale_v3",
+      "emission_mask": "emission_masks/31_handheld_device_emission.png",
+      "emission_mask_uv_channel": 1
+    }
+  ],
+  "materials": "Shared textures. Editable Blender parts; exported opaque parts merged. Separate glass, liquid, bubbles and hologram FX. Procedural microbump is Blender-only.",
+  "presentation_excluded_from_exports": true,
+  "proportion_revision": "2026-10-20_proportions_v2",
+  "proportion_adjustments": [
+    {
+      "id": 3,
+      "name": "server_rack",
+      "before_m": [
+        0.8125,
+        0.9131,
+        2.5625
+      ],
+      "after_m": [
+        1.0,
+        0.9131252765655518,
+        2.5625
+      ]
+    },
+    {
+      "id": 4,
+      "name": "control_server_rack",
+      "before_m": [
+        0.8125,
+        0.9419,
+        2.5625
+      ],
+      "after_m": [
+        1.0,
+        0.9418752193450928,
+        2.5625
+      ]
+    },
+    {
+      "id": 6,
+      "name": "standing_terminal",
+      "before_m": [
+        0.775,
+        0.5312,
+        1.6875
+      ],
+      "after_m": [
+        0.7749996185302734,
+        0.53125,
+        1.350000023841858
+      ]
+    },
+    {
+      "id": 21,
+      "name": "gray_hazard_drum",
+      "before_m": [
+        0.725,
+        0.7294,
+        1.1306
+      ],
+      "after_m": [
+        0.7250003814697266,
+        0.729374885559082,
+        0.875
+      ]
+    },
+    {
+      "id": 22,
+      "name": "red_hazard_drum",
+      "before_m": [
+        0.725,
+        0.7294,
+        1.1306
+      ],
+      "after_m": [
+        0.7249999046325684,
+        0.729374885559082,
+        0.875
+      ]
+    },
+    {
+      "id": 23,
+      "name": "blue_hazard_drum",
+      "before_m": [
+        0.725,
+        0.7294,
+        1.1306
+      ],
+      "after_m": [
+        0.7249999046325684,
+        0.729374885559082,
+        0.875
+      ]
+    }
+  ],
+  "user_global_enlargement": 1.5,
+  "revision_v3": "2026-10-20_workstation_scale_v3",
+  "merged_assets": {
+    "15": [
+      15,
+      16,
+      17
+    ]
+  },
+  "surface_fixes_v3": {
+    "revision": "2026-10-20_exposed_surface_clearance_v3",
+    "changed": [
+      {
+        "asset_id": 1,
+        "object": "01_power chassis_0001",
+        "action": "inset chassis rear face 3mm in world Y"
+      },
+      {
+        "asset_id": 2,
+        "object": "02_kiosk outside seam_0004",
+        "action": "extend seam outward 3mm past cheek"
+      },
+      {
+        "asset_id": 2,
+        "object": "02_kiosk outside seam_0005",
+        "action": "extend seam outward 3mm past cheek"
+      },
+      {
+        "asset_id": 2,
+        "object": "02_kiosk outside seam_0009",
+        "action": "extend seam outward 3mm past cheek"
+      },
+      {
+        "asset_id": 2,
+        "object": "02_kiosk outside seam_0010",
+        "action": "extend seam outward 3mm past cheek"
+      },
+      {
+        "asset_id": 2,
+        "object": "02_kiosk rear wall_0011",
+        "action": "inset console rear wall 3mm behind crossbeam"
+      },
+      {
+        "asset_id": 3,
+        "object": "03_rack chassis_0045",
+        "action": "inset chassis rear face 3mm in world Y"
+      },
+      {
+        "asset_id": 4,
+        "object": "04_rack chassis_0205",
+        "action": "inset chassis rear face 3mm in world Y"
+      },
+      {
+        "asset_id": 10,
+        "object": "10_corner_lid_cap_0484",
+        "action": "extend cap outward face 3mm beyond lid"
+      },
+      {
+        "asset_id": 10,
+        "object": "10_corner_lid_cap_0486",
+        "action": "extend cap outward face 3mm beyond lid"
+      },
+      {
+        "asset_id": 10,
+        "object": "10_corner_lid_cap_0488",
+        "action": "extend cap outward face 3mm beyond lid"
+      },
+      {
+        "asset_id": 10,
+        "object": "10_corner_lid_cap_0490",
+        "action": "extend cap outward face 3mm beyond lid"
+      },
+      {
+        "asset_id": 11,
+        "object": "11_handle_grip_0507",
+        "action": "raise grip top face 3mm past handle"
+      },
+      {
+        "asset_id": 14,
+        "object": "14_concentric projector focus_0204",
+        "action": "remove two coordinate-verified opposite full-ring seam caps"
+      },
+      {
+        "asset_id": 14,
+        "object": "14_cyan aperture perimeter_0203",
+        "action": "remove two coordinate-verified opposite full-ring seam caps"
+      },
+      {
+        "asset_id": 14,
+        "object": "14_inner machined aperture rim_0185",
+        "action": "remove two coordinate-verified opposite full-ring seam caps"
+      },
+      {
+        "asset_id": 14,
+        "object": "14_inner optical recess_0184",
+        "action": "remove two coordinate-verified opposite full-ring seam caps"
+      },
+      {
+        "asset_id": 14,
+        "object": "14_lower plinth armor_0181",
+        "action": "remove two coordinate-verified opposite full-ring seam caps"
+      },
+      {
+        "asset_id": 14,
+        "object": "14_outer rubber seam_0183",
+        "action": "remove two coordinate-verified opposite full-ring seam caps"
+      },
+      {
+        "asset_id": 14,
+        "object": "14_wide circular chassis_0182",
+        "action": "remove two coordinate-verified opposite full-ring seam caps"
+      },
+      {
+        "asset_id": 15,
+        "object": "15_top end armor_0609",
+        "action": "raise end armor 3mm above desktop"
+      },
+      {
+        "asset_id": 15,
+        "object": "15_top end armor_0614",
+        "action": "raise end armor 3mm above desktop"
+      },
+      {
+        "asset_id": 19,
+        "object": "19_slanted console rear wall_0068",
+        "action": "inset console rear wall 3mm behind crossbeam"
+      },
+      {
+        "asset_id": 20,
+        "object": "20_heavy console rear wall_0118",
+        "action": "inset console rear wall 3mm behind crossbeam"
+      }
+    ],
+    "already_applied": []
+  },
+  "emission_mask_manifest": "emission_masks/emission_mask_manifest.json"
+}

@@ -13,6 +13,7 @@ public class WaterDelayedDamageEffect : IStatusEffect
     private readonly float _critChance;
     private readonly float _critMultiplier;
     private readonly GameObject _vfxPrefab;
+    private readonly CombatSoundCue _impactSound;
 
     private float _elapsed;
     private bool _damageDone;
@@ -23,7 +24,7 @@ public class WaterDelayedDamageEffect : IStatusEffect
 
     public WaterDelayedDamageEffect(float damage, float delay, ElementType element,
                                     float critChance, float critMultiplier,
-                                    GameObject vfxPrefab = null)
+                                    GameObject vfxPrefab = null, CombatSoundCue impactSound = default)
     {
         _damage = damage;
         _delay = delay;
@@ -31,6 +32,7 @@ public class WaterDelayedDamageEffect : IStatusEffect
         _critChance = critChance;
         _critMultiplier = critMultiplier;
         _vfxPrefab = vfxPrefab;
+        _impactSound = impactSound;
     }
 
     public void OnApply(GameObject target)
@@ -63,11 +65,12 @@ public class WaterDelayedDamageEffect : IStatusEffect
         {
             yield return new WaitForSeconds(0.3f);
             DamageManager.Apply(
-                new HitInfo(_damage, _element, _critChance, _critMultiplier, poiseDamage: 0f),
+                new HitInfo(_damage, _element, _critChance, _critMultiplier, poiseDamage: 0f,
+                    impactSound: _impactSound, category: PlayerAttackCategory.Secondary),
                 _damageable, _targetGO);
 
             if (_vfxPrefab != null)
-                Object.Instantiate(_vfxPrefab, _targetGO.transform.position, Quaternion.identity);
+                StageTransientObject.Track(Object.Instantiate(_vfxPrefab, _targetGO.transform.position, Quaternion.identity));
         }
     }
 }

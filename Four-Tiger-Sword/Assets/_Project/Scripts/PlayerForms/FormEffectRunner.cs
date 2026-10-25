@@ -7,7 +7,7 @@ public class FormEffectRunner : MonoBehaviour
 {
     private PlayerController _owner;
     private void Awake() => _owner = GetComponent<PlayerController>();
-    private bool CanTick => _owner != null && _owner.StatManager.CurrentHp > 0f;
+    private bool CanTick => _owner != null && !_owner.IsStageTransitioning && _owner.StatManager.CurrentHp > 0f;
 
     public static IEnumerable<Component> Targets(Vector3 center, float radius)
     {
@@ -46,7 +46,8 @@ public class FormEffectRunner : MonoBehaviour
             if (!CanTick || target == null || !target.gameObject.activeInHierarchy) yield break;
             if (target.TryGetComponent<EnemyStat>(out var stats) && stats.IsDead) yield break;
             var result = DamageManager.Apply(hit, (IDamageable)target, target.gameObject);
-            if (result.Applied && vfx != null) Instantiate(vfx, target.transform.position, Quaternion.identity);
+            if (result.Applied && vfx != null)
+                StageTransientObject.Track(Instantiate(vfx, target.transform.position, Quaternion.identity));
         }
     }
 
@@ -72,11 +73,13 @@ public class FormEffectRunner : MonoBehaviour
             }
             else DamageArea(center, radius, new HitInfo(hit.BaseDamage * interval, hit.Element, hit.CriticalChance,
                 hit.CriticalMultiplier, hit.PoiseDamageMultiplier, hit.ArmorPierce, hit.Power, hit.PoiseDamage,
-                hit.StaggerResistLevel, hit.IsParryable, hit.Source, hit.TrueDamage));
+                hit.StaggerResistLevel, hit.IsParryable, hit.Source, hit.TrueDamage, hit.ImpactSound,
+                hit.Category, hit.ItemDamageMultiplier, hit.SourceDamageMultiplier, hit.HasSourceDamageSnapshot));
             remaining -= interval;
         }
         // TODO: 가시 덩굴/치유 영역의 지속 VFX 연결.
     }
 
-    private void OnDisable() => StopAllCoroutines();
+    public void CancelStageEffects() => StopAllCoroutines();
+    private void OnDisable() => CancelStageEffects();
 }

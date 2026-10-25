@@ -1,0 +1,62 @@
+{
+  "unityVersion": "6000.3.10f1",
+  "scene": "Assets/_Project/Scenes/Game Scene.unity",
+  "projectId": "93190cd9-a826-4b58-b257-cf4ba077b827",
+  "contentRevision": 71,
+  "contentStatus": "draft",
+  "sourceCatalogSha256": "752e87e280f7b682b4a4881e2fd84864a679d63077ebede12b5f0f5fc42940cf",
+  "sourceManifestSha256": "28e7cac3b5bae8e06054920289e8a7e2f0f8192ba439e3ef73742910b0e13b55",
+  "importedDefinitions": 20,
+  "importedSprites": 20,
+  "checks": {
+    "scriptCompilation": "passed",
+    "importerAssertions": 84,
+    "runtimeScenarios": 8,
+    "combatEditMode": "passed",
+    "combatPlayModeGeometry": "passed",
+    "stateMachinePlayModeAssertions": 156,
+    "consoleErrorsAfterVerification": 0
+  },
+  "livePlayerObservations": {
+    "initialOwned": 0,
+    "allOwned": 20,
+    "afterGrant": {
+      "hp": 5000,
+      "maxHp": 6300,
+      "sp": 100,
+      "maxSp": 145,
+      "spRegen": 30,
+      "dodgeCost": 15,
+      "switchCost": 6,
+      "normalItemMultiplier": 1.49,
+      "switchItemMultiplier": 1.65
+    },
+    "afterSuccessfulSwitch": {
+      "sp": 94,
+      "spRegen": 38,
+      "dodgeCost": 11,
+      "state": "PlayerSwitchAttackState",
+      "hudSp": 94,
+      "hudMaxSp": 145,
+      "hudFill": 0.648275852,
+      "effectsRemainWhileTimeScaleZero": true
+    },
+    "afterFillAndRemoveAll": {
+      "owned": 0,
+      "sp": 100,
+      "maxSp": 100,
+      "spRegen": 20,
+      "dodgeCost": 20,
+      "switchCost": 10,
+      "hudFill": 1
+    }
+  },
+  "finalState": {
+    "playing": false,
+    "initialOwned": 0,
+    "runInBackgroundRestored": true,
+    "runInBackground": false,
+    "sceneCatalogSaved": true,
+    "sceneUnchangedByTestFixtures": true
+  }
+}

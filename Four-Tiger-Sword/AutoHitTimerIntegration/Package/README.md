@@ -31,13 +31,15 @@ Unity 6000.0 이상을 대상으로 하는 Editor 전용 패키지입니다. Uni
 | 명령 | payload |
 |---|---|
 | `status`, `actors` | `{}` |
-| `search` | `{query,actorId}` |
+| `search` | `{query,actorId,offset?:0,limit?:1000}`; limit 1~1000, query가 비어 있으면 전체 후보 |
 | `import` | `{path,actorId}` |
 | `capture` | `{actorId,clip:{guid,localId},fps:24 또는 60,times?:number[],sessionId?:UUID,weaponId?,weaponBone?}` |
 | `cancel` | `{sessionId?}` 또는 `{requestId?}`; 생략하면 현재 촬영 취소 |
 | `targets` | `{actorId,adapterId?}` |
 | `previewChange`, `apply` | 프로젝트 어댑터 계약; `adapterId` 기본 `four-tiger-sword` |
 | `saveStatus` | `{changeId,adapterId?}`; 저장 저널의 완료/미실행/롤백/복구 필요 상태를 읽기 전용 조회 |
+
+검색 응답은 `{clips,truncated,nextOffset}`입니다. `truncated`가 true이면 동일한 query·actorId와 반환된 nextOffset으로 다음 페이지를 요청합니다. 마지막 페이지의 nextOffset은 null입니다. 클립명·Animator 상태명·경로를 검색하며, FBX 하위 클립과 같은 클립을 참조하는 서로 다른 상태를 포함합니다. 순서는 상태 경로·에셋 경로·클립명·하위 에셋 ID로 고정합니다. 데스크톱 앱의 자연어 검색은 빈 query로 전체 후보를 읽어 Codex에서 비교합니다.
 
 캡처 응답은 `{sessionId,clip,duration,fps,frames:[{id,time,path}],mediaRoot}`입니다. 긴 클립은 클라이언트가 `times`를 나누어 요청하고 같은 세션 ID를 재사용합니다. 촬영당 7200프레임 및 메타데이터 크기 제한을 사전 검사합니다.
 

@@ -39,7 +39,7 @@ public class WoodFormBalanceSettings
     [Min(0f)] public float VulnerabilityDamageBonusPercent = 20f;
     [Min(0.1f)] public float VulnerabilityDuration = 6f;
     [Header("Wood Skill - Gather")]
-    [Min(0f)] public float SkillSpiritCost = 180f;
+    [Min(0f)] public float SkillSpiritCost = 18f;
     [Min(0f)] public float SkillCooldownSeconds = 12f;
     [Min(0f), Tooltip("공격력에 곱하는 스킬 피해 계수")]
     public float SkillDamageMultiplier = 0.5f;

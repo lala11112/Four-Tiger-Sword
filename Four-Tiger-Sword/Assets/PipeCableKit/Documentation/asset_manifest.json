@@ -1,0 +1,1011 @@
+{
+  "version": 3,
+  "units": "meters",
+  "source_blend": "pipe_cable_kit.blend",
+  "revision": "Cross-section diameter increased approximately 30 percent, rounded to millimeters. Centerline, sockets and textures unchanged.",
+  "surface_style": "cool painted metal and matte rubber; plain ends",
+  "materials": [
+    {
+      "name": "PC_Gunmetal",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.35,
+      "roughness": 0.59,
+      "basecolor_texture": "Textures/PC_Gunmetal_BaseColor.png",
+      "normal_texture": "Textures/PC_Gunmetal_Normal.png",
+      "orm_texture": "Textures/PC_Gunmetal_ORM.png",
+      "metallic_smoothness_texture": "Textures/PC_Gunmetal_MetallicSmoothness.png",
+      "hdrp_mask_texture": "Textures/PC_Gunmetal_Mask.png"
+    },
+    {
+      "name": "PC_SatinSteel",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.4,
+      "roughness": 0.55,
+      "basecolor_texture": "Textures/PC_SatinSteel_BaseColor.png",
+      "normal_texture": "Textures/PC_SatinSteel_Normal.png",
+      "orm_texture": "Textures/PC_SatinSteel_ORM.png",
+      "metallic_smoothness_texture": "Textures/PC_SatinSteel_MetallicSmoothness.png",
+      "hdrp_mask_texture": "Textures/PC_SatinSteel_Mask.png"
+    },
+    {
+      "name": "PC_BlueGreyEnamel",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.25,
+      "roughness": 0.65,
+      "basecolor_texture": "Textures/PC_BlueGreyEnamel_BaseColor.png",
+      "normal_texture": "Textures/PC_BlueGreyEnamel_Normal.png",
+      "orm_texture": "Textures/PC_BlueGreyEnamel_ORM.png",
+      "metallic_smoothness_texture": "Textures/PC_BlueGreyEnamel_MetallicSmoothness.png",
+      "hdrp_mask_texture": "Textures/PC_BlueGreyEnamel_Mask.png"
+    },
+    {
+      "name": "PC_CoolSteel",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.4,
+      "roughness": 0.6,
+      "basecolor_texture": "Textures/PC_CoolSteel_BaseColor.png",
+      "normal_texture": "Textures/PC_CoolSteel_Normal.png",
+      "orm_texture": "Textures/PC_CoolSteel_ORM.png",
+      "metallic_smoothness_texture": "Textures/PC_CoolSteel_MetallicSmoothness.png",
+      "hdrp_mask_texture": "Textures/PC_CoolSteel_Mask.png"
+    },
+    {
+      "name": "PC_CarbonRubber",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.78,
+      "basecolor_texture": "Textures/PC_CarbonRubber_BaseColor.png",
+      "normal_texture": "Textures/PC_CarbonRubber_Normal.png",
+      "orm_texture": "Textures/PC_CarbonRubber_ORM.png",
+      "metallic_smoothness_texture": "Textures/PC_CarbonRubber_MetallicSmoothness.png",
+      "hdrp_mask_texture": "Textures/PC_CarbonRubber_Mask.png"
+    },
+    {
+      "name": "PC_SlatePVC",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.69,
+      "basecolor_texture": "Textures/PC_SlatePVC_BaseColor.png",
+      "normal_texture": "Textures/PC_SlatePVC_Normal.png",
+      "orm_texture": "Textures/PC_SlatePVC_ORM.png",
+      "metallic_smoothness_texture": "Textures/PC_SlatePVC_MetallicSmoothness.png",
+      "hdrp_mask_texture": "Textures/PC_SlatePVC_Mask.png"
+    },
+    {
+      "name": "PC_BlueRubber",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.74,
+      "basecolor_texture": "Textures/PC_BlueRubber_BaseColor.png",
+      "normal_texture": "Textures/PC_BlueRubber_Normal.png",
+      "orm_texture": "Textures/PC_BlueRubber_ORM.png",
+      "metallic_smoothness_texture": "Textures/PC_BlueRubber_MetallicSmoothness.png",
+      "hdrp_mask_texture": "Textures/PC_BlueRubber_Mask.png"
+    },
+    {
+      "name": "PC_GraphiteRubber",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.8,
+      "basecolor_texture": "Textures/PC_GraphiteRubber_BaseColor.png",
+      "normal_texture": "Textures/PC_GraphiteRubber_Normal.png",
+      "orm_texture": "Textures/PC_GraphiteRubber_ORM.png",
+      "metallic_smoothness_texture": "Textures/PC_GraphiteRubber_MetallicSmoothness.png",
+      "hdrp_mask_texture": "Textures/PC_GraphiteRubber_Mask.png"
+    },
+    {
+      "name": "PC_InnerSteel",
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.4,
+      "roughness": 0.7,
+      "basecolor_texture": "Textures/PC_InnerSteel_BaseColor.png",
+      "normal_texture": "Textures/PC_InnerSteel_Normal.png",
+      "orm_texture": "Textures/PC_InnerSteel_ORM.png",
+      "metallic_smoothness_texture": "Textures/PC_InnerSteel_MetallicSmoothness.png",
+      "hdrp_mask_texture": "Textures/PC_InnerSteel_Mask.png"
+    }
+  ],
+  "assets": [
+    {
+      "name": "Pipe_D052_Straight_1m",
+      "kind": "Pipe",
+      "shape": "Straight",
+      "diameter_m": 0.052,
+      "previous_diameter_m": 0.04,
+      "diameter_scale": 1.2999999999999998,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.0,
+      "bend_radius_m": 0,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "triangles": 192,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.026000000536441803,
+          -0.026000000536441803
+        ],
+        "max": [
+          1.0,
+          0.026000000536441803,
+          0.026000000536441803
+        ]
+      },
+      "materials": [
+        "PC_Gunmetal",
+        "PC_InnerSteel"
+      ],
+      "fbx": "models_fbx/Pipe_D052_Straight_1m.fbx",
+      "glb": "models_glb/Pipe_D052_Straight_1m.glb"
+    },
+    {
+      "name": "Pipe_D078_Straight_1m",
+      "kind": "Pipe",
+      "shape": "Straight",
+      "diameter_m": 0.078,
+      "previous_diameter_m": 0.06,
+      "diameter_scale": 1.3,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.0,
+      "bend_radius_m": 0,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "triangles": 192,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.039000000804662704,
+          -0.039000000804662704
+        ],
+        "max": [
+          1.0,
+          0.039000000804662704,
+          0.039000000804662704
+        ]
+      },
+      "materials": [
+        "PC_SatinSteel",
+        "PC_InnerSteel"
+      ],
+      "fbx": "models_fbx/Pipe_D078_Straight_1m.fbx",
+      "glb": "models_glb/Pipe_D078_Straight_1m.glb"
+    },
+    {
+      "name": "Pipe_D130_Straight_1m",
+      "kind": "Pipe",
+      "shape": "Straight",
+      "diameter_m": 0.13,
+      "previous_diameter_m": 0.1,
+      "diameter_scale": 1.3,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.0,
+      "bend_radius_m": 0,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "triangles": 192,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.06499999761581421,
+          -0.06499999761581421
+        ],
+        "max": [
+          1.0,
+          0.06499999761581421,
+          0.06499999761581421
+        ]
+      },
+      "materials": [
+        "PC_BlueGreyEnamel",
+        "PC_InnerSteel"
+      ],
+      "fbx": "models_fbx/Pipe_D130_Straight_1m.fbx",
+      "glb": "models_glb/Pipe_D130_Straight_1m.glb"
+    },
+    {
+      "name": "Pipe_D195_Straight_1m",
+      "kind": "Pipe",
+      "shape": "Straight",
+      "diameter_m": 0.195,
+      "previous_diameter_m": 0.15,
+      "diameter_scale": 1.3,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.0,
+      "bend_radius_m": 0,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "triangles": 192,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.09749999642372131,
+          -0.09749999642372131
+        ],
+        "max": [
+          1.0,
+          0.09749999642372131,
+          0.09749999642372131
+        ]
+      },
+      "materials": [
+        "PC_CoolSteel",
+        "PC_InnerSteel"
+      ],
+      "fbx": "models_fbx/Pipe_D195_Straight_1m.fbx",
+      "glb": "models_glb/Pipe_D195_Straight_1m.glb"
+    },
+    {
+      "name": "Pipe_D052_Elbow_1x1m",
+      "kind": "Pipe",
+      "shape": "Elbow",
+      "diameter_m": 0.052,
+      "previous_diameter_m": 0.04,
+      "diameter_scale": 1.2999999999999998,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.9484955592153876,
+      "bend_radius_m": 0.12,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          1
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ]
+      ],
+      "triangles": 1824,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.026000000536441803,
+          -0.026000000536441803
+        ],
+        "max": [
+          1.0260000228881836,
+          0.026000000536441803,
+          1.0
+        ]
+      },
+      "materials": [
+        "PC_Gunmetal",
+        "PC_InnerSteel"
+      ],
+      "fbx": "models_fbx/Pipe_D052_Elbow_1x1m.fbx",
+      "glb": "models_glb/Pipe_D052_Elbow_1x1m.glb"
+    },
+    {
+      "name": "Pipe_D078_Elbow_1x1m",
+      "kind": "Pipe",
+      "shape": "Elbow",
+      "diameter_m": 0.078,
+      "previous_diameter_m": 0.06,
+      "diameter_scale": 1.3,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.9484955592153876,
+      "bend_radius_m": 0.12,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          1
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ]
+      ],
+      "triangles": 1824,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.039000000804662704,
+          -0.039000000804662704
+        ],
+        "max": [
+          1.0390000343322754,
+          0.039000000804662704,
+          1.0
+        ]
+      },
+      "materials": [
+        "PC_SatinSteel",
+        "PC_InnerSteel"
+      ],
+      "fbx": "models_fbx/Pipe_D078_Elbow_1x1m.fbx",
+      "glb": "models_glb/Pipe_D078_Elbow_1x1m.glb"
+    },
+    {
+      "name": "Pipe_D130_Elbow_1x1m",
+      "kind": "Pipe",
+      "shape": "Elbow",
+      "diameter_m": 0.13,
+      "previous_diameter_m": 0.1,
+      "diameter_scale": 1.3,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.9141592653589794,
+      "bend_radius_m": 0.2,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          1
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ]
+      ],
+      "triangles": 1824,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.06499999761581421,
+          -0.06499999761581421
+        ],
+        "max": [
+          1.065000057220459,
+          0.06499999761581421,
+          1.0
+        ]
+      },
+      "materials": [
+        "PC_BlueGreyEnamel",
+        "PC_InnerSteel"
+      ],
+      "fbx": "models_fbx/Pipe_D130_Elbow_1x1m.fbx",
+      "glb": "models_glb/Pipe_D130_Elbow_1x1m.glb"
+    },
+    {
+      "name": "Pipe_D195_Elbow_1x1m",
+      "kind": "Pipe",
+      "shape": "Elbow",
+      "diameter_m": 0.195,
+      "previous_diameter_m": 0.15,
+      "diameter_scale": 1.3,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.8712388980384689,
+      "bend_radius_m": 0.3,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          1
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ]
+      ],
+      "triangles": 1824,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.09749999642372131,
+          -0.09749999642372131
+        ],
+        "max": [
+          1.097499966621399,
+          0.09749999642372131,
+          1.0
+        ]
+      },
+      "materials": [
+        "PC_CoolSteel",
+        "PC_InnerSteel"
+      ],
+      "fbx": "models_fbx/Pipe_D195_Elbow_1x1m.fbx",
+      "glb": "models_glb/Pipe_D195_Elbow_1x1m.glb"
+    },
+    {
+      "name": "Cable_D016_Straight_1m",
+      "kind": "Cable",
+      "shape": "Straight",
+      "diameter_m": 0.016,
+      "previous_diameter_m": 0.012,
+      "diameter_scale": 1.3333333333333333,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.0,
+      "bend_radius_m": 0,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "triangles": 60,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.00800000037997961,
+          -0.00800000037997961
+        ],
+        "max": [
+          1.0,
+          0.00800000037997961,
+          0.00800000037997961
+        ]
+      },
+      "materials": [
+        "PC_CarbonRubber"
+      ],
+      "fbx": "models_fbx/Cable_D016_Straight_1m.fbx",
+      "glb": "models_glb/Cable_D016_Straight_1m.glb"
+    },
+    {
+      "name": "Cable_D026_Straight_1m",
+      "kind": "Cable",
+      "shape": "Straight",
+      "diameter_m": 0.026,
+      "previous_diameter_m": 0.02,
+      "diameter_scale": 1.2999999999999998,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.0,
+      "bend_radius_m": 0,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "triangles": 60,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.013000000268220901,
+          -0.013000000268220901
+        ],
+        "max": [
+          1.0,
+          0.013000000268220901,
+          0.013000000268220901
+        ]
+      },
+      "materials": [
+        "PC_SlatePVC"
+      ],
+      "fbx": "models_fbx/Cable_D026_Straight_1m.fbx",
+      "glb": "models_glb/Cable_D026_Straight_1m.glb"
+    },
+    {
+      "name": "Cable_D042_Straight_1m",
+      "kind": "Cable",
+      "shape": "Straight",
+      "diameter_m": 0.042,
+      "previous_diameter_m": 0.032,
+      "diameter_scale": 1.3125,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.0,
+      "bend_radius_m": 0,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "triangles": 60,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.020999999716877937,
+          -0.020999999716877937
+        ],
+        "max": [
+          1.0,
+          0.020999999716877937,
+          0.020999999716877937
+        ]
+      },
+      "materials": [
+        "PC_BlueRubber"
+      ],
+      "fbx": "models_fbx/Cable_D042_Straight_1m.fbx",
+      "glb": "models_glb/Cable_D042_Straight_1m.glb"
+    },
+    {
+      "name": "Cable_D065_Straight_1m",
+      "kind": "Cable",
+      "shape": "Straight",
+      "diameter_m": 0.065,
+      "previous_diameter_m": 0.05,
+      "diameter_scale": 1.3,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.0,
+      "bend_radius_m": 0,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      "triangles": 60,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.032499998807907104,
+          -0.032499998807907104
+        ],
+        "max": [
+          1.0,
+          0.032499998807907104,
+          0.032499998807907104
+        ]
+      },
+      "materials": [
+        "PC_GraphiteRubber"
+      ],
+      "fbx": "models_fbx/Cable_D065_Straight_1m.fbx",
+      "glb": "models_glb/Cable_D065_Straight_1m.glb"
+    },
+    {
+      "name": "Cable_D016_Elbow_1x1m",
+      "kind": "Cable",
+      "shape": "Elbow",
+      "diameter_m": 0.016,
+      "previous_diameter_m": 0.012,
+      "diameter_scale": 1.3333333333333333,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.9399114857512856,
+      "bend_radius_m": 0.14,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          1
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ]
+      ],
+      "triangles": 604,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.00800000037997961,
+          -0.00800000037997961
+        ],
+        "max": [
+          1.0080000162124634,
+          0.00800000037997961,
+          1.0
+        ]
+      },
+      "materials": [
+        "PC_CarbonRubber"
+      ],
+      "fbx": "models_fbx/Cable_D016_Elbow_1x1m.fbx",
+      "glb": "models_glb/Cable_D016_Elbow_1x1m.glb"
+    },
+    {
+      "name": "Cable_D026_Elbow_1x1m",
+      "kind": "Cable",
+      "shape": "Elbow",
+      "diameter_m": 0.026,
+      "previous_diameter_m": 0.02,
+      "diameter_scale": 1.2999999999999998,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.9399114857512856,
+      "bend_radius_m": 0.14,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          1
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ]
+      ],
+      "triangles": 604,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.013000000268220901,
+          -0.013000000268220901
+        ],
+        "max": [
+          1.0130000114440918,
+          0.013000000268220901,
+          1.0
+        ]
+      },
+      "materials": [
+        "PC_SlatePVC"
+      ],
+      "fbx": "models_fbx/Cable_D026_Elbow_1x1m.fbx",
+      "glb": "models_glb/Cable_D026_Elbow_1x1m.glb"
+    },
+    {
+      "name": "Cable_D042_Elbow_1x1m",
+      "kind": "Cable",
+      "shape": "Elbow",
+      "diameter_m": 0.042,
+      "previous_diameter_m": 0.032,
+      "diameter_scale": 1.3125,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.9399114857512856,
+      "bend_radius_m": 0.14,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          1
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ]
+      ],
+      "triangles": 604,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.020999999716877937,
+          -0.020999999716877937
+        ],
+        "max": [
+          1.0210000276565552,
+          0.020999999716877937,
+          1.0
+        ]
+      },
+      "materials": [
+        "PC_BlueRubber"
+      ],
+      "fbx": "models_fbx/Cable_D042_Elbow_1x1m.fbx",
+      "glb": "models_glb/Cable_D042_Elbow_1x1m.glb"
+    },
+    {
+      "name": "Cable_D065_Elbow_1x1m",
+      "kind": "Cable",
+      "shape": "Elbow",
+      "diameter_m": 0.065,
+      "previous_diameter_m": 0.05,
+      "diameter_scale": 1.3,
+      "nominal_arm_m": 1,
+      "centerline_length_m": 1.9356194490192344,
+      "bend_radius_m": 0.15000000000000002,
+      "endpoints_blender": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          1
+        ]
+      ],
+      "endpoints_unity": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ]
+      ],
+      "triangles": 604,
+      "bounds_blender": {
+        "min": [
+          0.0,
+          -0.032499998807907104,
+          -0.032499998807907104
+        ],
+        "max": [
+          1.0325000286102295,
+          0.032499998807907104,
+          1.0
+        ]
+      },
+      "materials": [
+        "PC_GraphiteRubber"
+      ],
+      "fbx": "models_fbx/Cable_D065_Elbow_1x1m.fbx",
+      "glb": "models_glb/Cable_D065_Elbow_1x1m.glb"
+    }
+  ]
+}

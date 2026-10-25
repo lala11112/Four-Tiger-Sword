@@ -12,6 +12,23 @@ public class PlayerStatManager : MonoBehaviour
     private Dictionary<StatType, float> multValues = new(); // 승산 버프 합계 (+30% 등)
     private Dictionary<StatType, float> finalValues = new(); // 최종 계산된 값 (실제 사용하는 값)
 
+    private bool _initialized;
+    private readonly Dictionary<object, ItemResourceModifiers> _itemResourceModifiers = new(ReferenceSourceComparer.Instance);
+
+    private readonly struct ItemResourceModifiers
+    {
+        public readonly float MaxHpRatio, MaxSpAdd, SpRegenAdd, MaxSpCap, SpRegenCap;
+        public ItemResourceModifiers(float hpRatio, float spAdd, float regenAdd, float spCap, float regenCap)
+        { MaxHpRatio = hpRatio; MaxSpAdd = spAdd; SpRegenAdd = regenAdd; MaxSpCap = spCap; SpRegenCap = regenCap; }
+    }
+
+    private sealed class ReferenceSourceComparer : IEqualityComparer<object>
+    {
+        public static readonly ReferenceSourceComparer Instance = new();
+        public new bool Equals(object x, object y) => ReferenceEquals(x, y);
+        public int GetHashCode(object source) => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(source);
+    }
+
     public event Action OnStatsChanged; // 스탯 바뀔 때 UI 등에 알려주는 이벤트
 
     // ── 런타임 HP/SP 상태 ────────────────────────────────────────────────────────
@@ -19,8 +36,8 @@ public class PlayerStatManager : MonoBehaviour
     private float _currentSp;
     private float _spRegenTimer;
 
-    public float CurrentHp => _currentHp;
-    public float CurrentSp => _currentSp;
+    public float CurrentHp { get { EnsureInitialized(); return _currentHp; } }
+    public float CurrentSp { get { EnsureInitialized(); return _currentSp; } }
 
     // ── 런타임 필살기 게이지 상태 ─────────────────────────────────────────────────
     private float _currentUltimateGauge;
@@ -43,34 +60,54 @@ public class PlayerStatManager : MonoBehaviour
 
     private void Awake()
     {
-        InitializeFromData(); // SO 데이터로 초기화
+        EnsureInitialized();
+    }
+
+    /// <summary>Initializes base data and resource state explicitly for a new player or regression fixture.</summary>
+    public void Initialize(PlayerStatData data)
+    {
+        baseData = data;
+        baseValues.Clear();
+        addValues.Clear();
+        multValues.Clear();
+        finalValues.Clear();
+        _itemResourceModifiers.Clear();
+        _shields.Clear();
+        _spRegenTimer = 0f;
+        _initialized = false;
+        EnsureInitialized();
+    }
+
+    public void EnsureInitialized()
+    {
+        if (!_initialized) InitializeFromData();
     }
 
     // === S (Situation): 초기화 ===
     private void InitializeFromData()
     {
-        if (baseData == null) return; // SO 연결 안 했으면 무시
+        _initialized = true;
 
-        baseValues[StatType.ST_HP] = baseData.baseHP;   // 체력
-        baseValues[StatType.ST_SP] = baseData.baseSP;   // 영력
-        baseValues[StatType.ST_SP_REGEN] = baseData.baseSpRegen;    // 영력 회복
-        baseValues[StatType.ST_ATK] = baseData.baseATK; // 공격력
-        baseValues[StatType.ST_DEF] = baseData.baseDEF; // 방어력
-        baseValues[StatType.ST_CRT] = baseData.baseCRT; // 치명타율
-        baseValues[StatType.ST_CRTD] = baseData.baseCRTD; // 치명타 데미지
-        baseValues[StatType.ST_PEN] = baseData.basePEN; // 관통력
-        baseValues[StatType.ST_ELM_ATK] = baseData.baseElmAtk; // 속성 공격
-        baseValues[StatType.ST_ELM_RES] = baseData.baseElmRes; // 속성 저항
-        baseValues[StatType.ST_BRK] = baseData.baseBRK; // 강인도 파괴
-        baseValues[StatType.ST_CDR] = baseData.baseCDR; // 스킬 쿨타임 감소
-        baseValues[StatType.ST_ANOMALY] = baseData.baseAnomaly; // 상태이상 축적
-        baseValues[StatType.ST_ANOMALY_RES] = baseData.baseAnomalyRes; // 상태이상 내성
-        baseValues[StatType.ST_IN_GAGE] = baseData.baseInGage; // 인 게이지
-        baseValues[StatType.ST_IN_GAGE_RATE] = baseData.baseInGageRate; // 인 게이지 충전 효율
-        baseValues[StatType.ST_SPD] = baseData.baseSPD; // 이동속도
-        baseValues[StatType.DEF_POISE] = baseData.baseDefPoise; // 방어 강인도      
-        baseValues[StatType.KNOCKBACK_RESIST] = baseData.baseKnockbackResist; // 넉백 저항
-        baseValues[StatType.ST_ATK_SPD] = baseData.baseAtkSpd; // 공격 속도 배율
+        baseValues[StatType.ST_HP] = baseData != null ? baseData.baseHP : 100f;
+        baseValues[StatType.ST_SP] = baseData != null ? baseData.baseSP : 100f;
+        baseValues[StatType.ST_SP_REGEN] = baseData != null ? baseData.baseSpRegen : 20f;
+        baseValues[StatType.ST_ATK] = baseData != null ? baseData.baseATK : 10f;
+        baseValues[StatType.ST_DEF] = baseData != null ? baseData.baseDEF : 5f;
+        baseValues[StatType.ST_CRT] = baseData != null ? baseData.baseCRT : 5f;
+        baseValues[StatType.ST_CRTD] = baseData != null ? baseData.baseCRTD : 150f;
+        baseValues[StatType.ST_PEN] = baseData != null ? baseData.basePEN : 0f;
+        baseValues[StatType.ST_ELM_ATK] = baseData != null ? baseData.baseElmAtk : 0f;
+        baseValues[StatType.ST_ELM_RES] = baseData != null ? baseData.baseElmRes : 0f;
+        baseValues[StatType.ST_BRK] = baseData != null ? baseData.baseBRK : 1f;
+        baseValues[StatType.ST_CDR] = baseData != null ? baseData.baseCDR : 0f;
+        baseValues[StatType.ST_ANOMALY] = baseData != null ? baseData.baseAnomaly : 0f;
+        baseValues[StatType.ST_ANOMALY_RES] = baseData != null ? baseData.baseAnomalyRes : 0f;
+        baseValues[StatType.ST_IN_GAGE] = baseData != null ? baseData.baseInGage : 0f;
+        baseValues[StatType.ST_IN_GAGE_RATE] = baseData != null ? baseData.baseInGageRate : 1f;
+        baseValues[StatType.ST_SPD] = baseData != null ? baseData.baseSPD : 5f;
+        baseValues[StatType.DEF_POISE] = baseData != null ? baseData.baseDefPoise : 50f;
+        baseValues[StatType.KNOCKBACK_RESIST] = baseData != null ? baseData.baseKnockbackResist : 0.2f;
+        baseValues[StatType.ST_ATK_SPD] = baseData != null ? baseData.baseAtkSpd : 1f;
 
         // Add/Mult 초기화
         foreach (StatType stat in Enum.GetValues(typeof(StatType)))
@@ -79,17 +116,22 @@ public class PlayerStatManager : MonoBehaviour
             multValues[stat] = 0f; // 승산 버프 없음
         }
 
-        RecalculateAll();   // 전체 스탯 한번 계산
+        RecalculateAll(false);
 
         _currentHp             = GetStat(StatType.ST_HP);
         _currentSp             = GetStat(StatType.ST_SP);
         _currentUltimateGauge  = 0f;
+        OnStatsChanged?.Invoke();
+        OnHpChanged?.Invoke(_currentHp, MaxHp);
+        OnSpChanged?.Invoke(_currentSp, MaxSp);
     }
 
 
     // === 버프 추가: 장비 장착, 스킬 버프 등에서 호출 ===
     public void AddModifier(StatType stat, float addValue, float multValue)
     {
+        EnsureInitialized();
+        if (!IsFinite(addValue) || !IsFinite(multValue)) return;
         addValues[stat] += addValue; // 가산 값 누적 (예: +10 공격력)
         multValues[stat] += multValue; // 승산 값 누적 (예: +0.3 = 30% 증가)
         RecalculateStat(stat);  // 해당 스탯만 재계산
@@ -99,6 +141,8 @@ public class PlayerStatManager : MonoBehaviour
     // === 버프 제거: 장비 해제, 버프 종료 시 호출 ===
     public void RemoveModifier(StatType stat, float addValue, float multValue)
     {
+        EnsureInitialized();
+        if (!IsFinite(addValue) || !IsFinite(multValue)) return;
         addValues[stat] -= addValue; // 가산 값 제거 (예: -10 공격력)
         multValues[stat] -= multValue; // 승산 값 제거 (예: -0.3 = 30% 감소)
         RecalculateStat(stat); // 해당 스탯만 재계산
@@ -106,42 +150,77 @@ public class PlayerStatManager : MonoBehaviour
 
 
 
+    /// <summary>Replaces one item's owner contribution atomically without touching form/skill modifiers.</summary>
+    public void SetItemResourceModifiers(object source, float maxHpRatio, float maxSpAdd, float spRegenAdd,
+        float maxSpCap = 200f, float spRegenCap = 40f)
+    {
+        if (source == null) throw new ArgumentNullException(nameof(source));
+        if (!IsFinite(maxHpRatio) || !IsFinite(maxSpAdd) || !IsFinite(spRegenAdd)
+            || !IsFinite(maxSpCap) || !IsFinite(spRegenCap) || maxSpCap <= 0f || spRegenCap <= 0f)
+            throw new ArgumentException("Item resource modifiers and positive caps must be finite.");
+        EnsureInitialized();
+        _itemResourceModifiers[source] = new ItemResourceModifiers(maxHpRatio, maxSpAdd, spRegenAdd, maxSpCap, spRegenCap);
+        RecalculateAll();
+    }
+
+    public void RemoveItemResourceModifiers(object source)
+    {
+        if (source != null && _itemResourceModifiers.Remove(source)) RecalculateAll();
+    }
+
     // === 스탯 재계산: 버프 적용 후 각 스탯별로 계산 ===
     private void RecalculateStat(StatType stat)
     {
-        float baseVal = baseValues.GetValueOrDefault(stat, 0f); // 기본값 (SO에서 읽어온 원본)  
-        float addVal = addValues.GetValueOrDefault(stat, 0f); // 가산 버프 합계
-        float multVal = multValues.GetValueOrDefault(stat, 0f); // 승산 버프 합계
-
-        // 계산식: (기본값 + 가산값) * (1 + 승산값)
-        float result = (baseVal + addVal) * (1f + multVal);
-
-        // === E (Exception): 예외 처리 ===
-        result = ApplyClamp(stat, result); // 범위 제한 적용
-
-        finalValues[stat] = result; // 최종값 저장
-        OnStatsChanged?.Invoke(); // UI 등에 변경 알림
+        float previousMaxHp = finalValues.GetValueOrDefault(StatType.ST_HP);
+        float previousMaxSp = finalValues.GetValueOrDefault(StatType.ST_SP);
+        finalValues[stat] = CalculateStat(stat);
+        PublishStatChanges(previousMaxHp, previousMaxSp);
     }
 
     // === 전체 스탯 재계산 (초기화 시 사용) ===
-    private void RecalculateAll()
+    private void RecalculateAll(bool publish = true)
     {
+        float previousMaxHp = finalValues.GetValueOrDefault(StatType.ST_HP);
+        float previousMaxSp = finalValues.GetValueOrDefault(StatType.ST_SP);
         foreach (StatType stat in Enum.GetValues(typeof(StatType)))
+            finalValues[stat] = CalculateStat(stat);
+        if (publish) PublishStatChanges(previousMaxHp, previousMaxSp);
+    }
+
+    private float CalculateStat(StatType stat)
+    {
+        double add = addValues.GetValueOrDefault(stat), mult = multValues.GetValueOrDefault(stat);
+        foreach (var modifiers in _itemResourceModifiers.Values)
         {
-            float baseVal = baseValues.GetValueOrDefault(stat, 0f);
-            float addVal = addValues.GetValueOrDefault(stat, 0f);
-            float multVal = multValues.GetValueOrDefault(stat, 0f);
-
-            float result = (baseVal + addVal) * (1f + multVal);
-            finalValues[stat] = ApplyClamp(stat, result);
+            if (stat == StatType.ST_HP) mult += modifiers.MaxHpRatio;
+            else if (stat == StatType.ST_SP) add += modifiers.MaxSpAdd;
+            else if (stat == StatType.ST_SP_REGEN) add += modifiers.SpRegenAdd;
         }
+        double result = (baseValues.GetValueOrDefault(stat) + add) * (1d + mult);
+        return ApplyClamp(stat, (float)Math.Max(-float.MaxValue, Math.Min(float.MaxValue, result)));
+    }
 
-        OnStatsChanged?.Invoke();   // 전체 재계산 후 한번만 알림
+    private void PublishStatChanges(float previousMaxHp, float previousMaxSp)
+    {
+        float hpBefore = _currentHp, spBefore = _currentSp;
+        _currentHp = Mathf.Clamp(_currentHp, 0f, MaxHp);
+        _currentSp = Mathf.Clamp(_currentSp, 0f, MaxSp);
+        OnStatsChanged?.Invoke();
+        if (previousMaxHp != MaxHp || hpBefore != _currentHp) OnHpChanged?.Invoke(_currentHp, MaxHp);
+        if (previousMaxSp != MaxSp || spBefore != _currentSp) OnSpChanged?.Invoke(_currentSp, MaxSp);
     }
 
     // === 범위 제한: 특정 스탯이 말도 안 되는 값 되는 거 방지 ===
     private float ApplyClamp(StatType stat, float value)
     {
+        if (!IsFinite(value)) value = 0f;
+        if (stat == StatType.ST_HP || stat == StatType.ST_SP || stat == StatType.ST_SP_REGEN)
+            value = Mathf.Max(0f, value);
+        foreach (var modifiers in _itemResourceModifiers.Values)
+        {
+            if (stat == StatType.ST_SP) value = Mathf.Min(value, modifiers.MaxSpCap);
+            else if (stat == StatType.ST_SP_REGEN) value = Mathf.Min(value, modifiers.SpRegenCap);
+        }
         return stat switch
         {
             StatType.ST_SPD => Mathf.Max(value, 2f), // 이동속도 최소 2 (너무 느려지면 안됨)
@@ -155,12 +234,14 @@ public class PlayerStatManager : MonoBehaviour
     // === 외부에서 최종 스탯 가져가기 (데미지 계산, UI 표시 등) ===
     public float GetStat(StatType stat)
     {
+        EnsureInitialized();
         return finalValues.GetValueOrDefault(stat, 0f);
     }
 
     // === 외부에서 기본 스탯 가져가기 (장비창 "기본값" 표시용) ===
     public float GetBaseStat(StatType stat)
     {
+        EnsureInitialized();
         return baseValues.GetValueOrDefault(stat, 0f);
     }
 
@@ -169,6 +250,8 @@ public class PlayerStatManager : MonoBehaviour
     /// <summary>피해를 적용합니다. PlayerController.TakeDamage에서 호출됩니다.</summary>
     public DamageResult TakeDamage(float damage, ElementType damageType, bool isCritical)
     {
+        EnsureInitialized();
+        if (GetComponent<PlayerController>()?.IsStageTransitioning == true) return default;
         if (_currentHp <= 0f || damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return default;
         float hpBefore = _currentHp;
         float absorbed = AbsorbWithShields(Mathf.Max(0f, damage));
@@ -185,9 +268,12 @@ public class PlayerStatManager : MonoBehaviour
     /// <summary>SP를 소모합니다. 부족하면 false를 반환하고 소모하지 않습니다.</summary>
     public bool TryConsumeSp(float amount)
     {
-        if (_currentSp < amount) return false;
+        EnsureInitialized();
+        if (!IsFinite(amount) || amount < 0f || _currentSp < amount) return false;
+        if (amount == 0f) return true;
         _currentSp = Mathf.Max(0f, _currentSp - amount);
-        _spRegenTimer = baseData != null ? baseData.baseSpRegenDelay : 2f;
+        float delay = baseData != null ? baseData.baseSpRegenDelay : 1f;
+        _spRegenTimer = IsFinite(delay) ? Mathf.Max(0f, delay) : 1f;
         OnSpChanged?.Invoke(_currentSp, GetStat(StatType.ST_SP));
         return true;
     }
@@ -195,20 +281,27 @@ public class PlayerStatManager : MonoBehaviour
     /// <summary>SP를 외부에서 직접 추가합니다 (아이템, 보조 스킬 등).</summary>
     public void AddSp(float amount)
     {
+        EnsureInitialized();
+        if (!IsFinite(amount) || amount <= 0f) return;
         _currentSp = Mathf.Min(_currentSp + amount, GetStat(StatType.ST_SP));
         OnSpChanged?.Invoke(_currentSp, GetStat(StatType.ST_SP));
     }
 
     /// <summary>현재 SP가 요구량 이상인지 확인합니다.</summary>
-    public bool HasEnoughSp(float amount) => _currentSp >= amount;
+    public bool HasEnoughSp(float amount) => IsFinite(amount) && amount >= 0f && CurrentSp >= amount;
 
     /// <summary>PlayerController.Update()에서 매 프레임 호출. SP 자동 회복을 처리합니다.</summary>
     public void UpdateSpRegen(float deltaTime)
     {
+        EnsureInitialized();
+        if (GetComponent<PlayerController>()?.IsStageTransitioning == true) return;
+        if (!IsFinite(deltaTime) || deltaTime <= 0f || _currentHp <= 0f) return;
         if (_spRegenTimer > 0f)
         {
-            _spRegenTimer -= deltaTime;
-            return;
+            float waiting = Mathf.Min(_spRegenTimer, deltaTime);
+            _spRegenTimer -= waiting;
+            deltaTime -= waiting;
+            if (deltaTime <= 0f) return;
         }
 
         float maxSp = GetStat(StatType.ST_SP);
@@ -224,6 +317,8 @@ public class PlayerStatManager : MonoBehaviour
     /// <summary>필살기 게이지를 지정한 양만큼 충전합니다. 최대치를 초과하지 않습니다.</summary>
     public void AddUltimateGauge(float amount)
     {
+        EnsureInitialized();
+        if (!IsFinite(amount) || amount <= 0f) return;
         _currentUltimateGauge = Mathf.Min(_currentUltimateGauge + amount, MaxUltimateGauge);
         OnUltimateGaugeChanged?.Invoke(_currentUltimateGauge, MaxUltimateGauge);
     }
@@ -289,13 +384,15 @@ public class PlayerStatManager : MonoBehaviour
     }
     public void Heal(float amount)
     {
-        if (_currentHp <= 0f || amount <= 0f) return;
+        EnsureInitialized();
+        if (_currentHp <= 0f || !IsFinite(amount) || amount <= 0f) return;
         _currentHp = Mathf.Min(MaxHp, _currentHp + amount);
         OnHpChanged?.Invoke(_currentHp, MaxHp);
     }
     /// <summary>체력을 비용으로 소모합니다. 보호막과 피격 이벤트를 거치지 않으며 최소 체력을 남깁니다.</summary>
     public void ConsumeHealth(float amount, float minimumHp = 1f)
     {
+        EnsureInitialized();
         if (amount <= 0f || float.IsNaN(amount) || float.IsInfinity(amount)
             || float.IsNaN(minimumHp) || float.IsInfinity(minimumHp)) return;
         float cost = Mathf.Min(amount, Mathf.Max(0f, _currentHp - Mathf.Max(0f, minimumHp)));
@@ -305,6 +402,9 @@ public class PlayerStatManager : MonoBehaviour
     }
     private void Update()
     {
+        if (GetComponent<PlayerController>()?.IsStageTransitioning == true) return;
         UpdateShields(Time.deltaTime);
     }
+
+    private static bool IsFinite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
 }

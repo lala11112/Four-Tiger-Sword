@@ -102,7 +102,19 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 0}
+        SwingSound: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
+        SwingAudio:
+          Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
+          Accent: {fileID: 0}
+          Volume: 0.48
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
+        HitAudio:
+          Clip: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
+          Accent: {fileID: 0}
+          Volume: 0.62
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
         HitStop:
           OverrideHitStop: 0
           HitStopDuration: 0.08
@@ -113,12 +125,16 @@ MonoBehaviour:
           TrailStartTime: 0
           TrailEndTime: 0.5
         Slash:
-          SlashVFX: {fileID: 9015710735375805842, guid: 1b6d02aebe857d945a89798ffcebcfbf, type: 3}
+          SlashVFX: {fileID: 1789270911803724, guid: 3f0def245cefa134c838d34a7f6d2556, type: 3}
           SlashVFXStartTime: -1
-          SlashVFXOffset: {x: 0, y: 1, z: 0}
-          SlashVFXRotation: {x: 0, y: 0, z: -18}
-          SlashVFXScale: 1
-          SlashVFXLifetime: 0.22
+          SlashVFXOffset: {x: 0, y: -0.95, z: -1.4}
+          SlashVFXRotation: {x: 0, y: 0, z: 25}
+          SlashVFXScale: 0.65
+          SlashVFXLifetime: 0.42
+          PlaybackSpeed: 2.6
+          TimeOffset: -0.02
+          FollowPlayer: 1
+          AlternateDirection: 1
         Camera:
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
@@ -212,7 +228,19 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 0}
+        SwingSound: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
+        SwingAudio:
+          Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
+          Accent: {fileID: 0}
+          Volume: 0.48
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
+        HitAudio:
+          Clip: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
+          Accent: {fileID: 0}
+          Volume: 0.62
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
         HitStop:
           OverrideHitStop: 0
           HitStopDuration: 0.08
@@ -223,12 +251,16 @@ MonoBehaviour:
           TrailStartTime: 0
           TrailEndTime: 0.5
         Slash:
-          SlashVFX: {fileID: 9015710735375805842, guid: 1b6d02aebe857d945a89798ffcebcfbf, type: 3}
+          SlashVFX: {fileID: 1789270911803724, guid: 3f0def245cefa134c838d34a7f6d2556, type: 3}
           SlashVFXStartTime: -1
-          SlashVFXOffset: {x: 0, y: 1, z: 0}
-          SlashVFXRotation: {x: 0, y: 0, z: 18}
-          SlashVFXScale: 1
-          SlashVFXLifetime: 0.22
+          SlashVFXOffset: {x: 0, y: -0.95, z: -1.4}
+          SlashVFXRotation: {x: 0, y: 0, z: -15}
+          SlashVFXScale: 0.65
+          SlashVFXLifetime: 0.42
+          PlaybackSpeed: 2.6
+          TimeOffset: -0.02
+          FollowPlayer: 1
+          AlternateDirection: 1
         Camera:
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
@@ -322,7 +354,19 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 0}
+        SwingSound: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
+        SwingAudio:
+          Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
+          Accent: {fileID: 0}
+          Volume: 0.48
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
+        HitAudio:
+          Clip: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
+          Accent: {fileID: 0}
+          Volume: 0.62
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
         HitStop:
           OverrideHitStop: 0
           HitStopDuration: 0.08
@@ -333,12 +377,16 @@ MonoBehaviour:
           TrailStartTime: 0
           TrailEndTime: 0.5
         Slash:
-          SlashVFX: {fileID: 9015710735375805842, guid: 1b6d02aebe857d945a89798ffcebcfbf, type: 3}
+          SlashVFX: {fileID: 1789270911803724, guid: 3f0def245cefa134c838d34a7f6d2556, type: 3}
           SlashVFXStartTime: -1
-          SlashVFXOffset: {x: 0, y: 1, z: 0}
-          SlashVFXRotation: {x: 0, y: 0, z: -18}
-          SlashVFXScale: 1
-          SlashVFXLifetime: 0.22
+          SlashVFXOffset: {x: 0, y: -0.95, z: -1.4}
+          SlashVFXRotation: {x: 0, y: 0, z: 25}
+          SlashVFXScale: 0.65
+          SlashVFXLifetime: 0.42
+          PlaybackSpeed: 2.6
+          TimeOffset: -0.02
+          FollowPlayer: 1
+          AlternateDirection: 1
         Camera:
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
@@ -433,7 +481,19 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 0}
+        SwingSound: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
+        SwingAudio:
+          Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
+          Accent: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
+          Volume: 0.6
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
+        HitAudio:
+          Clip: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
+          Accent: {fileID: 0}
+          Volume: 0.7
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
         HitStop:
           OverrideHitStop: 0
           HitStopDuration: 0.08
@@ -450,6 +510,10 @@ MonoBehaviour:
           SlashVFXRotation: {x: 0, y: 0, z: 0}
           SlashVFXScale: 1
           SlashVFXLifetime: 0.22
+          PlaybackSpeed: 1
+          TimeOffset: 0
+          FollowPlayer: 0
+          AlternateDirection: 1
         Camera:
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
@@ -544,7 +608,19 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 0}
+        SwingSound: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
+        SwingAudio:
+          Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
+          Accent: {fileID: 0}
+          Volume: 0.62
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
+        HitAudio:
+          Clip: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
+          Accent: {fileID: 0}
+          Volume: 0.72
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
         HitStop:
           OverrideHitStop: 0
           HitStopDuration: 0.08
@@ -561,6 +637,10 @@ MonoBehaviour:
           SlashVFXRotation: {x: 0, y: 0, z: 0}
           SlashVFXScale: 1
           SlashVFXLifetime: 0.22
+          PlaybackSpeed: 1
+          TimeOffset: 0
+          FollowPlayer: 0
+          AlternateDirection: 1
         Camera:
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
@@ -655,7 +735,19 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 0}
+        SwingSound: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
+        SwingAudio:
+          Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
+          Accent: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
+          Volume: 0.55
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
+        HitAudio:
+          Clip: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
+          Accent: {fileID: 0}
+          Volume: 0.68
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
         HitStop:
           OverrideHitStop: 0
           HitStopDuration: 0.08
@@ -672,6 +764,10 @@ MonoBehaviour:
           SlashVFXRotation: {x: 0, y: 0, z: 0}
           SlashVFXScale: 1
           SlashVFXLifetime: 0.22
+          PlaybackSpeed: 1
+          TimeOffset: 0
+          FollowPlayer: 0
+          AlternateDirection: 1
         Camera:
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
@@ -766,7 +862,19 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 0}
+        SwingSound: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
+        SwingAudio:
+          Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
+          Accent: {fileID: 0}
+          Volume: 0.72
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
+        HitAudio:
+          Clip: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
+          Accent: {fileID: 0}
+          Volume: 0.74
+          AccentVolume: 0.28
+          PitchRange: {x: 0.97, y: 1.03}
         HitStop:
           OverrideHitStop: 0
           HitStopDuration: 0.08
@@ -783,6 +891,10 @@ MonoBehaviour:
           SlashVFXRotation: {x: 0, y: 0, z: 0}
           SlashVFXScale: 1
           SlashVFXLifetime: 0.22
+          PlaybackSpeed: 1
+          TimeOffset: 0
+          FollowPlayer: 0
+          AlternateDirection: 1
         Camera:
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
@@ -799,6 +911,30 @@ MonoBehaviour:
           StartTime: 0.2
           Duration: 0.05
         Feedback:
+          OverrideSlashVFX: 0
+          Slash:
+            SlashVFX: {fileID: 0}
+            SlashVFXStartTime: -1
+            SlashVFXOffset: {x: 0, y: 1, z: 0}
+            SlashVFXRotation: {x: 0, y: 0, z: 0}
+            SlashVFXScale: 1
+            SlashVFXLifetime: 0.22
+            PlaybackSpeed: 1
+            TimeOffset: 0
+            FollowPlayer: 0
+            AlternateDirection: 1
+          SwingAudio:
+            Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
+            Accent: {fileID: 0}
+            Volume: 0.72
+            AccentVolume: 0.28
+            PitchRange: {x: 0.97, y: 1.03}
+          HitAudio:
+            Clip: {fileID: 8300000, guid: f30bda0bed69a24409ddf7764db26d51, type: 3}
+            Accent: {fileID: 0}
+            Volume: 0.629
+            AccentVolume: 0.28
+            PitchRange: {x: 0.97, y: 1.03}
           OverrideHitVFX: 0
           HitEffect:
             Prefab: {fileID: 0}
@@ -818,6 +954,30 @@ MonoBehaviour:
           StartTime: 0.6
           Duration: 0.05
         Feedback:
+          OverrideSlashVFX: 0
+          Slash:
+            SlashVFX: {fileID: 0}
+            SlashVFXStartTime: -1
+            SlashVFXOffset: {x: 0, y: 1, z: 0}
+            SlashVFXRotation: {x: 0, y: 0, z: 0}
+            SlashVFXScale: 1
+            SlashVFXLifetime: 0.22
+            PlaybackSpeed: 1
+            TimeOffset: 0
+            FollowPlayer: 0
+            AlternateDirection: 1
+          SwingAudio:
+            Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
+            Accent: {fileID: 0}
+            Volume: 0.72
+            AccentVolume: 0.28
+            PitchRange: {x: 0.97, y: 1.03}
+          HitAudio:
+            Clip: {fileID: 8300000, guid: f30bda0bed69a24409ddf7764db26d51, type: 3}
+            Accent: {fileID: 0}
+            Volume: 0.629
+            AccentVolume: 0.28
+            PitchRange: {x: 0.97, y: 1.03}
           OverrideHitVFX: 0
           HitEffect:
             Prefab: {fileID: 0}
@@ -837,6 +997,30 @@ MonoBehaviour:
           StartTime: 1
           Duration: 0.05
         Feedback:
+          OverrideSlashVFX: 0
+          Slash:
+            SlashVFX: {fileID: 0}
+            SlashVFXStartTime: -1
+            SlashVFXOffset: {x: 0, y: 1, z: 0}
+            SlashVFXRotation: {x: 0, y: 0, z: 0}
+            SlashVFXScale: 1
+            SlashVFXLifetime: 0.22
+            PlaybackSpeed: 1
+            TimeOffset: 0
+            FollowPlayer: 0
+            AlternateDirection: 1
+          SwingAudio:
+            Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
+            Accent: {fileID: 0}
+            Volume: 0.72
+            AccentVolume: 0.28
+            PitchRange: {x: 0.97, y: 1.03}
+          HitAudio:
+            Clip: {fileID: 8300000, guid: f30bda0bed69a24409ddf7764db26d51, type: 3}
+            Accent: {fileID: 0}
+            Volume: 0.629
+            AccentVolume: 0.28
+            PitchRange: {x: 0.97, y: 1.03}
           OverrideHitVFX: 0
           HitEffect:
             Prefab: {fileID: 0}
@@ -856,6 +1040,30 @@ MonoBehaviour:
           StartTime: 1.4
           Duration: 0.05
         Feedback:
+          OverrideSlashVFX: 0
+          Slash:
+            SlashVFX: {fileID: 0}
+            SlashVFXStartTime: -1
+            SlashVFXOffset: {x: 0, y: 1, z: 0}
+            SlashVFXRotation: {x: 0, y: 0, z: 0}
+            SlashVFXScale: 1
+            SlashVFXLifetime: 0.22
+            PlaybackSpeed: 1
+            TimeOffset: 0
+            FollowPlayer: 0
+            AlternateDirection: 1
+          SwingAudio:
+            Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
+            Accent: {fileID: 0}
+            Volume: 0.72
+            AccentVolume: 0.28
+            PitchRange: {x: 0.97, y: 1.03}
+          HitAudio:
+            Clip: {fileID: 8300000, guid: f30bda0bed69a24409ddf7764db26d51, type: 3}
+            Accent: {fileID: 0}
+            Volume: 0.629
+            AccentVolume: 0.28
+            PitchRange: {x: 0.97, y: 1.03}
           OverrideHitVFX: 0
           HitEffect:
             Prefab: {fileID: 0}
@@ -875,6 +1083,30 @@ MonoBehaviour:
           StartTime: 1.8000001
           Duration: 0.05
         Feedback:
+          OverrideSlashVFX: 0
+          Slash:
+            SlashVFX: {fileID: 0}
+            SlashVFXStartTime: -1
+            SlashVFXOffset: {x: 0, y: 1, z: 0}
+            SlashVFXRotation: {x: 0, y: 0, z: 0}
+            SlashVFXScale: 1
+            SlashVFXLifetime: 0.22
+            PlaybackSpeed: 1
+            TimeOffset: 0
+            FollowPlayer: 0
+            AlternateDirection: 1
+          SwingAudio:
+            Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
+            Accent: {fileID: 0}
+            Volume: 0.72
+            AccentVolume: 0.28
+            PitchRange: {x: 0.97, y: 1.03}
+          HitAudio:
+            Clip: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
+            Accent: {fileID: 0}
+            Volume: 0.74
+            AccentVolume: 0.28
+            PitchRange: {x: 0.97, y: 1.03}
           OverrideHitVFX: 0
           HitEffect:
             Prefab: {fileID: 0}
@@ -893,4 +1125,16 @@ MonoBehaviour:
     AirAttackLoopAnimationName: 
   CommonFeedback:
     HitVFX: {fileID: 0}
-    HitSound: {fileID: 0}
+    HitSound: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
+    HitAudio:
+      Clip: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
+      Accent: {fileID: 0}
+      Volume: 0.62
+      AccentVolume: 0.28
+      PitchRange: {x: 0.97, y: 1.03}
+    SecondaryHitAudio:
+      Clip: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
+      Accent: {fileID: 0}
+      Volume: 0.48
+      AccentVolume: 0.28
+      PitchRange: {x: 0.97, y: 1.03}

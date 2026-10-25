@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 public class FormManager
 {
+    public enum SwitchReason { Direct, Parry }
     private PlayerController _playerController;
     public IForm CurrentForm{ get; private set; }
     private List<FormTransition> _transitions = new List<FormTransition>();
@@ -11,10 +12,23 @@ public class FormManager
 
     public Func<bool> CanTransition{ get; set; }
     public event Action<IForm> OnFormChanged;
+    public event Action<IForm, IForm> OnFormSwitchSucceeded;
 
     public FormManager(PlayerController playerController)
     {
         _playerController = playerController;
+    }
+
+    /// <summary>World resource time runs before actions; switching never resets a form's resource.</summary>
+    public void UpdateFormSp(float deltaTime)
+    {
+        if (_playerController == null || !_playerController.isActiveAndEnabled
+            || _playerController.IsStageTransitioning || _playerController.IsShopPaused
+            || _playerController.StatManager == null || _playerController.StatManager.CurrentHp <= 0f) return;
+        bool inCombat = _playerController.IsInRoomCombat;
+        foreach (var form in _registeredForms)
+            if (form is BaseForm normalForm)
+                normalForm.UpdateFormSp(deltaTime, form == CurrentForm, inCombat);
     }
 
     public void Update()
@@ -24,25 +38,32 @@ public class FormManager
 
         (CurrentForm as BaseForm)?.UpdateSkillCooldownUI();
 
-        if(CanTransition != null && !CanTransition.Invoke())
+        if (_playerController.ActionDeltaTime <= 0f || !_playerController.CanChangeForm || (CanTransition != null && !CanTransition.Invoke()))
         {
             return;
         }
 
         var toTransition = GetTransition();
-        if(toTransition != null)
+        if(toTransition != null && toTransition.TargetForm != CurrentForm)
         {
-            ChangeForm(toTransition.TargetForm);
+            TrySwitchForm(toTransition.TargetForm);
         }
     }
 
     public void CleanupTransientEffects()
     {
+        _playerController.CancelPendingSwitchAttack();
         _playerController.StopAttackTrails(true);
         _playerController.CombatCamera?.Cancel(_playerController, true);
         // Buffs may belong to an unequipped form; clear every registered owner on shutdown/death.
         foreach (var form in _registeredForms)
             (form as BaseForm)?.CleanupTransientEffects();
+    }
+
+    public void CleanupStageEffects()
+    {
+        foreach (var form in _registeredForms)
+            (form as BaseForm)?.CleanupStageEffects();
     }
 
     public void AddTransition(IForm targetForm, Func<bool> condition)
@@ -66,9 +87,36 @@ public class FormManager
         transitions.Add(new FormTransition(toForm, condition));
     }
 
-    public void ChangeForm(IForm form)
+    public void ChangeForm(IForm form) => AssignForm(form, true);
+
+    public BaseForm GetForm(ElementType element)
+    {
+        foreach (var form in _registeredForms)
+            if (form is BaseForm normalForm && normalForm.Element == element) return normalForm;
+        return null;
+    }
+
+    /// <summary>A committed combo finisher changes form once without switch costs or an E-style attack.</summary>
+    public bool TrySwitchForFinisher(BaseForm target)
+    {
+        if (target == null || target == CurrentForm || CurrentForm == null || !target.CanBeginFinisher
+            || !_registeredForms.Contains(target) || !_playerController.isActiveAndEnabled
+            || _playerController.IsStageTransitioning || _playerController.IsShopPaused
+            || _playerController.StatManager == null || _playerController.StatManager.CurrentHp <= 0f
+            || !(_playerController.StateMachine?.CurrentState is PlayerAttackState attack) || attack.IsHeavyAttack)
+            return false;
+        IForm previous = CurrentForm;
+        AssignForm(target, false);
+        if (_playerController.ItemRuntime != null) _playerController.ItemRuntime.NotifyFormSwitchSucceeded();
+        OnFormChanged?.Invoke(CurrentForm);
+        OnFormSwitchSucceeded?.Invoke(previous, target);
+        return true;
+    }
+
+    private void AssignForm(IForm form, bool publish)
     {
         if(CurrentForm == form) return;
+        _playerController.CancelPendingSwitchAttack();
         _playerController.StopAttackTrails(true);
         _playerController.CombatCamera?.Cancel(_playerController);
         if (form != null) _registeredForms.Add(form);
@@ -76,10 +124,49 @@ public class FormManager
         CurrentForm?.Unequip(_playerController);
         CurrentForm = form;
         CurrentForm?.Equip(_playerController);
-        OnFormChanged?.Invoke(CurrentForm);
+        if (publish)
+        {
+            _playerController.ItemRuntime?.RecalculateForCurrentForm();
+            OnFormChanged?.Invoke(CurrentForm);
+        }
     }
 
-    private FormTransition GetTransition()
+    /// <summary>Eligibility only. Initial/editor assignments use ChangeForm and never spend SP or proc items.</summary>
+    public bool CanSwitchForm(IForm target)
+        => target is BaseForm attackForm && attackForm.CanSwitchAttack
+            && CurrentForm != null && target != CurrentForm && _registeredForms.Contains(target)
+            && _playerController.isActiveAndEnabled && _playerController.StatManager != null
+            && _playerController.StatManager.CurrentHp > 0f && _playerController.CanChangeForm
+            && _playerController.StatManager.HasEnoughSp(_playerController.SwitchSpCost);
+
+    public bool TrySwitchForm(IForm target, SwitchReason reason = SwitchReason.Direct)
+    {
+        if (reason != SwitchReason.Direct && reason != SwitchReason.Parry) return false;
+        if (!CanSwitchForm(target)) return false;
+        var state = _playerController.StateMachine?.CurrentState;
+        bool permitted = reason == SwitchReason.Parry
+            ? state is PlayerParryState
+            : (state is PlayerIdleState || state is PlayerRunState)
+                && (CanTransition == null || CanTransition());
+        if (!permitted || !_playerController.StatManager.TryConsumeSp(_playerController.SwitchSpCost)) return false;
+
+        IForm previous = CurrentForm;
+        // New-form passives and freshly triggered effects are reconciled together: never
+        // clamp against an intermediate maximum before the successful-switch buff exists.
+        AssignForm(target, false);
+        _playerController.StartFormChangeCooldown();
+        _playerController.ItemRuntime?.NotifyFormSwitchSucceeded();
+        OnFormChanged?.Invoke(CurrentForm);
+        OnFormSwitchSucceeded?.Invoke(previous, target);
+        _playerController.QueueSwitchAttack((BaseForm)target);
+        if (reason == SwitchReason.Direct) _playerController.StartPendingSwitchAttack();
+        return true;
+    }
+
+    /// <summary>Numeric form selection only; Q never requests a parry.</summary>
+    public IForm GetRequestedForm() => GetDirectTransition()?.TargetForm;
+
+    private FormTransition GetDirectTransition()
     {
         foreach(var transition in _transitions)
         {
@@ -88,6 +175,14 @@ public class FormManager
                 return transition;
             }
         }
+
+        return null;
+    }
+
+    private FormTransition GetTransition()
+    {
+        var directTransition = GetDirectTransition();
+        if (directTransition != null) return directTransition;
 
         if(CurrentForm != null && _fastTransitions.TryGetValue(CurrentForm.GetType(), out var currentTransitions))
         {

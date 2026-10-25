@@ -29,12 +29,12 @@ public class PlayerRunState : IPlayerState
         Vector3 velocity = moveDir * _playerController.RunSpeed;
         velocity.y += _playerController.VerticalVelocity;
 
-        _playerController.Controller.Move(velocity * Time.deltaTime);
+        _playerController.Controller.Move(velocity * _playerController.ActionDeltaTime);
 
         if(moveDir != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(new Vector3(moveDir.x, 0, moveDir.z));
-            _playerController.transform.rotation = Quaternion.Slerp(_playerController.transform.rotation, targetRotation, _playerController.RotateSpeed * Time.deltaTime);
+            _playerController.transform.rotation = Quaternion.Slerp(_playerController.transform.rotation, targetRotation, _playerController.RotateSpeed * _playerController.ActionDeltaTime);
         }
     }
 

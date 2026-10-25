@@ -1,0 +1,85 @@
+{
+  "unit": "meter",
+  "unity_unit_m": 1,
+  "asset_count": 2,
+  "reference_grid_m": 2,
+  "scale_basis": "Latest laboratory props V3; wall panel H=1.21875m, wall vent W=.84375m. Lamp sizes are fitted design choices, not measurements recovered from images. No extra global enlargement.",
+  "assets": [
+    {
+      "id": 33,
+      "name": "wall_bulkhead_light",
+      "dimensions_blender_m": [
+        0.5,
+        0.2199999988079071,
+        1.149999976158142
+      ],
+      "bounds_min": [
+        -0.25,
+        -0.2199999988079071,
+        -0.574999988079071
+      ],
+      "bounds_max": [
+        0.25,
+        0.0,
+        0.574999988079071
+      ],
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "pivot": "rear mounting plane center; outward is Blender -Y",
+      "triangles": 8584,
+      "editable_parts": 30,
+      "closed_manifold_parts": true,
+      "degenerate_faces": 0,
+      "fbx": "models_fbx/33_wall_bulkhead_light.fbx",
+      "glb": "models_glb/33_wall_bulkhead_light.glb",
+      "emission_mask": "emission_masks/33_wall_bulkhead_light_emission.png",
+      "emission_mask_uv_index": 1,
+      "root_position_m": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 34,
+      "name": "ceiling_panel_light",
+      "dimensions_blender_m": [
+        2.0999999046325684,
+        0.6000000238418579,
+        0.20000000298023224
+      ],
+      "bounds_min": [
+        -1.0499999523162842,
+        -0.30000001192092896,
+        -0.20000000298023224
+      ],
+      "bounds_max": [
+        1.0499999523162842,
+        0.30000001192092896,
+        0.0
+      ],
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "pivot": "top mounting plane center; diffuser faces Blender -Z",
+      "triangles": 11984,
+      "editable_parts": 40,
+      "closed_manifold_parts": true,
+      "degenerate_faces": 0,
+      "fbx": "models_fbx/34_ceiling_panel_light.fbx",
+      "glb": "models_glb/34_ceiling_panel_light.glb",
+      "emission_mask": "emission_masks/34_ceiling_panel_light_emission.png",
+      "emission_mask_uv_index": 1,
+      "root_position_m": [
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}

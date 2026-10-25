@@ -15,7 +15,11 @@ public static class DamageManager
             if (!targetGO.activeInHierarchy) return default;
         }
         float damage = info.BaseDamage;
-        if (info.Source is PlayerController owner && owner.FormManager?.CurrentForm is BaseForm form)
+        if (info.Category == PlayerAttackCategory.Normal || info.Category == PlayerAttackCategory.SwitchAttack)
+            damage *= Mathf.Max(0f, info.ItemDamageMultiplier);
+        if (info.HasSourceDamageSnapshot)
+            damage *= Mathf.Max(0f, info.SourceDamageMultiplier);
+        else if (info.Source is PlayerController owner && owner.FormManager?.CurrentForm is BaseForm form)
         {
             damage *= form.OutgoingDamageMultiplier;
             if (info.Element != ElementType.ELEMENT_NONE)
@@ -44,8 +48,13 @@ public static class DamageManager
             }
         }
         if (float.IsNaN(damage) || float.IsInfinity(damage)) return default;
-        return target.TakeDamage(damage, info.Element, critical, info.Power,
+        damage = Mathf.Max(0f, damage);
+        Vector3 impactPosition = targetGO.transform.position;
+        DamageResult result = target.TakeDamage(damage, info.Element, critical, info.Power,
             Mathf.Max(0f, info.PoiseDamage * info.PoiseDamageMultiplier),
             info.StaggerResistLevel, info.IsParryable, info.Source);
+        if (result.Applied && result.HealthDamage + result.ShieldDamage > 0f)
+            CombatSfx.Play(info.ImpactSound, impactPosition, info.Source, impact: true);
+        return result;
     }
 }

@@ -11,12 +11,13 @@ public class PlayerMovement : MonoBehaviour
 
     public void ApplyGravity()
     {
+        if (_playerController.ActionDeltaTime <= 0f) return;
         if(_playerController.IsGround() && _playerController.VerticalVelocity < 0)
         {
             _playerController.VerticalVelocity = -2f;
         }
 
-        _playerController.VerticalVelocity += _playerController.Gravity * Time.deltaTime;
+        _playerController.VerticalVelocity += _playerController.Gravity * _playerController.ActionDeltaTime;
     }
 
     public Vector3 GetMoveDirection()
@@ -60,7 +61,7 @@ public class PlayerMovement : MonoBehaviour
         Vector3 velocity = moveDir * _playerController.RunSpeed;
         velocity.y = _playerController.VerticalVelocity;
 
-        CollisionFlags flags = _playerController.Controller.Move(velocity * Time.deltaTime);
+        CollisionFlags flags = _playerController.Controller.Move(velocity * _playerController.ActionDeltaTime);
 
         if((flags & CollisionFlags.Above) != 0 && _playerController.VerticalVelocity > 0f)
         {

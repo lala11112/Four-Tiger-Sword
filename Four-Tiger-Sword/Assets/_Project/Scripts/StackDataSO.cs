@@ -17,7 +17,8 @@ public class StackDataSO : ScriptableObject
     {
         var receiver = target.GetComponentInParent<IDamageable>();
         if (receiver is Component component)
-            DamageManager.Apply(new HitInfo(explosionDamage, ElementType.ELEMENT_NONE, 0f, 1f, poiseDamage: 20f),
+            DamageManager.Apply(new HitInfo(explosionDamage, ElementType.ELEMENT_NONE, 0f, 1f, poiseDamage: 20f,
+                impactSound: new CombatSoundSettings().Resolve(explosionSound), category: PlayerAttackCategory.Secondary),
                 receiver, component.gameObject);
     }
 }

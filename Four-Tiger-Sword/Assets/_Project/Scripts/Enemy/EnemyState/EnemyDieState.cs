@@ -10,15 +10,24 @@ public class EnemyDieState : IPlayerState
     {
         //죽음
         Debug.Log($"{_enemy.name} 사망");
-        _enemy.Animator.applyRootMotion = true;
-        _enemy.Animator.CrossFade("Die", 0.1f);
+        if (_enemy.Animator.HasState(0, Animator.StringToHash("Die")))
+        {
+            _enemy.Animator.applyRootMotion = true;
+            _enemy.Animator.CrossFade("Die", 0.1f, 0);
+        }
+        else
+        {
+            // Drone/Chang can fade from their current pose without a Die animation.
+            _enemy.Animator.applyRootMotion = false;
+            _enemy.SetAnimationSpeed(0f);
+        }
         _enemy.LockMovement();
         foreach (var collider in _enemy.GetComponentsInChildren<Collider>(true))
         {
             if (collider.GetComponentInParent<Enemy>() == _enemy)
                 collider.enabled = false;
         }
-        //Destroy(_enemy.gameObject);
+        _enemy.GetComponent<EnemyDeathFade>()?.BeginFade();
     }
 
     public void Update()

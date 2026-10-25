@@ -21,13 +21,32 @@ MonoBehaviour:
   cooldown: 0
   repeatWeightMultiplier: 0.5
   attackSpeed: 1
+  staggerLevel: 1
   isParryable: 0
   telegraphDuration: 1
+  SwingAudio:
+    Clip: {fileID: 8300000, guid: 619c07e2a6608cf4bbb8eab877a6df1f, type: 3}
+    Accent: {fileID: 0}
+    Volume: 0.68
+    AccentVolume: 0.28
+    PitchRange: {x: 0.97, y: 1.03}
+  HitAudio:
+    Clip: {fileID: 8300000, guid: 8529c572ae0cd314bb2d7dbfb6d186a5, type: 3}
+    Accent: {fileID: 0}
+    Volume: 0.68
+    AccentVolume: 0.28
+    PitchRange: {x: 0.97, y: 1.03}
+  LandingAudio:
+    Clip: {fileID: 0}
+    Accent: {fileID: 0}
+    Volume: 0.65
+    AccentVolume: 0.3
+    PitchRange: {x: 0.97, y: 1.03}
   useHpRatio: 1
   hpRatioThreshold: 0.3
   hpThreshold: 300
   explosionDelay: 2
-  damage: 2
+  damage: 10
   knockbackForce: 5
   explosionRadius: 3
   explosionOffset: {x: 0, y: 0, z: 0}

@@ -80,21 +80,23 @@ namespace StudioBaekho.Tests
             AssertBounds(new Bounds(Vector3.zero, new Vector3(2, 0.2f, 5)), VisualBounds(piece));
         }
 
-        [Test]
-        public void SegmentFloorIsBelowDoorLevelAndWallsLeaveRequestedClearWidth()
+        [TestCase(2f)]
+        [TestCase(4f)]
+        public void SegmentFloorIsBelowDoorLevelAndWallsLeaveRequestedClearWidth(float corridorWidth)
         {
             var segment = new BaekhoCorridorSegment(new Vector3(2, 4, -5), new Vector3(2, 4, 5));
-            BaekhoDungeonGeometry.BuildSegment(segment, 2f, style, parent.transform);
+            BaekhoDungeonGeometry.BuildSegment(segment, corridorWidth, style, parent.transform);
             var floor = parent.transform.Find("Floor");
             var left = parent.transform.Find("LeftWall");
             var right = parent.transform.Find("RightWall");
             Assert.That(VisualBounds(floor.gameObject).max.y, Is.EqualTo(4f).Within(Tolerance));
             Assert.That(VisualBounds(left.gameObject).min.y, Is.EqualTo(4f).Within(Tolerance));
             Assert.That(VisualBounds(right.gameObject).min.x - VisualBounds(left.gameObject).max.x,
-                Is.EqualTo(2f).Within(Tolerance));
+                Is.EqualTo(corridorWidth).Within(Tolerance));
+            Assert.That(VisualBounds(floor.gameObject).size.x, Is.EqualTo(corridorWidth).Within(Tolerance));
             Assert.That(floor.gameObject.layer, Is.EqualTo(LayerMask.NameToLayer("Ground")));
             Assert.That(floor.GetComponentsInChildren<Transform>(true).All(item => item.gameObject.layer == floor.gameObject.layer), Is.True);
-            Assert.That(parent.GetComponentsInChildren<Collider>().Count(collider => collider.enabled), Is.EqualTo(3));
+            Assert.That(parent.GetComponentsInChildren<Collider>().Count(collider => collider.enabled), Is.EqualTo(4));
         }
 
         [Test]
@@ -113,6 +115,64 @@ namespace StudioBaekho.Tests
             Assert.That(left.max.x, Is.EqualTo(-0.5f).Within(Tolerance));
             Assert.That(right.min.x, Is.EqualTo(0.5f).Within(Tolerance));
             Assert.That(right.max.x, Is.EqualTo(1f).Within(Tolerance));
+        }
+
+        [TestCase(0f, 0f)]
+        [TestCase(90f, 0f)]
+        [TestCase(90f, 90f)]
+        public void WideCorridorClosesExteriorShouldersWithoutChangingAuthoredDoor(float parentYaw, float socketYaw)
+        {
+            parent.transform.SetPositionAndRotation(new Vector3(11, 4, -7), Quaternion.Euler(0, parentYaw, 0));
+            var module = CreateModuleWithDoor();
+            module.transform.SetParent(parent.transform, false);
+            module.transform.localPosition = new Vector3(4, 2, -5);
+            module.transform.localRotation = Quaternion.Euler(0, 90, 0);
+            var socket = module.connections[0];
+            socket.transform.localRotation = Quaternion.Euler(0, socketYaw, 0);
+            style.wallHeight = 5f;
+
+            BaekhoDungeonGeometry.FinishDoor(module, 0, 4f, style, parent.transform);
+
+            var shoulders = parent.GetComponentsInChildren<BoxCollider>()
+                .Where(box => box.enabled && box.name == "CorridorShoulder_N")
+                .OrderBy(box => socket.transform.InverseTransformPoint(box.transform.position).x).ToArray();
+            Assert.That(shoulders.Length, Is.EqualTo(2));
+            for (int i = 0; i < shoulders.Length; i++)
+            {
+                var shoulder = shoulders[i];
+                var localCenter = socket.transform.InverseTransformPoint(shoulder.transform.position);
+                float side = i == 0 ? -1f : 1f;
+                Assert.That(Vector3.Distance(localCenter,
+                    new Vector3(side * 1.5f, style.wallHeight * 0.5f, style.wallThickness * 0.5f)),
+                    Is.LessThan(Tolerance));
+                Assert.That(Vector3.Distance(shoulder.size, new Vector3(1f, style.wallHeight, style.wallThickness)),
+                    Is.LessThan(Tolerance));
+                Assert.That(Quaternion.Angle(shoulder.transform.rotation, socket.transform.rotation), Is.LessThan(Tolerance));
+                AssertBounds(WorldBounds(shoulder.transform, shoulder.size), VisualBounds(shoulder.gameObject));
+                Assert.That(Mathf.Abs(localCenter.x) - shoulder.size.x * 0.5f,
+                    Is.EqualTo(socket.width * 0.5f).Within(Tolerance), "The authored opening must stay clear.");
+                Assert.That(Mathf.Abs(localCenter.x) + shoulder.size.x * 0.5f,
+                    Is.EqualTo(2f).Within(Tolerance), "The shoulder must reach the 4m corridor wall.");
+                Assert.That(localCenter.z - shoulder.size.z * 0.5f, Is.EqualTo(0f).Within(Tolerance),
+                    "The transition must remain outside the authored map.");
+            }
+            Assert.That(socket.width, Is.EqualTo(2f));
+            Assert.That(socket.height, Is.EqualTo(3f));
+            Assert.That(socket.placeholders[0].activeSelf, Is.False);
+            Assert.That(parent.GetComponentsInChildren<BoxCollider>().Count(box => box.enabled), Is.EqualTo(2));
+        }
+
+        [TestCase(2f)]
+        [TestCase(4f)]
+        public void MatchingDoorAndCorridorWidthsNeedNoShoulders(float width)
+        {
+            var module = CreateModuleWithDoor();
+            module.connections[0].width = width;
+
+            BaekhoDungeonGeometry.FinishDoor(module, 0, width, style, parent.transform);
+
+            Assert.That(parent.transform.childCount, Is.Zero);
+            Assert.That(module.connections[0].placeholders[0].activeSelf, Is.False);
         }
 
         [Test]

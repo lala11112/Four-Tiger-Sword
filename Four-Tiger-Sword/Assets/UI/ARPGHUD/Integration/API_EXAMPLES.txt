@@ -1,0 +1,77 @@
+PENTA HUD API 예제
+
+아래 전체 코드를 PentaHudBridge.cs로 저장한 뒤 자신의 장면 오브젝트에 붙이고,
+Inspector의 Hud 슬롯에 프리팹의 HudController를 연결하세요.
+이 스크립트는 표시 연결만 담당합니다. 실제 게임 코드가 공개 메서드를 호출합니다.
+
+using UnityEngine;
+using ArpgHud;
+
+public sealed class PentaHudBridge : MonoBehaviour
+{
+    [SerializeField] private HudController hud;
+
+    // 플레이어 생성/로드 후 실제 초기 상태로 호출합니다.
+    public void InitializeHud(float hp, float maxHp, float resource, float maxResource,
+        int form, float eRemaining, float eDuration, float rRemaining, float rDuration)
+    {
+        if (hud == null) return;
+        hud.SetHealth(hp, maxHp);
+        hud.SetAuxiliary(resource, maxResource);
+        hud.SetForm(form);
+        hud.SetCooldownE(eRemaining, eDuration);
+        hud.SetCooldownR(rRemaining, rDuration);
+    }
+
+    // 피해/회복 및 최대 체력 변경 후 호출합니다.
+    public void HealthChanged(float current, float maximum)
+    {
+        if (hud != null) hud.SetHealth(current, maximum);
+    }
+
+    public void ResourceChanged(float current, float maximum)
+    {
+        if (hud != null) hud.SetAuxiliary(current, maximum);
+    }
+
+    public void FormChanged(HudElement form)
+    {
+        if (hud != null) hud.SetForm(form);
+    }
+
+    // 게임의 쿨다운 계산이 갱신될 때마다 호출합니다.
+    // 시전 승인 직후에는 remaining == duration,
+    // 준비 완료 시에는 remaining == 0을 전달합니다.
+    public void CooldownsChanged(float eRemaining, float eDuration,
+        float rRemaining, float rDuration)
+    {
+        if (hud == null) return;
+        hud.SetCooldownE(eRemaining, eDuration);
+        hud.SetCooldownR(rRemaining, rDuration);
+    }
+}
+
+호출 값 예시 (HudController 참조가 hud일 때)
+
+hud.SetHealth(75f, 100f);          // 체력 75%
+hud.SetAuxiliary(30f, 60f);        // 보조 자원 50%
+hud.SetForm(HudElement.Water);    // 수 속성, 아이콘/테두리 자동 변경
+hud.SetForm(3);                   // 목 속성 (번호는 1부터 시작)
+hud.SetCooldownE(8f, 8f);         // E 시전이 승인된 직후
+hud.SetCooldownE(5.2f, 8f);       // 이후 게임에서 계산한 남은 시간
+hud.SetCooldownE(0f, 8f);         // E 준비 완료, 숫자 숨김
+hud.SetCooldownR(11.5f, 12f);
+hud.Refresh();                   // 현재 저장된 상태를 다시 표시
+HudState snapshot = hud.CurrentState;
+
+주의
+• 위 호출 값 예시는 독립 파일이 아니라 기존 메서드 안에서 사용하는 문장입니다.
+• CurrentState는 구조체 복사본입니다. 복사본을 바꿔도 HUD는 갱신되지 않습니다.
+  일반적인 변경에는 Set... 메서드를 사용하세요.
+• HudController는 시간을 감소시키지 않습니다. 게임의 실제 타이머 값을 전달하세요.
+• 쿨다운이 끝난 상태는 remaining=0으로 명시적으로 보내세요.
+• 쿨다운이 없는 스킬은 (0f, 0f)로 준비 상태를 표시할 수 있습니다.
+• 0 이하 duration이나 유효하지 않은 숫자는 안전한 표시 값으로 처리되지만,
+  게임에서는 유한한 값과 올바른 전체 시간을 보내세요.
+• 속성 변경은 전달된 E/R 시간을 초기화하지 않습니다.
+• 실제 입력/시전 가능 여부/소모 자원 검증은 게임 코드에서 처리하세요.

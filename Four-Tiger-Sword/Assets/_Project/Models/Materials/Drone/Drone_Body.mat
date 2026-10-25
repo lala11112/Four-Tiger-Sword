@@ -29,6 +29,7 @@ Material:
   - _CAST_SHADOWS_ON
   - _COLORRAMPLIGHTINGSTAGE_AFTERLIGHTING
   - _FADEUVSET_UV1
+  - _FADE_ON
   - _FOG_ON
   - _GREYSCALESTAGE_BEFORELIGHTING
   - _HEIGHTGRADIENTPOSITIONSPACE_LOCAL
@@ -276,9 +277,9 @@ Material:
     - _FadeBurnOn: 0
     - _FadeBurnWidth: 0.01
     - _FadeByCamDistanceOn: 0
-    - _FadeOn: 0
-    - _FadePower: 1
-    - _FadeTransition: 0.2
+    - _FadeOn: 1
+    - _FadePower: 1.15
+    - _FadeTransition: 0.203
     - _FadeUVSet: 0
     - _FlatNormalsBlend: 1
     - _FlatNormalsEnabled: 0
@@ -315,7 +316,7 @@ Material:
     - _HologramAccentFrequency: 2
     - _HologramAccentSpeed: 1
     - _HologramAlpha: 1
-    - _HologramBaseAlpha: 0.1
+    - _HologramBaseAlpha: 1
     - _HologramFrequency: 20
     - _HologramLineCenter: 0.5
     - _HologramLineSmoothness: 2

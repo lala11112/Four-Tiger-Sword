@@ -11,6 +11,8 @@ namespace StudioBaekho
         public BaekhoMapConnection[] connections = Array.Empty<BaekhoMapConnection>();
         public GameObject[] groundObjects = Array.Empty<GameObject>();
         public bool isCornerRoom;
+        [Min(0), Tooltip("Monster encounter budget for each generated instance of this map.")]
+        public int encounterBudget = 20;
 
         public BaekhoSocketData GetSocket(int index)
         {

@@ -108,6 +108,7 @@ namespace StudioBaekho
                 if ((room.role & BaekhoRoomRole.Start) != 0) result.startRoom = instance;
                 if ((room.role & BaekhoRoomRole.End) != 0) result.endRoom = instance;
                 if ((room.role & BaekhoRoomRole.Boss) != 0) result.bossRoom = instance;
+                if ((room.role & BaekhoRoomRole.Shop) != 0) result.shopRoom = instance;
                 yield return null;
             }
             foreach (var link in plan.links)
@@ -161,18 +162,35 @@ namespace StudioBaekho
             if (style == null) { error = "Corridor style is required."; return false; }
             if (!BaekhoDungeonGeometry.Positive(new Vector3(style.wallHeight, style.wallThickness, style.floorThickness)))
                 error = "Wall height/thickness and floor thickness must be finite and positive.";
+            else if (!BaekhoDungeonGeometry.Finite(style.ceilingThickness) || style.ceilingThickness <= 0f)
+                error = "Ceiling thickness must be finite and positive.";
+            else if (!BaekhoDungeonGeometry.Finite(style.lightSpacing) || style.lightSpacing < 0.1f)
+                error = "Light spacing must be finite and at least 0.1m.";
+            else if (!BaekhoDungeonGeometry.Finite(style.wallLightHeight) || style.wallLightHeight <= 0f || style.wallLightHeight > style.wallHeight)
+                error = "Wall light height must be finite, positive and no higher than the corridor wall.";
             else if (LayerMask.NameToLayer(style.groundLayer) < 0) error = "Ground layer does not exist: " + style.groundLayer;
             else
             {
-                foreach (var piece in new[] { style.floor, style.wall, style.cap })
+                foreach (var piece in new[] { style.floor, style.wall, style.cap, style.CeilingPiece })
                 {
                     if (piece == null || piece.prefab == null || !BaekhoDungeonGeometry.Positive(piece.localBounds.size))
-                    { error = "Assign floor, wall and cap prefabs and prepare their local bounds."; break; }
+                    { error = "Assign floor, wall and cap prefabs and prepare all piece bounds, including the ceiling when assigned."; break; }
                     if (piece.placement == BaekhoPiecePlacement.Repeat && (!BaekhoDungeonGeometry.Finite(piece.repeatLength) || piece.repeatLength < 0.1f))
                     { error = "Repeated prefab length must be at least 0.1m."; break; }
+                    if (piece.placement == BaekhoPiecePlacement.TilePreserveSize && !BaekhoDungeonGeometry.ValidateTiledPiece(piece, out error)) break;
                     if (piece.prefab.GetComponentInChildren<Rigidbody>(true) != null)
                     { error = "Corridor visual prefabs must not contain Rigidbodies."; break; }
                 }
+                if (error == null)
+                    foreach (var prefab in new[] { style.wallLightPrefab, style.ceilingLightPrefab })
+                    {
+                        if (prefab == null) continue;
+                        Vector3 scale = prefab.transform.localScale;
+                        if (!BaekhoDungeonGeometry.Positive(new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z))))
+                        { error = "Light fixture root scale must be finite and nonzero: " + prefab.name; break; }
+                        if (prefab.GetComponentInChildren<Rigidbody>(true) != null)
+                        { error = "Light fixture prefabs must not contain Rigidbodies: " + prefab.name; break; }
+                    }
             }
             return error == null;
         }

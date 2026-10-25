@@ -103,7 +103,7 @@ public class EnemyCombatIdleState : IPlayerState
 
         FaceTarget();
 
-        _roamTimer += Time.deltaTime;
+        _roamTimer += _enemy.ActionDeltaTime;
         if (_roamTimer < RoamInterval) return;
 
         _roamTimer = 0f;
@@ -133,6 +133,6 @@ public class EnemyCombatIdleState : IPlayerState
             _enemy.transform.rotation = Quaternion.RotateTowards(
                 _enemy.transform.rotation,
                 Quaternion.LookRotation(dir),
-                360f * Time.deltaTime);
+                360f * _enemy.ActionDeltaTime);
     }
 }

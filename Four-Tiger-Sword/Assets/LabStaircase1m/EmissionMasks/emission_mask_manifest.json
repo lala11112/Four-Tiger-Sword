@@ -1,0 +1,348 @@
+{
+  "revision": "2026-10-20_binary_emission_masks_v3",
+  "size_px": [
+    1024,
+    1024
+  ],
+  "channels": {
+    "RGB": "white (1,1,1)",
+    "A": "binary emission: emitting 255, other 0"
+  },
+  "uv_layer": "EmissionMaskUV",
+  "uv_index": 1,
+  "unity_channel": "uv2",
+  "gltf_attribute": "TEXCOORD_1",
+  "original_uv_layer": "UVMap (unchanged)",
+  "unity_import": "Do not generate lightmap UVs over uv2; sample mask alpha with UV channel 1. Use point filtering for strictly binary sampling, or clamp and bilinear filtering for smooth edges.",
+  "assets": [
+    {
+      "id": 32,
+      "name": "industrial_staircase_1m",
+      "png": "emission_masks/32_industrial_staircase_1m_emission.png",
+      "lit_parts": [],
+      "tiles": [
+        {
+          "part": "32_Anti_slip_tread_1_0002",
+          "material_index": 0,
+          "material": "LAB_dark",
+          "emitting": false,
+          "tile": 0,
+          "uv_min": [
+            0.00390625,
+            0.00390625
+          ],
+          "uv_max": [
+            0.1953125,
+            0.1953125
+          ]
+        },
+        {
+          "part": "32_Anti_slip_tread_2_0006",
+          "material_index": 0,
+          "material": "LAB_dark",
+          "emitting": false,
+          "tile": 1,
+          "uv_min": [
+            0.203125,
+            0.00390625
+          ],
+          "uv_max": [
+            0.3955078125,
+            0.1953125
+          ]
+        },
+        {
+          "part": "32_Anti_slip_tread_3_0010",
+          "material_index": 0,
+          "material": "LAB_dark",
+          "emitting": false,
+          "tile": 2,
+          "uv_min": [
+            0.4033203125,
+            0.00390625
+          ],
+          "uv_max": [
+            0.595703125,
+            0.1953125
+          ]
+        },
+        {
+          "part": "32_Anti_slip_tread_4_0014",
+          "material_index": 0,
+          "material": "LAB_dark",
+          "emitting": false,
+          "tile": 3,
+          "uv_min": [
+            0.603515625,
+            0.00390625
+          ],
+          "uv_max": [
+            0.7958984375,
+            0.1953125
+          ]
+        },
+        {
+          "part": "32_Anti_slip_tread_5_0018",
+          "material_index": 0,
+          "material": "LAB_dark",
+          "emitting": false,
+          "tile": 4,
+          "uv_min": [
+            0.8037109375,
+            0.00390625
+          ],
+          "uv_max": [
+            0.99609375,
+            0.1953125
+          ]
+        },
+        {
+          "part": "32_Metal_nosing_1_0003",
+          "material_index": 0,
+          "material": "LAB_edge",
+          "emitting": false,
+          "tile": 5,
+          "uv_min": [
+            0.00390625,
+            0.203125
+          ],
+          "uv_max": [
+            0.1953125,
+            0.3955078125
+          ]
+        },
+        {
+          "part": "32_Metal_nosing_2_0007",
+          "material_index": 0,
+          "material": "LAB_edge",
+          "emitting": false,
+          "tile": 6,
+          "uv_min": [
+            0.203125,
+            0.203125
+          ],
+          "uv_max": [
+            0.3955078125,
+            0.3955078125
+          ]
+        },
+        {
+          "part": "32_Metal_nosing_3_0011",
+          "material_index": 0,
+          "material": "LAB_edge",
+          "emitting": false,
+          "tile": 7,
+          "uv_min": [
+            0.4033203125,
+            0.203125
+          ],
+          "uv_max": [
+            0.595703125,
+            0.3955078125
+          ]
+        },
+        {
+          "part": "32_Metal_nosing_4_0015",
+          "material_index": 0,
+          "material": "LAB_edge",
+          "emitting": false,
+          "tile": 8,
+          "uv_min": [
+            0.603515625,
+            0.203125
+          ],
+          "uv_max": [
+            0.7958984375,
+            0.3955078125
+          ]
+        },
+        {
+          "part": "32_Metal_nosing_5_0019",
+          "material_index": 0,
+          "material": "LAB_edge",
+          "emitting": false,
+          "tile": 9,
+          "uv_min": [
+            0.8037109375,
+            0.203125
+          ],
+          "uv_max": [
+            0.99609375,
+            0.3955078125
+          ]
+        },
+        {
+          "part": "32_Safety_marker_1_0004",
+          "material_index": 0,
+          "material": "LAB_stripes",
+          "emitting": false,
+          "tile": 10,
+          "uv_min": [
+            0.00390625,
+            0.4033203125
+          ],
+          "uv_max": [
+            0.1953125,
+            0.595703125
+          ]
+        },
+        {
+          "part": "32_Safety_marker_1_0005",
+          "material_index": 0,
+          "material": "LAB_stripes",
+          "emitting": false,
+          "tile": 11,
+          "uv_min": [
+            0.203125,
+            0.4033203125
+          ],
+          "uv_max": [
+            0.3955078125,
+            0.595703125
+          ]
+        },
+        {
+          "part": "32_Safety_marker_2_0008",
+          "material_index": 0,
+          "material": "LAB_stripes",
+          "emitting": false,
+          "tile": 12,
+          "uv_min": [
+            0.4033203125,
+            0.4033203125
+          ],
+          "uv_max": [
+            0.595703125,
+            0.595703125
+          ]
+        },
+        {
+          "part": "32_Safety_marker_2_0009",
+          "material_index": 0,
+          "material": "LAB_stripes",
+          "emitting": false,
+          "tile": 13,
+          "uv_min": [
+            0.603515625,
+            0.4033203125
+          ],
+          "uv_max": [
+            0.7958984375,
+            0.595703125
+          ]
+        },
+        {
+          "part": "32_Safety_marker_3_0012",
+          "material_index": 0,
+          "material": "LAB_stripes",
+          "emitting": false,
+          "tile": 14,
+          "uv_min": [
+            0.8037109375,
+            0.4033203125
+          ],
+          "uv_max": [
+            0.99609375,
+            0.595703125
+          ]
+        },
+        {
+          "part": "32_Safety_marker_3_0013",
+          "material_index": 0,
+          "material": "LAB_stripes",
+          "emitting": false,
+          "tile": 15,
+          "uv_min": [
+            0.00390625,
+            0.603515625
+          ],
+          "uv_max": [
+            0.1953125,
+            0.7958984375
+          ]
+        },
+        {
+          "part": "32_Safety_marker_4_0016",
+          "material_index": 0,
+          "material": "LAB_stripes",
+          "emitting": false,
+          "tile": 16,
+          "uv_min": [
+            0.203125,
+            0.603515625
+          ],
+          "uv_max": [
+            0.3955078125,
+            0.7958984375
+          ]
+        },
+        {
+          "part": "32_Safety_marker_4_0017",
+          "material_index": 0,
+          "material": "LAB_stripes",
+          "emitting": false,
+          "tile": 17,
+          "uv_min": [
+            0.4033203125,
+            0.603515625
+          ],
+          "uv_max": [
+            0.595703125,
+            0.7958984375
+          ]
+        },
+        {
+          "part": "32_Safety_marker_5_0020",
+          "material_index": 0,
+          "material": "LAB_stripes",
+          "emitting": false,
+          "tile": 18,
+          "uv_min": [
+            0.603515625,
+            0.603515625
+          ],
+          "uv_max": [
+            0.7958984375,
+            0.7958984375
+          ]
+        },
+        {
+          "part": "32_Safety_marker_5_0021",
+          "material_index": 0,
+          "material": "LAB_stripes",
+          "emitting": false,
+          "tile": 19,
+          "uv_min": [
+            0.8037109375,
+            0.603515625
+          ],
+          "uv_max": [
+            0.99609375,
+            0.7958984375
+          ]
+        },
+        {
+          "part": "32_Solid_stair_body_0001",
+          "material_index": 0,
+          "material": "LAB_metal",
+          "emitting": false,
+          "tile": 20,
+          "uv_min": [
+            0.00390625,
+            0.8037109375
+          ],
+          "uv_max": [
+            0.1953125,
+            0.99609375
+          ]
+        }
+      ],
+      "alpha_values_normalized": [
+        0
+      ],
+      "uv0_unchanged": true,
+      "uv_alignment_verified": true,
+      "mixed_material_parts": []
+    }
+  ]
+}

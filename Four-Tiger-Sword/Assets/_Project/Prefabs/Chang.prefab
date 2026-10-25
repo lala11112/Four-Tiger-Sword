@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 2103948694980514502}
   - component: {fileID: 7500402754186254379}
   - component: {fileID: 7190520537986715912}
+  - component: {fileID: 6482193288364457613}
   m_Layer: 8
   m_Name: Chang
   m_TagString: Untagged
@@ -77,6 +78,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   EnemyStat: {fileID: 0}
   stateName: 
+  HurtDuration: 0.5
   _targetMemoryDuration: 4
   ApproachTimeout: 6
   ApproachStuckTimeout: 1.5
@@ -188,6 +190,24 @@ MonoBehaviour:
   RegisteredStacks:
   - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
   - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
+--- !u!114 &6482193288364457613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2552600057017201039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52537b332a0aa094e9b77be005bc49d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDeathFade
+  _delay: 0.35
+  _duration: 2
+  _targets:
+  - Renderer: {fileID: 1595951805110702795}
+    Materials:
+    - {fileID: 2100000, guid: 8fbe642d19fa81245950ec1f1d7937d4, type: 2}
 --- !u!1001 &14420121646640273
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -331,6 +351,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8f1a82d51d2659947a4c189df102a7e7, type: 3}
+--- !u!137 &1595951805110702795 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3511498378696096446, guid: 8f1a82d51d2659947a4c189df102a7e7, type: 3}
+  m_PrefabInstance: {fileID: 2782851413121575029}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2383554158016024478 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8f1a82d51d2659947a4c189df102a7e7, type: 3}

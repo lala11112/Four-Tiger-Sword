@@ -46,6 +46,13 @@ public sealed class FormActionGroupDrawer : PropertyDrawer
 {
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
+        if (property.propertyType == SerializedPropertyType.ManagedReference && property.name == "FinisherStep")
+            return CreateOptionalFinisher(property);
+        return CreateGroup(property);
+    }
+
+    private static Foldout CreateGroup(SerializedProperty property)
+    {
         var foldout = new Foldout
         {
             text = FormActionInspectorFields.Label(property),
@@ -63,6 +70,67 @@ public sealed class FormActionGroupDrawer : PropertyDrawer
             foldout.Add(FormActionInspectorFields.CreateField(child));
         }
         return foldout;
+    }
+
+    private static VisualElement CreateOptionalFinisher(SerializedProperty property)
+    {
+        var root = new VisualElement();
+        var serialized = property.serializedObject;
+        string path = property.propertyPath;
+        Action rebuild = null;
+        rebuild = () =>
+        {
+            serialized.UpdateIfRequiredOrScript();
+            var current = serialized.FindProperty(path);
+            root.Clear();
+            if (current == null) return;
+            bool canCopy = true, canClear = false;
+            foreach (var target in serialized.targetObjects)
+            {
+                var data = target as WeaponActionDataSO;
+                canCopy &= data?.ComboSteps != null && data.ComboSteps.Count > 2 && data.ComboSteps[2] != null;
+                canClear |= data?.FinisherStep != null;
+            }
+            root.Add(new HelpBox("강화 3타는 비워두면 일반 3타를 그대로 사용합니다. 별도 편집이 필요할 때 일반 3타를 복사하세요.", HelpBoxMessageType.Info));
+            var copy = new Button(() =>
+            {
+                foreach (var target in serialized.targetObjects)
+                {
+                    if (!(target is WeaponActionDataSO data) || data.ComboSteps == null
+                        || data.ComboSteps.Count < 3 || data.ComboSteps[2] == null) continue;
+                    Undo.RecordObject(data, "Copy normal third stage to finisher");
+                    data.FinisherStep = FinisherDataSetup.CloneStep(data.ComboSteps[2]);
+                    EditorUtility.SetDirty(data);
+                }
+                serialized.Update();
+                rebuild();
+            }) { text = "일반 3타를 복사해 별도 편집" };
+            copy.SetEnabled(canCopy);
+            root.Add(copy);
+            var clear = new Button(() =>
+            {
+                foreach (var target in serialized.targetObjects)
+                {
+                    if (!(target is WeaponActionDataSO data)) continue;
+                    Undo.RecordObject(data, "Use normal third stage for finisher");
+                    data.FinisherStep = null;
+                    EditorUtility.SetDirty(data);
+                }
+                serialized.Update();
+                rebuild();
+            }) { text = "별도 설정 지우고 일반 3타 사용" };
+            clear.SetEnabled(canClear);
+            root.Add(clear);
+            if (!current.hasMultipleDifferentValues && current.managedReferenceValue != null)
+            {
+                var group = CreateGroup(current);
+                root.Add(group);
+                group.Bind(serialized);
+            }
+        };
+        rebuild();
+        root.TrackPropertyValue(property.Copy(), _ => rebuild());
+        return root;
     }
 }
 

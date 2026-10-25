@@ -11,7 +11,8 @@ using Object = UnityEngine.Object;
 namespace StudioBaekho.CombatLab.FourTigerSword
 {
     /// <summary>Project-specific bindings. The reusable package never references game classes.</summary>
-    public sealed class FourTigerCombatAdapter : ICombatLabActionAdapter, ICombatLabMultiActionAdapter
+    public sealed partial class FourTigerCombatAdapter : ICombatLabFeedbackAdapter, ICombatLabMultiActionAdapter, ICombatLabReadyAdapter,
+        ICombatLabEarlyPlayAdapter, ICombatLabScenePreparation
     {
         public const string AdapterId = "four-tiger-sword.water";
         public const string KnockbackId = "knockbackMultiplier";
@@ -19,6 +20,63 @@ namespace StudioBaekho.CombatLab.FourTigerSword
         public const string HitStopId = "hitStopDuration";
         public string Id => AdapterId;
         public string DisplayName => "Four Tiger Sword / 공격·스킬";
+
+        public void PrepareBeforeSceneStart(ExperimentRequest request)
+        {
+            if (request.schemaVersion != 2 || request.scenarioMode != "fixed") return;
+            foreach (var run in SceneComponents<RunManager>().Where(item => item.isActiveAndEnabled))
+            {
+                // A late fallback cannot repair a map already generated with another seed.
+                if ((run.State != RunState.Preparing || run.CurrentChapterIndex >= 0) && run.RunSeed != request.seed)
+                    throw new InvalidOperationException("RunManager가 다른 seed로 이미 시작했습니다. 요청=" + request.seed + ", 실제=" + run.RunSeed);
+                run.randomizeSeed = false;
+                run.seed = request.seed;
+            }
+        }
+
+        public bool PrepareScenario(ExperimentRequest request, out string reason)
+        {
+            reason = null;
+            if (request.schemaVersion != 2 || request.scenarioMode != "fixed") return true;
+            var runs = SceneComponents<RunManager>().Where(item => item.isActiveAndEnabled).ToArray();
+            if (runs.Length > 1) throw new InvalidOperationException("고정 실험에는 활성 RunManager가 하나만 필요합니다.");
+            if (runs.Length == 1)
+            {
+                var run = runs[0];
+                if (run.State == RunState.Error || run.State == RunState.Lost || run.State == RunState.Won)
+                    throw new InvalidOperationException("던전 시작 실패: " + run.State + " " + run.LastError);
+                if (run.State != RunState.Playing)
+                { reason = "같은 seed의 절차 생성 스테이지가 준비되기를 기다립니다."; return false; }
+                if (run.RunSeed != request.seed)
+                    throw new InvalidOperationException("고정 실험 seed 불일치: 요청=" + request.seed + ", RunManager=" + run.RunSeed + ". 다른 맵을 같은 조건으로 비교할 수 없습니다.");
+            }
+            if (SceneComponents<Enemy>().Any(IsFixedTargetReady))
+            { reason = "기존 활성 표적을 사용했습니다. 런타임 던전 seed=" + (runs.Length == 1 ? runs[0].RunSeed.ToString() : "RunManager 없음") + "."; return true; }
+
+            var room = SceneComponents<DungeonRoomEncounter>()
+                .Where(item => item.isActiveAndEnabled && item.State == DungeonEncounterState.Waiting && item.Members.Count > 0)
+                .OrderBy(item => StableSceneKey(item.transform), StringComparer.Ordinal).FirstOrDefault();
+            if (room == null)
+            { reason = "활성 표적 또는 준비된 Waiting 전투방을 기다립니다."; return false; }
+            // Suppress AI before enabling Enemy.Start. Body collisions and reactions stay live.
+            foreach (var member in room.Members)
+                if (member != null && member.Enemy != null) member.Enemy.CombatLabPassive = true;
+            if (!room.BeginEncounter())
+                throw new InvalidOperationException("고정 실험 전투방 활성화 실패: " + StableSceneKey(room.transform) + " " + room.State + " " + room.Error);
+            reason = "고정 실험용 Waiting 전투방을 기존 BeginEncounter API로 런타임에만 활성화했습니다: "
+                + StableSceneKey(room.transform) + "; seed=" + (runs.Length == 1 ? runs[0].RunSeed.ToString() : "RunManager 없음")
+                + ". 씬·에셋에 저장하지 않으며 후보마다 새 Play Mode에서 준비합니다.";
+            return true;
+        }
+
+        internal static string StableSceneKey(Transform value)
+        {
+            var segments = new List<string>();
+            for (var current = value; current != null; current = current.parent)
+                segments.Add(current.name + "[" + current.GetSiblingIndex().ToString("D6", System.Globalization.CultureInfo.InvariantCulture) + "]");
+            segments.Reverse();
+            return value.gameObject.scene.path + ":" + string.Join("/", segments);
+        }
 
         public List<CombatSource> DiscoverSources()
         {
@@ -152,13 +210,27 @@ namespace StudioBaekho.CombatLab.FourTigerSword
         public void Validate(ExperimentRequest request)
         {
             var source = ValidateRequestData(request);
-            ValidateScene(source, request.actionId);
+            ValidateScene(source, request.actionId, request.schemaVersion == 2 && request.scenarioMode == "fixed");
+        }
+
+        public bool IsReady(ExperimentRequest request, out string reason)
+        {
+            if (!Application.isPlaying) { reason = "전투 씬의 Play Mode 초기화를 기다리고 있습니다."; return false; }
+            try
+            {
+                if (request == null) throw new ArgumentNullException(nameof(request));
+                ValidateScene(ResolveSource(request.sourceGuid), request.actionId,
+                    request.schemaVersion == 2 && request.scenarioMode == "fixed");
+                reason = string.Empty;
+                return true;
+            }
+            catch (Exception exception) { reason = exception.Message; return false; }
         }
 
         public ICombatLabSession Begin(ExperimentRequest request, CombatCandidate candidate)
         {
             Validate(request);
-            ValidateCandidate(candidate, ResolveSource(request.sourceGuid), request.actionId);
+            if (request.schemaVersion == 1 && !candidate.isSourceControl) ValidateCandidate(candidate, ResolveSource(request.sourceGuid), request.actionId);
             if (!Application.isPlaying) throw new InvalidOperationException("Enter Play Mode before starting a combat session.");
             return new FourTigerCombatSession(request, candidate);
         }
@@ -166,14 +238,14 @@ namespace StudioBaekho.CombatLab.FourTigerSword
         public Object Export(ExperimentRequest request, CombatCandidate candidate, string assetPath)
         {
             var source = ValidateRequestData(request);
-            ValidateCandidate(candidate, source, request.actionId);
+            if (request.schemaVersion == 1) ValidateCandidate(candidate, source, request.actionId);
             ValidateExportPath(assetPath);
             var owned = new List<Object>();
             CombatLabPreset preset = null;
             bool created = false;
             try
             {
-                var action = CloneAndApply(source, candidate, owned, request.actionId);
+                var action = CloneAndApply(source, candidate, owned, request.actionId, request.schemaVersion);
                 preset = ScriptableObject.CreateInstance<CombatLabPreset>();
                 preset.name = Path.GetFileNameWithoutExtension(assetPath);
                 preset.adapterId = AdapterId;
@@ -236,7 +308,8 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                 foreach (var selection in request.selections)
                 {
                     var candidate = selection.request.candidates.Single(item => item.id == selection.candidateId);
-                    ApplyCandidateToClone(clone, candidate, owned, selection.request.actionId);
+                    if (selection.request.schemaVersion == 2) ApplyFeedback(clone, candidate, selection.request.actionId);
+                    else ApplyCandidateToClone(clone, candidate, owned, selection.request.actionId);
                 }
                 // The form itself is the main object so the exported file can be assigned directly
                 // to the player's form field. Only newly tuned camera profiles become subassets.
@@ -281,11 +354,11 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             => (WaterFormActionDataSO)CloneAndApply((WeaponActionDataSO)source, candidate, owned, null);
 
         public static WeaponActionDataSO CloneAndApply(WeaponActionDataSO source,
-            CombatCandidate candidate, List<Object> owned, string actionId = null)
+            CombatCandidate candidate, List<Object> owned, string actionId = null, int schemaVersion = 1)
         {
             if (owned == null) throw new ArgumentNullException(nameof(owned));
             ValidateSource(source, actionId);
-            ValidateCandidate(candidate, source, actionId);
+            if (schemaVersion == 1 && !candidate.isSourceControl) ValidateCandidate(candidate, source, actionId);
             int firstOwned = owned.Count;
             try
             {
@@ -293,7 +366,11 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                 clone.name = source.name + " - " + candidate.label;
                 clone.hideFlags = HideFlags.HideAndDontSave;
                 owned.Add(clone);
-                ApplyCandidateToClone(clone, candidate, owned, actionId);
+                if (!candidate.isSourceControl)
+                {
+                    if (schemaVersion == 2) ApplyFeedback(clone, candidate, actionId);
+                    else ApplyCandidateToClone(clone, candidate, owned, actionId);
+                }
                 return clone;
             }
             catch
@@ -472,13 +549,14 @@ namespace StudioBaekho.CombatLab.FourTigerSword
         private static WeaponActionDataSO ValidateRequestData(ExperimentRequest request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            if (request.schemaVersion != 1) throw new ArgumentException("Unsupported experiment schema version.");
+            if (request.schemaVersion != 1 && request.schemaVersion != 2) throw new ArgumentException("Unsupported experiment schema version.");
             if (request.adapterId != AdapterId) throw new ArgumentException("Experiment adapter ID does not match this adapter.");
             RequireRange(request.durationSeconds, 1f, 60f, "durationSeconds");
             if (request.candidates == null || request.candidates.Count < 1 || request.candidates.Count > 12)
                 throw new ArgumentException("Use between 1 and 12 candidates per experiment.");
             var source = ResolveSource(request.sourceGuid);
             ValidateSource(source, request.actionId);
+            if (request.schemaVersion == 2) { CombatLab.ValidateData(request); return source; }
             var ids = new HashSet<string>(StringComparer.Ordinal);
             foreach (var candidate in request.candidates)
             {
@@ -553,8 +631,6 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                 }
                 else ValidateHitWindow(step.Execution.HitStartTime, step.Execution.HitDuration, step.Execution.Duration, prefix);
             }
-            foreach (var spec in ParameterSpecs(source, id))
-                RequireRange(spec.baseline, spec.minimum, spec.maximum, spec.label + " 기준값");
             if (id == "skill" && source is WoodFormActionDataSO wood)
             {
                 RequireRange(wood.FormExecution.SkillRadius, 0.1f, float.MaxValue, "SkillRadius");
@@ -580,7 +656,7 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             RequireRange(duration, 0.0001f, 60f, prefix + "hit duration");
         }
 
-        private static void ValidateScene(WeaponActionDataSO source, string actionId)
+        private static void ValidateScene(WeaponActionDataSO source, string actionId, bool fixedScenario = false)
         {
             if (InputSystem.settings.updateMode != InputSettings.UpdateMode.ProcessEventsInDynamicUpdate)
                 throw new InvalidOperationException("Combat playback requires Input System events in Dynamic Update.");
@@ -609,25 +685,34 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             int enemyLayer = LayerMask.NameToLayer("Enemy");
             if (groundLayer < 0 || enemyLayer < 0)
                 throw new InvalidOperationException("The project needs Ground and Enemy layers.");
-            if (!SceneComponents<Collider>().Any(c => c.enabled && c.gameObject.activeInHierarchy
-                    && !c.isTrigger && c.gameObject.layer == groundLayer))
-                throw new InvalidOperationException("The loaded scene needs an active Ground collider.");
+            ValidateGroundColliders(SceneComponents<Collider>(), groundLayer, fixedScenario, Application.isPlaying,
+                SceneComponents<RunManager>().Any(run => run.isActiveAndEnabled));
             var settings = SceneComponents<CombatSettings>().Where(s => s.isActiveAndEnabled).ToArray();
             if (settings.Length != 1 || settings[0].ElementTable == null || !settings[0].ElementTable.ValidateTable())
                 throw new InvalidOperationException("The scene needs one CombatSettings with a valid element matchup table.");
             var enemies = SceneComponents<Enemy>().Where(e => e.isActiveAndEnabled).ToArray();
-            if (enemies.Length == 0) throw new InvalidOperationException("The scene needs at least one active Enemy.");
-            foreach (var enemy in enemies)
+            if (fixedScenario)
             {
-                var stat = enemy.GetComponent<EnemyStat>();
-                var agent = enemy.GetComponent<NavMeshAgent>();
-                if (stat == null || new SerializedObject(stat).FindProperty("baseData")?.objectReferenceValue == null
-                    || agent == null || !agent.enabled)
-                    throw new InvalidOperationException("Enemy " + enemy.name + " needs configured EnemyStat and enabled NavMeshAgent.");
-                if (!enemy.GetComponentsInChildren<Collider>().Any(c => c.enabled && c.gameObject.layer == enemyLayer))
-                    throw new InvalidOperationException("Enemy " + enemy.name + " needs a collider on the Enemy layer.");
-                if (Application.isPlaying && (!agent.isOnNavMesh || stat.IsDead))
-                    throw new InvalidOperationException("Enemy " + enemy.name + " must be alive and on the NavMesh.");
+                // Dungeon enemies can be instantiated after Play Mode starts. Pool
+                // entries with disabled colliders are not the fixed experiment's target.
+                if (Application.isPlaying && !enemies.Any(IsFixedTargetReady))
+                    throw new InvalidOperationException("고정 표적 준비 대기: 살아 있고 Enemy 콜라이더·EnemyStat 데이터·NavMeshAgent가 활성화되어 NavMesh 위에 있는 적이 필요합니다.");
+            }
+            else
+            {
+                if (enemies.Length == 0) throw new InvalidOperationException("The scene needs at least one active Enemy.");
+                foreach (var enemy in enemies)
+                {
+                    var stat = enemy.GetComponent<EnemyStat>();
+                    var agent = enemy.GetComponent<NavMeshAgent>();
+                    if (stat == null || new SerializedObject(stat).FindProperty("baseData")?.objectReferenceValue == null
+                        || agent == null || !agent.enabled)
+                        throw new InvalidOperationException("Enemy " + enemy.name + " needs configured EnemyStat and enabled NavMeshAgent.");
+                    if (!enemy.GetComponentsInChildren<Collider>().Any(c => c.enabled && c.gameObject.layer == enemyLayer))
+                        throw new InvalidOperationException("Enemy " + enemy.name + " needs a collider on the Enemy layer.");
+                    if (Application.isPlaying && (!agent.isOnNavMesh || stat.IsDead))
+                        throw new InvalidOperationException("Enemy " + enemy.name + " must be alive and on the NavMesh.");
+                }
             }
             if (!Application.isPlaying) return;
             if (player.FormManager == null || player.Input == null || player.Animator == null || player.StatManager == null
@@ -639,6 +724,35 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             // skips them while still executing hit logic. Report this limitation in the session.
             if (CombatSettings.Active != settings[0])
                 throw new InvalidOperationException("The scene's CombatSettings has not registered as active.");
+        }
+
+        internal static void ValidateGroundColliders(IEnumerable<Collider> colliders, int groundLayer,
+            bool fixedScenario, bool playing, bool hasRuntimeRunManager)
+        {
+            // RunManager creates the dungeon floor after entering Play Mode. Only
+            // its fixed-v2 Edit Mode preflight may defer this check. IsReady and
+            // Begin call it again in Play Mode before recording or arming an attack.
+            bool runtimeFloorPending = fixedScenario && !playing && hasRuntimeRunManager;
+            if (!runtimeFloorPending && !colliders.Any(c => c != null && c.enabled && c.gameObject.activeInHierarchy
+                    && !c.isTrigger && c.gameObject.layer == groundLayer))
+                throw new InvalidOperationException("The loaded scene needs an active Ground collider.");
+        }
+
+        internal static bool IsFixedTargetReady(Enemy enemy)
+        {
+            if (enemy == null || !enemy.isActiveAndEnabled || !enemy.gameObject.scene.IsValid()
+                || !enemy.gameObject.scene.isLoaded) return false;
+            // A nested Enemy cannot be isolated by deactivating the other Enemy roots.
+            if (enemy.transform.parent != null && enemy.transform.parent.GetComponentInParent<Enemy>() != null) return false;
+            var stat = enemy.GetComponent<EnemyStat>();
+            var agent = enemy.GetComponent<NavMeshAgent>();
+            if (stat == null || new SerializedObject(stat).FindProperty("baseData")?.objectReferenceValue == null
+                || agent == null || !agent.enabled) return false;
+            int layer = LayerMask.NameToLayer("Enemy");
+            if (layer < 0 || !enemy.GetComponentsInChildren<Collider>().Any(c => c.enabled
+                && c.gameObject.activeInHierarchy && c.gameObject.layer == layer
+                && c.GetComponentInParent<Enemy>() == enemy)) return false;
+            return !Application.isPlaying || (enemy.EnemyStat == stat && stat.CurrentHp > 0f && !stat.IsDead && agent.isOnNavMesh);
         }
 
         private static T[] SceneComponents<T>() where T : Component
@@ -672,8 +786,7 @@ namespace StudioBaekho.CombatLab.FourTigerSword
         }
 
         private static CombatCandidate CopyCandidate(CombatCandidate source)
-            => new CombatCandidate { id = source.id, label = source.label, rationale = source.rationale,
-                values = source.values.Select(value => new ParameterValue(value.id, value.value)).ToList() };
+            => JsonUtility.FromJson<CombatCandidate>(JsonUtility.ToJson(source));
 
         private static float Scale(float value, float multiplier)
         {

@@ -59,18 +59,41 @@ namespace StudioBaekho.AutoHitTimerBootstrap
             string source = Path.Combine(Root, "AutoHitTimerIntegration/Adapter");
             string destination = Path.Combine(Application.dataPath, "StudioBaekho/AutoHitTimer/Editor");
             if (!Directory.Exists(source)) throw new InvalidOperationException("사인검 어댑터 설치 파일이 없습니다.");
-            Directory.CreateDirectory(destination);
-            foreach (string file in Directory.GetFiles(source, "*", SearchOption.AllDirectories))
+            AssetDatabase.StartAssetEditing();
+            try
             {
-                string relative = file.Substring(source.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                string target = Path.Combine(destination, relative);
-                Directory.CreateDirectory(Path.GetDirectoryName(target));
-                File.Copy(file, target, true);
+                RemoveRetiredAdapterFile("FourTigerSlashMapping.cs");
+                RemoveRetiredAdapterFile("FourTigerSlashMapping.cs.meta");
+                Directory.CreateDirectory(destination);
+                foreach (string file in Directory.GetFiles(source, "*", SearchOption.AllDirectories))
+                {
+                    string relative = file.Substring(source.Length).TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                    string target = Path.Combine(destination, relative);
+                    Directory.CreateDirectory(Path.GetDirectoryName(target));
+                    File.Copy(file, target, true);
+                }
             }
+            finally { AssetDatabase.StopAssetEditing(); }
             // Remove the request before domain reload, so the same installation cannot loop.
             File.Delete(RequestPath);
             WriteReceipt(true, "AutoHitTimer 패키지와 사인검 어댑터 설치 완료. 컴파일을 기다리세요.");
             AssetDatabase.Refresh();
+        }
+
+        private static void RemoveRetiredAdapterFile(string filename)
+        {
+            string root = Path.GetFullPath(Root);
+            string target = Path.GetFullPath(Path.Combine(root, "Assets/StudioBaekho/AutoHitTimer/Editor", filename));
+            if (!target.StartsWith(root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar,
+                StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("정리 경로가 프로젝트 밖입니다.");
+            for (string current = target; current != null; current = Path.GetDirectoryName(current))
+            {
+                if ((File.Exists(current) || Directory.Exists(current)) && (File.GetAttributes(current) & FileAttributes.ReparsePoint) != 0)
+                    throw new InvalidOperationException("연결된 경로의 파일을 정리할 수 없습니다: " + current);
+                if (string.Equals(current, root, StringComparison.OrdinalIgnoreCase)) break;
+            }
+            if (Directory.Exists(target)) throw new InvalidOperationException("정리 대상이 파일이 아닙니다: " + target);
+            if (File.Exists(target)) File.Delete(target);
         }
         [Serializable] private class Receipt { public bool success; public string message; public string utc; }
         private static void WriteReceipt(bool success, string message)

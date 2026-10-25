@@ -1,14 +1,65 @@
 # 런타임 맵 생성
 
 `Assets/_Game/ProceduralDungeon/DungeonDemo.unity`를 열고 Play하면 맵을 생성합니다.
-게임 씬에 적용할 때는 `DungeonGenerator.prefab`을 배치합니다. 플레이어 배치, NavMesh,
-적 스폰은 이 생성기에 포함하지 않습니다. 게임 시작과 연동하려면 `Completed` 이벤트를 사용합니다.
+게임 씬에 적용할 때는 `DungeonGenerator.prefab`을 배치합니다. 프리팹의 `DungeonEncounterDirector`가
+생성기의 `Completed` 이벤트를 받아 방별 NavMesh 준비, 몬스터 배치와 출입문 전투를 연결합니다.
+플레이어 자동 배치와 스테이지 전체 승리 처리는 별도입니다.
+
+## 미니맵
+
+`Game Scene`에는 `Assets/_Project/Prefabs/UI/DungeonMinimap.prefab`이 연결되어 있습니다.
+속성 HUD 아래에 300×300 미니맵을 표시하고, 골드는 미니맵 아래에 배치합니다.
+`DungeonMinimapView > World Span`으로 가로·세로 표시 범위(기본 100m)를 조절할 수 있습니다.
+
+방은 사각형, 통로는 폭이 있는 선으로 단순화합니다. 생성 루트의 +Z가 위쪽이며 플레이어를 중심으로
+지도가 이동합니다. 시작방은 즉시 공개하고 방·직선 통로·코너는 방문한 뒤 표시합니다.
+밝은 청록색은 현재 영역, 어두운 청록색은 방문한 영역입니다. 상점과 출구 아이콘은 해당 방을 방문한 뒤
+실제 앵커 위치에 표시합니다. 전투 클리어 여부와 무관하며 높낮이·구덩이·장애물 윤곽은 표현하지 않습니다.
+방문 기록은 같은 스테이지의 UI 재활성화 동안 유지하고, 새 생성 결과가 적용되면 초기화합니다.
+
+설치를 다시 연결하려면 `Tools > Studio Baekho > Dungeon > Install Minimap`을 사용합니다.
+기존 미니맵을 재사용하며 씬 저장은 별도로 수행합니다. 같은 메뉴의 `Run Minimap Model Regression`과
+`Run Minimap Integration Regression`은 임시 씬에서 좌표·방문·UI 수명·해상도 배치를 검사합니다.
+
+## 방별 몬스터와 전투
+
+- 맵 프리팹 루트의 `BaekhoMapModule > Encounter Budget`으로 방 예산을 설정합니다. 기본값은 20이며,
+  같은 맵이 여러 번 생성되어도 예산은 같습니다. 0이면 전투를 만들지 않습니다.
+- `Assets/_Game/ProceduralDungeon/DungeonEnemyCatalog.asset`에서 프리팹과 양의 정수 비용을 지정합니다.
+  초기 비용은 Chang=2, Drone=5, BlackSlayer=4입니다. 프리팹 루트에는 활성 Enemy와 NavMeshAgent가 필요합니다.
+- 예산을 넘지 않는 정확한 최적 조합을 고릅니다. 가능하면 두 종류 이상을 포함하고 최저비용 종류들의
+  합계 마릿수를 전체의 절반 이하로 제한합니다. 그 안에서 잔액을 최소화하고 동률만 랜덤 선택합니다.
+  균형 조합이 하나도 없으면 제한을 완화하고 경고합니다. 비용이 모두 같으면 저비용 비율 제한은 없습니다.
+- 각 방의 `BaekhoGameplayMarker.kind == "enemy"`를 배치 기준으로 사용합니다. 한 지점 주변에 여러 마리를
+  놓을 수 있으며 기본 반경은 3m입니다. 바닥 높이, NavMesh, 벽과 몬스터 간 간격을 검사합니다.
+  같은 던전 시드와 설정은 같은 조합과 배치를 재현합니다. 마커가 없는 방은 빈 방입니다.
+- 기존 베이크 데이터는 재사용하고 없는 방만 런타임에 베이크합니다. 현재 카탈로그는 NavMesh Agent Type 0을
+  사용합니다. 스폰이나 이동 데이터가 잘못되면 해당 방은 Failed 상태가 되고 문을 잠그지 않습니다.
+- 몬스터는 맵 생성 후 미리 보이는 상태로 배치됩니다. 방문 전에는 AI, 이동, 피격 콜라이더가 꺼집니다.
+  플레이어가 문짝의 안쪽 안전 경계를 완전히 지나면 방의 모든 연결된 문을 잠그고 몬스터를 활성화합니다.
+- `Enemy.OnDied`로 마지막 처치를 확인하면 모든 문을 엽니다. 시체 삭제를 기다리지 않습니다.
+  클리어한 방은 재입장해도 재스폰하거나 잠그지 않습니다. 별도 수동 배치 적은 집계하지 않습니다.
+- `BaekhoMapConnection > Runtime Door`에 기존 LabDoor 오브젝트를 연결하면 위치를 유지해 재사용합니다.
+  비어 있으면 생성기 프리팹의 Door Prefab으로 설치합니다. Closed Wall 측정값이 있으면 벽 두께의 중심에
+  맞추고 출입구의 바닥 높이는 유지합니다. 미사용 출구의 Runtime Door는 벽 봉쇄 시 숨깁니다.
+  `관측고지_전투실`의 `south_3`는 기존 수동 배치 문을 연결해 두었습니다.
+- 방별 `DungeonRoomEncounter`의 State, AliveCount, SpentBudget, RemainingBudget, Error와 Console 로그로
+  진행 상황을 확인할 수 있습니다. 성공한 재생성은 전투를 초기화하고 실패한 맵 생성은 기존 상태를 유지합니다.
+
+검증: `StudioBaekho.Maps.Tests`에 예산 최적성/혼합/시드 테스트가 포함됩니다.
+프로젝트 `Tools/`의 `DungeonEncounterGateRegression.Run`, `DungeonEncounterPlacementRegression.Run`,
+`DungeonEncounterCombatRegression.Run`은 Edit Mode 회귀 검사입니다. 실제 프레임과 NavMeshAgent 활성화,
+마지막 처치, 재생성 검증은 Play Mode에서 `DungeonEncounterPlayModeRegression.Start`를 실행합니다.
+마지막 검사는 현재 실행 중인 던전에서 적을 처치하고 맵을 재생성·제거하므로 테스트용 Play 세션에서 사용합니다.
+결과는 Editor SessionState의 `DungeonEncounter.PlayModeRegression` 키에 PASS 또는 FAIL로 기록됩니다.
 
 ## 설정
 
 `DungeonSettings.asset`에서 맵 목록과 개수, 시드, 간격, 통로 폭을 지정합니다.
 같은 맵을 여러 번 사용할 수 있으며 코너 방은 일반 맵 개수에 포함하지 않습니다.
-기본값은 6개, 통로 목표 폭 2m, 최소 문 폭 1m입니다. 두 문 중 좁은 폭에 통로를 맞춥니다.
+새 설정의 기본값은 6개, 통로 폭 2m, 최소 문 폭 1m입니다. 현재 `DungeonSettings.asset`은 10개, 통로 폭 4m입니다.
+직선과 코너 연결의 통로는 모두 설정 폭을 유지합니다. 좁은 문이 있어도 통로 전체를 줄이지 않으며,
+문과 통로의 폭 차이는 입구 양옆 벽으로 마감합니다. 방과 코너 프리팹에 있는 실제 문 폭은 유지합니다.
 Randomize Seed를 끄면 Seed 값을 재사용합니다. 실제 생성 시드는 Console에도 출력됩니다.
 
 생성기는 출입구의 바닥 높이가 같아지도록 맵을 위아래로 이동합니다.
@@ -43,7 +94,16 @@ Map Count는 시작방·끝방·보스방을 모두 포함하며, 코너 방은 
 2. 해당 스타일 에셋을 선택하고 `Assets > Baekho > Measure Corridor Style Pieces`를 실행합니다.
    로컬 메시 크기와 피벗 오프셋을 측정합니다. 프리팹을 수정한 뒤에도 다시 실행합니다.
 3. 각 프리팹은 로컬 X=폭, Y=높이, Z=길이로 제작합니다. 루트 피벗은 중앙이 아니어도 됩니다.
-4. Placement=Stretch는 길이에 맞춰 늘립니다. Repeat는 Repeat Length마다 반복하고 마지막 조각을 남은 길이에 맞춥니다.
+4. 현재 스타일은 `Placement=TilePreserveSize`를 사용합니다. 프리팹의 로컬 메시 크기에 원본 루트 스케일을 곱한
+   실제 크기(현재 가로 2m)로 반복합니다. 바닥은 X/Z, 측벽은 Z, 입구 마감은 X 방향을 유지하고,
+   높이와 두께만 요청 크기에 맞춥니다. 마지막 조각은 압축하지 않고 메시를 잘라 맞춥니다.
+5. `Stretch`와 `Repeat`는 기존 호환 모드입니다. Stretch는 전체 크기에 맞춰 늘리고,
+   Repeat는 Repeat Length마다 Z 방향으로 반복하며 마지막 조각은 남은 길이에 맞게 압축합니다.
+
+TilePreserveSize는 읽기 가능한 정적 MeshFilter/MeshRenderer를 사용합니다. 모델을 교체할 때는 Read/Write를 켭니다.
+잘린 원래 면의 UV·노멀·재질 구분은 유지하며, 새 단면은 첫 번째 재질로 막습니다.
+구멍이 있는 절단 단면이나 열린/비다양체 메시처럼 안전하게 닫을 수 없는 형상은 대상 이름과 함께 생성 오류로 보고합니다.
+절단 메시만 복사하여 생성하고 맵 제거 시 정리합니다. 일반 맵의 Closed Wall 복원은 기존 방식을 유지합니다.
 
 프리팹의 메시 외곽 크기가 구조물 크기입니다. 바닥은 윗면이 출입구 바닥에 맞춰집니다.
 충돌은 생성기가 만드는 BoxCollider로 처리하고 아트 프리팹의 Collider는 인스턴스에서 비활성화합니다.
@@ -60,6 +120,17 @@ Map Count는 시작방·끝방·보스방을 모두 포함하며, 코너 방은 
 ### 코너 방
 
 기본 코너 방은 `Modules/TEMP_CornerRoom_6x6.prefab`입니다. 최종 아트를 만들 때는 다음 규약을 따릅니다.
+
+현재 연결 통로와 6×6 코너 방에는 높이 4m, 두께 0.2m의 천장과 LabLights 벽등·천장등이 있습니다.
+코너 방의 북쪽·동쪽 출입구는 폭 4m를 유지하며, 중앙 천장등과 서쪽·남쪽 벽등을 사용합니다.
+`GreyboxCorridorStyle.asset`에서 Ceiling을 비우면 Floor를 천장으로 재사용합니다.
+Wall Light Prefab 또는 Ceiling Light Prefab을 비우면 해당 통로 조명을 생략합니다.
+통로 조명은 기본 6m 간격으로 균등 배치하며 벽등은 높이 2.2m에서 좌우 번갈아 설치합니다.
+짧은 통로에서 기구가 출입구나 실내 범위를 벗어나면 그 조명은 배치하지 않습니다.
+조명 인스턴스는 원래 크기·색·밝기를 유지하고 Collider와 실시간 그림자를 끕니다.
+기존 코너 방에 스타일 변경을 다시 적용하려면 `Tools > Baekho > Dungeon > Update Existing 6x6 Corner Room`을 실행합니다.
+이 도구는 기존 바닥·벽의 수평 배치와 프리팹 GUID를 유지하며 천장·조명을 중복 없이 갱신합니다.
+코너 프리팹에 저장할 천장 타일은 6m에 잘림 없이 들어맞는 크기를 사용합니다(현재 2m).
 
 - 루트 스케일은 (1,1,1), X/Z 기울기는 0입니다.
 - `BaekhoMapConnection` 2개를 서로 직각으로 향하도록 배치합니다. Forward는 방 바깥쪽,

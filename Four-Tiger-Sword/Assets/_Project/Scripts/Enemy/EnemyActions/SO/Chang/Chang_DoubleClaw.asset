@@ -14,14 +14,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MonsterComboAttackSO
   animName: Chang_DoubleClaw
   engageRange: 5
-  excuteRange: 2
+  executeRange: 2
   weight: 10
+  minimumRange: 0
+  preferredRange: 0
+  cooldown: 0
+  repeatWeightMultiplier: 0.5
   attackSpeed: 1
-  baseDamage: 1
-  criticalChance: 0.1
-  criticalMultiplier: 1.5
-  knockbackForce: 5
+  staggerLevel: 1
+  isParryable: 1
   telegraphDuration: 0.4
+  SwingAudio:
+    Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
+    Accent: {fileID: 0}
+    Volume: 0.42
+    AccentVolume: 0.28
+    PitchRange: {x: 0.97, y: 1.03}
+  HitAudio:
+    Clip: {fileID: 8300000, guid: 47c8889c3da34b54e897c6e11e3b3fa8, type: 3}
+    Accent: {fileID: 0}
+    Volume: 0.68
+    AccentVolume: 0.28
+    PitchRange: {x: 0.97, y: 1.03}
+  LandingAudio:
+    Clip: {fileID: 0}
+    Accent: {fileID: 0}
+    Volume: 0.65
+    AccentVolume: 0.3
+    PitchRange: {x: 0.97, y: 1.03}
+  baseDamage: 1
+  knockbackForce: 5
   attackDuration: 1.8
   hitBoxShape: 0
   hitBoxRadius: 1.2
@@ -30,7 +52,31 @@ MonoBehaviour:
     hitDuration: 0.1
     damage: 0
     hitBoxOffset: {x: 0, y: 0, z: 1}
+    SwingAudio:
+      Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
+      Accent: {fileID: 0}
+      Volume: 0.42
+      AccentVolume: 0.28
+      PitchRange: {x: 0.97, y: 1.03}
+    HitAudio:
+      Clip: {fileID: 8300000, guid: 47c8889c3da34b54e897c6e11e3b3fa8, type: 3}
+      Accent: {fileID: 0}
+      Volume: 0.64
+      AccentVolume: 0.28
+      PitchRange: {x: 0.97, y: 1.03}
   - hitStartTime: 1.05
     hitDuration: 0.1
     damage: 0
     hitBoxOffset: {x: 0, y: 0, z: 1}
+    SwingAudio:
+      Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
+      Accent: {fileID: 0}
+      Volume: 0.48
+      AccentVolume: 0.28
+      PitchRange: {x: 0.97, y: 1.03}
+    HitAudio:
+      Clip: {fileID: 8300000, guid: 47c8889c3da34b54e897c6e11e3b3fa8, type: 3}
+      Accent: {fileID: 0}
+      Volume: 0.64
+      AccentVolume: 0.28
+      PitchRange: {x: 0.97, y: 1.03}

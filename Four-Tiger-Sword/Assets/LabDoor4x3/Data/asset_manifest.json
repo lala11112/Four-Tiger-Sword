@@ -1,0 +1,99 @@
+{
+  "units": "meters",
+  "Unity_unit_m": 1,
+  "user_specification": {
+    "door_combined_width_height_depth": [
+      4,
+      3,
+      0.8
+    ],
+    "frame_outer_width_height_depth": [
+      4.2,
+      3.2,
+      2.2
+    ]
+  },
+  "closed_seam_m": 0.008,
+  "leaf_width_m": 1.996,
+  "bottom_of_leaf_m": 0.1,
+  "frame_throat_width_height_m": [
+    4.02,
+    3.02
+  ],
+  "center_sliding_channel_depth_m": 0.862,
+  "leaf_travel_m": 2.05,
+  "minimum_side_wall_pocket_per_side_m": 1.95,
+  "root_pivot": "bottom center of full frame",
+  "parts": [
+    {
+      "part": "Frame",
+      "dimensions_blender_m": [
+        4.199999809265137,
+        2.200000047683716,
+        3.200000047683716
+      ],
+      "bounds_min": [
+        -2.0999999046325684,
+        -1.100000023841858,
+        0.0
+      ],
+      "bounds_max": [
+        2.0999999046325684,
+        1.100000023841858,
+        3.200000047683716
+      ],
+      "triangles": 8616,
+      "editable_components": 36,
+      "closed_manifold_components": true
+    },
+    {
+      "part": "Door_Left",
+      "dimensions_blender_m": [
+        1.996000051498413,
+        0.800000011920929,
+        3.0
+      ],
+      "bounds_min": [
+        -2.0,
+        -0.4000000059604645,
+        0.10000000149011612
+      ],
+      "bounds_max": [
+        -0.004000000189989805,
+        0.4000000059604645,
+        3.0999999046325684
+      ],
+      "triangles": 9036,
+      "editable_components": 1,
+      "closed_manifold_components": true,
+      "merged_detail_objects": 15,
+      "single_mesh_object": true
+    },
+    {
+      "part": "Door_Right",
+      "dimensions_blender_m": [
+        1.996000051498413,
+        0.800000011920929,
+        3.0
+      ],
+      "bounds_min": [
+        0.004000000189989805,
+        -0.4000000059604645,
+        0.10000000149011612
+      ],
+      "bounds_max": [
+        2.0,
+        0.4000000059604645,
+        3.0999999046325684
+      ],
+      "triangles": 9036,
+      "editable_components": 1,
+      "closed_manifold_components": true,
+      "merged_detail_objects": 15,
+      "single_mesh_object": true
+    }
+  ],
+  "reference_proportion_note": "The requested 4.2 x 3.2 external frame around a 4 x 3 leaf pair makes a roughly .1m frontal border. Full 2.2m frame depth is preserved; no extra visual border increases these dimensions.",
+  "fbx": "models_fbx/35_industrial_sliding_door.fbx",
+  "glb": "models_glb/35_industrial_sliding_door.glb"
+}

@@ -1,0 +1,255 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4231878710653688261
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 274607574042471117}
+  m_Layer: 0
+  m_Name: BaekhoSocket_End
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &274607574042471117
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4231878710653688261}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0.7071068, w: 0}
+  m_LocalPosition: {x: 1, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1991081099689130655}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4570580513526755773
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1991081099689130655}
+  - component: {fileID: 5908097663078636638}
+  m_Layer: 0
+  m_Name: Wall_Pipe_D078_Elbow_1x1m
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1991081099689130655
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4570580513526755773}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8762941861364823239}
+  - {fileID: 2089510128834327181}
+  - {fileID: 5843536065754459619}
+  - {fileID: 274607574042471117}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5908097663078636638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4570580513526755773}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa1a2553756a13f47a15bb960b545881, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: StudioBaekho.Maps::StudioBaekho.BaekhoWallModule
+  kind: 5
+  family: PipeCableKit_Pipe_D078
+  sites: 00000000
+  heightMode: 2
+  height: 0.35
+  spacing: 0.05
+  probability: 100
+  doorSide: 2
+  mounts:
+  - {fileID: 2089510128834327181}
+  sockets:
+  - {fileID: 5843536065754459619}
+  - {fileID: 274607574042471117}
+  collisionBoxes:
+  - m_Center: {x: 0.44, y: 0, z: -0.000000037252903}
+    m_Extent: {x: 0.44, y: 0.039, z: 0.03900004}
+  - m_Center: {x: 0.88779235, y: 0.00019501895, z: -0.000000078231096}
+    m_Extent: {x: 0.0077923536, y: 0.03919502, z: 0.039}
+  - m_Center: {x: 0.8994794, y: 0.0011610053, z: -0.000000078231096}
+    m_Extent: {x: 0.011540055, y: 0.039395377, z: 0.039}
+  - m_Center: {x: 0.9109788, y: 0.0032714866, z: -0.000000078231096}
+    m_Extent: {x: 0.015176415, y: 0.039216347, z: 0.039}
+  - m_Center: {x: 0.9221799, y: 0.0065061264, z: -0.00000008195639}
+    m_Extent: {x: 0.018666804, y: 0.03865964, z: 0.039000005}
+  - m_Center: {x: 0.9329747, y: 0.010833766, z: -0.00000008195639}
+    m_Extent: {x: 0.021977305, y: 0.03773061, z: 0.039000005}
+  - m_Center: {x: 0.94325936, y: 0.016212735, z: -0.00000008195639}
+    m_Extent: {x: 0.02507627, y: 0.03643822, z: 0.039000005}
+  - m_Center: {x: 0.95293486, y: 0.022591244, z: -0.00000008195639}
+    m_Extent: {x: 0.027933598, y: 0.03479491, z: 0.039}
+  - m_Center: {x: 0.96190786, y: 0.029907845, z: -0.00000008195639}
+    m_Extent: {x: 0.030522108, y: 0.032816507, z: 0.039000005}
+  - m_Center: {x: 0.9700922, y: 0.038092088, z: -0.00000008568168}
+    m_Extent: {x: 0.03281653, y: 0.03052206, z: 0.039}
+  - m_Center: {x: 0.97740877, y: 0.04706514, z: -0.00000008568168}
+    m_Extent: {x: 0.034794927, y: 0.027933672, z: 0.039}
+  - m_Center: {x: 0.9837873, y: 0.056740597, z: -0.00000008568168}
+    m_Extent: {x: 0.036438227, y: 0.025076263, z: 0.039}
+  - m_Center: {x: 0.98916626, y: 0.067025274, z: -0.00000008568168}
+    m_Extent: {x: 0.037730575, y: 0.021977365, z: 0.039}
+  - m_Center: {x: 0.99349385, y: 0.07782014, z: -0.00000008568168}
+    m_Extent: {x: 0.038659632, y: 0.018666804, z: 0.039}
+  - m_Center: {x: 0.99672854, y: 0.08902121, z: -0.00000008568168}
+    m_Extent: {x: 0.0392164, y: 0.0151764825, z: 0.039}
+  - m_Center: {x: 0.998839, y: 0.100520626, z: -0.00000008568168}
+    m_Extent: {x: 0.039395332, y: 0.011539996, z: 0.039}
+  - m_Center: {x: 0.999805, y: 0.112207636, z: -0.00000008568168}
+    m_Extent: {x: 0.03919506, y: 0.0077923685, z: 0.039}
+  - m_Center: {x: 1, y: 0.56, z: -0.00000008568168}
+    m_Extent: {x: 0.039000034, y: 0.44, z: 0.039}
+--- !u!1 &8049470272726490067
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2089510128834327181}
+  m_Layer: 0
+  m_Name: BaekhoMount
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2089510128834327181
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8049470272726490067}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0.059}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1991081099689130655}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8324273975697063411
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5843536065754459619}
+  m_Layer: 0
+  m_Name: BaekhoSocket_Start
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5843536065754459619
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8324273975697063411}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1991081099689130655}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &6341609113217860119
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1991081099689130655}
+    m_Modifications:
+    - target: {fileID: 2422323975116289744, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2422323975116289744, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2422323975116289744, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2422323975116289744, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2422323975116289744, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2422323975116289744, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2422323975116289744, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2422323975116289744, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2422323975116289744, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2422323975116289744, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3500865215031215231, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+      propertyPath: m_Name
+      value: Pipe_D078_Elbow_1x1m
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+--- !u!4 &8762941861364823239 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2422323975116289744, guid: fde00d0d3bef0b54887af40600e8c131, type: 3}
+  m_PrefabInstance: {fileID: 6341609113217860119}
+  m_PrefabAsset: {fileID: 0}

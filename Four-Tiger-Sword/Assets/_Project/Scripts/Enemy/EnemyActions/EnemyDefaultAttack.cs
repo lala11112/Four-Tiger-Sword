@@ -5,6 +5,7 @@ public class EnemyDefaultAttack : EnemyAction
 {
     private readonly MonsterDefaultAttackSO _data;
     private readonly HashSet<IDamageable> _hitTargets = new HashSet<IDamageable>();
+    private bool _swingPlayed;
 
     public EnemyDefaultAttack(MonsterDefaultAttackSO data, Enemy enemy)
         : base(data, enemy)
@@ -16,6 +17,7 @@ public class EnemyDefaultAttack : EnemyAction
     {
         base.Enter();
         _hitTargets.Clear();
+        _swingPlayed = false;
         _enemy.Animator?.CrossFade(_data.animName, 0.01f);
 
         // TODO: _enemy.Animator?.SetTrigger(_data.animName);
@@ -29,6 +31,11 @@ public class EnemyDefaultAttack : EnemyAction
         if (CrossesHitWindow(previousTime, Mathf.Min(_timer, _data.attackDuration),
             _data.hitStartTime, _data.hitDuration))
         {
+            if (!_swingPlayed)
+            {
+                _swingPlayed = true;
+                PlaySwingSound();
+            }
             // telegraphDuration을 hitStartTime으로 설정하면 베이스 클래스가 이 시점에 자동으로 EndTelegraph() 호출
             BroadcastHit(); // TakeDamage에서 이 액션을 소스로 식별하기 위해
             ExecuteHit();
@@ -48,7 +55,7 @@ public class EnemyDefaultAttack : EnemyAction
             if (damageable == null || !_hitTargets.Add(damageable)) continue;
             DamageManager.Apply(
                 new HitInfo(_data.damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
-                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: GetKnockbackDirection(col) * _data.knockbackForce, staggerResistLevel: _data.staggerLevel, isParryable: _data.isParryable, source: this),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: GetKnockbackDirection(col) * _data.knockbackForce, staggerResistLevel: _data.staggerLevel, isParryable: _data.isParryable, source: this, impactSound: ResolveHitSound()),
                 damageable, col.gameObject);
         }
     }

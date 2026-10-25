@@ -7,15 +7,15 @@ public class StateMachine
     private readonly Dictionary<Type, List<Transition>> _transitions = new Dictionary<Type, List<Transition>>();
     private List<Transition> _anyTransitions = new List<Transition>();
 
-    public void Update()
+    public void Update(bool allowActionTransitions = true, bool updateState = true)
     {
-        var transition = GetTransition();
+        var transition = GetTransition(allowActionTransitions);
         if (transition != null)
         {
             ChangeState(transition.To);
         }
 
-        CurrentState?.Update();
+        if (updateState) CurrentState?.Update();
     }
 
     public void ChangeState(IPlayerState state)
@@ -42,7 +42,7 @@ public class StateMachine
         _anyTransitions.Add(new Transition(to, condition));
     }
 
-    private Transition GetTransition()
+    private Transition GetTransition(bool allowActionTransitions)
     {
         foreach (var transition in _anyTransitions)
         {
@@ -52,7 +52,7 @@ public class StateMachine
             }
         }
 
-        if(CurrentState != null && _transitions.TryGetValue(CurrentState.GetType(), out var currentTransitions))
+        if(allowActionTransitions && CurrentState != null && _transitions.TryGetValue(CurrentState.GetType(), out var currentTransitions))
         {
             foreach(var transition in currentTransitions)
             {

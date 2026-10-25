@@ -21,12 +21,12 @@ public abstract partial class BaseForm
         if (state is PlayerAttackState && _currentAction == ActionType.HeavyAttack)
             return HeavyAttackStep;
         if (state is PlayerAttackState)
-            return _weaponActionData.ComboSteps?.Count > 0 ? _weaponActionData.ComboSteps[_comboStep] : null;
+            return CurrentNormalAttackStep;
 
         if (state is PlayerAirAttackState airAttack)
             return airAttack.IsFinishing ? _weaponActionData.AirAttackStep : null;
 
-        if (state is PlayerSkillState)
+        if (state is PlayerSkillState || state is PlayerSwitchAttackState)
             return _weaponActionData.SkillSteps?.Count > 0 ? _weaponActionData.SkillSteps[_skillStep] : null;
 
         if (state is PlayerUltimateState)

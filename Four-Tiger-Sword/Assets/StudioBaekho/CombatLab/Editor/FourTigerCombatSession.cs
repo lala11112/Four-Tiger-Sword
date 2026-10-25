@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -11,7 +13,7 @@ namespace StudioBaekho.CombatLab.FourTigerSword
 {
     // Lives in Assets/Editor so it can reference the game's Assembly-CSharp types.
     // A fresh Play Mode session is required for every candidate; this is not a world resetter.
-    public sealed class FourTigerCombatSession : ICombatLabSession
+    public sealed class FourTigerCombatSession : ICombatLabArmedSession, ICombatLabReadySession
     {
         private const BindingFlags Hidden = BindingFlags.Instance | BindingFlags.NonPublic;
         private readonly List<Object> _owned = new List<Object>();
@@ -20,8 +22,20 @@ namespace StudioBaekho.CombatLab.FourTigerSword
         private readonly HashSet<Enemy> _enemies = new HashSet<Enemy>();
         private readonly CombatMetrics _metrics = new CombatMetrics();
         private readonly float _duration;
-        private readonly float _startedAt;
-        private readonly float _startedGameTime;
+        private float _startedAt;
+        private float _startedGameTime;
+        private readonly bool _fixedScenario;
+        private readonly bool _v2;
+        private bool _armed;
+        private int _followUpExecutions;
+        private Enemy _fixedTarget;
+        private Vector3 _targetPosition;
+        private Quaternion _targetRotation;
+        private float _targetHp;
+        private bool _targetPassive;
+        private string _cameraTargetId;
+        private readonly HashSet<string> _confirmedHitIds = new HashSet<string>();
+        private readonly List<GameObject> _hiddenEnemies = new List<GameObject>();
         private readonly float _oldTimeScale;
         private readonly bool _oldRunInBackground;
         private readonly UnityEngine.Random.State _oldRandomState;
@@ -63,6 +77,10 @@ namespace StudioBaekho.CombatLab.FourTigerSword
         private float _nextPressAt;
         private float _attackDistance;
         private string _lastState;
+        private int _lastReadyFrame = -1, _stableReadyFrames;
+        private Vector3 _readyPlayerPosition, _readyTargetPosition, _readyCameraPosition;
+        private Quaternion _readyCameraRotation;
+        private float _readyCameraFov;
 
         public bool Complete => _complete;
         public CombatMetrics Metrics => _metrics;
@@ -70,6 +88,9 @@ namespace StudioBaekho.CombatLab.FourTigerSword
         public FourTigerCombatSession(ExperimentRequest request, CombatCandidate candidate)
         {
             _actionId = FourTigerCombatAdapter.NormalizeActionId(request.actionId);
+            _v2 = request.schemaVersion == 2;
+            _fixedScenario = _v2 && request.scenarioMode == "fixed";
+            _armed = !_v2;
             _isNormal = _actionId.StartsWith("normal-", StringComparison.Ordinal);
             _isHeavy = _actionId == "heavy";
             _isSkill = _actionId == "skill";
@@ -85,7 +106,7 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             {
                 PreparePlayer();
                 var source = FourTigerCombatAdapter.ResolveSource(request.sourceGuid);
-                var data = FourTigerCombatAdapter.CloneAndApply(source, candidate, _owned, _actionId);
+                var data = FourTigerCombatAdapter.CloneAndApply(source, candidate, _owned, _actionId, request.schemaVersion);
                 _data = data;
                 _selectedSteps = FourTigerCombatAdapter.SelectedSteps(data, _actionId) ?? new List<WeaponActionData>();
                 // Isolated-step scenarios retain the selected animation and hit data, but start it
@@ -104,6 +125,8 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                 _formStepField = typeof(BaseForm).GetField(_isSkill ? "_skillStep" : _isUltimate ? "_ultimateStep" : "_comboStep", Hidden);
                 if (_formTimerField == null || _formStepField == null)
                     throw new InvalidOperationException("The adapter can no longer observe the selected action's runtime steps.");
+                // Teleport before binding the temporary form or filling its resources.
+                if (_fixedScenario) PrepareFixedTarget();
                 _originalForm = _player.FormManager.CurrentForm;
                 _player.FormManager.CleanupTransientEffects();
                 _player.FormManager.ChangeForm(_form);
@@ -111,10 +134,16 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                 InstallVirtualInput();
                 _player.StatManager.OnDamageTaken += OnPlayerDamaged;
                 SubscribeEnemies();
+                CombatFeedbackTelemetry.Recorded += OnTelemetry;
                 Application.runInBackground = true;
                 UnityEngine.Random.InitState(request.seed);
+                var actualValues = _v2 ? FourTigerCombatAdapter.AppliedFeedbackValues(data, _isNormal ? "normal-combo" : _actionId) : null;
                 foreach (var parameter in candidate.values)
-                    _metrics.appliedValues.Add(new ParameterValue(parameter.id, parameter.value));
+                {
+                    float actual = actualValues != null && actualValues.TryGetValue(parameter.id, out float observed) ? observed : parameter.value;
+                    _metrics.appliedValues.Add(new ParameterValue(parameter.id, actual));
+                    if (actual != parameter.value) _metrics.notes.Add(parameter.id + ": 요청 " + parameter.value + ", 적용 " + actual + ". 채널 모드 및 상속 우선순위에 따른 유효 필드 값입니다.");
+                }
                 RecordResolvedValues(data, request.sourceGuid);
                 _metrics.notes.Add("Selected action: " + FourTigerCombatAdapter.ActionLabel(source, _actionId) + " (" + _actionId + "). Virtual input passes through the original PlayerInputHandler and combat state machine.");
                 _metrics.notes.Add("A temporary InputSettings copy allows virtual input while the desktop app has focus. The original settings object is restored when the session ends.");
@@ -128,7 +157,8 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                     _metrics.notes.Add("Only E skills are requested. Their original cooldown and SP cost remain active; no basic attacks are substituted while waiting.");
                 if (candidate.values.Exists(value => value.id == FourTigerCombatAdapter.HitStopId))
                     _metrics.notes.Add("The selected action's Feedback.HitStop duration is applied to every effective hit, including hit overrides. Each hit's original effective time scale is preserved. Player defaults, parries and other actions remain unchanged; exported form copies retain the action overrides.");
-                _metrics.notes.Add("The whole scene's enemy AI remains active. Scene startup, physics, navigation and frame timing are not deterministic; the seed does not guarantee identical encounters.");
+                _metrics.notes.Add(_fixedScenario ? "고정 표적: 같은 초기 방향·거리에서 선택 동작을 한 번 실행합니다. 표적 AI는 수동 상태이며 피격·넉백은 유지됩니다. 표적 런타임 HP만 1,000,000으로 높여 연타 도중 사망을 방지합니다. 프레임과 물리는 완전 결정적이지 않습니다."
+                    : "The whole scene's enemy AI remains active. Scene startup, physics, navigation and frame timing are not deterministic; the seed does not guarantee identical encounters.");
                 _metrics.notes.Add("Enemy.OnDamaged counts all observed enemy damage, including secondary effects. It does not identify attack steps or prove a combo success rate.");
                 _metrics.notes.Add("Movement uses a simple nearest-enemy approach and estimated attack distance. No pathfinding or obstacle avoidance is provided by this player policy.");
                 InputSystem.onBeforeUpdate += BeforeInputUpdate;
@@ -139,6 +169,188 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                 Dispose();
                 throw;
             }
+        }
+
+        public void Arm()
+        {
+            if (_armed) return;
+            if (_fixedScenario)
+            {
+                if (!IsReadyToArm(out string reason))
+                    throw new InvalidOperationException("고정 시작 조건이 아직 안정되지 않았습니다: " + reason);
+            }
+            _startedAt = Time.realtimeSinceStartup;
+            _startedGameTime = Time.time;
+            if (_fixedScenario) RecordFixtureConditions();
+            _armed = true;
+            _nextPressAt = _startedAt + .3f; // Preserve actual pre-impact capture samples.
+            AddEvent("recording-armed", "녹화 준비 이후 입력 시작");
+        }
+
+        public bool IsReadyToArm(out string reason)
+        {
+            reason = null;
+            if (!_fixedScenario) return true;
+            SubscribeEnemies();
+            var camera = Camera.main;
+            if (_disposed || _player == null || !_player.IsGround() || !FourTigerCombatAdapter.IsFixedTargetReady(_fixedTarget) || camera == null)
+            { _stableReadyFrames = 0; reason = "살아 있는 표적, 접지된 플레이어와 Camera.main이 필요합니다."; return false; }
+            if (_lastReadyFrame != Time.frameCount)
+            {
+                bool stable = _lastReadyFrame >= 0
+                    && Vector3.Distance(_readyPlayerPosition, _player.transform.position) <= .002f
+                    && Vector3.Distance(_readyTargetPosition, _fixedTarget.transform.position) <= .002f
+                    && Vector3.Distance(_readyCameraPosition, camera.transform.position) <= .002f
+                    && Quaternion.Angle(_readyCameraRotation, camera.transform.rotation) <= .02f
+                    && Mathf.Abs(_readyCameraFov - camera.fieldOfView) <= .01f;
+                _stableReadyFrames = stable ? _stableReadyFrames + 1 : 0;
+                _lastReadyFrame = Time.frameCount;
+                _readyPlayerPosition = _player.transform.position; _readyTargetPosition = _fixedTarget.transform.position;
+                _readyCameraPosition = camera.transform.position; _readyCameraRotation = camera.transform.rotation; _readyCameraFov = camera.fieldOfView;
+            }
+            reason = "플레이어·표적·렌더 카메라의 연속 안정 프레임=" + _stableReadyFrames + "/3";
+            return _stableReadyFrames >= 3;
+        }
+
+        private void PrepareFixedTarget()
+        {
+            _fixedTarget = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None)
+                .Where(FourTigerCombatAdapter.IsFixedTargetReady)
+                .OrderBy(e => FixedTargetKey(e.transform), StringComparer.Ordinal).FirstOrDefault();
+            if (_fixedTarget == null)
+                throw new InvalidOperationException("고정 표적 준비 실패: 활성 Enemy 콜라이더·설정된 EnemyStat·NavMesh 위의 Agent를 갖춘 살아 있는 적이 없습니다.");
+            _targetPosition = _fixedTarget.transform.position; _targetRotation = _fixedTarget.transform.rotation;
+            _targetHp = _fixedTarget.EnemyStat.CurrentHp; _targetPassive = _fixedTarget.CombatLabPassive;
+            _fixedTarget.CombatLabPassive = true;
+            SubscribeEnemies(); // Isolate invalid pool entries as well as other configured enemies.
+            var agent = _fixedTarget.GetComponent<NavMeshAgent>();
+            var filter = new NavMeshQueryFilter { agentTypeID = agent.agentTypeID, areaMask = agent.areaMask };
+            PlacePlayerForFixedTarget(filter);
+            Vector3 desired = _player.transform.position + _player.transform.forward * (_attackDistance * .9f);
+            var playerController = _player.Controller;
+            var playerScale = _player.transform.lossyScale;
+            desired.y += _player.transform.TransformVector(playerController.center).y
+                - playerController.height * Mathf.Abs(playerScale.y) * .5f
+                - playerController.skinWidth * Mathf.Abs(playerScale.y);
+            if (!NavMesh.SamplePosition(desired, out var sample, .75f, filter))
+                throw new InvalidOperationException("고정 표적 위치에 NavMesh가 없습니다. 열린 평지에서 실험하세요.");
+            if (!agent.Warp(sample.position))
+                throw new InvalidOperationException("고정 표적 위치 이동에 실패했습니다.");
+            _fixedTarget.transform.rotation = Quaternion.LookRotation(-_player.transform.forward);
+            _fixedTarget.EnemyStat.CurrentHp = 1000000f;
+            Physics.SyncTransforms();
+            foreach (var camera in Object.FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None))
+            {
+                bool tracksPlayer = camera.Follow != null && (camera.Follow == _player.transform || camera.Follow.IsChildOf(_player.transform));
+                tracksPlayer |= camera.LookAt != null && (camera.LookAt == _player.transform || camera.LookAt.IsChildOf(_player.transform));
+                if (!tracksPlayer) continue;
+                camera.GetComponent<CombatCameraDirector>()?.Cancel(_player, true);
+                camera.PreviousStateIsValid = false;
+                camera.UpdateCameraState(Vector3.up, -1f);
+            }
+            _metrics.notes.Add("고정 표적 선택 키: " + FixedTargetKey(_fixedTarget.transform)
+                + ". NavMesh 안전 위치로 플레이어를 배치하고 카메라 이력을 초기화한 뒤, 접지와 연속 3프레임 안정 후 Arm 직전 조건을 관측합니다.");
+        }
+
+        private void PlacePlayerForFixedTarget(NavMeshQueryFilter filter)
+        {
+            var controller = _player.Controller;
+            var scale = _player.transform.lossyScale;
+            float radius = controller.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z));
+            float height = Mathf.Max(controller.height * Mathf.Abs(scale.y), radius * 2f);
+            Vector3 center = _player.transform.TransformVector(controller.center);
+            float skin = controller.skinWidth * Mathf.Abs(scale.y);
+            var targetAgent = _fixedTarget.GetComponent<NavMeshAgent>();
+            Vector3 floorProbe = _fixedTarget.transform.position
+                - Vector3.up * (targetAgent.baseOffset * Mathf.Abs(_fixedTarget.transform.lossyScale.y));
+            if (!NavMesh.SamplePosition(floorProbe, out var anchorHit, .75f, filter))
+                throw new InvalidOperationException("표적 NavMeshAgent baseOffset을 제외한 바닥 기준 위치를 찾지 못했습니다.");
+            Vector3 anchor = anchorHit.position;
+            int groundLayer = LayerMask.NameToLayer("Ground");
+            for (int ring = 0; ring < 3; ring++)
+            for (int direction = 0; direction < 8; direction++)
+            {
+                Vector3 forward = Quaternion.Euler(0, direction * 45f, 0) * Vector3.forward;
+                Vector3 desired = anchor - forward * (3f + ring * 1.5f);
+                if (!NavMesh.SamplePosition(desired, out var sample, .5f, filter)
+                    || NavMesh.Raycast(sample.position, anchor, out _, filter)) continue;
+                Vector3 position = sample.position;
+                position.y += height * .5f + skin - center.y;
+                Vector3 worldCenter = position + center;
+                Vector3 cap = Vector3.up * (height * .5f - radius);
+                bool blocked = Physics.OverlapCapsule(worldCenter - cap, worldCenter + cap, radius,
+                        ~(1 << groundLayer), QueryTriggerInteraction.Ignore)
+                    .Any(c => c != null && c.GetComponentInParent<PlayerController>() != _player
+                        && c.GetComponentInParent<Enemy>() != _fixedTarget);
+                Vector3 targetDesired = sample.position + forward * (_attackDistance * .9f);
+                if (blocked || !NavMesh.SamplePosition(targetDesired, out _, .3f, filter)
+                    || NavMesh.Raycast(sample.position, targetDesired, out _, filter)) continue;
+                _player.BeginStageTransition();
+                _player.CompleteStageTransition(position, Quaternion.LookRotation(forward));
+                _metrics.notes.Add("고정 실험 플레이어 배치: 표적 주변 NavMesh와 capsule 여유 공간을 검사했습니다. 높이=NavMesh.y + capsule높이/2 + skin - center.y, 위치=" + position + ".");
+                return;
+            }
+            throw new InvalidOperationException("표적 주변에서 플레이어 capsule과 타격 방향을 확보할 NavMesh 안전 위치를 찾지 못했습니다.");
+        }
+
+        private void RecordFixtureConditions()
+        {
+            Vector3 player = _player.transform.position;
+            Value("runtime.player.start.x", player.x); Value("runtime.player.start.y", player.y); Value("runtime.player.start.z", player.z);
+            Value("runtime.fixture.distance", Vector3.Distance(_fixedTarget.transform.position, _player.transform.position));
+            Vector3 actual = _fixedTarget.transform.position;
+            Value("runtime.fixture.target.x", actual.x); Value("runtime.fixture.target.y", actual.y); Value("runtime.fixture.target.z", actual.z);
+            Value("runtime.fixture.playerYaw", _player.transform.eulerAngles.y);
+            var renderCamera = Camera.main;
+            if (renderCamera != null)
+            {
+                Vector3 position = renderCamera.transform.position;
+                Value("runtime.fixture.camera.x", position.x); Value("runtime.fixture.camera.y", position.y); Value("runtime.fixture.camera.z", position.z);
+                Value("runtime.fixture.cameraPitch", renderCamera.transform.eulerAngles.x);
+                Value("runtime.fixture.cameraYaw", renderCamera.transform.eulerAngles.y);
+                Value("runtime.fixture.cameraRoll", renderCamera.transform.eulerAngles.z);
+                Value("runtime.fixture.cameraFov", renderCamera.fieldOfView);
+            }
+            else _metrics.notes.Add("고정 표적 Arm 시 Camera.main을 찾지 못해 렌더 카메라 조건을 기록하지 못했습니다.");
+            _metrics.notes.Add("fixture 관측 시점: 최소 3개의 실제 게임 프레임 동안 접지·위치·카메라 안정 확인 후 Arm 직전, 0.3초 입력 지연 이전입니다.");
+            AddEvent("fixed-target-ready", FixedTargetKey(_fixedTarget.transform));
+        }
+
+        private static string FixedTargetKey(Transform value)
+        {
+            var segments = new List<string>();
+            for (var current = value; current != null; current = current.parent)
+                segments.Add(current.name + "[" + current.GetSiblingIndex().ToString("D6", System.Globalization.CultureInfo.InvariantCulture) + "]");
+            segments.Reverse();
+            return value.gameObject.scene.path + ":" + string.Join("/", segments);
+        }
+        private static string HierarchyPath(Transform value)
+            => value.parent == null ? value.name : HierarchyPath(value.parent) + "/" + value.name;
+
+        private void OnTelemetry(CombatFeedbackTelemetryEvent evt)
+        {
+            if (_disposed || _complete || !_armed || _player == null) return;
+            // Camera/clock events may belong to the victim; confirmed hits must be ours.
+            if (evt.kind == "confirmed-impact" && evt.ownerId != _player.gameObject.GetInstanceID()) return;
+            int step = _formStepField == null ? 0 : Math.Max(0, (int)_formStepField.GetValue(_form));
+            if (_ultimateFollowUp && _player.StateMachine.CurrentState is PlayerAttackState)
+                step = Math.Max(0, (int)typeof(BaseForm).GetField("_comboStep", Hidden).GetValue(_form));
+            if (evt.kind == "confirmed-impact" && !string.IsNullOrEmpty(evt.detail))
+            {
+                int marker = evt.detail.IndexOf("step=", StringComparison.Ordinal);
+                if (marker >= 0 && int.TryParse(evt.detail.Substring(marker + 5).Split(';')[0], out int actualStep)) step = actualStep;
+            }
+            string target = "step." + step + (evt.hitIndex < 0 ? "" : ".hit." + evt.hitIndex);
+            if (evt.kind == "camera-begin") _cameraTargetId = target;
+            else if (evt.kind == "camera-output" || evt.kind.StartsWith("camera-return", StringComparison.Ordinal) || evt.kind == "camera-end")
+                target = _cameraTargetId ?? target;
+            if (evt.kind == "confirmed-impact") _confirmedHitIds.Add(target);
+            _metrics.events.Add(new CombatEvent { kind = evt.kind, detail = evt.detail,
+                eventId = "execution-" + _actionExecutions + "/" + target + "/event-" + evt.sequence,
+                targetId = target, value = evt.value, realTime = (float)(evt.realTime - _startedAt),
+                gameTime = evt.gameTime - _startedGameTime, unityFrameCount = evt.unityFrameCount,
+                unityRealtimeUs = evt.realTime * 1000000d, ownerInstanceId = evt.ownerId, targetInstanceId = evt.targetId,
+                position = evt.position, rotation = evt.rotation, fov = evt.fov });
         }
 
         private static float EstimateAttackDistance(WeaponActionData step)
@@ -218,13 +430,22 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             if (_hitStopField == null || _hitStopField.FieldType != typeof(float) || _registeredForms == null)
                 throw new InvalidOperationException("The Four Tiger integration no longer matches PlayerController/FormManager. Update the adapter before running.");
             bool validEnemy = false;
-            foreach (var enemy in Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None))
+            if (_fixedScenario)
             {
-                if (!IsLiving(enemy)) continue;
-                var agent = enemy.GetComponent<NavMeshAgent>();
-                if (agent == null || !agent.enabled || !agent.isOnNavMesh)
-                    throw new InvalidOperationException("Every active enemy needs an enabled NavMeshAgent on a baked NavMesh for meaningful knockback comparisons: " + enemy.name);
-                validEnemy = true;
+                validEnemy = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None).Any(FourTigerCombatAdapter.IsFixedTargetReady);
+                if (!validEnemy)
+                    throw new InvalidOperationException("고정 표적 준비 대기: 활성 Enemy 콜라이더와 설정된 EnemyStat, NavMesh 위의 Agent를 갖춘 살아 있는 적이 필요합니다.");
+            }
+            else
+            {
+                foreach (var enemy in Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None))
+                {
+                    if (!IsLiving(enemy)) continue;
+                    var agent = enemy.GetComponent<NavMeshAgent>();
+                    if (agent == null || !agent.enabled || !agent.isOnNavMesh)
+                        throw new InvalidOperationException("Every active enemy needs an enabled NavMeshAgent on a baked NavMesh for meaningful knockback comparisons: " + enemy.name);
+                    validEnemy = true;
+                }
             }
             if (!validEnemy) throw new InvalidOperationException("The scene needs at least one living active Enemy on a baked NavMesh.");
         }
@@ -309,10 +530,13 @@ namespace StudioBaekho.CombatLab.FourTigerSword
         private void RecordResolvedValues(WeaponActionDataSO data, string sourceGuid)
         {
             _metrics.notes.Add("Runtime source GUID: " + sourceGuid + "; starting form: " + (_originalForm?.GetType().Name ?? "None") + "; observed active enemy count: " + _enemies.Count + ".");
-            var position = _player.transform.position;
-            Value("runtime.player.start.x", position.x);
-            Value("runtime.player.start.y", position.y);
-            Value("runtime.player.start.z", position.z);
+            if (!_fixedScenario)
+            {
+                var position = _player.transform.position;
+                Value("runtime.player.start.x", position.x);
+                Value("runtime.player.start.y", position.y);
+                Value("runtime.player.start.z", position.z);
+            }
             Value("runtime.enemy.startCount", _enemies.Count);
             float playerHitStop = (float)_hitStopField.GetValue(_player);
             Value("runtime.player.hitStopDuration", playerHitStop);
@@ -428,7 +652,7 @@ namespace StudioBaekho.CombatLab.FourTigerSword
 
         public void Tick(float unscaledDeltaTime)
         {
-            if (_disposed) return;
+            if (_disposed || !_armed) return;
             if (_executionError != null) throw new InvalidOperationException(_executionError);
             if (_complete) return;
             _metrics.elapsedSeconds = Time.realtimeSinceStartup - _startedAt;
@@ -444,8 +668,9 @@ namespace StudioBaekho.CombatLab.FourTigerSword
 
         private void BeforeInputUpdate()
         {
-            if (_disposed || !Application.isPlaying || InputState.currentUpdateType != InputUpdateType.Dynamic
+            if (_disposed || !_armed || !Application.isPlaying || InputState.currentUpdateType != InputUpdateType.Dynamic
                 || _keyboard == null || _mouse == null || _lastInputFrame == Time.frameCount) return;
+            if (_fixedScenario && _fixedTarget != null) SubscribeEnemies();
             _lastInputFrame = Time.frameCount;
             ObserveActionExecution();
             if (!_complete && Time.realtimeSinceStartup - _startedAt >= _duration)
@@ -462,7 +687,7 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                     Vector3 offset = target.transform.position - _player.transform.position;
                     offset.y = 0f;
                     nearTarget = offset.magnitude <= _attackDistance;
-                    if (locomotion && !nearTarget) AddMovementKeys(offset.normalized, keys);
+                    if (!_fixedScenario && locomotion && !nearTarget) AddMovementKeys(offset.normalized, keys);
                     if (_player.StateMachine.CurrentState is PlayerIdleState && offset.sqrMagnitude > 0.001f)
                         _player.transform.rotation = Quaternion.LookRotation(offset);
                 }
@@ -485,7 +710,10 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                 else if (Time.realtimeSinceStartup >= _nextPressAt)
                 {
                     bool normalPolicy = _isNormal || (_ultimateFollowUp && _actionExecutions > 0);
-                    bool startAction = locomotion && target != null && nearTarget;
+                    // Fixed trials execute once from the prepared fixture. Collider separation or a
+                    // short hitbox must not silently suppress the requested action before measurement.
+                    bool startAction = locomotion && target != null && (_fixedScenario || nearTarget);
+                    if (_fixedScenario && (_ultimateFollowUp ? _followUpExecutions > 0 : _actionExecutions > 0)) startAction = false;
                     // Range gates the start of a new action only. Knockback or a defeated target
                     // must not suppress the remaining inputs of an already-started full combo.
                     // CanChainAttack also returns true on the final step, so check that a next
@@ -565,7 +793,7 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                 int originalStep = step + 1;
                 if (_isNormal && _actionId != "normal-combo") int.TryParse(_actionId.Substring("normal-".Length), out originalStep);
                 string detail = _actionId + "; " + _form.GetType().Name + "; step=" + originalStep + "; animation=" + animation;
-                if (followUp) AddEvent("follow-up-attack", detail, originalStep);
+                if (followUp) { _followUpExecutions++; AddEvent("follow-up-attack", detail, originalStep); }
                 else
                 {
                     _actionExecutions++;
@@ -608,8 +836,22 @@ namespace StudioBaekho.CombatLab.FourTigerSword
 
         private void SubscribeEnemies()
         {
+            if (_fixedScenario && _fixedTarget != null)
+            {
+                foreach (var enemy in Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None))
+                {
+                    if (enemy == _fixedTarget) continue;
+                    if (_enemies.Remove(enemy)) enemy.OnDamaged -= OnEnemyDamaged;
+                    if (!enemy.gameObject.activeSelf) continue;
+                    if (!_hiddenEnemies.Contains(enemy.gameObject)) _hiddenEnemies.Add(enemy.gameObject);
+                    enemy.gameObject.SetActive(false);
+                }
+                if (IsLiving(_fixedTarget) && _enemies.Add(_fixedTarget)) _fixedTarget.OnDamaged += OnEnemyDamaged;
+                return;
+            }
             foreach (var enemy in Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None))
-                if (IsLiving(enemy) && _enemies.Add(enemy)) enemy.OnDamaged += OnEnemyDamaged;
+                if ((_fixedScenario ? FourTigerCombatAdapter.IsFixedTargetReady(enemy) : IsLiving(enemy))
+                    && _enemies.Add(enemy)) enemy.OnDamaged += OnEnemyDamaged;
         }
 
         private void OnEnemyDamaged(float damage, ElementType element, bool critical)
@@ -631,7 +873,8 @@ namespace StudioBaekho.CombatLab.FourTigerSword
         private void AddEvent(string kind, string detail, float value = 0f)
         {
             _metrics.events.Add(new CombatEvent { realTime = Time.realtimeSinceStartup - _startedAt,
-                gameTime = Time.time - _startedGameTime, kind = kind, detail = detail, value = value });
+                gameTime = Time.time - _startedGameTime, kind = kind, detail = detail, value = value,
+                unityFrameCount = Time.frameCount, unityRealtimeUs = Time.realtimeSinceStartupAsDouble * 1000000d });
         }
 
         private void Finish(string reason)
@@ -640,6 +883,15 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             _complete = true;
             _metrics.elapsedSeconds = Time.realtimeSinceStartup - _startedAt;
             Value("runtime.action.executions", _actionExecutions);
+            if (_fixedScenario)
+            {
+                int expected = FourTigerCombatAdapter.ExpectedFeedbackHits(_data, _isNormal ? "normal-combo" : _actionId);
+                _metrics.expectedHitEvents = expected;
+                _metrics.confirmedHitEvents = _confirmedHitIds.Count;
+                _metrics.validationStatus = _confirmedHitIds.Count < expected ? "incomplete-hits" : "completed";
+                if (_metrics.validationStatus != "completed")
+                    _metrics.notes.Add("예상 타격 이벤트 " + expected + "개 중 " + _confirmedHitIds.Count + "개만 실제 명중했습니다. 거리·넉백·실행 길이를 확인하세요.");
+            }
             if (_actionExecutions == 0)
             {
                 _executionError = "The requested action '" + _actionId + "' did not execute. Check scene approach distance, action input bindings, resource requirements and test duration. " + reason;
@@ -653,6 +905,18 @@ namespace StudioBaekho.CombatLab.FourTigerSword
         {
             if (_disposed) return;
             _disposed = true;
+            CombatFeedbackTelemetry.Recorded -= OnTelemetry;
+            Cleanup(() => CombatHitStopService.ReleaseOwner(_player));
+            Cleanup(() => {
+                if (_fixedTarget != null) {
+                    _fixedTarget.CombatLabPassive = _targetPassive;
+                    _fixedTarget.EnemyStat.CurrentHp = _targetHp;
+                    var nav = _fixedTarget.GetComponent<NavMeshAgent>();
+                    if (nav != null && nav.enabled && nav.isOnNavMesh) nav.Warp(_targetPosition);
+                    _fixedTarget.transform.rotation = _targetRotation;
+                }
+                foreach (var hidden in _hiddenEnemies) if (hidden != null) hidden.SetActive(true);
+            });
             InputSystem.onBeforeUpdate -= BeforeInputUpdate;
             foreach (var enemy in _enemies) if (enemy != null) enemy.OnDamaged -= OnEnemyDamaged;
             if (_player != null && _player.StatManager != null) _player.StatManager.OnDamageTaken -= OnPlayerDamaged;
@@ -697,7 +961,8 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                 var owned = _owned[i];
                 Cleanup(() => { if (owned != null) Object.DestroyImmediate(owned); });
             }
-            Time.timeScale = _oldTimeScale;
+            // Stop ownership is released above. Do not resume an external pause on disposal.
+            if (!_v2) Time.timeScale = _oldTimeScale;
             Application.runInBackground = _oldRunInBackground;
             UnityEngine.Random.state = _oldRandomState;
         }

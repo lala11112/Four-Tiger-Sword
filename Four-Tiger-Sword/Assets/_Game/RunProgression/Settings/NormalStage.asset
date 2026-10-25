@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 480388ab5bde78e4eafa57e552161ee8, type: 3}
+  m_Name: NormalStage
+  m_EditorClassIdentifier: StudioBaekho.Maps::StudioBaekho.BaekhoDungeonSettings
+  maps:
+  - {fileID: 1016291800067319501, guid: d0d8e288708d9104ba309dd61849d41c, type: 3}
+  - {fileID: 9153447627390353593, guid: b2bf1068570e5e644bce41617bec59c3, type: 3}
+  - {fileID: 162763428814526199, guid: 63588edb21d2d4743b15fb3997acc93e, type: 3}
+  - {fileID: 6489629717832665134, guid: 2b4f658411cd21d41a70d671ea052190, type: 3}
+  - {fileID: 5856905028713261821, guid: 8bec81ae5a5e3db4d816ce6c36fe620a, type: 3}
+  - {fileID: 6554507086004103979, guid: d5ab2857428623f4a963284be92fc58d, type: 3}
+  - {fileID: 5159118234659481960, guid: d569c1de78d7653478dc2eccecdec458, type: 3}
+  - {fileID: 5856905028713261821, guid: 8bec81ae5a5e3db4d816ce6c36fe620a, type: 3}
+  - {fileID: 6554507086004103979, guid: d5ab2857428623f4a963284be92fc58d, type: 3}
+  startRoom: {fileID: 7997554717753838891, guid: 7fc33406e6cede048a8e209145ed92c4, type: 3}
+  endRoom: {fileID: 7997554717753838891, guid: fe6ecafa7f50c8a48922a2d0dac5e47e, type: 3}
+  bossRoom: {fileID: 0}
+  shopRoom: {fileID: 7997554717753838891, guid: 7114c457d5e47474aafbf442eca44fd9, type: 3}
+  cornerRoom: {fileID: 6521510642564884506, guid: 6be213c0bc6798048ab8ec76b9e86161, type: 3}
+  style: {fileID: 11400000, guid: 385aec3f7b4de574cb48c6f1209e5e7e, type: 2}
+  mapCount: 5
+  randomizeSeed: 1
+  seed: 12345
+  gridSize: 0.5
+  minimumMapGap: 4
+  maximumConnectionLength: 60
+  corridorWidth: 4
+  minimumDoorWidth: 1
+  placementAttempts: 64
+  layoutAttempts: 8
+  maxSearchNodes: 60000

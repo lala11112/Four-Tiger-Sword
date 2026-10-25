@@ -5,7 +5,7 @@ public class FireForm : BaseForm, IToggleUltimateForm
     private readonly FireFormActionDataSO _fireData;
 
     public override ElementType Element => ElementType.ELEMENT_FIRE;
-    public override float SkillSpCost => 200f;
+    public override float SkillSpCost => 20f;
     public override float SkillCooldown => 8f;
     public bool IsUltimateActive { get; private set; }
     public override bool CanUltimate => !IsUltimateActive && _weaponActionData != null && UltimateResourcesReady;
@@ -35,14 +35,14 @@ public class FireForm : BaseForm, IToggleUltimateForm
     protected override void OnHitEnemy(GameObject enemy, WeaponActionData step = null, HitEvent hitEvent = null)
     {
         base.OnHitEnemy(enemy, step, hitEvent);
-        TargetEffects(enemy).AddFireStack(EffectHit(2.5f), _fireData.FireExplosionDelay);
+        TargetEffects(enemy).AddFireStack(EffectHit(2.5f, secondary: true), _fireData.FireExplosionDelay);
     }
     protected override void OnDamageDealt(GameObject target, DamageResult result, WeaponActionData step = null, HitEvent hitEvent = null)
     {
         base.OnDamageDealt(target, result, step, hitEvent);
         if (!IsUltimateActive || !result.Applied) return;
         float rate = _currentAction == ActionType.Attack ? _normalLifeSteal
-            : _currentAction == ActionType.Skill ? _skillLifeSteal : 0f;
+            : _currentAction == ActionType.Skill || _currentAction == ActionType.SwitchAttack ? _skillLifeSteal : 0f;
         _playerController.StatManager.Heal(Mathf.Max(0f, result.HealthDamage) * rate);
     }
     public override void BeginSkill()
@@ -56,7 +56,7 @@ public class FireForm : BaseForm, IToggleUltimateForm
             _playerController.StatManager.AddModifier(StatType.ST_ATK, 0f, _skillAttackBonus);
     }
     protected override int QueryOverlap(WeaponActionData step, Vector3 center)
-        => _currentAction == ActionType.Skill
+        => _currentAction == ActionType.Skill || _currentAction == ActionType.SwitchAttack
             ? Physics.OverlapSphereNonAlloc(center, CurrentSkillRadius, _overlapBuffer, _enemyLayer)
             : base.QueryOverlap(step, center);
 
@@ -65,6 +65,7 @@ public class FireForm : BaseForm, IToggleUltimateForm
         if (IsUltimateActive) { DeactivateUltimate(); return; }
         ConsumeUltimateResources();
         _currentAction = ActionType.Ultimate;
+        PlayUltimateActivationSound();
         IsUltimateActive = true;
         _outgoingBonus = Mathf.Max(0f, _fireData.FireUltimateDamageDealtBonusPercent) / 100f;
         _incomingBonus = Mathf.Max(0f, _fireData.FireUltimateDamageTakenBonusPercent) / 100f;
@@ -105,8 +106,9 @@ public class FireForm : BaseForm, IToggleUltimateForm
     {
         if (_playerController?.FormManager?.CurrentForm != this) return;
         var state = _playerController.StateMachine.CurrentState;
-        if (state is PlayerAttackState || state is PlayerSkillState || state is PlayerAirAttackState || state is PlayerCounterState)
-            _playerController.Animator.speed = AttackSpeed;
+        if (state is PlayerAttackState || state is PlayerSkillState || state is PlayerSwitchAttackState
+            || state is PlayerAirAttackState || state is PlayerCounterState)
+            _playerController.SetAnimationSpeed(AttackSpeed);
     }
     private void RemoveSkillBuff()
     {

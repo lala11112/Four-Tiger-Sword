@@ -42,5 +42,10 @@ public abstract class MonsterSkillData : ScriptableObject
              "단일 타격 = hitStartTime, 콤보 = attackDuration, 대쉬 = startupTime 등을 참고해 설정하세요.")]
     public float telegraphDuration = 1.0f;
 
+    [Header("전투 사운드")]
+    public CombatSoundSettings SwingAudio = new CombatSoundSettings();
+    public CombatSoundSettings HitAudio = new CombatSoundSettings();
+    public CombatSoundSettings LandingAudio = new CombatSoundSettings();
+
     public abstract EnemyAction CreateAction(Enemy enemy);
 }

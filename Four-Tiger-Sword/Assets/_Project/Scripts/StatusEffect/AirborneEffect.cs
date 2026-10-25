@@ -12,6 +12,7 @@ public class AirborneEffect : IStatusEffect
     private float _baseOffset;
     private Transform _target;
     private float _baseY;
+    private CombatActorClock _clock;
     public bool IsExpired => _elapsed >= _duration;
     public AirborneEffect(float duration, float launchForce = 8f)
     {
@@ -25,11 +26,13 @@ public class AirborneEffect : IStatusEffect
         _agent = target.GetComponent<NavMeshAgent>();
         if (_agent != null) _baseOffset = _agent.baseOffset;
         _enemy = target.GetComponent<Enemy>();
+        if (_enemy != null) _clock = CombatActorClock.GetOrCreate(_enemy);
         if (_enemy != null) { _enemy.RootDuration = _duration; _enemy.IsRoot = true; }
     }
     public void OnUpdate(float dt)
     {
-        _elapsed += dt;
+        // Airborne displacement and its root window share the victim's action clock.
+        _elapsed += dt * (_clock != null ? _clock.TimeScale : 1f);
         float lift = Mathf.Sin(Mathf.Clamp01(_elapsed / _duration) * Mathf.PI) * _height;
         if (_agent != null && _agent.enabled && _agent.isOnNavMesh)
             _agent.baseOffset = _baseOffset + lift;

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public class EarthForm : BaseForm
 {
+    protected override float CurrentAttackAnimationSpeed
+        => _currentAction == ActionType.Skill || _currentAction == ActionType.SwitchAttack ? FixedActionSpeed : AttackSpeed;
     private readonly EarthFormActionDataSO _earthData;
 
     public override ElementType Element => ElementType.ELEMENT_EARTH;
@@ -41,6 +43,12 @@ public class EarthForm : BaseForm
         _guardCounterReady = false;
         base.BeginAttack();
     }
+    public override bool BeginFinisher(Vector3 lockedForward, bool transformed)
+    {
+        if (!CanBeginFinisherWith(_playerController, lockedForward, transformed)) return false;
+        _guardCounterReady = false;
+        return base.BeginFinisher(lockedForward, transformed);
+    }
     public override void BeginCounter()
     {
         _guardCounterReady = false;
@@ -75,21 +83,34 @@ public class EarthForm : BaseForm
     {
         base.BeginSkill();
         _playerController.StatManager.GrantShield(_skillShieldSource, _earthData.ShieldAmount, _earthData.ShieldDuration);
+        PrepareSkillAttack();
+    }
+    public override void BeginSwitchAttack()
+    {
+        base.BeginSwitchAttack();
+        PrepareSkillAttack();
+    }
+    private void PrepareSkillAttack()
+    {
         _dashElapsed = 0f;
         _skillActive = true;
         _dashTargets.Clear();
         _softTarget = null;
         _dashDirection = Vector3.ProjectOnPlane(_playerController.transform.forward, Vector3.up).normalized;
-        _playerController.Animator.speed = 1f;
+        _playerController.SetAnimationSpeed(FixedActionSpeed);
     }
-    public override void UpdateSkill(out bool isComplete) => AdvanceSkill(Time.deltaTime, out isComplete);
+    public override void UpdateSkill(out bool isComplete) => AdvanceSkill(_playerController.ActionDeltaTime, out isComplete);
     private void AdvanceSkill(float dt, out bool isComplete)
     {
         var step = _earthData.SkillSteps != null && _earthData.SkillSteps.Count > 0 ? _earthData.SkillSteps[0] : null;
         if (!_skillActive || step == null) { isComplete = true; return; }
         float duration = Mathf.Max(0.01f, _earthData.SkillDashDuration);
         float previous = _dashElapsed;
-        _dashElapsed += Mathf.Max(0f, dt);
+        _playerController.SetAnimationSpeed(FixedActionSpeed);
+        _dashElapsed += Mathf.Max(0f, dt) * FixedActionSpeed;
+        _timer = _dashElapsed;
+        if (HasCameraV2(step))
+            UpdateAttackCamera(step, _dashElapsed / Mathf.Max(0.01f, Mathf.Max(duration, step.Duration)));
         Vector3 offset = _playerController.transform.rotation * _earthData.SkillDashHitOffset;
         _sweepStart = _playerController.transform.position + offset;
         float distance = Mathf.Max(0f, _earthData.SkillDashDistance)
@@ -99,23 +120,43 @@ public class EarthForm : BaseForm
         _playerController.Controller.Move(motion);
         _sweepEnd = _playerController.transform.position + offset;
         if (previous < duration && dt > 0f)
-            ExecuteHit(step, Mathf.Max(0f, _earthData.SkillDashDamageMultiplier), step.PoiseDamage, _dashTargets);
+        {
+            HitEvent hitEvent = FirstHitEvent(step, out int eventIndex);
+            PlaySwingSound(step, hitEvent, eventIndex);
+            ExecuteHit(step, Mathf.Max(0f, _earthData.SkillDashDamageMultiplier), step.PoiseDamage, _dashTargets, hitEvent);
+        }
         isComplete = _dashElapsed >= Mathf.Max(duration, step.Duration);
     }
     protected override int QueryOverlap(WeaponActionData step, Vector3 center)
-        => _currentAction == ActionType.Skill
+        => _currentAction == ActionType.Skill || _currentAction == ActionType.SwitchAttack
             ? Physics.OverlapCapsuleNonAlloc(_sweepStart, _sweepEnd, Mathf.Max(0.1f, _earthData.SkillDashHitRadius), _overlapBuffer, _enemyLayer)
             : base.QueryOverlap(step, center);
+    protected override float ResolveKnockbackForce(WeaponActionData step, HitEvent hitEvent)
+        => (_currentAction == ActionType.Skill || _currentAction == ActionType.SwitchAttack)
+            && hitEvent?.Balance?.EnableV2 != true ? step.KnockbackForce : base.ResolveKnockbackForce(step, hitEvent);
+    protected override HitEvent ResolveStopHitEvent(WeaponActionData step, HitEvent hitEvent)
+        => (_currentAction == ActionType.Skill || _currentAction == ActionType.SwitchAttack)
+            && hitEvent?.Feedback?.HitStop?.EnableV2 != true ? null : hitEvent;
+    protected override CombatSoundCue ResolveHitSound(WeaponActionData step = null, HitEvent hitEvent = null)
+        => base.ResolveHitSound(step, hitEvent ?? (_currentAction == ActionType.Skill || _currentAction == ActionType.SwitchAttack
+            ? FirstHitEvent(step, out _) : null));
     public override void EndSkill()
     {
         _skillActive = false;
         _dashTargets.Clear();
         base.EndSkill();
     }
+    public override void EndSwitchAttack()
+    {
+        _skillActive = false;
+        _dashTargets.Clear();
+        base.EndSwitchAttack();
+    }
     public override void BeginUltimate()
     {
         ConsumeUltimateResources();
         _currentAction = ActionType.Ultimate;
+        PlayUltimateActivationSound();
         _playerController.StatManager.GrantShield(_ultimateShieldSource, _earthData.UltimateShieldAmount, _earthData.UltimateShieldDuration);
         UltimateBuffRemaining = Mathf.Max(0f, _earthData.UltimateBuffDuration);
     }
@@ -137,5 +178,13 @@ public class EarthForm : BaseForm
         UltimateBuffRemaining = 0f;
         _playerController?.StatManager.RemoveShield(_skillShieldSource);
         _playerController?.StatManager.RemoveShield(_ultimateShieldSource);
+    }
+
+    public override void CleanupStageEffects()
+    {
+        _skillActive = false;
+        _guardCounterReady = false;
+        _dashTargets.Clear();
+        base.CleanupStageEffects();
     }
 }

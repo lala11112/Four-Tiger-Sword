@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 4255200110448653429}
   - component: {fileID: 3282778978993342411}
   - component: {fileID: 7753285410349235997}
+  - component: {fileID: 8711977803326721495}
   m_Layer: 8
   m_Name: Drone
   m_TagString: Untagged
@@ -200,6 +201,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HitVfxAnchor
   spawnPoint: {fileID: 3121477681633157050}
+--- !u!114 &8711977803326721495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3750457541734520375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52537b332a0aa094e9b77be005bc49d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDeathFade
+  _delay: 0.35
+  _duration: 2
+  _targets:
+  - Renderer: {fileID: 4620216765888640796}
+    Materials:
+    - {fileID: 2100000, guid: f8773c28f633e514893a75a22763553f, type: 2}
+  - Renderer: {fileID: 7969313336034667555}
+    Materials:
+    - {fileID: 2100000, guid: 1f9d97a010bbb7445b2a0bbf696184cb, type: 2}
+  - Renderer: {fileID: 6937147859410352964}
+    Materials:
+    - {fileID: 2100000, guid: feb229a0db8fd344481cb49011c245ab, type: 2}
 --- !u!1 &6200595109726695912
 GameObject:
   m_ObjectHideFlags: 0
@@ -414,8 +439,23 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8708d8c4524cff4a8310cae46368941, type: 3}
+--- !u!137 &4620216765888640796 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 732227818387225015, guid: f8708d8c4524cff4a8310cae46368941, type: 3}
+  m_PrefabInstance: {fileID: 5347791431739739819}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5601794608544934208 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f8708d8c4524cff4a8310cae46368941, type: 3}
+  m_PrefabInstance: {fileID: 5347791431739739819}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &6937147859410352964 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3058675047728838127, guid: f8708d8c4524cff4a8310cae46368941, type: 3}
+  m_PrefabInstance: {fileID: 5347791431739739819}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &7969313336034667555 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -6579869313042701688, guid: f8708d8c4524cff4a8310cae46368941, type: 3}
   m_PrefabInstance: {fileID: 5347791431739739819}
   m_PrefabAsset: {fileID: 0}

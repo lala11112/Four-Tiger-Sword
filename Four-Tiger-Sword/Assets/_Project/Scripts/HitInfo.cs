@@ -1,4 +1,7 @@
 using UnityEngine;
+
+public enum PlayerAttackCategory { Other, Normal, SwitchAttack, Skill, Ultimate, Counter, Heavy, Secondary }
+
 public readonly struct HitInfo
 {
     public readonly float   BaseDamage;
@@ -14,6 +17,11 @@ public readonly struct HitInfo
     /// <summary>속성 상성, 치명타, 방어력을 모두 무시하는 고정 피해. 무적/가드/보호막은 유지합니다.</summary>
     public readonly bool TrueDamage;
     public readonly object Source;
+    public readonly CombatSoundCue ImpactSound;
+    public readonly PlayerAttackCategory Category;
+    public readonly float ItemDamageMultiplier;
+    public readonly float SourceDamageMultiplier;
+    public readonly bool HasSourceDamageSnapshot;
 
     public readonly Vector3 Power;
 
@@ -29,7 +37,10 @@ public readonly struct HitInfo
                    float poiseDamageMultiplier = 1f,
                    bool  armorPierce = false, Vector3 power = default, float poiseDamage = 0f,
                    StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE,
-                   bool isParryable = true, object source = null, bool trueDamage = false)
+                   bool isParryable = true, object source = null, bool trueDamage = false,
+                   CombatSoundCue impactSound = default,
+                   PlayerAttackCategory category = PlayerAttackCategory.Other, float itemDamageMultiplier = 1f,
+                   float sourceDamageMultiplier = 1f, bool hasSourceDamageSnapshot = false)
     {
         BaseDamage            = damage;
         Element               = element;
@@ -43,5 +54,10 @@ public readonly struct HitInfo
         IsParryable           = isParryable;
         Source = source;
         TrueDamage = trueDamage;
+        ImpactSound = impactSound;
+        Category = category;
+        ItemDamageMultiplier = itemDamageMultiplier;
+        SourceDamageMultiplier = sourceDamageMultiplier;
+        HasSourceDamageSnapshot = hasSourceDamageSnapshot;
     }
 }

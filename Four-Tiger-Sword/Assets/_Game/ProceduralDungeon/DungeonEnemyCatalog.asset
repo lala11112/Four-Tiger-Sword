@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c958f8d40e2486a4da32a73100e172e4, type: 3}
+  m_Name: DungeonEnemyCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::DungeonEnemyCatalog
+  enemies:
+  - prefab: {fileID: 2552600057017201039, guid: 9c622f250ecf58c439c77f0c5636830a, type: 3}
+    cost: 2
+  - prefab: {fileID: 3750457541734520375, guid: b868760258ea82c4e8e1e9490a131e0f, type: 3}
+    cost: 5
+  - prefab: {fileID: 2897307517416127197, guid: 23338733f2f7894438a96136c56f7c98, type: 3}
+    cost: 4

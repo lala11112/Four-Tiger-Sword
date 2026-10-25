@@ -36,8 +36,8 @@ public class EnemyApproachState : IPlayerState
     public void Update()
     {
         if (_enemy.DetectedTarget == null || _enemy.CurrentAction == null) return;
-        _elapsed += Time.deltaTime;
-        _stuckTime += Time.deltaTime;
+        _elapsed += _enemy.ActionDeltaTime;
+        _stuckTime += _enemy.ActionDeltaTime;
         if ((_enemy.transform.position - _progressPosition).sqrMagnitude >= 0.01f)
         {
             _progressPosition = _enemy.transform.position;
@@ -55,7 +55,7 @@ public class EnemyApproachState : IPlayerState
             _enemy.CancelFailedApproach();
             return;
         }
-        _repathTimer -= Time.deltaTime;
+        _repathTimer -= _enemy.ActionDeltaTime;
         if (_repathTimer > 0f) return;
         _repathTimer = 0.2f;
         Vector3 destination = _enemy.DetectedTarget.position;

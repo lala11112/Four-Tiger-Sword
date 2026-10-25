@@ -1,117 +1,156 @@
 using System;
-using System.Collections.Generic;
+using System.Collections;
+using StudioBaekho;
 using UnityEngine;
 
-[Serializable]
-public struct SpawnEntry
-{
-    [Tooltip("스폰할 몬스터 프리팹")]
-    public GameObject Prefab;
-    [Tooltip("스폰 위치 Transform (씬에 배치한 빈 오브젝트)")]
-    public Transform SpawnPoint;
-}
-
+/// <summary>Owns one generated stage. RunManager alone chooses and commits progression.</summary>
+[DisallowMultipleComponent]
 public class StageManager : MonoBehaviour
 {
-    [Header("스폰 설정")]
-    [SerializeField] private SpawnEntry[] _spawnEntries;
-
-    [Header("UI")]
-    [SerializeField] private StageResultUI _stageResultUI;
-
-    private readonly List<Enemy> _aliveEnemies = new List<Enemy>();
-
+    [SerializeField] private BaekhoDungeonGenerator generator;
+    [SerializeField] private DungeonEncounterDirector encounters;
+    public BaekhoDungeonGenerator Generator => generator;
+    public DungeonEncounterDirector Encounters => encounters;
+    public BaekhoDungeonResult Result { get; private set; }
+    public bool IsReady { get; private set; }
+    public bool IsCleared { get; private set; }
+    public string Error { get; private set; }
+    public int MapCount => Result?.rooms.Count ?? 0;
+    public StageExit Exit { get; private set; }
+    public Vector3 PlayerSpawnPosition { get; private set; }
+    public Quaternion PlayerSpawnRotation { get; private set; }
     public event Action OnStageClear;
     public event Action OnStageStart;
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        if (_spawnEntries == null) return;
-
-        for (int i = 0; i < _spawnEntries.Length; i++)
-        {
-            GameObject source = _spawnEntries[i].Prefab;
-            if (source == null || !source.scene.IsValid()) continue;
-
-            // Clone the asset, never a scene enemy whose death/dash can disable its collider.
-            string path = UnityEditor.PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(source);
-            GameObject prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
-            if (prefab != null)
-                _spawnEntries[i].Prefab = prefab;
-            else
-                Debug.LogWarning($"[StageManager] {source.name}은 씬 오브젝트입니다. 스폰 목록에는 Project 창의 몬스터 프리팹을 지정하세요.", this);
-        }
-    }
-#endif
+    public event Action ExitRequested;
+    public event Action<string> Failed;
+    private BaekhoDungeonSettings _runtimeSettings;
+    private DungeonRoomEncounter _endEncounter, _bossEncounter;
+    private PlayerController _player;
+    private bool _isBossStage, _exitRequested;
+    private int _generation;
 
     private void Awake()
     {
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        if (generator == null) generator = FindFirstObjectByType<BaekhoDungeonGenerator>();
+        if (encounters == null && generator != null) encounters = generator.GetComponent<DungeonEncounterDirector>();
+        if (generator != null) generator.generateOnStart = false;
         Application.targetFrameRate = 144;
     }
 
-    private void Start()
-    {
-        //SpawnAll();
-        OnStageStart?.Invoke();
-    }
+    public void Configure(BaekhoDungeonGenerator source, DungeonEncounterDirector director)
+    { generator = source; encounters = director; generator.generateOnStart = false; }
 
-    private void SpawnAll()
+    public IEnumerator Prepare(StageDefinition definition, bool bossStage, int stageSeed, int layoutSeed, PlayerController player)
     {
-        if (_spawnEntries == null || _spawnEntries.Length == 0)
+        int generation = ++_generation;
+        Suspend();
+        Error = null;
+        IsCleared = false;
+        _exitRequested = false;
+        _player = player;
+        _isBossStage = bossStage;
+        _endEncounter = _bossEncounter = null;
+        if (generator == null || encounters == null || player == null)
+        { SetError("Stage requires a generator, encounter director and player."); yield break; }
+        if (definition == null || !definition.Validate(bossStage, out _))
+        { SetError(definition == null ? "Stage Definition is missing." : GetValidationError(definition, bossStage)); yield break; }
+        if (_runtimeSettings != null) Destroy(_runtimeSettings);
+        _runtimeSettings = definition.CreateRuntimeSettings(stageSeed, bossStage);
+        generator.settings = _runtimeSettings;
+        encounters.catalog = definition.enemyCatalog;
+        encounters.ConfigureStage(bossStage ? definition.bossPrefab : null);
+        yield return generator.Generate(layoutSeed);
+        if (generation != _generation) yield break;
+        var result = generator.LastResult;
+        if (result == null || !result.success || result.root != generator.CurrentRoot)
+        { SetError(result?.error ?? "Dungeon generation failed."); yield break; }
+        Result = result;
+        float deadline = Time.realtimeSinceStartup + 120f;
+        while (!encounters.IsReady)
         {
-            Debug.LogWarning("[StageManager] 스폰 목록이 비어 있어 스폰을 중단합니다.", this);
-            return;
+            if (generation != _generation) yield break;
+            if (result.root == null || generator.CurrentRoot != result.root || Time.realtimeSinceStartup > deadline)
+            { SetError("Encounter preparation did not complete."); yield break; }
+            yield return null;
         }
-
-        foreach (var entry in _spawnEntries)
+        if (!string.IsNullOrEmpty(encounters.Error)) { SetError(encounters.Error); yield break; }
+        var start = result.startRoom != null ? result.startRoom.GetComponent<StageMapAnchors>() : null;
+        var end = result.endRoom != null ? result.endRoom.GetComponent<StageMapAnchors>() : null;
+        if (start == null || start.playerSpawn == null || end == null || end.exitPoint == null)
+        { SetError("Generated start or exit anchor is missing."); yield break; }
+        PlayerSpawnPosition = start.playerSpawn.position;
+        PlayerSpawnRotation = start.playerSpawn.rotation;
+        _endEncounter = result.endRoom.GetComponent<DungeonRoomEncounter>();
+        _bossEncounter = result.bossRoom != null ? result.bossRoom.GetComponent<DungeonRoomEncounter>() : null;
+        if (_endEncounter == null || (bossStage && _bossEncounter == null))
+        { SetError("Required stage encounter is missing."); yield break; }
+        var shop = GetComponent<StageShopService>();
+        if (_runtimeSettings.shopRoom != null && shop == null)
+        { SetError("This stage requires StageShopService."); yield break; }
+        if (shop != null)
         {
-            if (entry.Prefab == null)
-            {
-                Debug.LogWarning("[StageManager] Prefab이 비어 있는 SpawnEntry가 있습니다. 건너뜁니다.");
-                continue;
-            }
-
-            if (entry.SpawnPoint == null)
-            {
-                Debug.LogWarning($"[StageManager] {entry.Prefab.name}의 SpawnPoint가 비어 있습니다. 건너뜁니다.");
-                continue;
-            }
-
-            var go = Instantiate(entry.Prefab, entry.SpawnPoint.position, entry.SpawnPoint.rotation);
-            var enemy = go.GetComponent<Enemy>();
-
-            if (enemy == null)
-            {
-                Debug.LogWarning($"[StageManager] {entry.Prefab.name}에 Enemy 컴포넌트가 없습니다. 생존 추적에서 제외됩니다.");
-                continue;
-            }
-
-            _aliveEnemies.Add(enemy);
-            enemy.OnDied += () => OnEnemyDied(enemy);
+            try { shop.PrepareStage(stageSeed, result); }
+            catch (Exception exception) { SetError("Shop preparation failed: " + exception.Message); }
+            if (Error != null) yield break;
         }
-
-        if (_aliveEnemies.Count == 0)
-        {
-            // No wave started: clearing here would synchronously call SpawnAll again forever.
-            Debug.LogWarning("[StageManager] 생성된 적이 없어 스폰을 중단합니다. 프리팹과 스폰 위치를 확인하세요.", this);
-        }
+        var exitObject = new GameObject("StageExit");
+        exitObject.transform.SetParent(result.endRoom.transform, false);
+        exitObject.transform.SetPositionAndRotation(end.exitPoint.position, end.exitPoint.rotation);
+        Exit = exitObject.AddComponent<StageExit>();
+        Exit.Initialize(this, player, end.exitSize, generation);
+        IsReady = true;
     }
 
-    private void OnEnemyDied(Enemy enemy)
+    internal void NotifyStarted() => OnStageStart?.Invoke();
+
+    private static string GetValidationError(StageDefinition definition, bool bossStage)
+    { definition.Validate(bossStage, out string error); return error; }
+
+    public void Suspend()
     {
-        _aliveEnemies.Remove(enemy);
-
-        if (_aliveEnemies.Count == 0)
-            HandleStageClear();
+        IsReady = false;
+        GetComponent<StageShopService>()?.SuspendStage();
+        if (Exit != null) Exit.SetAvailable(false);
+        encounters?.SuspendEncounters();
     }
 
-    private void HandleStageClear()
+    public void Cancel()
     {
-        _stageResultUI?.ShowResult(true);
-        SpawnAll();
-        OnStageClear?.Invoke();
+        ++_generation;
+        StopAllCoroutines();
+        Suspend();
+        if (generator != null && generator.IsGenerating) generator.ClearGenerated();
     }
+
+    private void Update()
+    {
+        if (!IsReady) return;
+        if (!string.IsNullOrEmpty(encounters.Error)) { SetError(encounters.Error); Failed?.Invoke(Error); return; }
+        bool objectiveComplete = _endEncounter != null && _endEncounter.State == DungeonEncounterState.Cleared
+            && (!_isBossStage || (_bossEncounter != null && _bossEncounter.BossDefeated && _bossEncounter.State == DungeonEncounterState.Cleared));
+        Exit?.SetAvailable(objectiveComplete);
+        // Empty end rooms are Cleared at initialization: arrival, not a missed event, completes them.
+        if (objectiveComplete && _endEncounter.WasEntered) MarkClear();
+    }
+
+    public bool TryUseExit(PlayerController player, int generation)
+    {
+        if (!IsReady || _exitRequested || generation != _generation || player != _player || player.IsStageTransitioning || player.IsShopPaused
+            || Exit == null || !Exit.ContainsPlayer(player)
+            || player.StatManager.CurrentHp <= 0 || _endEncounter == null || _endEncounter.State != DungeonEncounterState.Cleared
+            || (_isBossStage && (_bossEncounter == null || !_bossEncounter.BossDefeated || _bossEncounter.State != DungeonEncounterState.Cleared))) return false;
+        _exitRequested = true;
+        MarkClear();
+        ExitRequested?.Invoke();
+        return true;
+    }
+
+    private void MarkClear()
+    { if (!IsCleared) { IsCleared = true; OnStageClear?.Invoke(); } }
+
+    private void SetError(string message)
+    { Error = message; Suspend(); Debug.LogWarning("[Stage] " + message, this); }
+
+    private void OnDestroy()
+    { if (_runtimeSettings != null) Destroy(_runtimeSettings); }
 }

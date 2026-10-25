@@ -6,6 +6,7 @@ public class PlayerDashState : IPlayerState
     private float _dashDuration = 0.2f;
     private float _dashTimer;
     private Vector3 _dashDirection;
+    private bool _started;
 
     public bool IsDashComplete{ get; private set; }
 
@@ -16,6 +17,8 @@ public class PlayerDashState : IPlayerState
         IsDashComplete = false;
         _dashTimer = 0;
         _playerController.Input.DashBuffer.Consume();
+        _started = _playerController.TryBeginDash();
+        if (!_started) { IsDashComplete = true; return; }
 
         if(_playerController.Input.MoveInput.sqrMagnitude > 0.01f)
         {
@@ -32,24 +35,25 @@ public class PlayerDashState : IPlayerState
 
     public void Update()
     {
-        _dashTimer += Time.deltaTime;
+        if (!_started) return;
+        _dashTimer += _playerController.ActionDeltaTime;
         if(_dashTimer >= _dashDuration)
         {
             IsDashComplete = true;
             _playerController.Movement.ApplyGravity();
-            _playerController.Controller.Move(new Vector3(0, _playerController.VerticalVelocity, 0) * Time.deltaTime);
+            _playerController.Controller.Move(new Vector3(0, _playerController.VerticalVelocity, 0) * _playerController.ActionDeltaTime);
         }
         else
         {
             _playerController.Movement.ApplyGravity();
             Vector3 dashVelocity = _dashDirection * _playerController.DashSpeed;
             dashVelocity.y = _playerController.VerticalVelocity;
-            _playerController.Controller.Move(dashVelocity * Time.deltaTime);
+            _playerController.Controller.Move(dashVelocity * _playerController.ActionDeltaTime);
         }
     }
 
     public void Exit()
     {
-        _playerController.StartDashCooldown();
+        if (_started) _playerController.StartDashCooldown();
     }
 }

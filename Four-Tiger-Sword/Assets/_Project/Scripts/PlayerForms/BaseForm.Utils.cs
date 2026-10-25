@@ -11,21 +11,28 @@ public abstract partial class BaseForm
         if (_playerController.Animator.HasState(0, Animator.StringToHash(stateName)))
         {
             //_playerController.Animator.applyRootMotion = true;
-            _playerController.Animator.CrossFade(stateName, transition);
+            // Every action clock starts at zero, including repeated attacks using the same state.
+            _playerController.Animator.CrossFade(stateName, transition, 0, 0f);
         }
     }
 
     protected void PlayCombo()
     {
+        SnapshotAttackDamage();
         _timer = 0;
         _playerController.Input.AttackBuffer.Consume();
         ClearHitTargets();
-        WeaponActionData step = _weaponActionData.ComboSteps[_comboStep];
-        ResetTargetApproach(step, _comboStep > 0);
+        WeaponActionData step = CurrentNormalAttackStep;
+        if (_finisherAttackActive)
+        {
+            ClearSoftTarget();
+            ApplyFinisherFacing();
+            ResetMotion(step);
+        }
+        else ResetTargetApproach(step, _comboStep > 0);
         BeginAttackCamera(step, _comboStep > 0);
         PlayActionAnimation(step.AnimationName, 0.1f);
         _playerController.UpdateAttackTrails(step, 0f);
-        PlayStepSound(_weaponActionData.ComboSteps, _comboStep);
         Debug.Log($"공격이름 : {step.AnimationName}  타수 : {_comboStep}");
     }
 
@@ -38,7 +45,6 @@ public abstract partial class BaseForm
         BeginAttackCamera(step, _skillStep > 0);
         PlayActionAnimation(step.AnimationName, 0.01f);
         _playerController.UpdateAttackTrails(step, 0f);
-        PlayStepSound(_weaponActionData.SkillSteps, _skillStep);
         Debug.Log($"스킬 단계 : {step.AnimationName} ({_skillStep})");
     }
 
@@ -51,7 +57,6 @@ public abstract partial class BaseForm
         BeginAttackCamera(step, _ultimateStep > 0);
         PlayActionAnimation(step.AnimationName, 0.01f);
         _playerController.UpdateAttackTrails(step, 0f);
-        PlayStepSound(_weaponActionData.UltimateSteps, _ultimateStep);
         Debug.Log($"궁극기 단계 : {step.AnimationName} ({_ultimateStep})");
     }
 
@@ -69,7 +74,7 @@ public abstract partial class BaseForm
         Transform point = anchor != null ? anchor.SpawnPoint : target.transform;
         Quaternion rotation = point.rotation * Quaternion.Euler(settings?.Rotation ?? Vector3.zero);
         // Spawn independently so knockback or death does not move/remove the impact effect.
-        GameObject effect = Object.Instantiate(prefab, point.position, rotation);
+        GameObject effect = StageTransientObject.Track(Object.Instantiate(prefab, point.position, rotation));
         effect.transform.localScale = Vector3.Scale(effect.transform.localScale, settings?.Scale ?? Vector3.one);
         foreach (var particles in effect.GetComponentsInChildren<ParticleSystem>(true))
         {
@@ -78,27 +83,73 @@ public abstract partial class BaseForm
         }
     }
 
-    protected void PlayHitSound(Vector3 position)
+    private readonly HashSet<int> _playedSwingEvents = new();
+    private float _previousSwingTime;
+
+    protected void ResetAttackSounds()
     {
-        if (_weaponActionData?.HitSound == null) return;
-
-        AudioClip clip = _weaponActionData.HitSound;
-        if (clip.loadState != AudioDataLoadState.Loaded)
-        {
-            Debug.LogWarning($"[PlayHitSound] '{clip.name}'의 Load Type이 Streaming이거나 아직 로드되지 않아 재생할 수 없습니다. Import Settings에서 Load Type을 'Decompress On Load'로 변경하세요.");
-            return;
-        }
-
-        AudioSource.PlayClipAtPoint(clip, position);
+        _playedSwingEvents.Clear();
+        _previousSwingTime = 0f;
     }
 
-    protected void PlayStepSound(List<WeaponActionData> steps, int index)
-    {
-        if (steps == null || index >= steps.Count) return;
-        WeaponActionData step = steps[index];
-        if (step.SwingSound == null) return;
+    protected void UpdateSwingSounds(WeaponActionData step)
+        => UpdateSwingSounds(step, _timer);
 
-        AudioSource.PlayClipAtPoint(step.SwingSound, _playerController.transform.position);
+    protected void UpdateSwingSounds(WeaponActionData step, float elapsed)
+    {
+        if (step == null) return;
+        float currentTime = Mathf.Min(elapsed, step.Duration);
+        if (currentTime <= _previousSwingTime) return;
+        _previousSwingTime = currentTime;
+        if (step.HitEvents != null && step.HitEvents.Count > 0)
+        {
+            for (int i = 0; i < step.HitEvents.Count; i++)
+            {
+                HitEvent hit = step.HitEvents[i];
+                if (hit != null && hit.Duration > 0f && hit.StartTime <= step.Duration
+                    && currentTime >= Mathf.Max(0f, hit.StartTime))
+                    PlaySwingSound(step, hit, i);
+            }
+        }
+        else if (step.HitDuration > 0f && step.HitStartTime <= step.Duration
+            && currentTime >= Mathf.Max(0f, step.HitStartTime))
+            PlaySwingSound(step);
+    }
+
+    protected void PlaySwingSound(WeaponActionData step, HitEvent hitEvent = null, int eventIndex = -1)
+    {
+        if (_playerController == null || step == null || !_playedSwingEvents.Add(eventIndex)) return;
+        CombatSoundSettings settings = hitEvent?.Feedback?.SwingAudio;
+        if (settings == null || !settings.HasSound) settings = step.Feedback?.SwingAudio;
+        CombatSoundCue cue = settings != null
+            ? settings.Resolve(step.SwingSound)
+            : new CombatSoundSettings().Resolve(step.SwingSound);
+        CombatSfx.Play(cue, _playerController.transform.position, _playerController);
+    }
+
+    protected virtual CombatSoundCue ResolveHitSound(WeaponActionData step = null, HitEvent hitEvent = null)
+    {
+        CombatSoundSettings settings = hitEvent?.Feedback?.HitAudio;
+        if (settings != null && settings.HasSound) return settings.Resolve();
+        settings = step?.Feedback?.HitAudio;
+        if (settings != null && settings.HasSound) return settings.Resolve();
+        settings = _weaponActionData?.CommonFeedback?.HitAudio;
+        return settings != null
+            ? settings.Resolve(_weaponActionData.HitSound)
+            : new CombatSoundSettings().Resolve(_weaponActionData?.HitSound);
+    }
+
+    protected CombatSoundCue ResolveSecondaryHitSound()
+    {
+        CombatSoundSettings settings = _weaponActionData?.CommonFeedback?.SecondaryHitAudio;
+        return settings != null && settings.HasSound ? settings.Resolve() : ResolveHitSound();
+    }
+
+    protected void PlayUltimateActivationSound()
+    {
+        ResetAttackSounds();
+        var steps = _weaponActionData?.UltimateSteps;
+        if (steps != null && steps.Count > 0) PlaySwingSound(steps[0]);
     }
 
     // ── 소프트 타겟팅 ────────────────────────────────────────────────────────
@@ -244,6 +295,6 @@ public abstract partial class BaseForm
         _playerController.transform.rotation = Quaternion.RotateTowards(
             _playerController.transform.rotation,
             targetRot,
-            SoftTargetRotationSpeed * (animationDelta >= 0f ? animationDelta : Time.deltaTime * AttackSpeed));
+            SoftTargetRotationSpeed * (animationDelta >= 0f ? animationDelta : _playerController.ActionDeltaTime * AttackSpeed));
     }
 }

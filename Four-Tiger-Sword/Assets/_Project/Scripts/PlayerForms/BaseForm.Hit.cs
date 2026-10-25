@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public abstract partial class BaseForm
 {
     private readonly Dictionary<int, HashSet<IDamageable>> _hitEventTargets = new();
+    private readonly HashSet<(WeaponActionData step, int hitIndex)> _confirmedFeedbackEvents = new();
     private float _previousHitTime;
     protected Collider[] _overlapBuffer = new Collider[32];
 
@@ -11,7 +12,9 @@ public abstract partial class BaseForm
     {
         _playerController.StopAttackTrails();
         ClearSlashEffects();
+        ResetAttackSounds();
         foreach (var targets in _hitEventTargets.Values) targets.Clear();
+        _confirmedFeedbackEvents.Clear();
         _previousHitTime = 0f;
     }
 
@@ -21,6 +24,7 @@ public abstract partial class BaseForm
 
     protected virtual void ProcessHit(WeaponActionData step)
     {
+        UpdateSwingSounds(step);
         UpdateSlashEffects(step);
         UpdateAttackCamera(step);
         float previousTime = _previousHitTime;
@@ -33,9 +37,6 @@ public abstract partial class BaseForm
             {
                 HitEvent e = step.HitEvents[i];
                 if (e == null || !CrossesHitWindow(previousTime, currentTime, e.StartTime, e.Duration)) continue;
-
-                //사운드 재생
-                //PlayStepSound();
 
                 if (!_hitEventTargets.ContainsKey(i)) _hitEventTargets[i] = new HashSet<IDamageable>();
                 ExecuteHit(step, e.Damage > 0 ? e.Damage : step.Damage, e.PoiseDamage > 0 ? e.PoiseDamage : step.PoiseDamage, _hitEventTargets[i], e);
@@ -54,10 +55,8 @@ public abstract partial class BaseForm
     {
         Vector3 center = _playerController.transform.position
                        + _playerController.transform.rotation * step.HitBoxOffset;
-        float knockbackForce = hitEvent != null && hitEvent.OverrideKnockbackForce
-            ? hitEvent.KnockbackForce : step.KnockbackForce;
+        float knockbackForce = ResolveKnockbackForce(step, hitEvent);
 
-        bool firstHit = true;
         int hitCount = GetOverlap(step, center);
         for (int i = 0; i < hitCount; i++)
         {
@@ -73,23 +72,54 @@ public abstract partial class BaseForm
 
             Vector3 knockback = KnockbackMotion.Power(target.transform.position - _playerController.transform.position,
                 knockbackForce);
-            float critChance = _playerController.StatManager.GetStat(StatType.ST_CRT)/100f;
-            float critMultiplier = _playerController.StatManager.GetStat(StatType.ST_CRTD)/100f;
+            float critChance = DamageCriticalChance;
+            float critMultiplier = DamageCriticalMultiplier;
             var result = DamageManager.Apply(
-                new HitInfo(baseDamage * _playerController.StatManager.GetStat(StatType.ST_ATK), Element, critChance, critMultiplier, trueDamage: DealsTrueDamage, source: _playerController, power: knockback, poiseDamage: poiseDamage, staggerResistLevel: step.StaggerResistLevel),
+                new HitInfo(baseDamage * DamageAttackStat, Element, critChance, critMultiplier, trueDamage: DealsTrueDamage, source: _playerController, power: knockback, poiseDamage: poiseDamage, staggerResistLevel: step.StaggerResistLevel, impactSound: ResolveHitSound(step, hitEvent),
+                    category: CurrentAttackCategory, itemDamageMultiplier: DamageItemMultiplier,
+                    sourceDamageMultiplier: DamageSourceMultiplier, hasSourceDamageSnapshot: true),
                 damageable, target);
 
             if (!result.Applied) continue;
-            if (firstHit)
-            {
-                _playerController.StartHitStop(step, hitEvent);
-                if (!NotifyCameraHit(step, target.transform, _playerController.transform.forward))
-                    _playerController.PlayAttackCameraShake(step);
-                firstHit = false;
-            }
+            ConfirmHitFeedback(step, (Component)damageable, result, hitEvent);
             OnDamageDealt(target, result, step, hitEvent);
         }
     }
+
+    /// <summary>Victim feedback runs per applied target; attacker/camera feedback runs once per hit event.</summary>
+    protected void ConfirmHitFeedback(WeaponActionData step, Component target, DamageResult result,
+        HitEvent hitEvent = null, int hitEventIndex = -1, Vector3 direction = default,
+        bool legacyCameraFallbackOnly = false, bool legacyFeedbackDisabled = false)
+    {
+        if (!result.Applied || target == null || _playerController == null) return;
+        if (hitEventIndex < 0 && hitEvent != null && step?.HitEvents != null)
+            hitEventIndex = step.HitEvents.IndexOf(hitEvent);
+        int stepIndex = _currentAction == ActionType.Attack ? _comboStep
+            : _currentAction == ActionType.Ultimate ? _ultimateStep : _skillStep;
+        CombatFeedbackTelemetry.Emit("confirmed-impact", _playerController.gameObject, target.gameObject,
+            hitEventIndex, $"action={_currentAction};step={stepIndex}", result.HealthDamage + result.ShieldDamage);
+        bool first = _confirmedFeedbackEvents.Add((step, hitEventIndex));
+        bool stopEnabled = !legacyFeedbackDisabled || step?.Feedback?.HitStop?.EnableV2 == true
+            || hitEvent?.Feedback?.HitStop?.EnableV2 == true;
+        if (stopEnabled)
+            _playerController.StartHitStop(step, ResolveStopHitEvent(step, hitEvent), result.Killed ? null : target, first);
+        if (direction.sqrMagnitude < 0.001f) direction = _playerController.transform.forward;
+        bool cameraEnabled = !legacyFeedbackDisabled || HasCameraV2(step, hitEvent);
+        bool cameraOwned = cameraEnabled && (!legacyCameraFallbackOnly || HasCameraV2(step, hitEvent))
+            && NotifyCameraHit(step, target.transform, direction, hitEvent, hitEventIndex);
+        if (first && cameraEnabled && !cameraOwned)
+            _playerController.PlayAttackCameraShake(step);
+    }
+
+    protected virtual float ResolveKnockbackForce(WeaponActionData step, HitEvent hitEvent)
+        => hitEvent != null && hitEvent.OverrideKnockbackForce ? hitEvent.KnockbackForce : step.KnockbackForce;
+
+    protected virtual HitEvent ResolveStopHitEvent(WeaponActionData step, HitEvent hitEvent) => hitEvent;
+
+    protected static bool HasCameraV2(WeaponActionData step, HitEvent hitEvent = null)
+        => step?.Feedback?.Camera?.V2?.HasOverrides == true
+            || step?.CameraProfile?.EnableV2 == true && step.CameraProfile.V2?.HasOverrides == true
+            || hitEvent?.Feedback?.CameraV2?.HasOverrides == true;
 
     private int GetOverlap(WeaponActionData step, Vector3 center)
     {

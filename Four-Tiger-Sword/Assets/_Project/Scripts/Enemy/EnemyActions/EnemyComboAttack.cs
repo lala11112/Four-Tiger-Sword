@@ -10,6 +10,7 @@ public class EnemyComboAttack : EnemyAction
 {
     private readonly MonsterComboAttackSO _data;
     private readonly List<HashSet<IDamageable>> _hitTargets = new List<HashSet<IDamageable>>();
+    private bool[] _swingPlayed;
 
     public EnemyComboAttack(MonsterComboAttackSO data, Enemy enemy)
         : base(data, enemy)
@@ -22,6 +23,7 @@ public class EnemyComboAttack : EnemyAction
         base.Enter();
 
         _hitTargets.Clear();
+        _swingPlayed = new bool[_data.hits.Count];
         for (int i = 0; i < _data.hits.Count; i++)
             _hitTargets.Add(new HashSet<IDamageable>());
 
@@ -40,7 +42,14 @@ public class EnemyComboAttack : EnemyAction
             EnemyHitEvent e = _data.hits[i];
             if (e != null && CrossesHitWindow(previousTime, Mathf.Min(_timer, _data.attackDuration),
                 e.hitStartTime, e.hitDuration))
+            {
+                if (!_swingPlayed[i])
+                {
+                    _swingPlayed[i] = true;
+                    PlaySwingSound(e.SwingAudio);
+                }
                 ExecuteHit(i, e);
+            }
         }
 
         if (_timer >= _data.attackDuration)
@@ -62,7 +71,7 @@ public class EnemyComboAttack : EnemyAction
             if (damageable == null || !_hitTargets[index].Add(damageable)) continue;
             DamageManager.Apply(
                 new HitInfo(damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
-                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: GetKnockbackDirection(col) * _data.knockbackForce, staggerResistLevel: _data.staggerLevel, isParryable: _data.isParryable, source: this),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: GetKnockbackDirection(col) * _data.knockbackForce, staggerResistLevel: _data.staggerLevel, isParryable: _data.isParryable, source: this, impactSound: ResolveHitSound(e.HitAudio)),
                 damageable, col.gameObject);
         }
     }

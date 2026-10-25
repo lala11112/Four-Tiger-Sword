@@ -11,6 +11,10 @@ public class PlayerDieState : IPlayerState
 
     public void Enter()
     {
+        _playerController.CancelHitStops();
+        _playerController.SetAnimationSpeed(1f);
+        _playerController.CancelPendingSwitchAttack();
+        _playerController.ItemRuntime?.ClearTimedEffects();
         _playerController.Animator.applyRootMotion = true;
         _playerController.Animator.CrossFade("Die", 0.1f);
         _playerController.Controller.enabled = false;
@@ -19,6 +23,7 @@ public class PlayerDieState : IPlayerState
         _playerController.FormManager.CleanupTransientEffects();
         _playerController.FormManager.CurrentForm.Unequip(_playerController);
         Debug.Log("Player Die");
+        _playerController.NotifyDied();
     }
 
     public void Update()

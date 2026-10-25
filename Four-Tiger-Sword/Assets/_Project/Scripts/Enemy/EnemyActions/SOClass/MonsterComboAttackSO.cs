@@ -13,6 +13,11 @@ public class EnemyHitEvent
     public float damage = 0;
     [Tooltip("히트박스 위치 오프셋 (타격마다 다르게 설정 가능)")]
     public Vector3 hitBoxOffset = new Vector3(0f, 0f, 1f);
+
+    [Tooltip("클립을 지정하면 이 타격의 공통 휘두름 사운드를 덮어씁니다.")]
+    public CombatSoundSettings SwingAudio = new CombatSoundSettings();
+    [Tooltip("클립을 지정하면 이 타격의 공통 명중 사운드를 덮어씁니다.")]
+    public CombatSoundSettings HitAudio = new CombatSoundSettings();
 }
 
 [CreateAssetMenu(fileName = "ComboAttack", menuName = "Monster/ComboAttack")]

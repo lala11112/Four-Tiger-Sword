@@ -1,0 +1,55 @@
+using System;
+using UnityEngine;
+
+namespace ArpgHud
+{
+    [Serializable]
+    public struct MeterState
+    {
+        public float Current, Maximum;
+        public MeterState(float current, float maximum) { Current = current; Maximum = maximum; }
+    }
+
+    [Serializable]
+    public struct SkillState
+    {
+        public Sprite ColorIcon, GrayIcon;
+        public float Remaining, Duration;
+        public bool Unavailable, Active;
+        public SkillState(Sprite color, Sprite gray, float remaining, float duration)
+        {
+            ColorIcon = color; GrayIcon = gray; Remaining = remaining; Duration = duration;
+            Unavailable = Active = false;
+        }
+    }
+
+    [Serializable]
+    public struct HudState
+    {
+        public MeterState Hp, Auxiliary, UltimateCharge;
+        public int ActiveFormIndex;
+        public SkillState E, R;
+    }
+
+    /// <summary>The game owns all state and cooldown timing. Publish after accepted changes.</summary>
+    public interface IHudStateSource
+    {
+        HudState CurrentState { get; }
+        event Action StateChanged;
+    }
+
+    public static class HudMath
+    {
+        public static bool IsFinite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
+        public static float Ratio(MeterState value) =>
+            IsFinite(value.Current) && IsFinite(value.Maximum) && value.Maximum > 0
+                ? Mathf.Clamp01(value.Current / value.Maximum) : 0;
+
+        public static float Remaining(SkillState value) =>
+            IsFinite(value.Duration) && IsFinite(value.Remaining) && value.Duration > 0
+                ? Mathf.Clamp(value.Remaining, 0, value.Duration) : 0;
+
+        public static float Progress(SkillState value) =>
+            IsFinite(value.Duration) && value.Duration > 0 ? 1 - Remaining(value) / value.Duration : 1;
+    }
+}

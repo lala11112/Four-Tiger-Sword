@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: IT_WOOD_02
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: 93190cd9-a826-4b58-b257-cf4ba077b827
+  candidateKey: c8d3e698-0a40-41a2-b8dc-613c05c4086e
+  itemId: IT_WOOD_02
+  displayName: "\uC228\uACB0 \uB9E4\uB4ED"
+  description: "\uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC SP \uC7AC\uC0DD +3 SP/\uCD08"
+  element: 1
+  grade: 2
+  purchasePrice: 40
+  effects:
+  - stat: 2
+    amount: 3
+    trigger: 0
+    allForms: 1
+    targetForms: 
+    durationSeconds: 0
+  icon: {fileID: 21300000, guid: dfd481c40b14d174293c36079e5eef33, type: 3}
+  contentStatus: draft
+  contentRevision: 1
+  sourceJson: "{\"candidateKey\":\"c8d3e698-0a40-41a2-b8dc-613c05c4086e\",\"itemId\":\"IT_WOOD_02\",\"name\":\"\uC228\uACB0
+    \uB9E4\uB4ED\",\"description\":\"\uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC SP \uC7AC\uC0DD
+    +3 SP/\uCD08\",\"descriptionStale\":false,\"element\":\"wood\",\"grade\":2,\"purchasePrice\":40,\"effects\":[{\"stat\":\"spRegen\",\"operation\":\"add\",\"amount\":3,\"unit\":\"SPPerSecond\",\"trigger\":\"whileOwned\",\"targetForms\":\"all\",\"durationSeconds\":null,\"stackLimit\":1,\"refreshPolicy\":\"refresh\",\"removeOnItemLoss\":true}],\"synergyTags\":[\"ITEM_WOOD\"],\"unsupportedEffectNotes\":\"\",\"contentRevision\":1,\"review\":{\"state\":\"draft\",\"dataRevision\":null,\"iconVersion\":null,\"iconContentRevision\":null,\"policyRevision\":null,\"note\":\"\",\"updatedAt\":\"2026-10-12T11:17:06.591Z\"},\"iconPath\":\"icons/c8d3e698-0a40-41a2-b8dc-613c05c4086e.png\",\"icon\":{\"versionId\":\"v-bbbdb29a-06f9-4a71-bcfe-fe128848a8d2\",\"sourceContentRevision\":1,\"sourceSha256\":\"4a051fdcb09e50f65b671a683d2d66cbff2430cb38e4408e7be99de92da0af07\",\"thumbnailSha256\":\"b7b2bc4ab5dbc55568f09bf0067b4656acd69f57649f226077b9bd1069269f2f\",\"tool\":\"imagegen\",\"observedModel\":null,\"createdAt\":\"2026-10-12T11:17:06.591Z\"}}"

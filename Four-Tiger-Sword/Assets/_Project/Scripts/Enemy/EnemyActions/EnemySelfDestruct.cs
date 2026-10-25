@@ -43,6 +43,7 @@ public class EnemySelfDestruct : EnemyAction
         {
             _warning = Object.Instantiate(_data.warningEffectPrefab,
                 _center + _data.warningEffectOffset, _rotation);
+            StageTransientObject.Track(_warning);
             _warning.transform.localScale = _data.warningEffectScale;
         }
     }
@@ -51,15 +52,16 @@ public class EnemySelfDestruct : EnemyAction
     {
         if (!IsActive || IsFinished || _exploded) return;
         base.Update();
-        _elapsed += Time.deltaTime;
+        _elapsed += _enemy.ActionDeltaTime;
         if (_elapsed < Mathf.Max(0f, _data.explosionDelay)) return;
 
         _exploded = true; // 프레임/콜라이더 수와 무관하게 한 번만 폭발합니다.
+        PlaySound(_data.SwingAudio, _center);
         EndTelegraph();
         ClearWarning();
         if (_data.explosionEffectPrefab != null)
         {
-            var effect = Object.Instantiate(_data.explosionEffectPrefab, _center, _rotation);
+            var effect = StageTransientObject.Track(Object.Instantiate(_data.explosionEffectPrefab, _center, _rotation));
             Object.Destroy(effect, Mathf.Max(0.1f, _data.explosionEffectLifetime));
         }
         BroadcastHit();
@@ -74,7 +76,7 @@ public class EnemySelfDestruct : EnemyAction
                 _data.damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element,
                 _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
                 _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage),
-                power: direction * _data.knockbackForce, staggerResistLevel: _data.staggerLevel, isParryable: _data.isParryable, source: this),
+                power: direction * _data.knockbackForce, staggerResistLevel: _data.staggerLevel, isParryable: _data.isParryable, source: this, impactSound: ResolveHitSound()),
                 target, col.gameObject);
         }
         _enemy.CompleteSelfDestruct(this);

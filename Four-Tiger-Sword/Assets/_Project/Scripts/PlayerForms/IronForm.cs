@@ -3,7 +3,7 @@ using UnityEngine;
 public class IronForm : BaseForm
 {
     public override ElementType Element => ElementType.ELEMENT_GOLD;
-    public override float SkillSpCost => 200f;
+    public override float SkillSpCost => 20f;
     public override float SkillCooldown => 10f;
     protected override bool DealsTrueDamage => _currentAction == ActionType.Ultimate;
     public IronForm(IronFormActionDataSO data) : base(data) { }
@@ -18,7 +18,8 @@ public class IronForm : BaseForm
     {
         base.OnHitEnemy(enemy, step, hitEvent);
         if (_currentAction == ActionType.Attack) TargetEffects(enemy).ApplyArmorShred(false);
-        if (_currentAction == ActionType.Skill) TargetEffects(enemy).ApplyArmorShred(true);
+        if (_currentAction == ActionType.Skill || _currentAction == ActionType.SwitchAttack)
+            TargetEffects(enemy).ApplyArmorShred(true);
         // TODO: 집중 찌르기/철쇄 격파/금강 파동포 Animator 모션 제작 후 연결.
         // _playerController.Animator.CrossFade("IronLaser", 0.1f);
     }

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace StudioBaekho
 {
     [System.Flags]
-    public enum BaekhoRoomRole { Normal = 0, Start = 1, End = 2, Boss = 4 }
+    public enum BaekhoRoomRole { Normal = 0, Start = 1, End = 2, Boss = 4, Shop = 8 }
 
     public sealed class BaekhoPlacedModule
     {
@@ -53,6 +53,7 @@ namespace StudioBaekho
         public int startMapId = -1;
         public int endMapId = -1;
         public int bossMapId = -1;
+        public int shopMapId = -1;
         public readonly List<BaekhoPlacedModule> rooms = new List<BaekhoPlacedModule>();
         public readonly List<BaekhoDungeonLink> links = new List<BaekhoDungeonLink>();
     }
@@ -67,6 +68,7 @@ namespace StudioBaekho
         public BaekhoMapModule startRoom;
         public BaekhoMapModule endRoom;
         public BaekhoMapModule bossRoom;
+        public BaekhoMapModule shopRoom;
         public readonly List<BaekhoMapModule> rooms = new List<BaekhoMapModule>();
     }
 }

@@ -15,6 +15,8 @@ namespace StudioBaekho
         public string kind;
         public float width;
         public float height;
+        [Tooltip("Optional authored combat door. The game reuses it for connected exits; unused exits hide it.")]
+        public GameObject runtimeDoor;
         [Tooltip("Only doorway placeholder objects; never include the surrounding frame or walls.")]
         public GameObject[] placeholders = System.Array.Empty<GameObject>();
         [Tooltip("Prepared full wall bay used when this doorway is unused. Matches the surrounding map wall.")]

@@ -10,6 +10,7 @@ public class SlowEffect : IStatusEffect
 
     private NavMeshAgent _agent;
     private float _originalSpeed;
+    private CombatActorClock _clock;
 
     public bool IsExpired => _elapsed >= _duration;
 
@@ -21,6 +22,13 @@ public class SlowEffect : IStatusEffect
 
     public void OnApply(GameObject target)
     {
+        var actor = target.GetComponent<Enemy>() as Component ?? target.GetComponent<PlayerController>();
+        if (actor != null)
+        {
+            _clock = CombatActorClock.GetOrCreate(actor);
+            _clock.SetMovementModifier(this, 1f - _slowRatio);
+            return;
+        }
         _agent = target.GetComponent<NavMeshAgent>();
         if (_agent == null) return;
         _originalSpeed = _agent.speed;
@@ -31,6 +39,7 @@ public class SlowEffect : IStatusEffect
 
     public void OnRemove(GameObject target)
     {
+        if (_clock != null) _clock.RemoveMovementModifier(this);
         if (_agent != null)
             _agent.speed = _originalSpeed;
     }

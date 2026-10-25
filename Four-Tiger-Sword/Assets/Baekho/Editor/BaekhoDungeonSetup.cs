@@ -272,6 +272,11 @@ namespace StudioBaekho
                 style.floor.prefab = RequirePrefab(BlockoutFolder + "/Prefabs/Floor.prefab");
                 style.wall.prefab = RequirePrefab(BlockoutFolder + "/Prefabs/Wall.prefab");
                 style.cap.prefab = style.wall.prefab;
+                style.wallHeight = 4f;
+                style.ceiling.prefab = style.floor.prefab;
+                style.ceiling.placement = BaekhoPiecePlacement.TilePreserveSize;
+                style.wallLightPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/LabLights/Prefabs/33_wall_bulkhead_light.prefab");
+                style.ceilingLightPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/LabLights/Prefabs/34_ceiling_panel_light.prefab");
                 PrepareStyle(style);
                 AssetDatabase.CreateAsset(style, stylePath);
             }
@@ -352,9 +357,9 @@ namespace StudioBaekho
         public static void PrepareStyle(BaekhoCorridorStyle style)
         {
             if (style == null) throw new ArgumentNullException(nameof(style));
-            foreach (BaekhoPrefabPiece piece in new[] { style.floor, style.wall, style.cap })
+            foreach (BaekhoPrefabPiece piece in new[] { style.floor, style.wall, style.cap, style.CeilingPiece })
             {
-                if (piece == null || piece.prefab == null) throw new InvalidDataException("Assign all three style prefabs before measuring.");
+                if (piece == null || piece.prefab == null) throw new InvalidDataException("Assign floor, wall and cap prefabs before measuring; ceiling may reuse floor.");
                 piece.localBounds = MeasureGeometryBounds(piece.prefab);
                 if (piece.localBounds.size.x <= 0 || piece.localBounds.size.y <= 0 || piece.localBounds.size.z <= 0)
                     throw new InvalidDataException("Corridor pieces need nonzero width, height and depth: " + piece.prefab.name);
@@ -403,16 +408,85 @@ namespace StudioBaekho
                 CreateBox(root, "floor_Temp", new Vector3(0, -0.1f, 0), new Vector3(6, 0.2f, 6), floorMaterial);
                 CreateBox(root, "wall_West", new Vector3(-2.875f, 1.5f, 0), new Vector3(0.25f, 3, 6), wallMaterial);
                 CreateBox(root, "wall_South", new Vector3(0, 1.5f, -2.875f), new Vector3(6, 3, 0.25f), wallMaterial);
-                CreateBox(root, "wall_NorthLeft", new Vector3(-2, 1.5f, 2.875f), new Vector3(2, 3, 0.25f), wallMaterial);
-                CreateBox(root, "wall_NorthRight", new Vector3(2, 1.5f, 2.875f), new Vector3(2, 3, 0.25f), wallMaterial);
-                CreateBox(root, "wall_EastBottom", new Vector3(2.875f, 1.5f, -2), new Vector3(0.25f, 3, 2), wallMaterial);
-                CreateBox(root, "wall_EastTop", new Vector3(2.875f, 1.5f, 2), new Vector3(0.25f, 3, 2), wallMaterial);
+                CreateBox(root, "wall_NorthLeft", new Vector3(-2.5f, 1.5f, 2.875f), new Vector3(1, 3, 0.25f), wallMaterial);
+                CreateBox(root, "wall_NorthRight", new Vector3(2.5f, 1.5f, 2.875f), new Vector3(1, 3, 0.25f), wallMaterial);
+                CreateBox(root, "wall_EastBottom", new Vector3(2.875f, 1.5f, -2.5f), new Vector3(0.25f, 3, 1), wallMaterial);
+                CreateBox(root, "wall_EastTop", new Vector3(2.875f, 1.5f, 2.5f), new Vector3(0.25f, 3, 1), wallMaterial);
                 CreateSocket(root, "North", new Vector3(0, 0, 3), 0);
                 CreateSocket(root, "East", new Vector3(3, 0, 0), 90);
-                PrepareModule(root, new Bounds(new Vector3(0, 1.4f, 0), new Vector3(6, 3.2f, 6))).isCornerRoom = true;
+                ImproveCornerRoom(root, style);
                 SavePrefab(root, path);
             }
             finally { EditorSceneManager.ClosePreviewScene(scene); }
+        }
+
+        [MenuItem("Tools/Baekho/Dungeon/Update Existing 6x6 Corner Room")]
+        private static void UpdateDefaultCornerFromMenu()
+        {
+            UpdateDefaultCornerRoom(AssetDatabase.LoadAssetAtPath<BaekhoCorridorStyle>(OutputFolder + "/GreyboxCorridorStyle.asset"));
+        }
+
+        /// <summary>Updates the existing corner asset in place, preserving its GUID and horizontal layout.</summary>
+        public static void UpdateDefaultCornerRoom(BaekhoCorridorStyle style)
+        {
+            RequireEditMode();
+            PrepareStyle(style);
+            if (!BaekhoDungeonGenerator.ValidateStyle(style, out string error)) throw new InvalidDataException(error);
+            string path = OutputFolder + "/Modules/TEMP_CornerRoom_6x6.prefab";
+            GameObject root = PrefabUtility.LoadPrefabContents(path);
+            try
+            {
+                ImproveCornerRoom(root, style);
+                SavePrefab(root, path);
+            }
+            finally { PrefabUtility.UnloadPrefabContents(root); }
+        }
+
+        private static void ImproveCornerRoom(GameObject root, BaekhoCorridorStyle style)
+        {
+            string[] walls = { "wall_West", "wall_South", "wall_NorthLeft", "wall_NorthRight", "wall_EastBottom", "wall_EastTop" };
+            foreach (string name in walls)
+            {
+                Transform wall = root.transform.Find(name);
+                if (wall == null) throw new InvalidDataException("Missing default corner wall: " + name);
+                Vector3 position = wall.localPosition, scale = wall.localScale;
+                position.y = style.wallHeight * 0.5f;
+                scale.y = style.wallHeight;
+                wall.localPosition = position;
+                wall.localScale = scale;
+            }
+            foreach (var socket in root.GetComponentsInChildren<BaekhoMapConnection>(true))
+            {
+                socket.width = 4f;
+                socket.height = style.wallHeight;
+            }
+            // Only replace this tool's additions, leaving authored floor/walls and their identities intact.
+            foreach (string name in new[] { "ceiling_Connection", "ConnectionLighting" })
+            {
+                Transform existing = root.transform.Find(name);
+                if (existing != null) UnityEngine.Object.DestroyImmediate(existing.gameObject);
+            }
+            var ceiling = BaekhoDungeonGeometry.PlacePiece(style.CeilingPiece, root.transform,
+                new Vector3(0, style.wallHeight + style.ceilingThickness * 0.5f, 0),
+                new Vector3(6, style.ceilingThickness, 6), Quaternion.identity, 0,
+                tiledAxes: BaekhoPieceTilingAxes.XZ);
+            ceiling.name = "ceiling_Connection";
+            // Authored prefab meshes must be persistent. The default 2m tiles fit 6m exactly.
+            foreach (var filter in ceiling.GetComponentsInChildren<MeshFilter>(true))
+                if (filter.sharedMesh != null && !EditorUtility.IsPersistent(filter.sharedMesh))
+                    throw new InvalidDataException("The 6x6 corner ceiling requires tiles that fit without cropped meshes.");
+            var lights = NewObject("ConnectionLighting", root.scene);
+            lights.transform.SetParent(root.transform, false);
+            BaekhoDungeonGeometry.PlaceLight(style.ceilingLightPrefab, lights.transform,
+                new Vector3(0, style.wallHeight, 0), Quaternion.identity, "CeilingLight_Center");
+            Transform west = root.transform.Find("wall_West"), south = root.transform.Find("wall_South");
+            BaekhoDungeonGeometry.PlaceLight(style.wallLightPrefab, lights.transform,
+                new Vector3(west.localPosition.x + west.localScale.x * 0.5f, style.wallLightHeight, 0),
+                Quaternion.Euler(0, 90, 0), "WallLight_West");
+            BaekhoDungeonGeometry.PlaceLight(style.wallLightPrefab, lights.transform,
+                new Vector3(0, style.wallLightHeight, south.localPosition.z + south.localScale.z * 0.5f),
+                Quaternion.identity, "WallLight_South");
+            PrepareModule(root).isCornerRoom = true;
         }
 
         private static void CreateGeneratorPrefab(string path, BaekhoDungeonSettings settings)
@@ -487,8 +561,8 @@ namespace StudioBaekho
             socket.id = id;
             socket.label = id;
             socket.kind = "door";
-            socket.width = 2;
-            socket.height = 3;
+            socket.width = 4;
+            socket.height = 4;
         }
 
         private static void SavePrefab(GameObject root, string path)

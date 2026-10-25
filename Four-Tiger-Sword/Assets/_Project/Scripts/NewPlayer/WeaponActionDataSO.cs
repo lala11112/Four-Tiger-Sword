@@ -21,6 +21,11 @@ public abstract class WeaponActionDataSO : ScriptableObject
 
     // Compatibility accessors used by the form runtime and CombatLab adapter.
     public List<WeaponActionData> ComboSteps { get => Actions.ComboSteps; set => Actions.ComboSteps = value; }
+    public WeaponActionData FinisherStep
+    {
+        get => Actions?.FinisherStep;
+        set { Actions ??= new FormActionSet(); Actions.FinisherStep = value; }
+    }
     public string ParryAnimationName { get => CommonExecution.ParryAnimationName; set => CommonExecution.ParryAnimationName = value; }
     public string AirAttackStartAnimationName { get => CommonExecution.AirAttackStartAnimationName; set => CommonExecution.AirAttackStartAnimationName = value; }
     public float AirAttackStartDuration { get => CommonExecution.AirAttackStartDuration; set => CommonExecution.AirAttackStartDuration = value; }
@@ -40,6 +45,9 @@ public class FormActionSet
     [Tooltip("1타, 2타, 3타... 에 대한 데이터 리스트")]
     public List<WeaponActionData> ComboSteps;
 
+    [SerializeReference, InspectorName("강화 3타 (Finisher)"), Tooltip("다른 폼으로 이어지는 강화 3타. 비어 있으면 해당 폼의 일반 3타를 사용합니다. 피해 배율은 별도로 추가하지 않습니다.")]
+    public WeaponActionData FinisherStep;
+
     [Tooltip("착지 시 마무리 공격 데이터. AnimationName은 마무리 모션, Duration은 마무리 시간입니다.")]
     public WeaponActionData AirAttackStep;
 
@@ -49,7 +57,7 @@ public class FormActionSet
     [Tooltip("스킬 공격 데이터 (여러 단계 가능)")]
     public List<WeaponActionData> SkillSteps;
 
-    [Tooltip("궁극기 공격 데이터 (여러 단계 가능). 수 폼의 고정 10연타는 첫 단계의 Hit Events를 순서대로 참조하여 히트스탑만 적용합니다. 해당 히트 설정이 없으면 첫 단계의 기본 히트스탑을 사용합니다.")]
+    [Tooltip("궁극기 공격 데이터 (여러 단계 가능). 수 폼의 고정 10연타는 첫 단계의 Hit Events를 순서대로 참조하여 히트스탑과 사운드를 적용합니다. 해당 히트 설정이 없으면 첫 단계의 기본 설정을 사용합니다.")]
     public List<WeaponActionData> UltimateSteps;
 }
 
@@ -57,6 +65,26 @@ public class FormActionSet
 public class FormBalanceSettings
 {
     [Min(0f)] public float UltimateCooldown = 30f;
+
+    [InspectorName("폼 유지 SP"), Tooltip("공용 영력/행동 비용과 독립된 폼별 자원입니다.")]
+    public FormSpSettings FormSp = new FormSpSettings();
+}
+
+[Serializable]
+public class FormSpSettings
+{
+    [Min(0.01f), Tooltip("폼별 SP 최대치. 새 플레이어는 모든 폼이 완충 상태로 시작합니다.")]
+    public float MaxSp = 100f;
+    [Min(0.01f), Tooltip("전투 중 활성 폼이 최대 SP에서 고갈되기까지 걸리는 시간(초).")]
+    public float DepletionSeconds = 30f;
+    [Min(0.01f), Tooltip("비활성 폼이 SP 0에서 완충되기까지 걸리는 시간(초).")]
+    public float RecoverySeconds = 20f;
+    [Range(0.01f, 1f), Tooltip("고갈 페널티가 해제되는 SP 비율. 0.2 = 최대치의 20%.")]
+    public float ExhaustionRecoveryRatio = 0.2f;
+    [Range(0f, 1f), Tooltip("고갈 중 공격력 배율. 0.8 = 20% 감소.")]
+    public float ExhaustedAttackMultiplier = 0.8f;
+    [Range(0f, 1f), Tooltip("고갈 중 공격속도 배율. 0.8 = 20% 감소.")]
+    public float ExhaustedAttackSpeedMultiplier = 0.8f;
 }
 
 [Serializable]
@@ -83,4 +111,10 @@ public class FormFeedbackSettings
 
     [Tooltip("적을 타격했을 때 재생할 사운드")]
     public AudioClip HitSound;
+
+    [Tooltip("이 폼의 공통 적중 사운드. 비워두면 기존 Hit Sound를 사용합니다.")]
+    public CombatSoundSettings HitAudio = new CombatSoundSettings();
+
+    [Tooltip("화염 스택 폭발 등 추가 피해의 사운드. 비워두면 공통 적중 사운드를 사용합니다.")]
+    public CombatSoundSettings SecondaryHitAudio = new CombatSoundSettings();
 }

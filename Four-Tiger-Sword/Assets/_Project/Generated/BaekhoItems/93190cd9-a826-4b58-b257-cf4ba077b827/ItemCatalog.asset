@@ -1,0 +1,590 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 247fa2ccbab7f134abe555ebf94f9ae8, type: 3}
+  m_Name: Baekho Items 93190cd9-a826-4b58-b257-cf4ba077b827
+  m_EditorClassIdentifier: Assembly-CSharp::ItemCatalog
+  projectId: 93190cd9-a826-4b58-b257-cf4ba077b827
+  contentRevision: 71
+  contentStatus: draft
+  sourceJson: "{\n  \"schemaVersion\": 1,\n  \"contentStatus\": \"draft\",\n  \"projectId\":
+    \"93190cd9-a826-4b58-b257-cf4ba077b827\",\n  \"contentRevision\": 71,\n  \"sourceRefs\":
+    [\n    {\n      \"repository\": \"lala11112/Four-Tiger-Sword\",\n      \"branch\":
+    \"codex/system-design-2026-10-07\",\n      \"commit\": \"fe533a25a0df81eb317059ee18708229d63320ad\",\n     
+    \"document\": \"docs/planning/2026-10-07-roguelike-direction.md\",\n      \"status\":
+    \"confirmed\"\n    },\n    {\n      \"repository\": \"lala11112/Four-Tiger-Sword\",\n     
+    \"branch\": \"codex/system-design-2026-10-07\",\n      \"commit\": \"fe533a25a0df81eb317059ee18708229d63320ad\",\n     
+    \"document\": \"docs/planning/2026-10-07-initial-content-draft.md\",\n      \"status\":
+    \"proposal\"\n    },\n    {\n      \"repository\": \"lala11112/studio-baekho-tools\",\n     
+    \"branch\": \"integration/baekho-studio\",\n      \"commit\": \"5d0cb0f416184d4752ebe6667152cc74fdd0b697\",\n     
+    \"document\": \"AGENTS.md\",\n      \"status\": \"implementation\"\n    }\n 
+    ],\n  \"ruleProfile\": {\n    \"confirmed\": {\n      \"itemCount\": 20,\n     
+    \"gradePrices\": [\n        20,\n        40,\n        80,\n        160\n     
+    ],\n      \"maxOwnedPerId\": 1,\n      \"baseMaxSp\": 100,\n      \"baseRegen\":
+    20,\n      \"regenDelaySeconds\": 1,\n      \"dodgeCost\": 20,\n      \"switchCost\":
+    10,\n      \"switchCooldownSeconds\": 2\n    },\n    \"proposed\": {\n      \"maxSpCap\":
+    200,\n      \"regenCap\": 40,\n      \"minDodgeCost\": 8,\n      \"minSwitchCost\":
+    4,\n      \"stacking\": \"additiveBySource\",\n      \"sourceStackLimit\": 1,\n     
+    \"timedRefresh\": \"refresh\",\n      \"removeOnItemLoss\": true,\n      \"refillOnMaxIncrease\":
+    false,\n      \"clampOnMaxDecrease\": true\n    },\n    \"revision\": 1,\n   
+    \"adoptions\": {}\n  },\n  \"items\": [\n    {\n      \"candidateKey\": \"f7666cbc-5cd9-47e8-9205-a379800224b1\",\n     
+    \"itemId\": \"IT_WOOD_01\",\n      \"name\": \"\uC0C8\uC2F9 \uBD80\uC801\",\n     
+    \"description\": \"\uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC \uCD5C\uB300 SP +10
+    SP\",\n      \"descriptionStale\": false,\n      \"element\": \"wood\",\n     
+    \"grade\": 1,\n      \"purchasePrice\": 20,\n      \"effects\": [\n        {\n         
+    \"stat\": \"maxSp\",\n          \"operation\": \"add\",\n          \"amount\":
+    10,\n          \"unit\": \"SP\",\n          \"trigger\": \"whileOwned\",\n         
+    \"targetForms\": \"all\",\n          \"durationSeconds\": null,\n          \"stackLimit\":
+    1,\n          \"refreshPolicy\": \"refresh\",\n          \"removeOnItemLoss\":
+    true\n        }\n      ],\n      \"synergyTags\": [\n        \"ITEM_WOOD\"\n     
+    ],\n      \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\": 1,\n     
+    \"review\": {\n        \"state\": \"draft\",\n        \"dataRevision\": null,\n       
+    \"iconVersion\": null,\n        \"iconContentRevision\": null,\n        \"policyRevision\":
+    null,\n        \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:09:01.329Z\"\n     
+    },\n      \"iconPath\": \"icons/f7666cbc-5cd9-47e8-9205-a379800224b1.png\",\n     
+    \"icon\": {\n        \"versionId\": \"v-168355fc-4493-4daa-be58-1cf1326fbfbe\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"020f297ef476f374b87b133439e883fc891d45878347c91c100ee419feda85f3\",\n       
+    \"thumbnailSha256\": \"d8f53b43070ba867538e496a87963015e482b34919224d6dec0b5357893ac02f\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:09:01.329Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"c8d3e698-0a40-41a2-b8dc-613c05c4086e\",\n      \"itemId\": \"IT_WOOD_02\",\n     
+    \"name\": \"\uC228\uACB0 \uB9E4\uB4ED\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC SP \uC7AC\uC0DD +3 SP/\uCD08\",\n      \"descriptionStale\":
+    false,\n      \"element\": \"wood\",\n      \"grade\": 2,\n      \"purchasePrice\":
+    40,\n      \"effects\": [\n        {\n          \"stat\": \"spRegen\",\n         
+    \"operation\": \"add\",\n          \"amount\": 3,\n          \"unit\": \"SPPerSecond\",\n         
+    \"trigger\": \"whileOwned\",\n          \"targetForms\": \"all\",\n         
+    \"durationSeconds\": null,\n          \"stackLimit\": 1,\n          \"refreshPolicy\":
+    \"refresh\",\n          \"removeOnItemLoss\": true\n        }\n      ],\n     
+    \"synergyTags\": [\n        \"ITEM_WOOD\"\n      ],\n      \"unsupportedEffectNotes\":
+    \"\",\n      \"contentRevision\": 1,\n      \"review\": {\n        \"state\":
+    \"draft\",\n        \"dataRevision\": null,\n        \"iconVersion\": null,\n       
+    \"iconContentRevision\": null,\n        \"policyRevision\": null,\n        \"note\":
+    \"\",\n        \"updatedAt\": \"2026-10-12T11:17:06.591Z\"\n      },\n      \"iconPath\":
+    \"icons/c8d3e698-0a40-41a2-b8dc-613c05c4086e.png\",\n      \"icon\": {\n       
+    \"versionId\": \"v-bbbdb29a-06f9-4a71-bcfe-fe128848a8d2\",\n        \"sourceContentRevision\":
+    1,\n        \"sourceSha256\": \"4a051fdcb09e50f65b671a683d2d66cbff2430cb38e4408e7be99de92da0af07\",\n       
+    \"thumbnailSha256\": \"b7b2bc4ab5dbc55568f09bf0067b4656acd69f57649f226077b9bd1069269f2f\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:17:06.591Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"13eb6f25-bbdc-4207-9614-ac9dbff75174\",\n      \"itemId\": \"IT_WOOD_03\",\n     
+    \"name\": \"\uAE4A\uC740 \uBFCC\uB9AC\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uCD5C\uB300 SP +20 SP, \uBCF4\uC720 \uC911 \uBAA8\uB4E0
+    \uD3FC \uC77C\uBC18 \uACF5\uACA9 \uD53C\uD574 +8%\",\n      \"descriptionStale\":
+    false,\n      \"element\": \"wood\",\n      \"grade\": 3,\n      \"purchasePrice\":
+    80,\n      \"effects\": [\n        {\n          \"stat\": \"maxSp\",\n         
+    \"operation\": \"add\",\n          \"amount\": 20,\n          \"unit\": \"SP\",\n         
+    \"trigger\": \"whileOwned\",\n          \"targetForms\": \"all\",\n         
+    \"durationSeconds\": null,\n          \"stackLimit\": 1,\n          \"refreshPolicy\":
+    \"refresh\",\n          \"removeOnItemLoss\": true\n        },\n        {\n         
+    \"stat\": \"normalDamage\",\n          \"operation\": \"addRatio\",\n         
+    \"amount\": 0.08,\n          \"unit\": \"ratio\",\n          \"trigger\": \"whileOwned\",\n         
+    \"targetForms\": \"all\",\n          \"durationSeconds\": null,\n          \"stackLimit\":
+    1,\n          \"refreshPolicy\": \"refresh\",\n          \"removeOnItemLoss\":
+    true\n        }\n      ],\n      \"synergyTags\": [\n        \"ITEM_WOOD\"\n     
+    ],\n      \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\": 1,\n     
+    \"review\": {\n        \"state\": \"draft\",\n        \"dataRevision\": null,\n       
+    \"iconVersion\": null,\n        \"iconContentRevision\": null,\n        \"policyRevision\":
+    null,\n        \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:19:36.109Z\"\n     
+    },\n      \"iconPath\": \"icons/13eb6f25-bbdc-4207-9614-ac9dbff75174.png\",\n     
+    \"icon\": {\n        \"versionId\": \"v-1a04abf2-1216-4d9b-811f-4fb95ec68733\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"2d91bbbae875a768536549e2054a2d676741fade1d5749f6709aaa24b86ad1a8\",\n       
+    \"thumbnailSha256\": \"0afcc5b284b49e99c5608d2b1773a53fd5a13cd51cfcc58d3292d2cce89775db\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:19:36.109Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"22bf8771-31b1-4476-be3a-0bb4f1ddc594\",\n      \"itemId\": \"IT_WOOD_04\",\n     
+    \"name\": \"\uB2E4\uC2DC \uD53C\uB294 \uAC00\uC9C0\",\n      \"description\":
+    \"\uC804\uD658 \uC131\uACF5 \uD6C4 3\uCD08 \uB3D9\uC548 \uBAA8\uB4E0 \uD3FC SP
+    \uC7AC\uC0DD +8 SP/\uCD08\",\n      \"descriptionStale\": false,\n      \"element\":
+    \"wood\",\n      \"grade\": 4,\n      \"purchasePrice\": 160,\n      \"effects\":
+    [\n        {\n          \"stat\": \"spRegen\",\n          \"operation\": \"add\",\n         
+    \"amount\": 8,\n          \"unit\": \"SPPerSecond\",\n          \"trigger\":
+    \"formSwitchSucceeded\",\n          \"targetForms\": \"all\",\n          \"durationSeconds\":
+    3,\n          \"stackLimit\": 1,\n          \"refreshPolicy\": \"refresh\",\n         
+    \"removeOnItemLoss\": true\n        }\n      ],\n      \"synergyTags\": [\n       
+    \"ITEM_WOOD\"\n      ],\n      \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\":
+    1,\n      \"review\": {\n        \"state\": \"draft\",\n        \"dataRevision\":
+    null,\n        \"iconVersion\": null,\n        \"iconContentRevision\": null,\n       
+    \"policyRevision\": null,\n        \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:21:21.887Z\"\n     
+    },\n      \"iconPath\": \"icons/22bf8771-31b1-4476-be3a-0bb4f1ddc594.png\",\n     
+    \"icon\": {\n        \"versionId\": \"v-e1906e49-44a3-4e58-8a1f-7915e26cdf6e\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"249b36bcd05d33e2ebfbf353c293f8d566d713c4df68ff06c951f2f6372ff6b7\",\n       
+    \"thumbnailSha256\": \"428bbe3501d38ce804a0280be5a457ad3f3f0cfb6c93c7f79de342cd916811ef\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:21:21.887Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"47d886a2-a187-4da3-9c3a-ddc6b2aa6ec4\",\n      \"itemId\": \"IT_FIRE_01\",\n     
+    \"name\": \"\uBD88\uC528 \uC7A5\uC2DD\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uC77C\uBC18 \uACF5\uACA9 \uD53C\uD574 +8%\",\n     
+    \"descriptionStale\": false,\n      \"element\": \"fire\",\n      \"grade\":
+    1,\n      \"purchasePrice\": 20,\n      \"effects\": [\n        {\n         
+    \"stat\": \"normalDamage\",\n          \"operation\": \"addRatio\",\n         
+    \"amount\": 0.08,\n          \"unit\": \"ratio\",\n          \"trigger\": \"whileOwned\",\n         
+    \"targetForms\": \"all\",\n          \"durationSeconds\": null,\n          \"stackLimit\":
+    1,\n          \"refreshPolicy\": \"refresh\",\n          \"removeOnItemLoss\":
+    true\n        }\n      ],\n      \"synergyTags\": [\n        \"ITEM_FIRE\"\n     
+    ],\n      \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\": 1,\n     
+    \"review\": {\n        \"state\": \"draft\",\n        \"dataRevision\": null,\n       
+    \"iconVersion\": null,\n        \"iconContentRevision\": null,\n        \"policyRevision\":
+    null,\n        \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:23:38.506Z\"\n     
+    },\n      \"iconPath\": \"icons/47d886a2-a187-4da3-9c3a-ddc6b2aa6ec4.png\",\n     
+    \"icon\": {\n        \"versionId\": \"v-e006cfc7-eb9f-4ed0-8350-6c20930bd236\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"4b7e57b6f1194735fc5797474da6c5bb4b5fc06c027f436db4e8e204e93cd045\",\n       
+    \"thumbnailSha256\": \"519c92cfefa77cecf0a8737c8aa66e1f69c94e70d2c61beb613db20177f9a69a\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:23:38.506Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"667cbdf0-b2cd-4d5b-bbed-fd5e29510898\",\n      \"itemId\": \"IT_FIRE_02\",\n     
+    \"name\": \"\uBD89\uC740 \uC778\uC7A5\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uC804\uD658 \uAC15\uD654 \uC2A4\uD0AC \uD53C\uD574
+    +12%\",\n      \"descriptionStale\": false,\n      \"element\": \"fire\",\n     
+    \"grade\": 2,\n      \"purchasePrice\": 40,\n      \"effects\": [\n        {\n         
+    \"stat\": \"switchDamage\",\n          \"operation\": \"addRatio\",\n         
+    \"amount\": 0.12,\n          \"unit\": \"ratio\",\n          \"trigger\": \"whileOwned\",\n         
+    \"targetForms\": \"all\",\n          \"durationSeconds\": null,\n          \"stackLimit\":
+    1,\n          \"refreshPolicy\": \"refresh\",\n          \"removeOnItemLoss\":
+    true\n        }\n      ],\n      \"synergyTags\": [\n        \"ITEM_FIRE\"\n     
+    ],\n      \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\": 1,\n     
+    \"review\": {\n        \"state\": \"draft\",\n        \"dataRevision\": null,\n       
+    \"iconVersion\": null,\n        \"iconContentRevision\": null,\n        \"policyRevision\":
+    null,\n        \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:26:00.106Z\"\n     
+    },\n      \"iconPath\": \"icons/667cbdf0-b2cd-4d5b-bbed-fd5e29510898.png\",\n     
+    \"icon\": {\n        \"versionId\": \"v-1854d0e5-7cc6-48c5-9580-f7bac4bfd0e3\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"88a06366cc69d552ca5ac04cefff6f0a2c8c004b24aab5d567a97695b5028ad2\",\n       
+    \"thumbnailSha256\": \"4389789f18447818e648a4c0ebe5a55dad42a2f0c31453cb43e20320a317016d\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:26:00.106Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"bb9f2edb-dea6-42ef-9f06-51684f212a4d\",\n      \"itemId\": \"IT_FIRE_03\",\n     
+    \"name\": \"\uD0C0\uC624\uB974\uB294 \uB9E4\uB4ED\",\n      \"description\":
+    \"\uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC \uC77C\uBC18 \uACF5\uACA9 \uD53C\uD574
+    +18%\",\n      \"descriptionStale\": false,\n      \"element\": \"fire\",\n     
+    \"grade\": 3,\n      \"purchasePrice\": 80,\n      \"effects\": [\n        {\n         
+    \"stat\": \"normalDamage\",\n          \"operation\": \"addRatio\",\n         
+    \"amount\": 0.18,\n          \"unit\": \"ratio\",\n          \"trigger\": \"whileOwned\",\n         
+    \"targetForms\": \"all\",\n          \"durationSeconds\": null,\n          \"stackLimit\":
+    1,\n          \"refreshPolicy\": \"refresh\",\n          \"removeOnItemLoss\":
+    true\n        }\n      ],\n      \"synergyTags\": [\n        \"ITEM_FIRE\"\n     
+    ],\n      \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\": 1,\n     
+    \"review\": {\n        \"state\": \"draft\",\n        \"dataRevision\": null,\n       
+    \"iconVersion\": null,\n        \"iconContentRevision\": null,\n        \"policyRevision\":
+    null,\n        \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:29:05.754Z\"\n     
+    },\n      \"iconPath\": \"icons/bb9f2edb-dea6-42ef-9f06-51684f212a4d.png\",\n     
+    \"icon\": {\n        \"versionId\": \"v-2da42ea8-aff4-4e49-b3be-269a9f7b6914\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"70a70d27d305b586ac5012f1d0579ac392fa35d12b4f0ff1e962c80598c1d0e1\",\n       
+    \"thumbnailSha256\": \"0809c38d76913620546141576a4a4a21b0adafead0f254ef0490531bfd044f92\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:29:05.754Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"b4a846e2-7abd-4f47-bf4b-88096fa177b5\",\n      \"itemId\": \"IT_FIRE_04\",\n     
+    \"name\": \"\uC774\uC5B4\uC9C0\uB294 \uBD88\uAF43\",\n      \"description\":
+    \"\uC804\uD658 \uC131\uACF5 \uD6C4 3\uCD08 \uB3D9\uC548 \uBAA8\uB4E0 \uD3FC \uC77C\uBC18
+    \uACF5\uACA9 \uD53C\uD574 +30%\",\n      \"descriptionStale\": false,\n     
+    \"element\": \"fire\",\n      \"grade\": 4,\n      \"purchasePrice\": 160,\n     
+    \"effects\": [\n        {\n          \"stat\": \"normalDamage\",\n          \"operation\":
+    \"addRatio\",\n          \"amount\": 0.3,\n          \"unit\": \"ratio\",\n         
+    \"trigger\": \"formSwitchSucceeded\",\n          \"targetForms\": \"all\",\n         
+    \"durationSeconds\": 3,\n          \"stackLimit\": 1,\n          \"refreshPolicy\":
+    \"refresh\",\n          \"removeOnItemLoss\": true\n        }\n      ],\n     
+    \"synergyTags\": [\n        \"ITEM_FIRE\"\n      ],\n      \"unsupportedEffectNotes\":
+    \"\",\n      \"contentRevision\": 1,\n      \"review\": {\n        \"state\":
+    \"draft\",\n        \"dataRevision\": null,\n        \"iconVersion\": null,\n       
+    \"iconContentRevision\": null,\n        \"policyRevision\": null,\n        \"note\":
+    \"\",\n        \"updatedAt\": \"2026-10-12T11:31:40.978Z\"\n      },\n      \"iconPath\":
+    \"icons/b4a846e2-7abd-4f47-bf4b-88096fa177b5.png\",\n      \"icon\": {\n       
+    \"versionId\": \"v-fe129849-879a-45ef-8aa3-fc8d18e02aa5\",\n        \"sourceContentRevision\":
+    1,\n        \"sourceSha256\": \"4d13bf7db089ac7352662de3ef9ecce4160167de3093a6549d999798ae85c259\",\n       
+    \"thumbnailSha256\": \"bc754aa4b7fa4aac11373adfcb7012d8bae487bc9836a057cebec6cc732c6e20\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:31:40.978Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"2c141a41-6651-47e7-b716-ca0276978653\",\n      \"itemId\": \"IT_EARTH_01\",\n     
+    \"name\": \"\uD759\uBE5B \uBD80\uC801\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uCD5C\uB300 HP +8%\",\n      \"descriptionStale\":
+    false,\n      \"element\": \"earth\",\n      \"grade\": 1,\n      \"purchasePrice\":
+    20,\n      \"effects\": [\n        {\n          \"stat\": \"maxHp\",\n         
+    \"operation\": \"addRatio\",\n          \"amount\": 0.08,\n          \"unit\":
+    \"ratio\",\n          \"trigger\": \"whileOwned\",\n          \"targetForms\":
+    \"all\",\n          \"durationSeconds\": null,\n          \"stackLimit\": 1,\n         
+    \"refreshPolicy\": \"refresh\",\n          \"removeOnItemLoss\": true\n       
+    }\n      ],\n      \"synergyTags\": [\n        \"ITEM_EARTH\"\n      ],\n     
+    \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\": 1,\n      \"review\":
+    {\n        \"state\": \"draft\",\n        \"dataRevision\": null,\n        \"iconVersion\":
+    null,\n        \"iconContentRevision\": null,\n        \"policyRevision\": null,\n       
+    \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:33:32.247Z\"\n      },\n     
+    \"iconPath\": \"icons/2c141a41-6651-47e7-b716-ca0276978653.png\",\n      \"icon\":
+    {\n        \"versionId\": \"v-980d1770-3074-404a-a14a-4989df8dd6f0\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"0a29f94039a98e8307f6f2c3f75c8b18227c983ef5172f9a1fc8fa9b3ec8a73d\",\n       
+    \"thumbnailSha256\": \"1b278958ceecbc51398aa195479b8af3cbccb2551721d00fa459ea0d3b81d33b\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:33:32.247Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"07105ba7-63f0-4886-b021-ca4b05f0567b\",\n      \"itemId\": \"IT_EARTH_02\",\n     
+    \"name\": \"\uAC00\uBCBC\uC6B4 \uB514\uB524\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uD68C\uD53C SP \uBE44\uC6A9 -2 SP\",\n      \"descriptionStale\":
+    false,\n      \"element\": \"earth\",\n      \"grade\": 2,\n      \"purchasePrice\":
+    40,\n      \"effects\": [\n        {\n          \"stat\": \"dodgeSpCost\",\n         
+    \"operation\": \"add\",\n          \"amount\": -2,\n          \"unit\": \"SP\",\n         
+    \"trigger\": \"whileOwned\",\n          \"targetForms\": \"all\",\n         
+    \"durationSeconds\": null,\n          \"stackLimit\": 1,\n          \"refreshPolicy\":
+    \"refresh\",\n          \"removeOnItemLoss\": true\n        }\n      ],\n     
+    \"synergyTags\": [\n        \"ITEM_EARTH\"\n      ],\n      \"unsupportedEffectNotes\":
+    \"\",\n      \"contentRevision\": 1,\n      \"review\": {\n        \"state\":
+    \"draft\",\n        \"dataRevision\": null,\n        \"iconVersion\": null,\n       
+    \"iconContentRevision\": null,\n        \"policyRevision\": null,\n        \"note\":
+    \"\",\n        \"updatedAt\": \"2026-10-12T11:35:28.974Z\"\n      },\n      \"iconPath\":
+    \"icons/07105ba7-63f0-4886-b021-ca4b05f0567b.png\",\n      \"icon\": {\n       
+    \"versionId\": \"v-6f37b14f-2455-4775-bc9f-8ca36001459e\",\n        \"sourceContentRevision\":
+    1,\n        \"sourceSha256\": \"f860e85f6aa99969d14ddfdbf0b117e2d7df091c772c76c9eba353bd70a1acb7\",\n       
+    \"thumbnailSha256\": \"65aba948a90290e040c8244617c034340e3198b3aa37468b69142389bfab9fa0\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:35:28.974Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"afd287a9-cfc7-47db-8779-6d5cc4d2efd4\",\n      \"itemId\": \"IT_EARTH_03\",\n     
+    \"name\": \"\uB2E8\uB2E8\uD55C \uB9E4\uB4ED\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uCD5C\uB300 HP +18%\",\n      \"descriptionStale\":
+    false,\n      \"element\": \"earth\",\n      \"grade\": 3,\n      \"purchasePrice\":
+    80,\n      \"effects\": [\n        {\n          \"stat\": \"maxHp\",\n         
+    \"operation\": \"addRatio\",\n          \"amount\": 0.18,\n          \"unit\":
+    \"ratio\",\n          \"trigger\": \"whileOwned\",\n          \"targetForms\":
+    \"all\",\n          \"durationSeconds\": null,\n          \"stackLimit\": 1,\n         
+    \"refreshPolicy\": \"refresh\",\n          \"removeOnItemLoss\": true\n       
+    }\n      ],\n      \"synergyTags\": [\n        \"ITEM_EARTH\"\n      ],\n     
+    \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\": 1,\n      \"review\":
+    {\n        \"state\": \"draft\",\n        \"dataRevision\": null,\n        \"iconVersion\":
+    null,\n        \"iconContentRevision\": null,\n        \"policyRevision\": null,\n       
+    \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:37:32.090Z\"\n      },\n     
+    \"iconPath\": \"icons/afd287a9-cfc7-47db-8779-6d5cc4d2efd4.png\",\n      \"icon\":
+    {\n        \"versionId\": \"v-29fbf77f-c269-4ce1-b138-5fff31aabd71\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"327759b0e1d631d7d23e9829eb9aa9a41b1ead8466cad971f90d45bceff52e97\",\n       
+    \"thumbnailSha256\": \"6cbb6329eef31ef159f2df09441dd44bb3548ed7830e1c2d4033423f3684cf3d\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:37:32.090Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"9c820720-65fe-488a-a286-8e48a4aceaa2\",\n      \"itemId\": \"IT_EARTH_04\",\n     
+    \"name\": \"\uC6C0\uC9C1\uC774\uB294 \uC0B0\",\n      \"description\": \"\uC804\uD658
+    \uC131\uACF5 \uD6C4 3\uCD08 \uB3D9\uC548 \uBAA8\uB4E0 \uD3FC \uD68C\uD53C SP
+    \uBE44\uC6A9 -4 SP\",\n      \"descriptionStale\": false,\n      \"element\":
+    \"earth\",\n      \"grade\": 4,\n      \"purchasePrice\": 160,\n      \"effects\":
+    [\n        {\n          \"stat\": \"dodgeSpCost\",\n          \"operation\":
+    \"add\",\n          \"amount\": -4,\n          \"unit\": \"SP\",\n          \"trigger\":
+    \"formSwitchSucceeded\",\n          \"targetForms\": \"all\",\n          \"durationSeconds\":
+    3,\n          \"stackLimit\": 1,\n          \"refreshPolicy\": \"refresh\",\n         
+    \"removeOnItemLoss\": true\n        }\n      ],\n      \"synergyTags\": [\n       
+    \"ITEM_EARTH\"\n      ],\n      \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\":
+    1,\n      \"review\": {\n        \"state\": \"draft\",\n        \"dataRevision\":
+    null,\n        \"iconVersion\": null,\n        \"iconContentRevision\": null,\n       
+    \"policyRevision\": null,\n        \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:39:49.976Z\"\n     
+    },\n      \"iconPath\": \"icons/9c820720-65fe-488a-a286-8e48a4aceaa2.png\",\n     
+    \"icon\": {\n        \"versionId\": \"v-77242cb6-1f58-4508-a9ff-91163be49539\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"2a432bf8645db82309514cc0d30035bb14046a09037461d0027f5db85354e6ab\",\n       
+    \"thumbnailSha256\": \"03868df83a4b4ed7f3fc41f8f612769a41dabd3f9f7d02940ffce968d51f23fe\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:39:49.976Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"65269c4d-245b-400b-bf1d-5c4aca10d5a7\",\n      \"itemId\": \"IT_METAL_01\",\n     
+    \"name\": \"\uBE5B\uB098\uB294 \uC870\uAC01\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uC804\uD658 \uAC15\uD654 \uC2A4\uD0AC \uD53C\uD574
+    +8%\",\n      \"descriptionStale\": false,\n      \"element\": \"metal\",\n     
+    \"grade\": 1,\n      \"purchasePrice\": 20,\n      \"effects\": [\n        {\n         
+    \"stat\": \"switchDamage\",\n          \"operation\": \"addRatio\",\n         
+    \"amount\": 0.08,\n          \"unit\": \"ratio\",\n          \"trigger\": \"whileOwned\",\n         
+    \"targetForms\": \"all\",\n          \"durationSeconds\": null,\n          \"stackLimit\":
+    1,\n          \"refreshPolicy\": \"refresh\",\n          \"removeOnItemLoss\":
+    true\n        }\n      ],\n      \"synergyTags\": [\n        \"ITEM_METAL\"\n     
+    ],\n      \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\": 1,\n     
+    \"review\": {\n        \"state\": \"draft\",\n        \"dataRevision\": null,\n       
+    \"iconVersion\": null,\n        \"iconContentRevision\": null,\n        \"policyRevision\":
+    null,\n        \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:41:58.857Z\"\n     
+    },\n      \"iconPath\": \"icons/65269c4d-245b-400b-bf1d-5c4aca10d5a7.png\",\n     
+    \"icon\": {\n        \"versionId\": \"v-555d7aac-573d-4e1a-991e-aa0cceb86a40\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"3aeb8cb9087f97d023bdbd52ca5ac8c073bbcbabceef2491c63cf795f6be2b74\",\n       
+    \"thumbnailSha256\": \"eb85b9e0796b7eb83d1e9c1d158dcdd9d7ba7ed41c64ec95fd98c28c04535977\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:41:58.857Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"43e9b7c1-566a-42cd-b7f8-70f2903f4dbc\",\n      \"itemId\": \"IT_METAL_02\",\n     
+    \"name\": \"\uB9DE\uBB3C\uB9B0 \uACE0\uB9AC\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uC804\uD658 SP \uBE44\uC6A9 -1 SP\",\n      \"descriptionStale\":
+    false,\n      \"element\": \"metal\",\n      \"grade\": 2,\n      \"purchasePrice\":
+    40,\n      \"effects\": [\n        {\n          \"stat\": \"switchSpCost\",\n         
+    \"operation\": \"add\",\n          \"amount\": -1,\n          \"unit\": \"SP\",\n         
+    \"trigger\": \"whileOwned\",\n          \"targetForms\": \"all\",\n         
+    \"durationSeconds\": null,\n          \"stackLimit\": 1,\n          \"refreshPolicy\":
+    \"refresh\",\n          \"removeOnItemLoss\": true\n        }\n      ],\n     
+    \"synergyTags\": [\n        \"ITEM_METAL\"\n      ],\n      \"unsupportedEffectNotes\":
+    \"\",\n      \"contentRevision\": 1,\n      \"review\": {\n        \"state\":
+    \"draft\",\n        \"dataRevision\": null,\n        \"iconVersion\": null,\n       
+    \"iconContentRevision\": null,\n        \"policyRevision\": null,\n        \"note\":
+    \"\",\n        \"updatedAt\": \"2026-10-12T11:43:59.402Z\"\n      },\n      \"iconPath\":
+    \"icons/43e9b7c1-566a-42cd-b7f8-70f2903f4dbc.png\",\n      \"icon\": {\n       
+    \"versionId\": \"v-68c5dd71-6811-438d-acd0-8f212304ba7c\",\n        \"sourceContentRevision\":
+    1,\n        \"sourceSha256\": \"ad4cec0908d03a03bd90112ac40b3cc3c72323a19d019266c5d85b80a90fc79a\",\n       
+    \"thumbnailSha256\": \"31258dfc997c3b05fbce0a980d71e1ec9d5df9ff32c05425c324fb97685a9f0e\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:43:59.402Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"6a605411-ae6b-4a7c-9c7b-0e636b23b54d\",\n      \"itemId\": \"IT_METAL_03\",\n     
+    \"name\": \"\uC815\uB828\uB41C \uC778\uC7A5\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uC804\uD658 \uAC15\uD654 \uC2A4\uD0AC \uD53C\uD574
+    +20%\",\n      \"descriptionStale\": false,\n      \"element\": \"metal\",\n     
+    \"grade\": 3,\n      \"purchasePrice\": 80,\n      \"effects\": [\n        {\n         
+    \"stat\": \"switchDamage\",\n          \"operation\": \"addRatio\",\n         
+    \"amount\": 0.2,\n          \"unit\": \"ratio\",\n          \"trigger\": \"whileOwned\",\n         
+    \"targetForms\": \"all\",\n          \"durationSeconds\": null,\n          \"stackLimit\":
+    1,\n          \"refreshPolicy\": \"refresh\",\n          \"removeOnItemLoss\":
+    true\n        }\n      ],\n      \"synergyTags\": [\n        \"ITEM_METAL\"\n     
+    ],\n      \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\": 1,\n     
+    \"review\": {\n        \"state\": \"draft\",\n        \"dataRevision\": null,\n       
+    \"iconVersion\": null,\n        \"iconContentRevision\": null,\n        \"policyRevision\":
+    null,\n        \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:46:28.289Z\"\n     
+    },\n      \"iconPath\": \"icons/6a605411-ae6b-4a7c-9c7b-0e636b23b54d.png\",\n     
+    \"icon\": {\n        \"versionId\": \"v-fce073b6-db9f-43cb-a828-4b62da494587\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"8c67bcb48c32e33f3a2adab33756b7dd74f9661c82162c69b94277ec3a1765c5\",\n       
+    \"thumbnailSha256\": \"54c29f198fa0e8ecc7e0c1eafc2abab033125a488fd5f75a90a29d7ebff26414\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:46:28.289Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"b91c66c3-805e-45cf-8d0e-4fbb458ce771\",\n      \"itemId\": \"IT_METAL_04\",\n     
+    \"name\": \"\uC624\uC0C9 \uC5F0\uACB0\uACE0\uB9AC\",\n      \"description\":
+    \"\uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC \uC77C\uBC18 \uACF5\uACA9 \uD53C\uD574
+    +15%, \uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC \uC804\uD658 \uAC15\uD654 \uC2A4\uD0AC
+    \uD53C\uD574 +25%\",\n      \"descriptionStale\": false,\n      \"element\":
+    \"metal\",\n      \"grade\": 4,\n      \"purchasePrice\": 160,\n      \"effects\":
+    [\n        {\n          \"stat\": \"normalDamage\",\n          \"operation\":
+    \"addRatio\",\n          \"amount\": 0.15,\n          \"unit\": \"ratio\",\n         
+    \"trigger\": \"whileOwned\",\n          \"targetForms\": \"all\",\n         
+    \"durationSeconds\": null,\n          \"stackLimit\": 1,\n          \"refreshPolicy\":
+    \"refresh\",\n          \"removeOnItemLoss\": true\n        },\n        {\n         
+    \"stat\": \"switchDamage\",\n          \"operation\": \"addRatio\",\n         
+    \"amount\": 0.25,\n          \"unit\": \"ratio\",\n          \"trigger\": \"whileOwned\",\n         
+    \"targetForms\": \"all\",\n          \"durationSeconds\": null,\n          \"stackLimit\":
+    1,\n          \"refreshPolicy\": \"refresh\",\n          \"removeOnItemLoss\":
+    true\n        }\n      ],\n      \"synergyTags\": [\n        \"ITEM_METAL\"\n     
+    ],\n      \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\": 1,\n     
+    \"review\": {\n        \"state\": \"draft\",\n        \"dataRevision\": null,\n       
+    \"iconVersion\": null,\n        \"iconContentRevision\": null,\n        \"policyRevision\":
+    null,\n        \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:48:44.842Z\"\n     
+    },\n      \"iconPath\": \"icons/b91c66c3-805e-45cf-8d0e-4fbb458ce771.png\",\n     
+    \"icon\": {\n        \"versionId\": \"v-695a7389-85f1-4faf-95ea-581a85810532\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"137c927fd7c5e2f49080524f0a63136af9189ddd4410cd511c50edc7cda9eae1\",\n       
+    \"thumbnailSha256\": \"50adf9bdb30e2ed5515cfde0b1cddcd9987b75b98cdbd9465e9540a2a7e54241\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:48:44.842Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"a26c6adf-b94e-42f4-a1a1-7db5f9a1c95c\",\n      \"itemId\": \"IT_WATER_01\",\n     
+    \"name\": \"\uBB3C\uBC29\uC6B8 \uC7A5\uC2DD\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC SP \uC7AC\uC0DD +2 SP/\uCD08\",\n      \"descriptionStale\":
+    false,\n      \"element\": \"water\",\n      \"grade\": 1,\n      \"purchasePrice\":
+    20,\n      \"effects\": [\n        {\n          \"stat\": \"spRegen\",\n         
+    \"operation\": \"add\",\n          \"amount\": 2,\n          \"unit\": \"SPPerSecond\",\n         
+    \"trigger\": \"whileOwned\",\n          \"targetForms\": \"all\",\n         
+    \"durationSeconds\": null,\n          \"stackLimit\": 1,\n          \"refreshPolicy\":
+    \"refresh\",\n          \"removeOnItemLoss\": true\n        }\n      ],\n     
+    \"synergyTags\": [\n        \"ITEM_WATER\"\n      ],\n      \"unsupportedEffectNotes\":
+    \"\",\n      \"contentRevision\": 1,\n      \"review\": {\n        \"state\":
+    \"draft\",\n        \"dataRevision\": null,\n        \"iconVersion\": null,\n       
+    \"iconContentRevision\": null,\n        \"policyRevision\": null,\n        \"note\":
+    \"\",\n        \"updatedAt\": \"2026-10-12T11:51:01.297Z\"\n      },\n      \"iconPath\":
+    \"icons/a26c6adf-b94e-42f4-a1a1-7db5f9a1c95c.png\",\n      \"icon\": {\n       
+    \"versionId\": \"v-73ff49e7-3e9a-4f34-a48b-ee2aac44367c\",\n        \"sourceContentRevision\":
+    1,\n        \"sourceSha256\": \"db2b9c4a7172592f2ea449f5228231709471912d3e7ee7c9b33f65b565918f87\",\n       
+    \"thumbnailSha256\": \"8c3427d777cb7a4472576c48624ee6bb12b6043ef193d4d8d5c04523f084b9b1\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:51:01.297Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"7c9a964a-72ec-4064-a18b-bfa1c514f06e\",\n      \"itemId\": \"IT_WATER_02\",\n     
+    \"name\": \"\uAE4A\uC740 \uBB3C\uBCD1\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uCD5C\uB300 SP +15 SP\",\n      \"descriptionStale\":
+    false,\n      \"element\": \"water\",\n      \"grade\": 2,\n      \"purchasePrice\":
+    40,\n      \"effects\": [\n        {\n          \"stat\": \"maxSp\",\n         
+    \"operation\": \"add\",\n          \"amount\": 15,\n          \"unit\": \"SP\",\n         
+    \"trigger\": \"whileOwned\",\n          \"targetForms\": \"all\",\n         
+    \"durationSeconds\": null,\n          \"stackLimit\": 1,\n          \"refreshPolicy\":
+    \"refresh\",\n          \"removeOnItemLoss\": true\n        }\n      ],\n     
+    \"synergyTags\": [\n        \"ITEM_WATER\"\n      ],\n      \"unsupportedEffectNotes\":
+    \"\",\n      \"contentRevision\": 1,\n      \"review\": {\n        \"state\":
+    \"draft\",\n        \"dataRevision\": null,\n        \"iconVersion\": null,\n       
+    \"iconContentRevision\": null,\n        \"policyRevision\": null,\n        \"note\":
+    \"\",\n        \"updatedAt\": \"2026-10-12T11:53:17.661Z\"\n      },\n      \"iconPath\":
+    \"icons/7c9a964a-72ec-4064-a18b-bfa1c514f06e.png\",\n      \"icon\": {\n       
+    \"versionId\": \"v-d9a9ff36-c64a-460e-b89a-b0d7fb3a51b0\",\n        \"sourceContentRevision\":
+    1,\n        \"sourceSha256\": \"863e92deb2bd704142b5c90eba68c22dbbd0f23887bde8d7736dab82323f3b33\",\n       
+    \"thumbnailSha256\": \"0509ed8f32fc682974f0784d55c16906ac3f721f675b02cee4d7292f2b4563ed\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:53:17.661Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"790cd15d-cf82-4dfe-904a-8b88948ce2ea\",\n      \"itemId\": \"IT_WATER_03\",\n     
+    \"name\": \"\uD750\uB974\uB294 \uB9E4\uB4ED\",\n      \"description\": \"\uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uD68C\uD53C SP \uBE44\uC6A9 -3 SP, \uBCF4\uC720 \uC911
+    \uBAA8\uB4E0 \uD3FC \uC804\uD658 SP \uBE44\uC6A9 -1 SP\",\n      \"descriptionStale\":
+    false,\n      \"element\": \"water\",\n      \"grade\": 3,\n      \"purchasePrice\":
+    80,\n      \"effects\": [\n        {\n          \"stat\": \"dodgeSpCost\",\n         
+    \"operation\": \"add\",\n          \"amount\": -3,\n          \"unit\": \"SP\",\n         
+    \"trigger\": \"whileOwned\",\n          \"targetForms\": \"all\",\n         
+    \"durationSeconds\": null,\n          \"stackLimit\": 1,\n          \"refreshPolicy\":
+    \"refresh\",\n          \"removeOnItemLoss\": true\n        },\n        {\n         
+    \"stat\": \"switchSpCost\",\n          \"operation\": \"add\",\n          \"amount\":
+    -1,\n          \"unit\": \"SP\",\n          \"trigger\": \"whileOwned\",\n         
+    \"targetForms\": \"all\",\n          \"durationSeconds\": null,\n          \"stackLimit\":
+    1,\n          \"refreshPolicy\": \"refresh\",\n          \"removeOnItemLoss\":
+    true\n        }\n      ],\n      \"synergyTags\": [\n        \"ITEM_WATER\"\n     
+    ],\n      \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\": 1,\n     
+    \"review\": {\n        \"state\": \"draft\",\n        \"dataRevision\": null,\n       
+    \"iconVersion\": null,\n        \"iconContentRevision\": null,\n        \"policyRevision\":
+    null,\n        \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:55:19.251Z\"\n     
+    },\n      \"iconPath\": \"icons/790cd15d-cf82-4dfe-904a-8b88948ce2ea.png\",\n     
+    \"icon\": {\n        \"versionId\": \"v-3249554a-5d93-4d0d-9b05-1875e0939c6a\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"edad0cac207f867e5687cd9806310c88de0c6554788f45598a45d523caa6c4ce\",\n       
+    \"thumbnailSha256\": \"44ac002b1d7eb3114ad750e3cc1a7e6e00b0312d9c449eb1d7775092d5b66062\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:55:19.251Z\"\n      }\n    },\n    {\n      \"candidateKey\":
+    \"e459b96b-407a-46c5-aa22-64741722a350\",\n      \"itemId\": \"IT_WATER_04\",\n     
+    \"name\": \"\uB04A\uC784\uC5C6\uB294 \uBB3C\uACB0\",\n      \"description\":
+    \"\uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC SP \uC7AC\uC0DD +5 SP/\uCD08, \uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uC804\uD658 SP \uBE44\uC6A9 -2 SP\",\n      \"descriptionStale\":
+    false,\n      \"element\": \"water\",\n      \"grade\": 4,\n      \"purchasePrice\":
+    160,\n      \"effects\": [\n        {\n          \"stat\": \"spRegen\",\n         
+    \"operation\": \"add\",\n          \"amount\": 5,\n          \"unit\": \"SPPerSecond\",\n         
+    \"trigger\": \"whileOwned\",\n          \"targetForms\": \"all\",\n         
+    \"durationSeconds\": null,\n          \"stackLimit\": 1,\n          \"refreshPolicy\":
+    \"refresh\",\n          \"removeOnItemLoss\": true\n        },\n        {\n         
+    \"stat\": \"switchSpCost\",\n          \"operation\": \"add\",\n          \"amount\":
+    -2,\n          \"unit\": \"SP\",\n          \"trigger\": \"whileOwned\",\n         
+    \"targetForms\": \"all\",\n          \"durationSeconds\": null,\n          \"stackLimit\":
+    1,\n          \"refreshPolicy\": \"refresh\",\n          \"removeOnItemLoss\":
+    true\n        }\n      ],\n      \"synergyTags\": [\n        \"ITEM_WATER\"\n     
+    ],\n      \"unsupportedEffectNotes\": \"\",\n      \"contentRevision\": 1,\n     
+    \"review\": {\n        \"state\": \"draft\",\n        \"dataRevision\": null,\n       
+    \"iconVersion\": null,\n        \"iconContentRevision\": null,\n        \"policyRevision\":
+    null,\n        \"note\": \"\",\n        \"updatedAt\": \"2026-10-12T11:57:22.624Z\"\n     
+    },\n      \"iconPath\": \"icons/e459b96b-407a-46c5-aa22-64741722a350.png\",\n     
+    \"icon\": {\n        \"versionId\": \"v-9b5f2d78-4cbd-4ed0-8b00-0868e648d55d\",\n       
+    \"sourceContentRevision\": 1,\n        \"sourceSha256\": \"d6b2d0df917097f36561acd00016a5ddd95d8e669cd06d0bd1cc73cd46a499c6\",\n       
+    \"thumbnailSha256\": \"1f0d480aab908aed9c60e04971d6087ead9ac04c1d40f4f8c2579c8368ef24d7\",\n       
+    \"tool\": \"imagegen\",\n        \"observedModel\": null,\n        \"createdAt\":
+    \"2026-10-12T11:57:22.624Z\"\n      }\n    }\n  ],\n  \"synergyReferences\":
+    [\n    {\n      \"id\": \"SYN_WOOD_01\",\n      \"items\": [\n        {\n         
+    \"candidateKey\": \"f7666cbc-5cd9-47e8-9205-a379800224b1\",\n          \"itemId\":
+    \"IT_WOOD_01\",\n          \"originalId\": \"IT_WOOD_01\"\n        },\n       
+    {\n          \"candidateKey\": \"c8d3e698-0a40-41a2-b8dc-613c05c4086e\",\n         
+    \"itemId\": \"IT_WOOD_02\",\n          \"originalId\": \"IT_WOOD_02\"\n       
+    }\n      ]\n    },\n    {\n      \"id\": \"SYN_FIRE_01\",\n      \"items\": [\n       
+    {\n          \"candidateKey\": \"47d886a2-a187-4da3-9c3a-ddc6b2aa6ec4\",\n         
+    \"itemId\": \"IT_FIRE_01\",\n          \"originalId\": \"IT_FIRE_01\"\n       
+    },\n        {\n          \"candidateKey\": \"667cbdf0-b2cd-4d5b-bbed-fd5e29510898\",\n         
+    \"itemId\": \"IT_FIRE_02\",\n          \"originalId\": \"IT_FIRE_02\"\n       
+    }\n      ]\n    },\n    {\n      \"id\": \"SYN_EARTH_01\",\n      \"items\":
+    [\n        {\n          \"candidateKey\": \"2c141a41-6651-47e7-b716-ca0276978653\",\n         
+    \"itemId\": \"IT_EARTH_01\",\n          \"originalId\": \"IT_EARTH_01\"\n       
+    },\n        {\n          \"candidateKey\": \"07105ba7-63f0-4886-b021-ca4b05f0567b\",\n         
+    \"itemId\": \"IT_EARTH_02\",\n          \"originalId\": \"IT_EARTH_02\"\n       
+    }\n      ]\n    },\n    {\n      \"id\": \"SYN_METAL_01\",\n      \"items\":
+    [\n        {\n          \"candidateKey\": \"65269c4d-245b-400b-bf1d-5c4aca10d5a7\",\n         
+    \"itemId\": \"IT_METAL_01\",\n          \"originalId\": \"IT_METAL_01\"\n       
+    },\n        {\n          \"candidateKey\": \"43e9b7c1-566a-42cd-b7f8-70f2903f4dbc\",\n         
+    \"itemId\": \"IT_METAL_02\",\n          \"originalId\": \"IT_METAL_02\"\n       
+    }\n      ]\n    },\n    {\n      \"id\": \"SYN_WATER_01\",\n      \"items\":
+    [\n        {\n          \"candidateKey\": \"a26c6adf-b94e-42f4-a1a1-7db5f9a1c95c\",\n         
+    \"itemId\": \"IT_WATER_01\",\n          \"originalId\": \"IT_WATER_01\"\n       
+    },\n        {\n          \"candidateKey\": \"7c9a964a-72ec-4064-a18b-bfa1c514f06e\",\n         
+    \"itemId\": \"IT_WATER_02\",\n          \"originalId\": \"IT_WATER_02\"\n       
+    }\n      ]\n    }\n  ]\n}"
+  manifestJson: "{\n  \"schemaVersion\": 1,\n  \"exportId\": \"e09139a2-7121-42e6-b75c-e12a533428ed\",\n 
+    \"kind\": \"draft\",\n  \"projectId\": \"93190cd9-a826-4b58-b257-cf4ba077b827\",\n 
+    \"contentRevision\": 71,\n  \"policyRevision\": 1,\n  \"createdAt\": \"2026-10-12T11:58:08.681Z\",\n 
+    \"sourceRefs\": [\n    {\n      \"repository\": \"lala11112/Four-Tiger-Sword\",\n     
+    \"branch\": \"codex/system-design-2026-10-07\",\n      \"commit\": \"fe533a25a0df81eb317059ee18708229d63320ad\",\n     
+    \"document\": \"docs/planning/2026-10-07-roguelike-direction.md\",\n      \"status\":
+    \"confirmed\"\n    },\n    {\n      \"repository\": \"lala11112/Four-Tiger-Sword\",\n     
+    \"branch\": \"codex/system-design-2026-10-07\",\n      \"commit\": \"fe533a25a0df81eb317059ee18708229d63320ad\",\n     
+    \"document\": \"docs/planning/2026-10-07-initial-content-draft.md\",\n      \"status\":
+    \"proposal\"\n    },\n    {\n      \"repository\": \"lala11112/studio-baekho-tools\",\n     
+    \"branch\": \"integration/baekho-studio\",\n      \"commit\": \"5d0cb0f416184d4752ebe6667152cc74fdd0b697\",\n     
+    \"document\": \"AGENTS.md\",\n      \"status\": \"implementation\"\n    }\n 
+    ],\n  \"icons\": [\n    {\n      \"itemId\": \"IT_WOOD_01\",\n      \"iconPath\":
+    \"icons/f7666cbc-5cd9-47e8-9205-a379800224b1.png\"\n    },\n    {\n      \"itemId\":
+    \"IT_WOOD_02\",\n      \"iconPath\": \"icons/c8d3e698-0a40-41a2-b8dc-613c05c4086e.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_WOOD_03\",\n      \"iconPath\": \"icons/13eb6f25-bbdc-4207-9614-ac9dbff75174.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_WOOD_04\",\n      \"iconPath\": \"icons/22bf8771-31b1-4476-be3a-0bb4f1ddc594.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_FIRE_01\",\n      \"iconPath\": \"icons/47d886a2-a187-4da3-9c3a-ddc6b2aa6ec4.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_FIRE_02\",\n      \"iconPath\": \"icons/667cbdf0-b2cd-4d5b-bbed-fd5e29510898.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_FIRE_03\",\n      \"iconPath\": \"icons/bb9f2edb-dea6-42ef-9f06-51684f212a4d.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_FIRE_04\",\n      \"iconPath\": \"icons/b4a846e2-7abd-4f47-bf4b-88096fa177b5.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_EARTH_01\",\n      \"iconPath\": \"icons/2c141a41-6651-47e7-b716-ca0276978653.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_EARTH_02\",\n      \"iconPath\": \"icons/07105ba7-63f0-4886-b021-ca4b05f0567b.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_EARTH_03\",\n      \"iconPath\": \"icons/afd287a9-cfc7-47db-8779-6d5cc4d2efd4.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_EARTH_04\",\n      \"iconPath\": \"icons/9c820720-65fe-488a-a286-8e48a4aceaa2.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_METAL_01\",\n      \"iconPath\": \"icons/65269c4d-245b-400b-bf1d-5c4aca10d5a7.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_METAL_02\",\n      \"iconPath\": \"icons/43e9b7c1-566a-42cd-b7f8-70f2903f4dbc.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_METAL_03\",\n      \"iconPath\": \"icons/6a605411-ae6b-4a7c-9c7b-0e636b23b54d.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_METAL_04\",\n      \"iconPath\": \"icons/b91c66c3-805e-45cf-8d0e-4fbb458ce771.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_WATER_01\",\n      \"iconPath\": \"icons/a26c6adf-b94e-42f4-a1a1-7db5f9a1c95c.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_WATER_02\",\n      \"iconPath\": \"icons/7c9a964a-72ec-4064-a18b-bfa1c514f06e.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_WATER_03\",\n      \"iconPath\": \"icons/790cd15d-cf82-4dfe-904a-8b88948ce2ea.png\"\n   
+    },\n    {\n      \"itemId\": \"IT_WATER_04\",\n      \"iconPath\": \"icons/e459b96b-407a-46c5-aa22-64741722a350.png\"\n   
+    }\n  ],\n  \"files\": [\n    {\n      \"path\": \"icons/f7666cbc-5cd9-47e8-9205-a379800224b1.png\",\n     
+    \"sha256\": \"d8f53b43070ba867538e496a87963015e482b34919224d6dec0b5357893ac02f\"\n   
+    },\n    {\n      \"path\": \"icons/c8d3e698-0a40-41a2-b8dc-613c05c4086e.png\",\n     
+    \"sha256\": \"b7b2bc4ab5dbc55568f09bf0067b4656acd69f57649f226077b9bd1069269f2f\"\n   
+    },\n    {\n      \"path\": \"icons/13eb6f25-bbdc-4207-9614-ac9dbff75174.png\",\n     
+    \"sha256\": \"0afcc5b284b49e99c5608d2b1773a53fd5a13cd51cfcc58d3292d2cce89775db\"\n   
+    },\n    {\n      \"path\": \"icons/22bf8771-31b1-4476-be3a-0bb4f1ddc594.png\",\n     
+    \"sha256\": \"428bbe3501d38ce804a0280be5a457ad3f3f0cfb6c93c7f79de342cd916811ef\"\n   
+    },\n    {\n      \"path\": \"icons/47d886a2-a187-4da3-9c3a-ddc6b2aa6ec4.png\",\n     
+    \"sha256\": \"519c92cfefa77cecf0a8737c8aa66e1f69c94e70d2c61beb613db20177f9a69a\"\n   
+    },\n    {\n      \"path\": \"icons/667cbdf0-b2cd-4d5b-bbed-fd5e29510898.png\",\n     
+    \"sha256\": \"4389789f18447818e648a4c0ebe5a55dad42a2f0c31453cb43e20320a317016d\"\n   
+    },\n    {\n      \"path\": \"icons/bb9f2edb-dea6-42ef-9f06-51684f212a4d.png\",\n     
+    \"sha256\": \"0809c38d76913620546141576a4a4a21b0adafead0f254ef0490531bfd044f92\"\n   
+    },\n    {\n      \"path\": \"icons/b4a846e2-7abd-4f47-bf4b-88096fa177b5.png\",\n     
+    \"sha256\": \"bc754aa4b7fa4aac11373adfcb7012d8bae487bc9836a057cebec6cc732c6e20\"\n   
+    },\n    {\n      \"path\": \"icons/2c141a41-6651-47e7-b716-ca0276978653.png\",\n     
+    \"sha256\": \"1b278958ceecbc51398aa195479b8af3cbccb2551721d00fa459ea0d3b81d33b\"\n   
+    },\n    {\n      \"path\": \"icons/07105ba7-63f0-4886-b021-ca4b05f0567b.png\",\n     
+    \"sha256\": \"65aba948a90290e040c8244617c034340e3198b3aa37468b69142389bfab9fa0\"\n   
+    },\n    {\n      \"path\": \"icons/afd287a9-cfc7-47db-8779-6d5cc4d2efd4.png\",\n     
+    \"sha256\": \"6cbb6329eef31ef159f2df09441dd44bb3548ed7830e1c2d4033423f3684cf3d\"\n   
+    },\n    {\n      \"path\": \"icons/9c820720-65fe-488a-a286-8e48a4aceaa2.png\",\n     
+    \"sha256\": \"03868df83a4b4ed7f3fc41f8f612769a41dabd3f9f7d02940ffce968d51f23fe\"\n   
+    },\n    {\n      \"path\": \"icons/65269c4d-245b-400b-bf1d-5c4aca10d5a7.png\",\n     
+    \"sha256\": \"eb85b9e0796b7eb83d1e9c1d158dcdd9d7ba7ed41c64ec95fd98c28c04535977\"\n   
+    },\n    {\n      \"path\": \"icons/43e9b7c1-566a-42cd-b7f8-70f2903f4dbc.png\",\n     
+    \"sha256\": \"31258dfc997c3b05fbce0a980d71e1ec9d5df9ff32c05425c324fb97685a9f0e\"\n   
+    },\n    {\n      \"path\": \"icons/6a605411-ae6b-4a7c-9c7b-0e636b23b54d.png\",\n     
+    \"sha256\": \"54c29f198fa0e8ecc7e0c1eafc2abab033125a488fd5f75a90a29d7ebff26414\"\n   
+    },\n    {\n      \"path\": \"icons/b91c66c3-805e-45cf-8d0e-4fbb458ce771.png\",\n     
+    \"sha256\": \"50adf9bdb30e2ed5515cfde0b1cddcd9987b75b98cdbd9465e9540a2a7e54241\"\n   
+    },\n    {\n      \"path\": \"icons/a26c6adf-b94e-42f4-a1a1-7db5f9a1c95c.png\",\n     
+    \"sha256\": \"8c3427d777cb7a4472576c48624ee6bb12b6043ef193d4d8d5c04523f084b9b1\"\n   
+    },\n    {\n      \"path\": \"icons/7c9a964a-72ec-4064-a18b-bfa1c514f06e.png\",\n     
+    \"sha256\": \"0509ed8f32fc682974f0784d55c16906ac3f721f675b02cee4d7292f2b4563ed\"\n   
+    },\n    {\n      \"path\": \"icons/790cd15d-cf82-4dfe-904a-8b88948ce2ea.png\",\n     
+    \"sha256\": \"44ac002b1d7eb3114ad750e3cc1a7e6e00b0312d9c449eb1d7775092d5b66062\"\n   
+    },\n    {\n      \"path\": \"icons/e459b96b-407a-46c5-aa22-64741722a350.png\",\n     
+    \"sha256\": \"1f0d480aab908aed9c60e04971d6087ead9ac04c1d40f4f8c2579c8368ef24d7\"\n   
+    },\n    {\n      \"path\": \"saingeom-items.v1.json\",\n      \"sha256\": \"752e87e280f7b682b4a4881e2fd84864a679d63077ebede12b5f0f5fc42940cf\"\n   
+    },\n    {\n      \"path\": \"validation-report.json\",\n      \"sha256\": \"84d5710980bfa697a1553a86104dfc2c521d4b5dd12145e134fbc5842d38c094\"\n   
+    },\n    {\n      \"path\": \"README.md\",\n      \"sha256\": \"1354c93abcceb1b0853d33e336f1309bc40b241e269baff90245c9c42bf3b584\"\n   
+    }\n  ]\n}"
+  catalogSha256: 752e87e280f7b682b4a4881e2fd84864a679d63077ebede12b5f0f5fc42940cf
+  manifestSha256: 28e7cac3b5bae8e06054920289e8a7e2f0f8192ba439e3ef73742910b0e13b55
+  items:
+  - {fileID: 11400000, guid: e76a858be4735674bb30699781d7918e, type: 2}
+  - {fileID: 11400000, guid: 6b65e10e2d2951044967b84d79fbf708, type: 2}
+  - {fileID: 11400000, guid: ed2ac50c10bfe4a4d9c6011748a9ea0e, type: 2}
+  - {fileID: 11400000, guid: 376267b7fcb6c3741a06b654b2bbf893, type: 2}
+  - {fileID: 11400000, guid: d9cfec264bc60b34294572b512723996, type: 2}
+  - {fileID: 11400000, guid: d083ba3cf0179984d8013b2444cb305c, type: 2}
+  - {fileID: 11400000, guid: 02790966f315ab54798b73d466e5b465, type: 2}
+  - {fileID: 11400000, guid: f18a712f3b8a5cb408ffc0bfba10002d, type: 2}
+  - {fileID: 11400000, guid: 25d9e18674398f34abca4f2e569c3158, type: 2}
+  - {fileID: 11400000, guid: 0e22226ba6e4be146acdb008dde9d89b, type: 2}
+  - {fileID: 11400000, guid: 5ee47b49e8faca7448f388173490e04e, type: 2}
+  - {fileID: 11400000, guid: 6f7775df95d243b49b92dfbc29da5f65, type: 2}
+  - {fileID: 11400000, guid: dbb7200e47162d647804c6455ee26c61, type: 2}
+  - {fileID: 11400000, guid: ab975c6f1543ba546b4f09a47d604a94, type: 2}
+  - {fileID: 11400000, guid: 522a4dc9500a80e479b2d9417cfe9957, type: 2}
+  - {fileID: 11400000, guid: aeff3a816484f9c49b7adb7ad8fcef87, type: 2}
+  - {fileID: 11400000, guid: 1cc7a9bb3afdd7d47b2c4c3aa1cf0ea9, type: 2}
+  - {fileID: 11400000, guid: 750d6ab2bb2037448b39959c0eeb7193, type: 2}
+  - {fileID: 11400000, guid: 86a5886f8ccca0e4a973746b5b4a90c5, type: 2}
+  - {fileID: 11400000, guid: f3d7058790a49f54b84c59a7d515a23f, type: 2}
+  policy:
+    maxSpCap: 200
+    regenCap: 40
+    minDodgeCost: 8
+    minSwitchCost: 4

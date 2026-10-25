@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: IT_WOOD_03
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: 93190cd9-a826-4b58-b257-cf4ba077b827
+  candidateKey: 13eb6f25-bbdc-4207-9614-ac9dbff75174
+  itemId: IT_WOOD_03
+  displayName: "\uAE4A\uC740 \uBFCC\uB9AC"
+  description: "\uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC \uCD5C\uB300 SP +20 SP, \uBCF4\uC720
+    \uC911 \uBAA8\uB4E0 \uD3FC \uC77C\uBC18 \uACF5\uACA9 \uD53C\uD574 +8%"
+  element: 1
+  grade: 3
+  purchasePrice: 80
+  effects:
+  - stat: 1
+    amount: 20
+    trigger: 0
+    allForms: 1
+    targetForms: 
+    durationSeconds: 0
+  - stat: 3
+    amount: 0.08
+    trigger: 0
+    allForms: 1
+    targetForms: 
+    durationSeconds: 0
+  icon: {fileID: 21300000, guid: f5e1adb1b1bad5a4b9e3aff306b9fcb4, type: 3}
+  contentStatus: draft
+  contentRevision: 1
+  sourceJson: "{\"candidateKey\":\"13eb6f25-bbdc-4207-9614-ac9dbff75174\",\"itemId\":\"IT_WOOD_03\",\"name\":\"\uAE4A\uC740
+    \uBFCC\uB9AC\",\"description\":\"\uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC \uCD5C\uB300
+    SP +20 SP, \uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC \uC77C\uBC18 \uACF5\uACA9
+    \uD53C\uD574 +8%\",\"descriptionStale\":false,\"element\":\"wood\",\"grade\":3,\"purchasePrice\":80,\"effects\":[{\"stat\":\"maxSp\",\"operation\":\"add\",\"amount\":20,\"unit\":\"SP\",\"trigger\":\"whileOwned\",\"targetForms\":\"all\",\"durationSeconds\":null,\"stackLimit\":1,\"refreshPolicy\":\"refresh\",\"removeOnItemLoss\":true},{\"stat\":\"normalDamage\",\"operation\":\"addRatio\",\"amount\":0.08,\"unit\":\"ratio\",\"trigger\":\"whileOwned\",\"targetForms\":\"all\",\"durationSeconds\":null,\"stackLimit\":1,\"refreshPolicy\":\"refresh\",\"removeOnItemLoss\":true}],\"synergyTags\":[\"ITEM_WOOD\"],\"unsupportedEffectNotes\":\"\",\"contentRevision\":1,\"review\":{\"state\":\"draft\",\"dataRevision\":null,\"iconVersion\":null,\"iconContentRevision\":null,\"policyRevision\":null,\"note\":\"\",\"updatedAt\":\"2026-10-12T11:19:36.109Z\"},\"iconPath\":\"icons/13eb6f25-bbdc-4207-9614-ac9dbff75174.png\",\"icon\":{\"versionId\":\"v-1a04abf2-1216-4d9b-811f-4fb95ec68733\",\"sourceContentRevision\":1,\"sourceSha256\":\"2d91bbbae875a768536549e2054a2d676741fade1d5749f6709aaa24b86ad1a8\",\"thumbnailSha256\":\"0afcc5b284b49e99c5608d2b1773a53fd5a13cd51cfcc58d3292d2cce89775db\",\"tool\":\"imagegen\",\"observedModel\":null,\"createdAt\":\"2026-10-12T11:19:36.109Z\"}}"

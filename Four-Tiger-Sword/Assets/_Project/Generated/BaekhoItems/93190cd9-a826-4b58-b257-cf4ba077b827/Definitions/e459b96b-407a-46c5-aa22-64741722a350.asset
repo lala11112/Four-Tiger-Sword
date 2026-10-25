@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: IT_WATER_04
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: 93190cd9-a826-4b58-b257-cf4ba077b827
+  candidateKey: e459b96b-407a-46c5-aa22-64741722a350
+  itemId: IT_WATER_04
+  displayName: "\uB04A\uC784\uC5C6\uB294 \uBB3C\uACB0"
+  description: "\uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC SP \uC7AC\uC0DD +5 SP/\uCD08,
+    \uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC \uC804\uD658 SP \uBE44\uC6A9 -2 SP"
+  element: 5
+  grade: 4
+  purchasePrice: 160
+  effects:
+  - stat: 2
+    amount: 5
+    trigger: 0
+    allForms: 1
+    targetForms: 
+    durationSeconds: 0
+  - stat: 6
+    amount: -2
+    trigger: 0
+    allForms: 1
+    targetForms: 
+    durationSeconds: 0
+  icon: {fileID: 21300000, guid: dd562ec320a39d143ab0fce0b1a78426, type: 3}
+  contentStatus: draft
+  contentRevision: 1
+  sourceJson: "{\"candidateKey\":\"e459b96b-407a-46c5-aa22-64741722a350\",\"itemId\":\"IT_WATER_04\",\"name\":\"\uB04A\uC784\uC5C6\uB294
+    \uBB3C\uACB0\",\"description\":\"\uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC SP \uC7AC\uC0DD
+    +5 SP/\uCD08, \uBCF4\uC720 \uC911 \uBAA8\uB4E0 \uD3FC \uC804\uD658 SP \uBE44\uC6A9
+    -2 SP\",\"descriptionStale\":false,\"element\":\"water\",\"grade\":4,\"purchasePrice\":160,\"effects\":[{\"stat\":\"spRegen\",\"operation\":\"add\",\"amount\":5,\"unit\":\"SPPerSecond\",\"trigger\":\"whileOwned\",\"targetForms\":\"all\",\"durationSeconds\":null,\"stackLimit\":1,\"refreshPolicy\":\"refresh\",\"removeOnItemLoss\":true},{\"stat\":\"switchSpCost\",\"operation\":\"add\",\"amount\":-2,\"unit\":\"SP\",\"trigger\":\"whileOwned\",\"targetForms\":\"all\",\"durationSeconds\":null,\"stackLimit\":1,\"refreshPolicy\":\"refresh\",\"removeOnItemLoss\":true}],\"synergyTags\":[\"ITEM_WATER\"],\"unsupportedEffectNotes\":\"\",\"contentRevision\":1,\"review\":{\"state\":\"draft\",\"dataRevision\":null,\"iconVersion\":null,\"iconContentRevision\":null,\"policyRevision\":null,\"note\":\"\",\"updatedAt\":\"2026-10-12T11:57:22.624Z\"},\"iconPath\":\"icons/e459b96b-407a-46c5-aa22-64741722a350.png\",\"icon\":{\"versionId\":\"v-9b5f2d78-4cbd-4ed0-8b00-0868e648d55d\",\"sourceContentRevision\":1,\"sourceSha256\":\"d6b2d0df917097f36561acd00016a5ddd95d8e669cd06d0bd1cc73cd46a499c6\",\"thumbnailSha256\":\"1f0d480aab908aed9c60e04971d6087ead9ac04c1d40f4f8c2579c8368ef24d7\",\"tool\":\"imagegen\",\"observedModel\":null,\"createdAt\":\"2026-10-12T11:57:22.624Z\"}}"

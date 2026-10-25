@@ -19,6 +19,7 @@ public class PlayerHitState : IPlayerState
 
     public void Enter()
     {
+        Player.CancelPendingSwitchAttack();
         Player.StopParryKnockback();
         _previousRootMotion = Player.Animator.applyRootMotion;
         Player.Animator.applyRootMotion = false;
@@ -30,7 +31,7 @@ public class PlayerHitState : IPlayerState
         HitVelocity = Player.ConsumeHitReaction();
         Elapsed = 0f;
         IsComplete = false;
-        Player.Animator.speed = 1f;
+        Player.SetAnimationSpeed(1f);
         ClearActionBuffers();
 
         // 전용 모션이 아직 없으면 Hit, Idle 순으로 폴백하여 이전 공격 모션을 끊습니다.
@@ -55,8 +56,8 @@ public class PlayerHitState : IPlayerState
 
         ClearActionBuffers();
         Player.Movement.ApplyGravity();
-        Vector3 displacement = GetKnockbackDisplacement(Time.deltaTime);
-        displacement.y = Player.VerticalVelocity * Time.deltaTime;
+        Vector3 displacement = GetKnockbackDisplacement(Player.ActionDeltaTime);
+        displacement.y = Player.VerticalVelocity * Player.ActionDeltaTime;
         if (Player.Controller.enabled)
         {
             CollisionFlags flags = Player.Controller.Move(displacement);
@@ -64,7 +65,7 @@ public class PlayerHitState : IPlayerState
                 Player.VerticalVelocity = 0f;
         }
 
-        Elapsed += Time.deltaTime;
+        Elapsed += Player.ActionDeltaTime;
         IsComplete = Elapsed >= Mathf.Max(0f, Duration);
     }
 
@@ -77,13 +78,12 @@ public class PlayerHitState : IPlayerState
         Player.Input.UltimateBuffer.Consume();
         Player.Input.JumpBuffer.Consume();
         Player.Input.DashBuffer.Consume();
-        Player.Input.ParryBuffer.Consume();
     }
 
     public void Exit()
     {
         Player.Animator.applyRootMotion = _previousRootMotion;
-        Player.Animator.speed = 1f;
+        Player.SetAnimationSpeed(1f);
         HitVelocity = Vector3.zero;
     }
 }

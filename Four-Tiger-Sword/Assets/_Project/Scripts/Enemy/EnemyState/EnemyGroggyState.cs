@@ -19,7 +19,7 @@ public class EnemyGroggyState : IPlayerState
     }
     public void Update()
     {
-        _remaining -= Time.deltaTime;
+        _remaining -= _enemy.ActionDeltaTime;
         if (_remaining <= 0f) _enemy.IsGroggy = false;
     }
 

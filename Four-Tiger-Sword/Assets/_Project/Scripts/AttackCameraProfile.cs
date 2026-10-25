@@ -26,4 +26,12 @@ public sealed class AttackCameraProfile : ScriptableObject
 
     [Header("Actual hit only")]
     [Min(0)] public float HitImpulse = 0.3f;
+
+    [Header("Optional Feel preset")]
+    [Tooltip("지정하면 Feel이 줌과 적중 효과를 재생합니다. 기존 구도와 복귀 설정은 유지됩니다.")]
+    public CombatFeelFeedback FeelFeedbackPrefab;
+
+    [Header("Optional absolute feedback (legacy profiles keep this disabled)")]
+    public bool EnableV2;
+    public CombatCameraV2Settings V2 = new CombatCameraV2Settings();
 }

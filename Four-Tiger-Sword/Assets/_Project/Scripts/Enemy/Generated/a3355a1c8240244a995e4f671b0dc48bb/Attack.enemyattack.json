@@ -1,0 +1,155 @@
+{
+  "version": 1,
+  "attackId": "a3355a1c8240244a995e4f671b0dc48bb",
+  "typeId": "Baekho.Generated.a3355a1c8240244a995e4f671b0dc48bb.MonsterTripleSphereBurstSO",
+  "name": "구형 탄환 3연사",
+  "description": "기본 설정은 1초 준비 후 0.15초 간격으로 3발 발사입니다. 각 탄환은 발사 순간 플레이어 방향을 고정하며, 반경 0.12m·속도 8m/s·수명 3초·기본 피해 ATK×0.3을 사용합니다. 기존 속성·치명타·경직·패링·사운드 규칙을 유지합니다. 시작점 중첩 검사와 이동 구간 SphereCast로 소유자를 제외한 가장 가까운 충돌을 처리하며, 벽이나 플레이어에 닿으면 소멸합니다. 중단·패링 시 모든 탄환을 제거하고, 남은 탄환이 있으면 액션을 완료하지 않습니다. 기본 구형 외형을 StageTransientObject로 추적하며 Animator 기본값은 Attack입니다. attackSpeed는 준비·발사 간격에 적용하고, 탄환 이동·수명은 Enemy.ActionDeltaTime을 사용합니다. 미리보기는 기본 설정의 1.00/1.15/1.30초 발사와 장애물이 없는 최대 24m 궤적을 표시합니다.",
+  "defaults": {
+    "animName": "Attack",
+    "engageRange": 10,
+    "executeRange": 8,
+    "weight": 100,
+    "minimumRange": 0,
+    "preferredRange": 6,
+    "cooldown": 0,
+    "repeatWeightMultiplier": 0.5,
+    "attackSpeed": 1,
+    "staggerLevel": 1,
+    "isParryable": true,
+    "telegraphDuration": 1,
+    "SwingAudio": {
+      "Clip": null,
+      "Accent": null,
+      "Volume": 0.65,
+      "AccentVolume": 0.3,
+      "PitchRange": [
+        0.97,
+        1.03
+      ]
+    },
+    "HitAudio": {
+      "Clip": null,
+      "Accent": null,
+      "Volume": 0.65,
+      "AccentVolume": 0.3,
+      "PitchRange": [
+        0.97,
+        1.03
+      ]
+    },
+    "LandingAudio": {
+      "Clip": null,
+      "Accent": null,
+      "Volume": 0.65,
+      "AccentVolume": 0.3,
+      "PitchRange": [
+        0.97,
+        1.03
+      ]
+    },
+    "startupTime": 1,
+    "shotInterval": 0.15,
+    "projectileCount": 3,
+    "projectileSpeed": 8,
+    "projectileRadius": 0.12,
+    "projectileLifetime": 3,
+    "damage": 0.3,
+    "knockbackForce": 0,
+    "spawnOffset": [
+      0,
+      1.5,
+      0
+    ],
+    "targetHeight": 1.5,
+    "projectileMaterial": null
+  },
+  "preview": {
+    "shapes": [
+      {
+        "shape": "path",
+        "start": 1,
+        "end": 4,
+        "offset": [
+          0,
+          1.5,
+          0
+        ],
+        "radius": 0.12,
+        "points": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3
+          ],
+          [
+            0,
+            0,
+            24
+          ]
+        ]
+      },
+      {
+        "shape": "path",
+        "start": 1.15,
+        "end": 4.15,
+        "offset": [
+          0,
+          1.5,
+          0
+        ],
+        "radius": 0.12,
+        "points": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3
+          ],
+          [
+            0,
+            0,
+            24
+          ]
+        ]
+      },
+      {
+        "shape": "path",
+        "start": 1.3,
+        "end": 4.3,
+        "offset": [
+          0,
+          1.5,
+          0
+        ],
+        "radius": 0.12,
+        "points": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            3
+          ],
+          [
+            0,
+            0,
+            24
+          ]
+        ]
+      }
+    ]
+  },
+  "previewSupported": true
+}

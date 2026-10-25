@@ -31,7 +31,7 @@ public class BindEffect : IStatusEffect
     private IEnumerator SpawnVFX(GameObject target)
     {
         yield return new WaitForSeconds(1f);
-        effectInstance = Object.Instantiate(_vfxPrefab, target.transform.position, Quaternion.identity);
+        effectInstance = StageTransientObject.Track(Object.Instantiate(_vfxPrefab, target.transform.position, Quaternion.identity));
     }
 
     public void OnUpdate(float deltaTime) => _elapsed += deltaTime;

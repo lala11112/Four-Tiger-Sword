@@ -31,7 +31,7 @@ public abstract class EnemyAction
         IsActive = true;
         _telegraphActive = false;
         if (_enemy.Animator != null)
-            _enemy.Animator.speed = SkillData.attackSpeed;
+            _enemy.SetAnimationSpeed(SkillData.attackSpeed);
 
         StartTelegraph();
     }
@@ -39,12 +39,12 @@ public abstract class EnemyAction
     public virtual void Update()
     {
         // attackSpeed 배율만큼 타이머를 빠르게 진행 → 모든 판정 타이밍이 비례해서 당겨짐
-        _timer += Time.deltaTime * SkillData.attackSpeed;
+        _timer += _enemy.ActionDeltaTime * SkillData.attackSpeed;
 
         // 예고 타이밍 자동 관리: _telegraphTimer는 서브클래스의 _timer 리셋과 무관하게 증가
         if (_telegraphActive && SkillData.isParryable)
         {
-            _telegraphTimer += Time.deltaTime * SkillData.attackSpeed;
+            _telegraphTimer += _enemy.ActionDeltaTime * SkillData.attackSpeed;
             if (_telegraphTimer >= SkillData.telegraphDuration)
                 EndTelegraph();
         }
@@ -56,7 +56,7 @@ public abstract class EnemyAction
         IsFinished = true;
         IsActive = false;
         if (_enemy.Animator != null)
-            _enemy.Animator.speed = 1f;
+            _enemy.SetAnimationSpeed(1f);
 
         EndTelegraph();
     }
@@ -90,6 +90,20 @@ public abstract class EnemyAction
     
 
     // ── 공통 헬퍼 ────────────────────────────────────────────────────────────
+
+    protected void PlaySwingSound(CombatSoundSettings overrideSound = null)
+    {
+        CombatSoundSettings sound = overrideSound != null && overrideSound.HasSound
+            ? overrideSound : SkillData.SwingAudio;
+        PlaySound(sound, _enemy.transform.position);
+    }
+
+    protected void PlaySound(CombatSoundSettings sound, Vector3 position)
+        => CombatSfx.Play(sound?.Resolve() ?? default, position, this);
+
+    protected CombatSoundCue ResolveHitSound(CombatSoundSettings overrideSound = null)
+        => overrideSound != null && overrideSound.HasSound
+            ? overrideSound.Resolve() : SkillData.HitAudio?.Resolve() ?? default;
 
     protected static bool CrossesHitWindow(float previousTime, float currentTime, float start, float duration)
         => duration > 0f && currentTime > previousTime

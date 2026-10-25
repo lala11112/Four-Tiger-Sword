@@ -4,12 +4,14 @@ public abstract partial class BaseForm
 {
     public virtual void BeginAttack()
     {
+        ResetFinisherAttack();
+        _normalAttackActive = true;
         _currentAction = ActionType.Attack;
         _comboStep = 0;
         _timer = 0f;
         ClearHitTargets();
         if (!HasSteps(_weaponActionData?.ComboSteps)) return;
-        _playerController.Animator.speed = AttackSpeed;
+        _playerController.SetAnimationSpeed(AttackSpeed);
         PlayCombo();
     }
 
@@ -17,14 +19,15 @@ public abstract partial class BaseForm
     {
         isComplete = false;
 
-        if (!HasSteps(_weaponActionData?.ComboSteps))
+        WeaponActionData currentStep = CurrentNormalAttackStep;
+        if (currentStep == null)
         {
             isComplete = true;
             return;
         }
 
-        _timer += Time.deltaTime * AttackSpeed;
-        WeaponActionData currentStep = _weaponActionData.ComboSteps[_comboStep];
+        _timer += _playerController.ActionDeltaTime * AttackSpeed;
+        ApplyFinisherFacing();
 
         _playerController.UpdateAttackTrails(currentStep, _timer);
         MoveForward(currentStep);
@@ -34,8 +37,8 @@ public abstract partial class BaseForm
             isComplete = true;
     }
 
-    public bool CanChainAttack => HasSteps(_weaponActionData?.ComboSteps)
-        && _timer >= _weaponActionData.ComboSteps[_comboStep].ComboTransitionTime;
+    public bool CanChainAttack => !_finisherAttackActive && HasSteps(_weaponActionData?.ComboSteps)
+        && CurrentNormalAttackStep != null && _timer >= CurrentNormalAttackStep.ComboTransitionTime;
 
     public bool TryContinueAttack()
     {
@@ -48,23 +51,24 @@ public abstract partial class BaseForm
     public virtual void EndAttack()
     {
         EndAttackCamera();
+        ResetFinisherAttack();
         _comboStep = 0;
         _softTarget = null;
         ClearHitTargets();
-        _playerController.Animator.speed = 1f;
+        _playerController.SetAnimationSpeed(1f);
     }
 
     // ── 패링 ─────────────────────────────────────────────────────────────────
 
     public virtual void BeginParry()
     {
-        _playerController.Animator.speed = 1f;
+        _playerController.SetAnimationSpeed(1f);
         PlayActionAnimation(_weaponActionData?.ParryAnimationName, 0f);
     }
 
     public virtual void EndParry()
     {
-        _playerController.Animator.speed = 1f;
+        _playerController.SetAnimationSpeed(1f);
     }
 
     // ── 공중 공격: 시작 → 하강 반복 → 착지 마무리 ──────────────────────────
@@ -72,17 +76,18 @@ public abstract partial class BaseForm
     public virtual void BeginAirAttack()
     {
         _currentAction = ActionType.AirAttack;
+        SnapshotAttackDamage();
         _timer = 0;
         _softTarget = null;
         ClearHitTargets();
-        _playerController.Animator.speed = AttackSpeed;
+        _playerController.SetAnimationSpeed(AttackSpeed);
         PlayActionAnimation(_weaponActionData?.AirAttackStartAnimationName, 0.05f);
     }
 
     public virtual void UpdateAirAttackStart(out bool isComplete)
     {
-        _playerController.Animator.speed = AttackSpeed;
-        _timer += Time.deltaTime * AttackSpeed;
+        _playerController.SetAnimationSpeed(AttackSpeed);
+        _timer += _playerController.ActionDeltaTime * AttackSpeed;
         isComplete = _weaponActionData == null
             || string.IsNullOrWhiteSpace(_weaponActionData.AirAttackStartAnimationName)
             || _timer >= _weaponActionData.AirAttackStartDuration;
@@ -100,7 +105,7 @@ public abstract partial class BaseForm
         FindSoftTarget();
         BeginAttackCamera(_weaponActionData?.AirAttackStep);
         ClearHitTargets();
-        _playerController.Animator.speed = AttackSpeed;
+        _playerController.SetAnimationSpeed(AttackSpeed);
         PlayActionAnimation(_weaponActionData?.AirAttackStep?.AnimationName, 0.05f);
         _playerController.UpdateAttackTrails(_weaponActionData?.AirAttackStep, 0f);
     }
@@ -110,8 +115,8 @@ public abstract partial class BaseForm
         isComplete = false;
         if (_weaponActionData == null || _weaponActionData.AirAttackStep == null) { isComplete = true; return; }
 
-        _playerController.Animator.speed = AttackSpeed;
-        _timer += Time.deltaTime * AttackSpeed;
+        _playerController.SetAnimationSpeed(AttackSpeed);
+        _timer += _playerController.ActionDeltaTime * AttackSpeed;
         RotateTowardSoftTarget();
         _playerController.UpdateAttackTrails(_weaponActionData.AirAttackStep, _timer);
         ProcessHit(_weaponActionData.AirAttackStep);
@@ -123,7 +128,7 @@ public abstract partial class BaseForm
         EndAttackCamera();
         _softTarget = null;
         ClearHitTargets();
-        _playerController.Animator.speed = 1f;
+        _playerController.SetAnimationSpeed(1f);
     }
 
     // ── 스킬 ─────────────────────────────────────────────────────────────────
@@ -134,7 +139,7 @@ public abstract partial class BaseForm
         _playerController.StatManager.TryConsumeSp(SkillSpCost);
         _skillStep = 0;
         FindSoftTarget();
-        _playerController.Animator.speed = AttackSpeed;
+        _playerController.SetAnimationSpeed(AttackSpeed);
         PlaySkillStep();
     }
 
@@ -143,7 +148,7 @@ public abstract partial class BaseForm
         isComplete = false;
         if (_weaponActionData == null || _weaponActionData.SkillSteps == null || _weaponActionData.SkillSteps.Count == 0) { isComplete = true; return; }
 
-        _timer += Time.deltaTime * AttackSpeed;
+        _timer += _playerController.ActionDeltaTime * AttackSpeed;
         WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
         _playerController.UpdateAttackTrails(step, _timer);
         MoveForward(step);
@@ -163,7 +168,33 @@ public abstract partial class BaseForm
         _softTarget = null;
         ClearHitTargets();
         _skillCooldownTimer = SkillCooldown;
-        _playerController.Animator.speed = 1f;
+        _playerController.SetAnimationSpeed(1f);
+    }
+
+    // Shares the authored skill attack, but never consumes E resources or starts its cooldown.
+    public virtual void BeginSwitchAttack()
+    {
+        _currentAction = ActionType.SwitchAttack;
+        SnapshotAttackDamage();
+        _skillStep = 0;
+        FindSoftTarget();
+        _playerController.SetAnimationSpeed(AttackSpeed);
+        if (CanSwitchAttack) PlaySkillStep();
+    }
+
+    public virtual void UpdateSwitchAttack(out bool isComplete)
+    {
+        if (!CanSwitchAttack) { isComplete = true; return; }
+        UpdateSkill(out isComplete);
+    }
+
+    public virtual void EndSwitchAttack()
+    {
+        EndAttackCamera();
+        _skillStep = 0;
+        _softTarget = null;
+        ClearHitTargets();
+        _playerController.SetAnimationSpeed(1f);
     }
 
     // ── 궁극기 ───────────────────────────────────────────────────────────────
@@ -174,7 +205,7 @@ public abstract partial class BaseForm
         _currentAction = ActionType.Ultimate;
         _ultimateStep = 0;
         FindSoftTarget();
-        _playerController.Animator.speed = AttackSpeed;
+        _playerController.SetAnimationSpeed(AttackSpeed);
         PlayUltimateStep();
     }
 
@@ -189,7 +220,7 @@ public abstract partial class BaseForm
         isComplete = false;
         if (_weaponActionData == null || _weaponActionData.UltimateSteps == null || _weaponActionData.UltimateSteps.Count == 0) { isComplete = true; return; }
 
-        _timer += Time.deltaTime * AttackSpeed;
+        _timer += _playerController.ActionDeltaTime * AttackSpeed;
         WeaponActionData step = _weaponActionData.UltimateSteps[_ultimateStep];
         _playerController.UpdateAttackTrails(step, _timer);
         MoveForward(step);
@@ -208,7 +239,7 @@ public abstract partial class BaseForm
         _ultimateStep = 0;
         _softTarget = null;
         ClearHitTargets();
-        _playerController.Animator.speed = 1f;
+        _playerController.SetAnimationSpeed(1f);
     }
 
     // ── 반격 (패링 반격 윈도우에서만 진입 가능) ───────────────────────────────
@@ -222,7 +253,7 @@ public abstract partial class BaseForm
         BeginAttackCamera(_weaponActionData?.CounterStep
             ?? (_weaponActionData?.ComboSteps?.Count > 0 ? _weaponActionData.ComboSteps[0] : null));
         ClearHitTargets();
-        _playerController.Animator.speed = AttackSpeed;
+        _playerController.SetAnimationSpeed(AttackSpeed);
         // CounterStep이 없으면 첫 번째 콤보 스텝을 폴백으로 사용
         if (_weaponActionData?.CounterStep != null)
             PlayActionAnimation(_weaponActionData.CounterStep.AnimationName, 0.05f);
@@ -241,7 +272,7 @@ public abstract partial class BaseForm
 
         if (step == null) { isComplete = true; return; }
 
-        _timer += Time.deltaTime * AttackSpeed;
+        _timer += _playerController.ActionDeltaTime * AttackSpeed;
         _playerController.UpdateAttackTrails(step, _timer);
         MoveForward(step);
         ProcessHit(step);
@@ -255,7 +286,7 @@ public abstract partial class BaseForm
         EndAttackCamera();
         _softTarget = null;
         ClearHitTargets();
-        _playerController.Animator.speed = 1f;
+        _playerController.SetAnimationSpeed(1f);
     }
 
 }

@@ -96,6 +96,7 @@ public class EnemyJumpSlam : EnemyAction
 
     private void BeginJump()
     {
+        PlaySwingSound();
         _jumpStartPos = _enemy.transform.position;
 
         // 도약 시점의 플레이어 위치를 목표로 고정 (이후 플레이어가 움직여도 방향 불변)
@@ -147,6 +148,7 @@ public class EnemyJumpSlam : EnemyAction
         _enemy.SyncMovementLock();
         _enemy.transform.rotation = Quaternion.Euler(0f, _enemy.transform.eulerAngles.y, 0f);
         // telegraphDuration을 startupTime + jumpDuration으로 설정하면 베이스 클래스가 착지 직전에 자동으로 EndTelegraph() 호출
+        PlaySound(_data.LandingAudio, _enemy.transform.position);
         BroadcastHit(); // TakeDamage에서 이 액션을 소스로 식별하기 위해
         ExecuteSlam();
     }
@@ -182,7 +184,7 @@ public class EnemyJumpSlam : EnemyAction
             Vector3 knockback = GetKnockbackDirection(col) * _data.knockbackForce;
             DamageManager.Apply(
                 new HitInfo(_data.damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
-                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: knockback, staggerResistLevel: _data.staggerLevel, isParryable: _data.isParryable, source: this),
+                            _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: knockback, staggerResistLevel: _data.staggerLevel, isParryable: _data.isParryable, source: this, impactSound: ResolveHitSound()),
                 damageable, col.gameObject);
         }
     }

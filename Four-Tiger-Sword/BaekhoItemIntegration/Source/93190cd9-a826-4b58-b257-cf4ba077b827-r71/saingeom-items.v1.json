@@ -1,0 +1,1148 @@
+{
+  "schemaVersion": 1,
+  "contentStatus": "draft",
+  "projectId": "93190cd9-a826-4b58-b257-cf4ba077b827",
+  "contentRevision": 71,
+  "sourceRefs": [
+    {
+      "repository": "lala11112/Four-Tiger-Sword",
+      "branch": "codex/system-design-2026-10-07",
+      "commit": "fe533a25a0df81eb317059ee18708229d63320ad",
+      "document": "docs/planning/2026-10-07-roguelike-direction.md",
+      "status": "confirmed"
+    },
+    {
+      "repository": "lala11112/Four-Tiger-Sword",
+      "branch": "codex/system-design-2026-10-07",
+      "commit": "fe533a25a0df81eb317059ee18708229d63320ad",
+      "document": "docs/planning/2026-10-07-initial-content-draft.md",
+      "status": "proposal"
+    },
+    {
+      "repository": "lala11112/studio-baekho-tools",
+      "branch": "integration/baekho-studio",
+      "commit": "5d0cb0f416184d4752ebe6667152cc74fdd0b697",
+      "document": "AGENTS.md",
+      "status": "implementation"
+    }
+  ],
+  "ruleProfile": {
+    "confirmed": {
+      "itemCount": 20,
+      "gradePrices": [
+        20,
+        40,
+        80,
+        160
+      ],
+      "maxOwnedPerId": 1,
+      "baseMaxSp": 100,
+      "baseRegen": 20,
+      "regenDelaySeconds": 1,
+      "dodgeCost": 20,
+      "switchCost": 10,
+      "switchCooldownSeconds": 2
+    },
+    "proposed": {
+      "maxSpCap": 200,
+      "regenCap": 40,
+      "minDodgeCost": 8,
+      "minSwitchCost": 4,
+      "stacking": "additiveBySource",
+      "sourceStackLimit": 1,
+      "timedRefresh": "refresh",
+      "removeOnItemLoss": true,
+      "refillOnMaxIncrease": false,
+      "clampOnMaxDecrease": true
+    },
+    "revision": 1,
+    "adoptions": {}
+  },
+  "items": [
+    {
+      "candidateKey": "f7666cbc-5cd9-47e8-9205-a379800224b1",
+      "itemId": "IT_WOOD_01",
+      "name": "새싹 부적",
+      "description": "보유 중 모든 폼 최대 SP +10 SP",
+      "descriptionStale": false,
+      "element": "wood",
+      "grade": 1,
+      "purchasePrice": 20,
+      "effects": [
+        {
+          "stat": "maxSp",
+          "operation": "add",
+          "amount": 10,
+          "unit": "SP",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_WOOD"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:09:01.329Z"
+      },
+      "iconPath": "icons/f7666cbc-5cd9-47e8-9205-a379800224b1.png",
+      "icon": {
+        "versionId": "v-168355fc-4493-4daa-be58-1cf1326fbfbe",
+        "sourceContentRevision": 1,
+        "sourceSha256": "020f297ef476f374b87b133439e883fc891d45878347c91c100ee419feda85f3",
+        "thumbnailSha256": "d8f53b43070ba867538e496a87963015e482b34919224d6dec0b5357893ac02f",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:09:01.329Z"
+      }
+    },
+    {
+      "candidateKey": "c8d3e698-0a40-41a2-b8dc-613c05c4086e",
+      "itemId": "IT_WOOD_02",
+      "name": "숨결 매듭",
+      "description": "보유 중 모든 폼 SP 재생 +3 SP/초",
+      "descriptionStale": false,
+      "element": "wood",
+      "grade": 2,
+      "purchasePrice": 40,
+      "effects": [
+        {
+          "stat": "spRegen",
+          "operation": "add",
+          "amount": 3,
+          "unit": "SPPerSecond",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_WOOD"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:17:06.591Z"
+      },
+      "iconPath": "icons/c8d3e698-0a40-41a2-b8dc-613c05c4086e.png",
+      "icon": {
+        "versionId": "v-bbbdb29a-06f9-4a71-bcfe-fe128848a8d2",
+        "sourceContentRevision": 1,
+        "sourceSha256": "4a051fdcb09e50f65b671a683d2d66cbff2430cb38e4408e7be99de92da0af07",
+        "thumbnailSha256": "b7b2bc4ab5dbc55568f09bf0067b4656acd69f57649f226077b9bd1069269f2f",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:17:06.591Z"
+      }
+    },
+    {
+      "candidateKey": "13eb6f25-bbdc-4207-9614-ac9dbff75174",
+      "itemId": "IT_WOOD_03",
+      "name": "깊은 뿌리",
+      "description": "보유 중 모든 폼 최대 SP +20 SP, 보유 중 모든 폼 일반 공격 피해 +8%",
+      "descriptionStale": false,
+      "element": "wood",
+      "grade": 3,
+      "purchasePrice": 80,
+      "effects": [
+        {
+          "stat": "maxSp",
+          "operation": "add",
+          "amount": 20,
+          "unit": "SP",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        },
+        {
+          "stat": "normalDamage",
+          "operation": "addRatio",
+          "amount": 0.08,
+          "unit": "ratio",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_WOOD"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:19:36.109Z"
+      },
+      "iconPath": "icons/13eb6f25-bbdc-4207-9614-ac9dbff75174.png",
+      "icon": {
+        "versionId": "v-1a04abf2-1216-4d9b-811f-4fb95ec68733",
+        "sourceContentRevision": 1,
+        "sourceSha256": "2d91bbbae875a768536549e2054a2d676741fade1d5749f6709aaa24b86ad1a8",
+        "thumbnailSha256": "0afcc5b284b49e99c5608d2b1773a53fd5a13cd51cfcc58d3292d2cce89775db",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:19:36.109Z"
+      }
+    },
+    {
+      "candidateKey": "22bf8771-31b1-4476-be3a-0bb4f1ddc594",
+      "itemId": "IT_WOOD_04",
+      "name": "다시 피는 가지",
+      "description": "전환 성공 후 3초 동안 모든 폼 SP 재생 +8 SP/초",
+      "descriptionStale": false,
+      "element": "wood",
+      "grade": 4,
+      "purchasePrice": 160,
+      "effects": [
+        {
+          "stat": "spRegen",
+          "operation": "add",
+          "amount": 8,
+          "unit": "SPPerSecond",
+          "trigger": "formSwitchSucceeded",
+          "targetForms": "all",
+          "durationSeconds": 3,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_WOOD"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:21:21.887Z"
+      },
+      "iconPath": "icons/22bf8771-31b1-4476-be3a-0bb4f1ddc594.png",
+      "icon": {
+        "versionId": "v-e1906e49-44a3-4e58-8a1f-7915e26cdf6e",
+        "sourceContentRevision": 1,
+        "sourceSha256": "249b36bcd05d33e2ebfbf353c293f8d566d713c4df68ff06c951f2f6372ff6b7",
+        "thumbnailSha256": "428bbe3501d38ce804a0280be5a457ad3f3f0cfb6c93c7f79de342cd916811ef",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:21:21.887Z"
+      }
+    },
+    {
+      "candidateKey": "47d886a2-a187-4da3-9c3a-ddc6b2aa6ec4",
+      "itemId": "IT_FIRE_01",
+      "name": "불씨 장식",
+      "description": "보유 중 모든 폼 일반 공격 피해 +8%",
+      "descriptionStale": false,
+      "element": "fire",
+      "grade": 1,
+      "purchasePrice": 20,
+      "effects": [
+        {
+          "stat": "normalDamage",
+          "operation": "addRatio",
+          "amount": 0.08,
+          "unit": "ratio",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_FIRE"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:23:38.506Z"
+      },
+      "iconPath": "icons/47d886a2-a187-4da3-9c3a-ddc6b2aa6ec4.png",
+      "icon": {
+        "versionId": "v-e006cfc7-eb9f-4ed0-8350-6c20930bd236",
+        "sourceContentRevision": 1,
+        "sourceSha256": "4b7e57b6f1194735fc5797474da6c5bb4b5fc06c027f436db4e8e204e93cd045",
+        "thumbnailSha256": "519c92cfefa77cecf0a8737c8aa66e1f69c94e70d2c61beb613db20177f9a69a",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:23:38.506Z"
+      }
+    },
+    {
+      "candidateKey": "667cbdf0-b2cd-4d5b-bbed-fd5e29510898",
+      "itemId": "IT_FIRE_02",
+      "name": "붉은 인장",
+      "description": "보유 중 모든 폼 전환 강화 스킬 피해 +12%",
+      "descriptionStale": false,
+      "element": "fire",
+      "grade": 2,
+      "purchasePrice": 40,
+      "effects": [
+        {
+          "stat": "switchDamage",
+          "operation": "addRatio",
+          "amount": 0.12,
+          "unit": "ratio",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_FIRE"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:26:00.106Z"
+      },
+      "iconPath": "icons/667cbdf0-b2cd-4d5b-bbed-fd5e29510898.png",
+      "icon": {
+        "versionId": "v-1854d0e5-7cc6-48c5-9580-f7bac4bfd0e3",
+        "sourceContentRevision": 1,
+        "sourceSha256": "88a06366cc69d552ca5ac04cefff6f0a2c8c004b24aab5d567a97695b5028ad2",
+        "thumbnailSha256": "4389789f18447818e648a4c0ebe5a55dad42a2f0c31453cb43e20320a317016d",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:26:00.106Z"
+      }
+    },
+    {
+      "candidateKey": "bb9f2edb-dea6-42ef-9f06-51684f212a4d",
+      "itemId": "IT_FIRE_03",
+      "name": "타오르는 매듭",
+      "description": "보유 중 모든 폼 일반 공격 피해 +18%",
+      "descriptionStale": false,
+      "element": "fire",
+      "grade": 3,
+      "purchasePrice": 80,
+      "effects": [
+        {
+          "stat": "normalDamage",
+          "operation": "addRatio",
+          "amount": 0.18,
+          "unit": "ratio",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_FIRE"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:29:05.754Z"
+      },
+      "iconPath": "icons/bb9f2edb-dea6-42ef-9f06-51684f212a4d.png",
+      "icon": {
+        "versionId": "v-2da42ea8-aff4-4e49-b3be-269a9f7b6914",
+        "sourceContentRevision": 1,
+        "sourceSha256": "70a70d27d305b586ac5012f1d0579ac392fa35d12b4f0ff1e962c80598c1d0e1",
+        "thumbnailSha256": "0809c38d76913620546141576a4a4a21b0adafead0f254ef0490531bfd044f92",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:29:05.754Z"
+      }
+    },
+    {
+      "candidateKey": "b4a846e2-7abd-4f47-bf4b-88096fa177b5",
+      "itemId": "IT_FIRE_04",
+      "name": "이어지는 불꽃",
+      "description": "전환 성공 후 3초 동안 모든 폼 일반 공격 피해 +30%",
+      "descriptionStale": false,
+      "element": "fire",
+      "grade": 4,
+      "purchasePrice": 160,
+      "effects": [
+        {
+          "stat": "normalDamage",
+          "operation": "addRatio",
+          "amount": 0.3,
+          "unit": "ratio",
+          "trigger": "formSwitchSucceeded",
+          "targetForms": "all",
+          "durationSeconds": 3,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_FIRE"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:31:40.978Z"
+      },
+      "iconPath": "icons/b4a846e2-7abd-4f47-bf4b-88096fa177b5.png",
+      "icon": {
+        "versionId": "v-fe129849-879a-45ef-8aa3-fc8d18e02aa5",
+        "sourceContentRevision": 1,
+        "sourceSha256": "4d13bf7db089ac7352662de3ef9ecce4160167de3093a6549d999798ae85c259",
+        "thumbnailSha256": "bc754aa4b7fa4aac11373adfcb7012d8bae487bc9836a057cebec6cc732c6e20",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:31:40.978Z"
+      }
+    },
+    {
+      "candidateKey": "2c141a41-6651-47e7-b716-ca0276978653",
+      "itemId": "IT_EARTH_01",
+      "name": "흙빛 부적",
+      "description": "보유 중 모든 폼 최대 HP +8%",
+      "descriptionStale": false,
+      "element": "earth",
+      "grade": 1,
+      "purchasePrice": 20,
+      "effects": [
+        {
+          "stat": "maxHp",
+          "operation": "addRatio",
+          "amount": 0.08,
+          "unit": "ratio",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_EARTH"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:33:32.247Z"
+      },
+      "iconPath": "icons/2c141a41-6651-47e7-b716-ca0276978653.png",
+      "icon": {
+        "versionId": "v-980d1770-3074-404a-a14a-4989df8dd6f0",
+        "sourceContentRevision": 1,
+        "sourceSha256": "0a29f94039a98e8307f6f2c3f75c8b18227c983ef5172f9a1fc8fa9b3ec8a73d",
+        "thumbnailSha256": "1b278958ceecbc51398aa195479b8af3cbccb2551721d00fa459ea0d3b81d33b",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:33:32.247Z"
+      }
+    },
+    {
+      "candidateKey": "07105ba7-63f0-4886-b021-ca4b05f0567b",
+      "itemId": "IT_EARTH_02",
+      "name": "가벼운 디딤",
+      "description": "보유 중 모든 폼 회피 SP 비용 -2 SP",
+      "descriptionStale": false,
+      "element": "earth",
+      "grade": 2,
+      "purchasePrice": 40,
+      "effects": [
+        {
+          "stat": "dodgeSpCost",
+          "operation": "add",
+          "amount": -2,
+          "unit": "SP",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_EARTH"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:35:28.974Z"
+      },
+      "iconPath": "icons/07105ba7-63f0-4886-b021-ca4b05f0567b.png",
+      "icon": {
+        "versionId": "v-6f37b14f-2455-4775-bc9f-8ca36001459e",
+        "sourceContentRevision": 1,
+        "sourceSha256": "f860e85f6aa99969d14ddfdbf0b117e2d7df091c772c76c9eba353bd70a1acb7",
+        "thumbnailSha256": "65aba948a90290e040c8244617c034340e3198b3aa37468b69142389bfab9fa0",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:35:28.974Z"
+      }
+    },
+    {
+      "candidateKey": "afd287a9-cfc7-47db-8779-6d5cc4d2efd4",
+      "itemId": "IT_EARTH_03",
+      "name": "단단한 매듭",
+      "description": "보유 중 모든 폼 최대 HP +18%",
+      "descriptionStale": false,
+      "element": "earth",
+      "grade": 3,
+      "purchasePrice": 80,
+      "effects": [
+        {
+          "stat": "maxHp",
+          "operation": "addRatio",
+          "amount": 0.18,
+          "unit": "ratio",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_EARTH"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:37:32.090Z"
+      },
+      "iconPath": "icons/afd287a9-cfc7-47db-8779-6d5cc4d2efd4.png",
+      "icon": {
+        "versionId": "v-29fbf77f-c269-4ce1-b138-5fff31aabd71",
+        "sourceContentRevision": 1,
+        "sourceSha256": "327759b0e1d631d7d23e9829eb9aa9a41b1ead8466cad971f90d45bceff52e97",
+        "thumbnailSha256": "6cbb6329eef31ef159f2df09441dd44bb3548ed7830e1c2d4033423f3684cf3d",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:37:32.090Z"
+      }
+    },
+    {
+      "candidateKey": "9c820720-65fe-488a-a286-8e48a4aceaa2",
+      "itemId": "IT_EARTH_04",
+      "name": "움직이는 산",
+      "description": "전환 성공 후 3초 동안 모든 폼 회피 SP 비용 -4 SP",
+      "descriptionStale": false,
+      "element": "earth",
+      "grade": 4,
+      "purchasePrice": 160,
+      "effects": [
+        {
+          "stat": "dodgeSpCost",
+          "operation": "add",
+          "amount": -4,
+          "unit": "SP",
+          "trigger": "formSwitchSucceeded",
+          "targetForms": "all",
+          "durationSeconds": 3,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_EARTH"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:39:49.976Z"
+      },
+      "iconPath": "icons/9c820720-65fe-488a-a286-8e48a4aceaa2.png",
+      "icon": {
+        "versionId": "v-77242cb6-1f58-4508-a9ff-91163be49539",
+        "sourceContentRevision": 1,
+        "sourceSha256": "2a432bf8645db82309514cc0d30035bb14046a09037461d0027f5db85354e6ab",
+        "thumbnailSha256": "03868df83a4b4ed7f3fc41f8f612769a41dabd3f9f7d02940ffce968d51f23fe",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:39:49.976Z"
+      }
+    },
+    {
+      "candidateKey": "65269c4d-245b-400b-bf1d-5c4aca10d5a7",
+      "itemId": "IT_METAL_01",
+      "name": "빛나는 조각",
+      "description": "보유 중 모든 폼 전환 강화 스킬 피해 +8%",
+      "descriptionStale": false,
+      "element": "metal",
+      "grade": 1,
+      "purchasePrice": 20,
+      "effects": [
+        {
+          "stat": "switchDamage",
+          "operation": "addRatio",
+          "amount": 0.08,
+          "unit": "ratio",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_METAL"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:41:58.857Z"
+      },
+      "iconPath": "icons/65269c4d-245b-400b-bf1d-5c4aca10d5a7.png",
+      "icon": {
+        "versionId": "v-555d7aac-573d-4e1a-991e-aa0cceb86a40",
+        "sourceContentRevision": 1,
+        "sourceSha256": "3aeb8cb9087f97d023bdbd52ca5ac8c073bbcbabceef2491c63cf795f6be2b74",
+        "thumbnailSha256": "eb85b9e0796b7eb83d1e9c1d158dcdd9d7ba7ed41c64ec95fd98c28c04535977",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:41:58.857Z"
+      }
+    },
+    {
+      "candidateKey": "43e9b7c1-566a-42cd-b7f8-70f2903f4dbc",
+      "itemId": "IT_METAL_02",
+      "name": "맞물린 고리",
+      "description": "보유 중 모든 폼 전환 SP 비용 -1 SP",
+      "descriptionStale": false,
+      "element": "metal",
+      "grade": 2,
+      "purchasePrice": 40,
+      "effects": [
+        {
+          "stat": "switchSpCost",
+          "operation": "add",
+          "amount": -1,
+          "unit": "SP",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_METAL"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:43:59.402Z"
+      },
+      "iconPath": "icons/43e9b7c1-566a-42cd-b7f8-70f2903f4dbc.png",
+      "icon": {
+        "versionId": "v-68c5dd71-6811-438d-acd0-8f212304ba7c",
+        "sourceContentRevision": 1,
+        "sourceSha256": "ad4cec0908d03a03bd90112ac40b3cc3c72323a19d019266c5d85b80a90fc79a",
+        "thumbnailSha256": "31258dfc997c3b05fbce0a980d71e1ec9d5df9ff32c05425c324fb97685a9f0e",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:43:59.402Z"
+      }
+    },
+    {
+      "candidateKey": "6a605411-ae6b-4a7c-9c7b-0e636b23b54d",
+      "itemId": "IT_METAL_03",
+      "name": "정련된 인장",
+      "description": "보유 중 모든 폼 전환 강화 스킬 피해 +20%",
+      "descriptionStale": false,
+      "element": "metal",
+      "grade": 3,
+      "purchasePrice": 80,
+      "effects": [
+        {
+          "stat": "switchDamage",
+          "operation": "addRatio",
+          "amount": 0.2,
+          "unit": "ratio",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_METAL"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:46:28.289Z"
+      },
+      "iconPath": "icons/6a605411-ae6b-4a7c-9c7b-0e636b23b54d.png",
+      "icon": {
+        "versionId": "v-fce073b6-db9f-43cb-a828-4b62da494587",
+        "sourceContentRevision": 1,
+        "sourceSha256": "8c67bcb48c32e33f3a2adab33756b7dd74f9661c82162c69b94277ec3a1765c5",
+        "thumbnailSha256": "54c29f198fa0e8ecc7e0c1eafc2abab033125a488fd5f75a90a29d7ebff26414",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:46:28.289Z"
+      }
+    },
+    {
+      "candidateKey": "b91c66c3-805e-45cf-8d0e-4fbb458ce771",
+      "itemId": "IT_METAL_04",
+      "name": "오색 연결고리",
+      "description": "보유 중 모든 폼 일반 공격 피해 +15%, 보유 중 모든 폼 전환 강화 스킬 피해 +25%",
+      "descriptionStale": false,
+      "element": "metal",
+      "grade": 4,
+      "purchasePrice": 160,
+      "effects": [
+        {
+          "stat": "normalDamage",
+          "operation": "addRatio",
+          "amount": 0.15,
+          "unit": "ratio",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        },
+        {
+          "stat": "switchDamage",
+          "operation": "addRatio",
+          "amount": 0.25,
+          "unit": "ratio",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_METAL"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:48:44.842Z"
+      },
+      "iconPath": "icons/b91c66c3-805e-45cf-8d0e-4fbb458ce771.png",
+      "icon": {
+        "versionId": "v-695a7389-85f1-4faf-95ea-581a85810532",
+        "sourceContentRevision": 1,
+        "sourceSha256": "137c927fd7c5e2f49080524f0a63136af9189ddd4410cd511c50edc7cda9eae1",
+        "thumbnailSha256": "50adf9bdb30e2ed5515cfde0b1cddcd9987b75b98cdbd9465e9540a2a7e54241",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:48:44.842Z"
+      }
+    },
+    {
+      "candidateKey": "a26c6adf-b94e-42f4-a1a1-7db5f9a1c95c",
+      "itemId": "IT_WATER_01",
+      "name": "물방울 장식",
+      "description": "보유 중 모든 폼 SP 재생 +2 SP/초",
+      "descriptionStale": false,
+      "element": "water",
+      "grade": 1,
+      "purchasePrice": 20,
+      "effects": [
+        {
+          "stat": "spRegen",
+          "operation": "add",
+          "amount": 2,
+          "unit": "SPPerSecond",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_WATER"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:51:01.297Z"
+      },
+      "iconPath": "icons/a26c6adf-b94e-42f4-a1a1-7db5f9a1c95c.png",
+      "icon": {
+        "versionId": "v-73ff49e7-3e9a-4f34-a48b-ee2aac44367c",
+        "sourceContentRevision": 1,
+        "sourceSha256": "db2b9c4a7172592f2ea449f5228231709471912d3e7ee7c9b33f65b565918f87",
+        "thumbnailSha256": "8c3427d777cb7a4472576c48624ee6bb12b6043ef193d4d8d5c04523f084b9b1",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:51:01.297Z"
+      }
+    },
+    {
+      "candidateKey": "7c9a964a-72ec-4064-a18b-bfa1c514f06e",
+      "itemId": "IT_WATER_02",
+      "name": "깊은 물병",
+      "description": "보유 중 모든 폼 최대 SP +15 SP",
+      "descriptionStale": false,
+      "element": "water",
+      "grade": 2,
+      "purchasePrice": 40,
+      "effects": [
+        {
+          "stat": "maxSp",
+          "operation": "add",
+          "amount": 15,
+          "unit": "SP",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_WATER"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:53:17.661Z"
+      },
+      "iconPath": "icons/7c9a964a-72ec-4064-a18b-bfa1c514f06e.png",
+      "icon": {
+        "versionId": "v-d9a9ff36-c64a-460e-b89a-b0d7fb3a51b0",
+        "sourceContentRevision": 1,
+        "sourceSha256": "863e92deb2bd704142b5c90eba68c22dbbd0f23887bde8d7736dab82323f3b33",
+        "thumbnailSha256": "0509ed8f32fc682974f0784d55c16906ac3f721f675b02cee4d7292f2b4563ed",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:53:17.661Z"
+      }
+    },
+    {
+      "candidateKey": "790cd15d-cf82-4dfe-904a-8b88948ce2ea",
+      "itemId": "IT_WATER_03",
+      "name": "흐르는 매듭",
+      "description": "보유 중 모든 폼 회피 SP 비용 -3 SP, 보유 중 모든 폼 전환 SP 비용 -1 SP",
+      "descriptionStale": false,
+      "element": "water",
+      "grade": 3,
+      "purchasePrice": 80,
+      "effects": [
+        {
+          "stat": "dodgeSpCost",
+          "operation": "add",
+          "amount": -3,
+          "unit": "SP",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        },
+        {
+          "stat": "switchSpCost",
+          "operation": "add",
+          "amount": -1,
+          "unit": "SP",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_WATER"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:55:19.251Z"
+      },
+      "iconPath": "icons/790cd15d-cf82-4dfe-904a-8b88948ce2ea.png",
+      "icon": {
+        "versionId": "v-3249554a-5d93-4d0d-9b05-1875e0939c6a",
+        "sourceContentRevision": 1,
+        "sourceSha256": "edad0cac207f867e5687cd9806310c88de0c6554788f45598a45d523caa6c4ce",
+        "thumbnailSha256": "44ac002b1d7eb3114ad750e3cc1a7e6e00b0312d9c449eb1d7775092d5b66062",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:55:19.251Z"
+      }
+    },
+    {
+      "candidateKey": "e459b96b-407a-46c5-aa22-64741722a350",
+      "itemId": "IT_WATER_04",
+      "name": "끊임없는 물결",
+      "description": "보유 중 모든 폼 SP 재생 +5 SP/초, 보유 중 모든 폼 전환 SP 비용 -2 SP",
+      "descriptionStale": false,
+      "element": "water",
+      "grade": 4,
+      "purchasePrice": 160,
+      "effects": [
+        {
+          "stat": "spRegen",
+          "operation": "add",
+          "amount": 5,
+          "unit": "SPPerSecond",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        },
+        {
+          "stat": "switchSpCost",
+          "operation": "add",
+          "amount": -2,
+          "unit": "SP",
+          "trigger": "whileOwned",
+          "targetForms": "all",
+          "durationSeconds": null,
+          "stackLimit": 1,
+          "refreshPolicy": "refresh",
+          "removeOnItemLoss": true
+        }
+      ],
+      "synergyTags": [
+        "ITEM_WATER"
+      ],
+      "unsupportedEffectNotes": "",
+      "contentRevision": 1,
+      "review": {
+        "state": "draft",
+        "dataRevision": null,
+        "iconVersion": null,
+        "iconContentRevision": null,
+        "policyRevision": null,
+        "note": "",
+        "updatedAt": "2026-10-12T11:57:22.624Z"
+      },
+      "iconPath": "icons/e459b96b-407a-46c5-aa22-64741722a350.png",
+      "icon": {
+        "versionId": "v-9b5f2d78-4cbd-4ed0-8b00-0868e648d55d",
+        "sourceContentRevision": 1,
+        "sourceSha256": "d6b2d0df917097f36561acd00016a5ddd95d8e669cd06d0bd1cc73cd46a499c6",
+        "thumbnailSha256": "1f0d480aab908aed9c60e04971d6087ead9ac04c1d40f4f8c2579c8368ef24d7",
+        "tool": "imagegen",
+        "observedModel": null,
+        "createdAt": "2026-10-12T11:57:22.624Z"
+      }
+    }
+  ],
+  "synergyReferences": [
+    {
+      "id": "SYN_WOOD_01",
+      "items": [
+        {
+          "candidateKey": "f7666cbc-5cd9-47e8-9205-a379800224b1",
+          "itemId": "IT_WOOD_01",
+          "originalId": "IT_WOOD_01"
+        },
+        {
+          "candidateKey": "c8d3e698-0a40-41a2-b8dc-613c05c4086e",
+          "itemId": "IT_WOOD_02",
+          "originalId": "IT_WOOD_02"
+        }
+      ]
+    },
+    {
+      "id": "SYN_FIRE_01",
+      "items": [
+        {
+          "candidateKey": "47d886a2-a187-4da3-9c3a-ddc6b2aa6ec4",
+          "itemId": "IT_FIRE_01",
+          "originalId": "IT_FIRE_01"
+        },
+        {
+          "candidateKey": "667cbdf0-b2cd-4d5b-bbed-fd5e29510898",
+          "itemId": "IT_FIRE_02",
+          "originalId": "IT_FIRE_02"
+        }
+      ]
+    },
+    {
+      "id": "SYN_EARTH_01",
+      "items": [
+        {
+          "candidateKey": "2c141a41-6651-47e7-b716-ca0276978653",
+          "itemId": "IT_EARTH_01",
+          "originalId": "IT_EARTH_01"
+        },
+        {
+          "candidateKey": "07105ba7-63f0-4886-b021-ca4b05f0567b",
+          "itemId": "IT_EARTH_02",
+          "originalId": "IT_EARTH_02"
+        }
+      ]
+    },
+    {
+      "id": "SYN_METAL_01",
+      "items": [
+        {
+          "candidateKey": "65269c4d-245b-400b-bf1d-5c4aca10d5a7",
+          "itemId": "IT_METAL_01",
+          "originalId": "IT_METAL_01"
+        },
+        {
+          "candidateKey": "43e9b7c1-566a-42cd-b7f8-70f2903f4dbc",
+          "itemId": "IT_METAL_02",
+          "originalId": "IT_METAL_02"
+        }
+      ]
+    },
+    {
+      "id": "SYN_WATER_01",
+      "items": [
+        {
+          "candidateKey": "a26c6adf-b94e-42f4-a1a1-7db5f9a1c95c",
+          "itemId": "IT_WATER_01",
+          "originalId": "IT_WATER_01"
+        },
+        {
+          "candidateKey": "7c9a964a-72ec-4064-a18b-bfa1c514f06e",
+          "itemId": "IT_WATER_02",
+          "originalId": "IT_WATER_02"
+        }
+      ]
+    }
+  ]
+}

@@ -37,8 +37,14 @@ public class FormTargetEffects : MonoBehaviour
 
     private IEnumerator DelayedFireExplosion(HitInfo explosion, float delay)
     {
-        // 히트스탑에 영향을 받지 않도록 실제 시간으로 기다립니다.
-        if (delay > 0f) yield return new WaitForSecondsRealtime(delay);
+        // Ordinary hit stop does not delay the explosion; modal slow motion and pauses do.
+        float remaining = Mathf.Max(0f, delay);
+        while (remaining > 0f)
+        {
+            yield return null;
+            if (!CanReceiveExplosion()) yield break;
+            remaining -= Time.unscaledDeltaTime * CombatHitStopService.ModalTimeMultiplier;
+        }
         if (!CanReceiveExplosion()) yield break;
         var target = GetComponent<IDamageable>();
         if (target != null) DamageManager.Apply(explosion, target, gameObject);

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using System.Collections;
 using Unity.Cinemachine;
 
@@ -12,6 +13,15 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     public FormManager FormManager { get; private set; }
     public StateMachine StateMachine { get; private set; }
     public PlayerStatManager StatManager { get; private set; }
+    public CombatActorClock ActorClock { get; private set; }
+    public float ActionDeltaTime => IsShopPaused ? 0f : ActorClock != null ? ActorClock.DeltaTime : Time.deltaTime;
+    public float ActionTimeScale => IsShopPaused ? 0f : ActorClock != null ? ActorClock.TimeScale : 1f;
+    public float ActionTime => ActorClock != null ? ActorClock.Time : Time.time;
+    public void SetAnimationSpeed(float speed)
+    {
+        if (ActorClock != null) ActorClock.SetAnimationSpeed(speed);
+        else if (Animator != null) Animator.speed = speed;
+    }
     public Transform CameraTransform;
     [Header("Combat Camera")]
     [SerializeField] private CombatCameraDirector _combatCamera;
@@ -51,25 +61,38 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     [Header("Dash Settings")]
     public float DashCooldown = 1.0f;
     private float _dashCooldownTimer;
-    public bool CanDash => _dashCooldownTimer <= 0f;
+    public bool CanDash => !IsStageTransitioning && !IsShopPaused && _dashCooldownTimer <= 0f && StatManager != null
+        && StatManager.CurrentHp > 0f && StatManager.HasEnoughSp(DodgeSpCost);
     public bool IsDashing => StateMachine.CurrentState is PlayerDashState;
 
-    [Header("Parry Settings")]
-    public float ParryCooldown            = 0.8f;
+    [Header("Form Change / Parry Settings")]
+    [FormerlySerializedAs("ParryCooldown")]
+    [Min(0f), Tooltip("일반 폼 변경과 패링이 공유하는 쿨타임 (초)")]
+    public float FormChangeCooldown = 2f;
     [Tooltip("패링 성공 시 필살기 게이지 충전량 (막은 타격마다 적용)")]
     public float ParryUltimateGaugeReward = 30f;
-    private float _parryCooldownTimer;
+    private float _formChangeCooldownTimer;
+    public bool CanChangeForm => !IsStageTransitioning && !IsShopPaused && _formChangeCooldownTimer <= 0f;
 
     /// <summary>패링 활성 윈도우 내에 있을 때 true. TakeDamage에서 패링 판정에 사용됩니다.</summary>
     public bool IsParryActive => StateMachine.CurrentState is PlayerParryState ps && ps.IsParryWindowActive;
 
     /// <summary>쿨타임 없음 + 지상 + 적의 예고가 활성 상태일 때만 패링 가능합니다.</summary>
-    public bool CanParry => _parryCooldownTimer <= 0f && IsGround() && ParryEventBus.IsAnyTelegraphActive;
+    public bool CanParry => CanChangeForm && IsGround() && ParryEventBus.IsAnyTelegraphActive;
+
+    public bool HasFormParryRequest
+    {
+        get
+        {
+            var requestedForm = FormManager?.GetRequestedForm();
+            return requestedForm != null && CanParry && FormManager.CanSwitchForm(requestedForm);
+        }
+    }
 
 
     // CanSkill / CanUltimate 는 현재 폼의 쿨타임과 SP를 함께 검사합니다.
-    public bool CanSkill => FormManager?.CurrentForm?.CanSkill ?? false;
-    public bool CanUltimate => FormManager?.CurrentForm?.CanUltimate ?? false;
+    public bool CanSkill => !IsStageTransitioning && !IsShopPaused && (FormManager?.CurrentForm?.CanSkill ?? false);
+    public bool CanUltimate => !IsStageTransitioning && !IsShopPaused && (FormManager?.CurrentForm?.CanUltimate ?? false);
 
     public bool IsKnockbacking => _knockbackCoroutine != null
         || PendingHitReaction == PlayerHitReaction.Knockback
@@ -102,8 +125,6 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     [Tooltip("넉백 지속 시간 (초)")]
     [SerializeField] private float _knockbackDuration = 0.25f;
     private Coroutine _knockbackCoroutine;
-    private Coroutine _hitStopCoroutine;
-    private float _timeScaleBeforeHitStop;
 
     [Header("Default Hit Stop Settings")]
     [Min(0f), Tooltip("패링 및 개별 히트스탑이 설정되지 않은 공격의 기본 지속 시간(실제 시간 기준 초)")]
@@ -124,7 +145,9 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     private void Awake()
     {
         StatManager = GetComponent<PlayerStatManager>();
+        ItemRuntime = GetComponent<PlayerItemRuntime>();
         Animator = gameObject.GetComponentInChildren<Animator>();
+        ActorClock = CombatActorClock.GetOrCreate(this);
         ImpulseSource = GetComponent<CinemachineImpulseSource>();
         Controller = GetComponent<CharacterController>();
         Input = GetComponent<PlayerInputHandler>();
@@ -145,18 +168,33 @@ public partial class PlayerController : MonoBehaviour, IDamageable
 
     private void Start()
     {
+        ItemRuntime?.Initialize(this);
         DamageTextManager.Instance?.Register(this);
         PlayerUIManager.Instance?.Register(this);
     }
 
     private void Update()
     {
+        if (IsStageTransitioning) return;
+        if (IsShopPaused)
+        {
+            // A scripted lethal hit must still terminate the run while the shop owns world time.
+            if (StatManager != null && StatManager.CurrentHp <= 0f)
+                StateMachine?.Update(false, false);
+            return;
+        }
+        TryOpenFinisherFromInput();
         UpdateCoyoteTimer();
         UpdateDashCooldown();
-        UpdateParryCooldown();
+        UpdateFormChangeCooldown();
+        ItemRuntime?.Tick(Time.deltaTime);
         StatManager.UpdateSpRegen(Time.deltaTime);
-        TryDeactivateUltimate();
-        StateMachine.Update();  
+        FormManager.UpdateFormSp(Time.deltaTime);
+        bool canAct = ActionDeltaTime > 0f;
+        if (canAct) TryDeactivateUltimate();
+        // Death and external hit reactions have priority even while actor time is stopped.
+        StateMachine.Update(canAct, canAct);
+        if (IsStageTransitioning) return;
         FormManager.Update();
     }
 
@@ -176,7 +214,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         if (IsGround())
             _coyoteTimer = CoyoteTime;
         else
-            _coyoteTimer -= Time.deltaTime;
+            _coyoteTimer -= ActionDeltaTime;
     }
 
     private void UpdateDashCooldown()
@@ -185,14 +223,14 @@ public partial class PlayerController : MonoBehaviour, IDamageable
             _dashCooldownTimer -= Time.deltaTime;
     }
 
-    private void UpdateParryCooldown()
+    private void UpdateFormChangeCooldown()
     {
-        if (_parryCooldownTimer > 0f)
-            _parryCooldownTimer -= Time.deltaTime;
+        if (_formChangeCooldownTimer > 0f)
+            _formChangeCooldownTimer = Mathf.Max(0f, _formChangeCooldownTimer - Time.deltaTime);
     }
 
 
-    public void StartParryCooldown() => _parryCooldownTimer = ParryCooldown;
+    public void StartFormChangeCooldown() => _formChangeCooldownTimer = Mathf.Max(0f, FormChangeCooldown);
 
     public void OnParrySuccess()
     {
@@ -228,7 +266,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
-    public bool CanJump() => IsGround() || _coyoteTimer > 0f;
+    public bool CanJump() => !IsStageTransitioning && !IsShopPaused && (IsGround() || _coyoteTimer > 0f);
     public void ConsumeCoyote() => _coyoteTimer = 0f;
     public void StartDashCooldown() => _dashCooldownTimer = DashCooldown;
 
@@ -247,7 +285,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
 
     public DamageResult TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE, bool isParryable = true, object source = null)
     {
-        if (!isActiveAndEnabled || StatManager.CurrentHp <= 0f || IsDashing
+        if (!isActiveAndEnabled || IsStageTransitioning || StatManager.CurrentHp <= 0f || IsDashing
             || damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return default;
         if ((FormManager.CurrentForm as BaseForm)?.BlocksIncomingDamage(damage, power, source) == true)
             return new DamageResult(DamageOutcome.Blocked);
@@ -255,19 +293,21 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         if (isParryable && IsParryActive)
         {
             var parryState = StateMachine.CurrentState as PlayerParryState;
-            if (parryState != null)
-                parryState.OnHitParried(source);
-
-            if (CanReactToHit(staggerResistLevel))
-                ApplyKnockback(power);
-            OnParrySuccess();
-            (source as EnemyAction)?.OnParried();
-            return new DamageResult(DamageOutcome.Parried);
+            if (parryState != null && parryState.OnHitParried(source))
+            {
+                if (CanReactToHit(staggerResistLevel))
+                    ApplyKnockback(power);
+                OnParrySuccess();
+                (source as EnemyAction)?.OnParried();
+                return new DamageResult(DamageOutcome.Parried);
+            }
         }
 
         Debug.Log("플레이어 피격!");
         damage *= (FormManager.CurrentForm as BaseForm)?.IncomingDamageMultiplier ?? 1f;
         var result = StatManager.TakeDamage(damage, damageType, isCritical);
+        if (result.Applied && result.HealthDamage + result.ShieldDamage > 0f)
+            CancelPendingSwitchAttack();
         if (result.Applied && !result.Killed && result.HealthDamage + result.ShieldDamage > 0f)
             RequestHitReaction(power, poiseDamage, staggerResistLevel);
         return result;
@@ -306,7 +346,14 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     }
 
     private Vector3 GetKnockbackVelocity(Vector3 power)
-        => KnockbackMotion.Velocity(power, _knockbackResistance);
+    {
+        Vector3 velocity = KnockbackMotion.Velocity(power, _knockbackResistance);
+        if (KnockbackMotion.IsFinite(power.sqrMagnitude) && power.magnitude > velocity.magnitude + .0001f)
+            CombatFeedbackTelemetry.Emit("value-limited", gameObject, gameObject,
+                detail: System.FormattableString.Invariant($"channel=knockback.speed;requested={power.magnitude:R};applied={velocity.magnitude:R};reason=player-knockback-resistance;unit=m/s"),
+                value: velocity.magnitude, position: transform.position);
+        return velocity;
+    }
 
     // 패링 성공 시에는 반격 상태를 유지한 채 밀림만 적용합니다.
     private void ApplyKnockback(Vector3 power)
@@ -333,45 +380,40 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         => StartHitStop(_hitStopDuration, _hitStopTimeScale);
 
     /// <summary>히트별 설정, 타수별 설정, 플레이어 기본값 순서로 히트스탑을 적용합니다.</summary>
-    public void StartHitStop(WeaponActionData step, HitEvent hitEvent = null)
+    public void StartHitStop(WeaponActionData step, HitEvent hitEvent = null, Component victim = null, bool includeAttacker = true)
     {
-        if (hitEvent != null && hitEvent.OverrideHitStop)
-            StartHitStop(hitEvent.HitStopDuration, hitEvent.HitStopTimeScale);
-        else if (step != null && step.OverrideHitStop)
-            StartHitStop(step.HitStopDuration, step.HitStopTimeScale);
-        else
-            StartHitStop();
+        var settings = hitEvent?.Feedback?.HitStop;
+        if (settings == null || !settings.OverrideHitStop) settings = step?.Feedback?.HitStop;
+        if (settings == null || !settings.OverrideHitStop)
+            settings = new HitStopSettings { HitStopDuration = _hitStopDuration, HitStopTimeScale = _hitStopTimeScale };
+        if (!isActiveAndEnabled || IsStageTransitioning) return;
+        CombatHitStopService.Apply(this, this, victim, settings, includeAttacker);
     }
 
     /// <summary>히트스탑 지속시간과 타임스케일을 직접 지정합니다. 퍼펙트 패링 등 특수 연출에 사용합니다.</summary>
     public void StartHitStop(float duration, float timeScale)
     {
-        if (!isActiveAndEnabled || !KnockbackMotion.IsFinite(duration) || duration <= 0f
-            || !KnockbackMotion.IsFinite(timeScale)) return;
-        if (_hitStopCoroutine != null) StopCoroutine(_hitStopCoroutine);
-        else _timeScaleBeforeHitStop = Time.timeScale;
-        _hitStopCoroutine = StartCoroutine(HitStopRoutine(duration, timeScale));
+        if (!isActiveAndEnabled || IsStageTransitioning) return;
+        CombatHitStopService.Apply(this, this, null,
+            new HitStopSettings { HitStopDuration = duration, HitStopTimeScale = timeScale });
     }
 
-    private IEnumerator HitStopRoutine(float duration, float timeScale)
+    public void CancelHitStops()
     {
-        Time.timeScale = Mathf.Clamp01(timeScale);
-        yield return new WaitForSecondsRealtime(duration);
-        Time.timeScale = _timeScaleBeforeHitStop;
-        _hitStopCoroutine = null;
+        CombatHitStopService.ReleaseOwner(this);
+        ActorClock?.ClearStops();
     }
 
     private void OnDisable()
     {
+        CancelFinisherSelection();
+        CancelPendingSwitchAttack();
+        if (StateMachine?.CurrentState is PlayerSwitchAttackState activeSwitch)
+            activeSwitch.Cancel();
         StopAttackTrails(true);
         _combatCamera?.Cancel(this, true);
         FormManager?.CleanupTransientEffects();
-        if (_hitStopCoroutine != null)
-        {
-            StopCoroutine(_hitStopCoroutine);
-            Time.timeScale = _timeScaleBeforeHitStop;
-            _hitStopCoroutine = null;
-        }
+        CancelHitStops();
 
         StopParryKnockback();
         ConsumeHitReaction();
@@ -385,10 +427,10 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         while (elapsed < duration)
         {
             if (!Controller.enabled || StatManager.CurrentHp <= 0f) break;
-            Vector3 delta = KnockbackMotion.Displacement(initialVelocity, elapsed, Time.deltaTime, duration);
+            Vector3 delta = KnockbackMotion.Displacement(initialVelocity, elapsed, ActionDeltaTime, duration);
             Controller.Move(delta);
 
-            elapsed += Time.deltaTime;
+            elapsed += ActionDeltaTime;
             yield return null;
         }
 

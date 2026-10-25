@@ -27,7 +27,7 @@ public class EarthFormActionDataSO : WeaponActionDataSO
 public class EarthFormBalanceSettings
 {
     [Header("Earth Skill - Charge")]
-    [Min(0f)] public float SkillSpiritCost = 150f;
+    [Min(0f)] public float SkillSpiritCost = 15f;
     [Min(0f)] public float SkillCooldownSeconds = 8f;
     [Min(0f), Tooltip("돌진 공격력 계수. 한 번의 돌진은 적마다 한 번 타격합니다.")]
     public float SkillDashDamageMultiplier = 2f;

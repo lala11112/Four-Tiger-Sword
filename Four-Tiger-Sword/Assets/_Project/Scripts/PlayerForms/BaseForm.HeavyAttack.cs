@@ -12,18 +12,16 @@ public abstract partial class BaseForm
         ClearHitTargets();
         ResetTargetApproach(HeavyAttackStep);
         BeginAttackCamera(HeavyAttackStep, continuing, cameraTarget, cameraDirection);
-        _playerController.Animator.speed = AttackSpeed;
+        _playerController.SetAnimationSpeed(AttackSpeed);
         if (_playerController.Animator.HasState(0, Animator.StringToHash(HeavyAttackStep.AnimationName)))
             _playerController.Animator.CrossFade(HeavyAttackStep.AnimationName, 0f, 0, 0f);
-        if (HeavyAttackStep.SwingSound != null)
-            AudioSource.PlayClipAtPoint(HeavyAttackStep.SwingSound, _playerController.transform.position);
         _playerController.UpdateAttackTrails(HeavyAttackStep, 0f);
     }
 
     public virtual void UpdateHeavyAttack(out bool isComplete)
     {
         if (HeavyAttackStep == null) { isComplete = true; return; }
-        _timer += Time.deltaTime * AttackSpeed;
+        _timer += _playerController.ActionDeltaTime * AttackSpeed;
         _playerController.UpdateAttackTrails(HeavyAttackStep, _timer);
         MoveForward(HeavyAttackStep);
         ProcessHit(HeavyAttackStep);

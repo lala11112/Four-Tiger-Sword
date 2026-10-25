@@ -7,11 +7,11 @@ public class PlayerStatData : ScriptableObject
     [Tooltip("플레이어 최대 체력. 0이 되면 사망 처리됩니다.")]
     public float baseHP = 100f;
     [Tooltip("스킬 사용 자원(영력). 스킬 시전 시 소모되며 시간이 지나면 자동 회복됩니다.")]
-    public float baseSP = 50f;
+    public float baseSP = 100f;
     [Tooltip("영력(SP) 초당 자동 회복량.")]
-    public float baseSpRegen = 50f;
+    public float baseSpRegen = 20f;
     [Tooltip("영력(SP) 소모 후 회복이 시작될 때까지 대기 시간(초).")]
-    public float baseSpRegenDelay = 2f;
+    public float baseSpRegenDelay = 1f;
 
     [Header("② 핵심 전투")]
     [Tooltip("기본 물리 공격력. 데미지 계산의 기반 수치입니다.")]

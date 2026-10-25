@@ -217,6 +217,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FinisherSelect"",
+                    ""type"": ""Button"",
+                    ""id"": ""78be8012-961a-4284-a4aa-82d87b109655"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -420,12 +429,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""4303e746-8695-45a9-b657-c6e2b0f1e51f"",
-                    ""path"": ""<Keyboard>/f"",
+                    ""id"": ""c958149f-baaa-451e-b9de-33ba8c0fd2dc"",
+                    ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Parring"",
+                    ""action"": ""FinisherSelect"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -450,6 +459,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Ultimate = m_Player.FindAction("Ultimate", throwIfNotFound: true);
         m_Player_FastFormChange = m_Player.FindAction("FastFormChange", throwIfNotFound: true);
         m_Player_Parring = m_Player.FindAction("Parring", throwIfNotFound: true);
+        m_Player_FinisherSelect = m_Player.FindAction("FinisherSelect", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -544,6 +554,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Ultimate;
     private readonly InputAction m_Player_FastFormChange;
     private readonly InputAction m_Player_Parring;
+    private readonly InputAction m_Player_FinisherSelect;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -612,6 +623,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Parring => m_Wrapper.m_Player_Parring;
         /// <summary>
+        /// Provides access to the underlying input action "Player/FinisherSelect".
+        /// </summary>
+        public InputAction @FinisherSelect => m_Wrapper.m_Player_FinisherSelect;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Player; }
@@ -679,6 +694,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Parring.started += instance.OnParring;
             @Parring.performed += instance.OnParring;
             @Parring.canceled += instance.OnParring;
+            @FinisherSelect.started += instance.OnFinisherSelect;
+            @FinisherSelect.performed += instance.OnFinisherSelect;
+            @FinisherSelect.canceled += instance.OnFinisherSelect;
         }
 
         /// <summary>
@@ -732,6 +750,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Parring.started -= instance.OnParring;
             @Parring.performed -= instance.OnParring;
             @Parring.canceled -= instance.OnParring;
+            @FinisherSelect.started -= instance.OnFinisherSelect;
+            @FinisherSelect.performed -= instance.OnFinisherSelect;
+            @FinisherSelect.canceled -= instance.OnFinisherSelect;
         }
 
         /// <summary>
@@ -870,5 +891,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnParring(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "FinisherSelect" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFinisherSelect(InputAction.CallbackContext context);
     }
 }

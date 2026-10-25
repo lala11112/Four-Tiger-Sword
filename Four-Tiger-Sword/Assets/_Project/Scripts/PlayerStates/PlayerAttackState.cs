@@ -8,6 +8,8 @@ public class PlayerAttackState : IPlayerState
     private bool _normalStarted, _normalComplete, _heavyStarted;
     private bool _pending, _heavyRequested;
     private bool _queuedHeavy;
+    private bool _finisherOpened;
+    private bool _finisherCommitted;
     private uint _pressId;
     private float _heldTime;
     private bool _isAttackComplete;
@@ -21,6 +23,10 @@ public class PlayerAttackState : IPlayerState
     }
     public bool IsCharging => _pending && (!_normalStarted || _normalComplete);
     public bool IsHeavyAttack => _heavyStarted;
+    public bool CanSelectFinisher => !_finisherOpened && !_heavyStarted && _normalStarted
+        && !_normalComplete && _form is BaseForm form && form.CanSelectFinisher;
+    public bool IsFinisherWindowValid => !_heavyStarted && _normalStarted && !_normalComplete
+        && _form is BaseForm form && form.CanSelectFinisher;
 
     public PlayerAttackState(PlayerController playerController) => _playerController = playerController;
 
@@ -31,6 +37,7 @@ public class PlayerAttackState : IPlayerState
         _normalStarted = _normalComplete = _heavyStarted = false;
         _pending = _heavyRequested = IsAttackComplete = false;
         _queuedHeavy = false;
+        _finisherOpened = _finisherCommitted = false;
         _pressId = _playerController.Input.AttackPressId;
         if (_heavy?.CanHeavyAttack == true)
         {
@@ -45,6 +52,13 @@ public class PlayerAttackState : IPlayerState
     {
         var input = _playerController.Input;
         if (!_playerController.IsGround()) _playerController.Movement.ApplyGravity();
+
+        if (_playerController.IsFinisherSelecting)
+        {
+            _form.UpdateAttack(out _normalComplete);
+            IsAttackComplete = _normalComplete;
+            return;
+        }
 
         if (_heavyStarted)
         {
@@ -69,7 +83,7 @@ public class PlayerAttackState : IPlayerState
             return;
         }
 
-        if (!_pending && _normalStarted && input.AttackBuffer.IsActive
+        if (!_finisherCommitted && !_pending && _normalStarted && input.AttackBuffer.IsActive
             && input.AttackPressId != _pressId && _heavy?.CanHeavyAttack == true)
             CapturePress();
 
@@ -106,14 +120,50 @@ public class PlayerAttackState : IPlayerState
         if (_normalStarted && !_normalComplete)
             _form.UpdateAttack(out _normalComplete);
         else
-            _playerController.Controller.Move(Vector3.up * _playerController.VerticalVelocity * Time.deltaTime);
+            _playerController.Controller.Move(Vector3.up * _playerController.VerticalVelocity * _playerController.ActionDeltaTime);
 
-        if (_normalStarted && !_pending && input.AttackBuffer.IsActive && _form.TryContinueAttack())
+        if (!_finisherCommitted && _normalStarted && !_pending && input.AttackBuffer.IsActive && _form.TryContinueAttack())
         {
             input.AttackBuffer.Consume();
             _normalComplete = false;
         }
         IsAttackComplete = _normalStarted && _normalComplete && !_pending;
+    }
+
+    internal void BeginFinisherSelection(Vector3 forward)
+    {
+        _finisherOpened = true;
+        _pending = _heavyRequested = _queuedHeavy = false;
+        (_form as BaseForm)?.LockFinisherFacing(forward);
+    }
+
+    internal bool CommitFinisher(BaseForm target, Vector3 forward)
+    {
+        if (!IsFinisherWindowValid || target == null) return false;
+        bool transformed = !ReferenceEquals(target, _form);
+        if (!target.CanBeginFinisherWith(_playerController, forward, transformed)) return false;
+        if (transformed)
+        {
+            // Validate the destination before ending the source action. This route has no E follow-up.
+            if (!_playerController.FormManager.TrySwitchForFinisher(target)) return false;
+            _form.EndAttack();
+        }
+        _form = target;
+        _heavy = target as IHeavyAttackForm;
+        if (!target.BeginFinisher(forward, transformed))
+        {
+            target.EndAttack();
+            _normalStarted = _normalComplete = IsAttackComplete = true;
+            _pending = _heavyRequested = _heavyStarted = _queuedHeavy = false;
+            return false;
+        }
+        _normalStarted = true;
+        _normalComplete = IsAttackComplete = false;
+        _pending = _heavyRequested = _heavyStarted = _queuedHeavy = false;
+        _finisherCommitted = true;
+        _pressId = _playerController.Input.AttackPressId;
+        _playerController.Input.AttackBuffer.Consume();
+        return true;
     }
 
     private void CapturePress()
@@ -137,12 +187,13 @@ public class PlayerAttackState : IPlayerState
 
     public void Exit()
     {
+        _playerController.CancelFinisherSelection();
         if (_heavyStarted) _heavy.EndHeavyAttack();
         else if (_normalStarted) _form.EndAttack();
         // Canceled charges cannot leak an attack into the next state.
         if (!IsAttackComplete) _playerController.Input.AttackBuffer.Consume();
         _pending = false;
         _queuedHeavy = false;
-        _playerController.Animator.speed = 1f;
+        _playerController.SetAnimationSpeed(1f);
     }
 }

@@ -131,6 +131,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "FinisherSelect",
+                    "type": "Button",
+                    "id": "78be8012-961a-4284-a4aa-82d87b109655",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -334,12 +343,12 @@
                 },
                 {
                     "name": "",
-                    "id": "4303e746-8695-45a9-b657-c6e2b0f1e51f",
-                    "path": "<Keyboard>/f",
+                    "id": "c958149f-baaa-451e-b9de-33ba8c0fd2dc",
+                    "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Parring",
+                    "action": "FinisherSelect",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -4,11 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
 namespace StudioBaekho
@@ -24,12 +26,12 @@ namespace StudioBaekho
         private static readonly HashSet<string> ExtendedRoles = new HashSet<string>(StringComparer.Ordinal)
         {
             "ceiling", "bridge", "cliff", "slope", "light", "railing", "column", "arch", "water",
-            "hazard", "trap", "gate", "switch", "secretDoor", "rest", "merchant", "altar", "decoration"
+            "hazard", "trap", "gate", "switch", "secretDoor", "rest", "merchant", "altar", "decoration", "vegetation"
         };
         private static readonly HashSet<string> FixtureRoles = new HashSet<string>(StringComparer.Ordinal)
         {
             "light", "railing", "column", "arch", "water", "hazard", "trap", "gate", "switch",
-            "secretDoor", "rest", "merchant", "altar", "decoration"
+            "secretDoor", "rest", "merchant", "altar", "decoration", "vegetation"
         };
 
         [Serializable] private sealed class Manifest
@@ -104,7 +106,7 @@ namespace StudioBaekho
                 string output = BuildFromPath(AssetDatabase.GetAssetPath(Selection.activeObject));
                 Selection.activeObject = AssetDatabase.LoadAssetAtPath<GameObject>(output);
                 EditorGUIUtility.PingObject(Selection.activeObject);
-                Debug.Log("Baekho map prefab created: " + output);
+                Debug.Log("Baekho map prefab created with baked NavMesh: " + output);
             }
             catch (Exception exception)
             {
@@ -113,8 +115,14 @@ namespace StudioBaekho
             }
         }
 
-        /// <summary>Build a new prefab next to an Assets-relative manifest; never overwrites an existing asset.</summary>
+        /// <summary>Build a new prefab and baked NavMesh next to an Assets-relative manifest.</summary>
         public static string BuildFromPath(string manifestAssetPath)
+        {
+            return BuildFromPath(manifestAssetPath, true);
+        }
+
+        /// <summary>Set bakeNavMesh to false for geometry-only imports; -1 uses the project's first agent type.</summary>
+        public static string BuildFromPath(string manifestAssetPath, bool bakeNavMesh, int agentTypeID = -1)
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 throw new InvalidOperationException("Exit Play Mode before building a prefab.");
@@ -127,8 +135,24 @@ namespace StudioBaekho
             new ManifestShape(json).Validate();
             Manifest manifest = JsonUtility.FromJson<Manifest>(json);
             GameObject[] prefabs = ValidateManifest(manifest);
+            Type surfaceType = null;
+            if (bakeNavMesh)
+            {
+                surfaceType = RequireNavMeshSurface();
+                if (agentTypeID == -1 && NavMesh.GetSettingsCount() > 0)
+                    agentTypeID = NavMesh.GetSettingsByIndex(0).agentTypeID;
+                bool validAgent = false;
+                for (int index = 0; index < NavMesh.GetSettingsCount(); index++)
+                    if (NavMesh.GetSettingsByIndex(index).agentTypeID == agentTypeID) validAgent = true;
+                if (!validAgent)
+                    throw new InvalidOperationException("Choose a valid Agent Type in Window > AI > Navigation before baking the map.");
+            }
             string folder = Path.GetDirectoryName(manifestAssetPath).Replace('\\', '/');
             string output = AssetDatabase.GenerateUniqueAssetPath(folder + "/" + manifest.name + ".prefab");
+            string navigationOutput = bakeNavMesh
+                ? AssetDatabase.GenerateUniqueAssetPath(Path.ChangeExtension(output, ".NavMesh.asset")) : null;
+            NavMeshData navigationData = null;
+            bool attemptedNavigationSave = false;
             Scene preview = default(Scene);
             bool saved = false;
             bool attemptedSave = false;
@@ -239,6 +263,18 @@ namespace StudioBaekho
                         new Vector3(manifest.width * manifest.cellSize, 0, manifest.height * manifest.cellSize));
                     BaekhoDungeonSetup.PrepareModule(root, nominalBounds, manifestAssetPath);
                 }
+                if (bakeNavMesh)
+                {
+                    navigationData = BakeNavigation(root, surfaceType, agentTypeID);
+                    // BuildNavMesh creates transient data. Persist it before serializing the prefab reference.
+                    if (File.Exists(Path.GetFullPath(navigationOutput)))
+                        throw new IOException("The NavMesh output path was created by another process. Try again.");
+                    attemptedNavigationSave = true;
+                    AssetDatabase.CreateAsset(navigationData, navigationOutput);
+                    AssetDatabase.SaveAssetIfDirty(navigationData);
+                    if (AssetDatabase.LoadAssetAtPath<NavMeshData>(navigationOutput) != navigationData)
+                        throw new IOException("Unity could not save the generated NavMesh data.");
+                }
                 // GenerateUniqueAssetPath protects existing prefabs; check again immediately before saving.
                 if (File.Exists(Path.GetFullPath(output)))
                     throw new IOException("The output path was created by another process. Try again.");
@@ -255,7 +291,83 @@ namespace StudioBaekho
             {
                 if (preview.IsValid()) EditorSceneManager.ClosePreviewScene(preview);
                 if (attemptedSave && !saved) AssetDatabase.DeleteAsset(output);
+                if (attemptedNavigationSave && !saved) AssetDatabase.DeleteAsset(navigationOutput);
+                if (navigationData != null && !EditorUtility.IsPersistent(navigationData))
+                    UnityEngine.Object.DestroyImmediate(navigationData);
             }
+        }
+
+        // Resolve the optional package at runtime so copying this importer never breaks compilation.
+        private static Type RequireNavMeshSurface()
+        {
+            Type type = Type.GetType("Unity.AI.Navigation.NavMeshSurface, Unity.AI.Navigation");
+            if (type == null)
+                throw new InvalidOperationException("Automatic NavMesh baking requires AI Navigation (com.unity.ai.navigation). " +
+                    "Install AI Navigation from Window > Package Manager > Unity Registry, wait for compilation, then run Build Prefab again.");
+            return type;
+        }
+
+        private static NavMeshData BakeNavigation(GameObject root, Type surfaceType, int agentTypeID)
+        {
+            // Rebuild one surface for the assembled map instead of also loading stale per-piece NavMeshes.
+            foreach (Component child in root.GetComponentsInChildren(surfaceType, true))
+            {
+                var behaviour = child as Behaviour;
+                if (behaviour == null || !behaviour.enabled) continue;
+                behaviour.enabled = false;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(behaviour);
+            }
+            Component surface = root.AddComponent(surfaceType);
+            SetNavigationProperty(surface, "agentTypeID", agentTypeID);
+            SetNavigationProperty(surface, "collectObjects", "Children");
+            SetNavigationProperty(surface, "useGeometry", NavMeshCollectGeometry.RenderMeshes);
+            SetNavigationProperty(surface, "layerMask", (LayerMask)(-1));
+            PropertyInfo dataProperty = NavigationProperty(surfaceType, "navMeshData");
+            MethodInfo build = surfaceType.GetMethod("BuildNavMesh", Type.EmptyTypes);
+            if (build == null) throw new InvalidOperationException("AI Navigation does not expose NavMeshSurface.BuildNavMesh. Update the package.");
+            NavMeshData data = null;
+            bool built = false;
+            try
+            {
+                build.Invoke(surface, null);
+                data = dataProperty.GetValue(surface, null) as NavMeshData;
+                if (data == null)
+                    throw new InvalidOperationException("NavMesh baking produced no data. Check the map geometry and Navigation Agent settings.");
+                data.name = root.name + " NavMesh";
+                built = true;
+                return data;
+            }
+            catch (TargetInvocationException exception)
+            {
+                throw new InvalidOperationException("NavMesh baking failed: " +
+                    (exception.InnerException ?? exception).Message, exception.InnerException ?? exception);
+            }
+            finally
+            {
+                // Preview scenes do not register surfaces with the navigation system. Still release the
+                // temporary data on failure; destroying a Surface itself does not destroy its NavMeshData.
+                if (!built)
+                {
+                    data = dataProperty.GetValue(surface, null) as NavMeshData;
+                    if (data != null && !EditorUtility.IsPersistent(data)) UnityEngine.Object.DestroyImmediate(data);
+                }
+            }
+        }
+
+        private static PropertyInfo NavigationProperty(Type type, string name)
+        {
+            PropertyInfo property = type.GetProperty(name);
+            if (property == null)
+                throw new InvalidOperationException("AI Navigation is missing NavMeshSurface." + name + ". Update the package.");
+            return property;
+        }
+
+        private static void SetNavigationProperty(Component surface, string name, object value)
+        {
+            PropertyInfo property = NavigationProperty(surface.GetType(), name);
+            if (value is string && property.PropertyType.IsEnum)
+                value = Enum.Parse(property.PropertyType, (string)value);
+            property.SetValue(surface, value, null);
         }
 
         private static string RequireManifestPath(string assetPath)
@@ -301,9 +413,9 @@ namespace StudioBaekho
                 ValidateVector(item.position, item.id + ".position", false);
                 ValidateVector(item.rotation, item.id + ".rotation", false);
                 ValidateVector(item.scale, item.id + ".scale", true);
-                if (item.centerXZ && (manifest.schemaVersion != 5 || (item.role != "prop" && item.role != "decoration") ||
+                if (item.centerXZ && (manifest.schemaVersion != 5 || (item.role != "prop" && item.role != "decoration" && item.role != "vegetation") ||
                     PlacementSurface(item) != "bottom" || HasFitSize(item) || item.fitHeight != 0 || item.fitWidth != 0 || item.rotation.x != 0 || item.rotation.z != 0))
-                    throw new InvalidDataException("centerXZ requires a v5 measured prop or decoration, bottom alignment, no X/Z tilt and no fit fields: " + item.id);
+                    throw new InvalidDataException("centerXZ requires a v5 measured prop, decoration or vegetation, bottom alignment, no X/Z tilt and no fit fields: " + item.id);
                 if (HasFitSize(item))
                 {
                     ValidateVector(item.fitSize, item.id + ".fitSize", true);

@@ -148,7 +148,8 @@ namespace StudioBaekho
         {
             plan = null;
             if (!Validate(settings, out List<ModuleData> maps, out ModuleData corner,
-                out ModuleData startRoom, out ModuleData endRoom, out ModuleData bossRoom, out error)) return false;
+                out ModuleData startRoom, out ModuleData endRoom, out ModuleData bossRoom,
+                out ModuleData shopRoom, out error)) return false;
             var random = new System.Random(seed);
             var budget = new PlanningBudget { remaining = settings.maxSearchNodes };
             bool hasBoss = bossRoom != null;
@@ -174,7 +175,8 @@ namespace StudioBaekho
             for (int layout = 0; layout < settings.layoutAttempts; layout++)
             {
                 var candidate = new BaekhoDungeonPlan { seed = seed, startMapId = 0,
-                    endMapId = settings.mapCount - 1, bossMapId = hasBoss ? settings.mapCount - 2 : -1 };
+                    endMapId = settings.mapCount - 1, bossMapId = hasBoss ? settings.mapCount - 2 : -1,
+                    shopMapId = shopRoom != null ? settings.mapCount - (hasBoss ? 3 : 2) : -1 };
                 var placed = new List<PlacedData>();
                 ModuleData root = roots[random.Next(roots.Count)];
                 var rootPlacement = new BaekhoPlacedModule { id = 0, prefab = root.prefab,
@@ -189,6 +191,7 @@ namespace StudioBaekho
                 {
                     bool isEnd = mapIndex == candidate.endMapId;
                     bool isBoss = mapIndex == candidate.bossMapId;
+                    bool isShop = mapIndex == candidate.shopMapId;
                     bool added = false;
                     for (int attempt = 0; attempt < settings.placementAttempts && !added; attempt++)
                     {
@@ -206,6 +209,7 @@ namespace StudioBaekho
                         int fromSocket = available[random.Next(available.Count)];
                         ModuleData data;
                         if (isBoss) data = bossRoom;
+                        else if (isShop) data = shopRoom;
                         else if (isEnd && endRoom != null) data = endRoom;
                         else if (needsBranch && !branchAtStart && mapIndex == hubId) data = hubs[random.Next(hubs.Count)];
                         else data = maps[random.Next(maps.Count)];
@@ -218,7 +222,8 @@ namespace StudioBaekho
                         int targetDirection = (sourceDirection + (choice == 0 ? 1 : choice == 1 ? 3 : 2)) % 4;
                         int rotation = (targetDirection - Direction(data.sockets[toSocket].forward) + 4) % 4;
                         var room = new BaekhoPlacedModule { id = mapIndex, prefab = data.prefab, quarterTurns = rotation,
-                            role = isBoss ? BaekhoRoomRole.Boss : isEnd ? BaekhoRoomRole.End : BaekhoRoomRole.Normal };
+                            role = isBoss ? BaekhoRoomRole.Boss : isEnd ? BaekhoRoomRole.End
+                                : isShop ? BaekhoRoomRole.Shop : BaekhoRoomRole.Normal };
                         Vector3 relativeSocket = Rotate(data.sockets[toSocket].position, rotation);
                         RectXZ relativeBounds = new RectXZ(room.WorldBounds);
                         Vector3 forward = Forward(sourceDirection), right = Forward((sourceDirection + 1) % 4);
@@ -233,8 +238,8 @@ namespace StudioBaekho
                         room.position = target - relativeSocket;
                         if (!RoomFits(room, candidate, settings.minimumMapGap, settings.style.wallThickness)) continue;
 
-                        float width = Mathf.Min(settings.corridorWidth,
-                            Mathf.Min(parent.data.sockets[fromSocket].width, data.sockets[toSocket].width));
+                        // Door openings are finished locally; they must not narrow the entire connection.
+                        float width = settings.corridorWidth;
                         if (TryRoute(settings, candidate, parent, fromSocket, room, data, toSocket, corner, width, budget,
                             out BaekhoDungeonLink link))
                         {
@@ -277,6 +282,8 @@ namespace StudioBaekho
             int deepest = -1;
             foreach (PlacedData item in placed)
             {
+                // A shop is an optional destination, never a route to another room.
+                if ((item.placed.role & BaekhoRoomRole.Shop) != 0) continue;
                 if (!HasUnusedSocket(item)) continue;
                 if (requiredParentId >= 0 && item.placed.id != requiredParentId) continue;
                 if (requiredParentId < 0 && forcedHub >= 0 && item.placed.id != forcedHub) continue;
@@ -298,7 +305,7 @@ namespace StudioBaekho
             int finalDirection = (Direction(SocketForward(to, toData, toIndex)) + 2) % 4;
             if (Mathf.Abs(start.y - end.y) > Epsilon || Manhattan(start, end) > settings.maximumConnectionLength + Epsilon) return false;
 
-            // Straight connections need not shrink for an unused corner prefab.
+            // Route and collision checks use the same configured width for straight and bent connections.
             var root = new RouteNode { position = start, direction = direction };
             if (CanFinish(root, end, finalDirection, settings.maximumConnectionLength)
                 && SegmentFits(start, end, width, root, settings, plan, from, fromIndex, to, toData, toIndex))
@@ -308,7 +315,6 @@ namespace StudioBaekho
                 return true;
             }
 
-            width = Mathf.Min(width, Mathf.Min(corner.sockets[0].width, corner.sockets[1].width));
             var heap = new NodeHeap();
             var visited = new Dictionary<StateKey, float>();
             int order = 0;
@@ -556,9 +562,10 @@ namespace StudioBaekho
 
         private static bool Validate(BaekhoDungeonSettings settings, out List<ModuleData> maps,
             out ModuleData corner, out ModuleData startRoom, out ModuleData endRoom,
-            out ModuleData bossRoom, out string error)
+            out ModuleData bossRoom, out ModuleData shopRoom, out string error)
         {
-            maps = new List<ModuleData>(); corner = null; startRoom = null; endRoom = null; bossRoom = null; error = null;
+            maps = new List<ModuleData>(); corner = null; startRoom = null; endRoom = null;
+            bossRoom = null; shopRoom = null; error = null;
             if (settings == null) { error = "Dungeon settings are missing."; return false; }
             if (settings.mapCount < 1 || settings.placementAttempts < 1 || settings.layoutAttempts < 1 || settings.maxSearchNodes < 1
                 || !Positive(settings.gridSize) || !Positive(settings.maximumConnectionLength)
@@ -571,18 +578,25 @@ namespace StudioBaekho
             { error = "A corridor style with positive finite wall/floor dimensions is required."; return false; }
             if (settings.bossRoom != null && settings.mapCount < 3)
             { error = "A boss before a separate end room requires mapCount of at least three (start, boss, end)."; return false; }
+            if (settings.shopRoom != null && settings.mapCount < (settings.bossRoom != null ? 5 : 4))
+            { error = "A shop branch requires mapCount of at least four, or five with a boss (start, ordinary hub, shop, optional boss, end)."; return false; }
+            if (settings.shopRoom != null && (settings.shopRoom == settings.startRoom
+                || settings.shopRoom == settings.endRoom || settings.shopRoom == settings.bossRoom))
+            { error = "The dedicated Shop Room must use a separate prefab from start, end and boss rooms."; return false; }
             if (settings.mapCount == 1 && settings.startRoom != null && settings.endRoom != null
                 && settings.startRoom != settings.endRoom)
             { error = "A one-room layout cannot use different explicit start and end prefabs; use one prefab or increase mapCount."; return false; }
             if (settings.startRoom != null && !ValidateModule(settings.startRoom, false, settings, out startRoom, out error)) return false;
             if (settings.endRoom != null && !ValidateModule(settings.endRoom, false, settings, out endRoom, out error)) return false;
+            if (settings.shopRoom != null && !ValidateModule(settings.shopRoom, false, settings, out shopRoom, out error)) return false;
             if (settings.bossRoom != null)
             {
                 if (!ValidateModule(settings.bossRoom, false, settings, out bossRoom, out error)) return false;
                 if (bossRoom.usable.Count < 2)
                 { error = "The boss room needs at least two usable doors: one entrance and one connection to the separate end room."; return false; }
             }
-            int ordinaryCount = Mathf.Max(0, settings.mapCount - 2 - (bossRoom != null ? 1 : 0));
+            int ordinaryCount = Mathf.Max(0, settings.mapCount - 2 - (bossRoom != null ? 1 : 0)
+                - (shopRoom != null ? 1 : 0));
             bool needsPool = settings.mapCount == 1 ? startRoom == null && endRoom == null
                 : ordinaryCount > 0 || startRoom == null || endRoom == null;
             if (needsPool && settings.maps != null)
@@ -590,13 +604,14 @@ namespace StudioBaekho
                 foreach (BaekhoMapModule prefab in settings.maps)
                 {
                     // Explicit role assets are never drawn again as ordinary/random endpoint rooms.
-                    if (prefab != null && (prefab == settings.startRoom || prefab == settings.endRoom || prefab == settings.bossRoom)) continue;
+                    if (prefab != null && (prefab == settings.startRoom || prefab == settings.endRoom
+                        || prefab == settings.bossRoom || prefab == settings.shopRoom)) continue;
                     if (!ValidateModule(prefab, false, settings, out ModuleData data, out error)) return false;
                     maps.Add(data);
                 }
             }
             if (needsPool && maps.Count == 0)
-            { error = "The ordinary Maps pool is empty after excluding explicit start/end/boss prefabs. Add an ordinary map or assign the missing endpoint prefab."; return false; }
+            { error = "The ordinary Maps pool is empty after excluding explicit start/end/boss/shop prefabs. Add an ordinary map or assign the missing endpoint prefab."; return false; }
             if (!ValidateModule(settings.cornerRoom, true, settings, out corner, out error)) return false;
             return true;
         }

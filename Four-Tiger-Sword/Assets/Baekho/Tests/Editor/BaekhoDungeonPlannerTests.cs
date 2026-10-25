@@ -216,6 +216,100 @@ namespace StudioBaekho.Tests
             Assert.That(error, Is.Not.Null.And.Not.Empty);
         }
 
+        [TestCase(false, 4)]
+        [TestCase(false, 6)]
+        [TestCase(true, 5)]
+        [TestCase(true, 7)]
+        public void DedicatedShopIsUniqueReachableAndOptionalWithOrWithoutBoss(bool withBoss, int mapCount)
+        {
+            settings.mapCount = mapCount;
+            var ordinary = settings.maps[0];
+            settings.startRoom = CreateRoom("Shop stage start", 2f);
+            settings.startRoom.connections = settings.startRoom.connections.Take(1).ToArray();
+            settings.endRoom = CreateRoom("Shop stage end", 2f);
+            settings.endRoom.connections = settings.endRoom.connections.Take(1).ToArray();
+            // Multiple usable doors prove the planner enforces the leaf rather than relying on the prefab.
+            settings.shopRoom = CreateRoom("Dedicated shop", 2f);
+            if (withBoss)
+            {
+                settings.bossRoom = CreateRoom("Shop stage boss", 2f);
+                settings.bossRoom.connections = settings.bossRoom.connections.Take(2).ToArray();
+            }
+            settings.maps = withBoss
+                ? new[] { ordinary, settings.startRoom, settings.endRoom, settings.bossRoom, settings.shopRoom }
+                : new[] { ordinary, settings.startRoom, settings.endRoom, settings.shopRoom };
+
+            foreach (int seed in new[] { 1, 42, 9277 })
+            {
+                var plan = Plan(seed);
+                Assert.That(Fingerprint(Plan(seed)), Is.EqualTo(Fingerprint(plan)), "Shop graph must be deterministic.");
+                Assert.That(plan.rooms.Count, Is.EqualTo(mapCount));
+                Assert.That(plan.links.Count, Is.EqualTo(mapCount - 1));
+                Assert.That(plan.shopMapId, Is.GreaterThan(0));
+                Assert.That(plan.rooms.Count(room => room.prefab == settings.shopRoom), Is.EqualTo(1));
+                Assert.That(plan.rooms.Count(room => (room.role & BaekhoRoomRole.Shop) != 0), Is.EqualTo(1));
+                Assert.That(plan.rooms.Single(room => room.id == plan.shopMapId).role, Is.EqualTo(BaekhoRoomRole.Shop));
+                Assert.That(plan.rooms.Where(room => room.role == BaekhoRoomRole.Normal)
+                    .All(room => room.prefab == ordinary), Is.True, "Dedicated shop must never appear as an ordinary map.");
+                Assert.That(Degree(plan, plan.shopMapId), Is.EqualTo(1), "Shop must remain a terminal optional branch.");
+                Assert.That(Degree(plan, plan.startMapId), Is.EqualTo(1));
+                Assert.That(Degree(plan, plan.endMapId), Is.EqualTo(1));
+                Assert.That(plan.rooms.Where(room => room.role == BaekhoRoomRole.Normal)
+                    .Any(room => Degree(plan, room.id) >= 3), Is.True);
+                foreach (var room in plan.rooms)
+                    Assert.That(Reachable(plan, plan.startMapId, room.id, -1), Is.True, "Every shop stage room must be reachable.");
+                Assert.That(Reachable(plan, plan.startMapId, plan.endMapId, plan.shopMapId), Is.True,
+                    "The stage exit must remain reachable without visiting the shop.");
+                if (withBoss)
+                {
+                    Assert.That(Degree(plan, plan.bossMapId), Is.EqualTo(2));
+                    Assert.That(Reachable(plan, plan.startMapId, plan.bossMapId, plan.shopMapId), Is.True);
+                    Assert.That(Reachable(plan, plan.startMapId, plan.endMapId, plan.bossMapId), Is.False);
+                    var exitLink = plan.links.Single(link => link.fromMapId == plan.endMapId || link.toMapId == plan.endMapId);
+                    Assert.That(exitLink.fromMapId == plan.bossMapId || exitLink.toMapId == plan.bossMapId, Is.True);
+                }
+                else Assert.That(plan.bossMapId, Is.EqualTo(-1));
+            }
+        }
+
+        [Test]
+        public void SingleDoorShopCanBeASeparateBranch()
+        {
+            settings.mapCount = 4;
+            settings.shopRoom = CreateRoom("One door shop", 2f);
+            settings.shopRoom.connections = settings.shopRoom.connections.Take(1).ToArray();
+            var plan = Plan(12345);
+            Assert.That(Degree(plan, plan.shopMapId), Is.EqualTo(1));
+            Assert.That(Reachable(plan, plan.startMapId, plan.endMapId, plan.shopMapId), Is.True);
+        }
+
+        [TestCase(false, 3)]
+        [TestCase(true, 4)]
+        public void ShopBranchRejectsTooFewRoleSlots(bool withBoss, int mapCount)
+        {
+            settings.mapCount = mapCount;
+            settings.shopRoom = CreateRoom("Shop requiring separate branch", 2f);
+            if (withBoss) settings.bossRoom = CreateRoom("Boss", 2f);
+            Assert.That(BaekhoDungeonPlanner.TryPlan(settings, 22, out var plan, out var error), Is.False);
+            Assert.That(plan, Is.Null);
+            Assert.That(error, Does.Contain("shop branch").IgnoreCase);
+        }
+
+        [Test]
+        public void DedicatedShopCannotSupplyTheOrdinaryPoolOrReuseAnEndpoint()
+        {
+            settings.mapCount = 4;
+            settings.startRoom = CreateRoom("Start", 2f);
+            settings.endRoom = CreateRoom("End", 2f);
+            settings.shopRoom = CreateRoom("Shop", 2f);
+            settings.maps = new[] { settings.startRoom, settings.endRoom, settings.shopRoom };
+            Assert.That(BaekhoDungeonPlanner.TryPlan(settings, 22, out var plan, out var error), Is.False);
+            Assert.That(error, Does.Contain("ordinary Maps pool"));
+            settings.shopRoom = settings.startRoom;
+            Assert.That(BaekhoDungeonPlanner.TryPlan(settings, 22, out plan, out error), Is.False);
+            Assert.That(error, Does.Contain("separate prefab"));
+        }
+
         [Test]
         public void TooFewRoomsCannotSilentlyMergeDedicatedRoles()
         {
@@ -290,13 +384,23 @@ namespace StudioBaekho.Tests
             Assert.That(connectedDifferentLocalHeights, Is.True, "Fixture must exercise a 4m floor offset.");
         }
 
-        [Test]
-        public void OneMetreDoorwaysAreAcceptedAndLimitCorridorWidth()
+        [TestCase(1f, 4f)]
+        [TestCase(2f, 4f)]
+        [TestCase(4f, 2f)]
+        public void MixedDoorWidthsKeepConfiguredCorridorWidth(float startWidth, float endWidth)
         {
-            foreach (var socket in settings.maps[0].connections) socket.width = 1f;
+            settings.corridorWidth = 4f;
+            settings.startRoom = CreateRoom("Narrow start", startWidth);
+            settings.endRoom = CreateRoom("Wide end", endWidth);
             var plan = Plan(62);
             Assert.That(plan.links.Count, Is.GreaterThan(0));
-            Assert.That(plan.links.All(link => Mathf.Abs(link.width - 1f) < Tolerance), Is.True);
+            Assert.That(plan.links.All(link => Mathf.Abs(link.width - settings.corridorWidth) < Tolerance), Is.True,
+                "A narrow doorway must not shrink the entire corridor connected to it.");
+            Assert.That(plan.rooms.Single(room => room.id == plan.startMapId).prefab, Is.SameAs(settings.startRoom));
+            Assert.That(plan.rooms.Single(room => room.id == plan.endMapId).prefab, Is.SameAs(settings.endRoom));
+            Assert.That(settings.startRoom.connections.All(socket => socket.width == startWidth), Is.True);
+            Assert.That(settings.endRoom.connections.All(socket => socket.width == endWidth), Is.True,
+                "Planning must preserve the authored doorway dimensions.");
         }
 
         [Test]
@@ -309,12 +413,17 @@ namespace StudioBaekho.Tests
             Assert.That(settings.maps[0].connections.All(socket => socket.width == 0.5f), Is.True);
         }
 
-        [TestCase(1)]
-        [TestCase(12345)]
-        [TestCase(9277)]
-        public void RoomsCornersAndCorridorWallsDoNotOverlapInXZ(int seed)
+        [TestCase(1, 2f)]
+        [TestCase(12345, 2f)]
+        [TestCase(9277, 2f)]
+        [TestCase(1, 4f)]
+        [TestCase(12345, 4f)]
+        [TestCase(9277, 4f)]
+        public void RoomsCornersAndCorridorWallsDoNotOverlapInXZ(int seed, float corridorWidth)
         {
+            settings.corridorWidth = corridorWidth;
             var plan = Plan(seed);
+            Assert.That(plan.links.All(link => Mathf.Abs(link.width - corridorWidth) < Tolerance), Is.True);
             var modules = new List<BaekhoPlacedModule>(plan.rooms);
             modules.AddRange(plan.links.SelectMany(link => link.corners));
             for (int a = 0; a < modules.Count; a++)
@@ -346,17 +455,23 @@ namespace StudioBaekho.Tests
                 }
         }
 
-        [Test]
-        public void EveryBendIsOccupiedByAReplaceableCornerRoom()
+        [TestCase(2f)]
+        [TestCase(4f)]
+        public void EveryBendIsOccupiedByAReplaceableCornerRoomWithoutShrinkingCorridors(float corridorWidth)
         {
+            settings.corridorWidth = corridorWidth;
+            foreach (var socket in settings.maps[0].connections) socket.width = 4f;
             int totalCorners = 0;
             for (int seed = 0; seed < 8 && totalCorners == 0; seed++)
             {
                 var plan = Plan(seed);
                 Assert.That(plan.rooms.Count, Is.EqualTo(settings.mapCount), "Corner rooms are extra.");
+                Assert.That(plan.links.All(link => Mathf.Abs(link.width - corridorWidth) < Tolerance), Is.True,
+                    "The replaceable corner's 2m sockets must not shrink a configured 4m corridor.");
                 totalCorners += AssertCornerChains(plan);
             }
             Assert.That(totalCorners, Is.GreaterThan(0), "Seeded fixtures must exercise actual corner placement.");
+            Assert.That(settings.cornerRoom.connections.All(socket => socket.width == 2f), Is.True);
         }
 
         [Test]
@@ -430,6 +545,7 @@ namespace StudioBaekho.Tests
             Assert.That(plan.startMapId, Is.EqualTo(plan.endMapId));
             Assert.That(plan.rooms[0].role, Is.EqualTo(BaekhoRoomRole.Start | BaekhoRoomRole.End));
             Assert.That(plan.bossMapId, Is.EqualTo(-1));
+            Assert.That(plan.shopMapId, Is.EqualTo(-1));
         }
 
         private static int Degree(BaekhoDungeonPlan plan, int roomId)
@@ -585,7 +701,8 @@ namespace StudioBaekho.Tests
                     .Append('/').Append(module.role);
                 appendVector(module.position);
             };
-            result.Append(plan.seed).Append('/').Append(plan.startMapId).Append('/').Append(plan.endMapId).Append('/').Append(plan.bossMapId);
+            result.Append(plan.seed).Append('/').Append(plan.startMapId).Append('/').Append(plan.endMapId)
+                .Append('/').Append(plan.bossMapId).Append('/').Append(plan.shopMapId);
             foreach (var room in plan.rooms) appendModule(room);
             foreach (var link in plan.links)
             {

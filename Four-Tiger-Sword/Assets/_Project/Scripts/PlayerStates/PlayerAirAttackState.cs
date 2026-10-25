@@ -41,7 +41,7 @@ public class PlayerAirAttackState : IPlayerState
 
         if (_phase == Phase.Loop)
         {
-            _playerController.Controller.Move(new Vector3(0f, _playerController.VerticalVelocity, 0f) * Time.deltaTime);
+            _playerController.Controller.Move(new Vector3(0f, _playerController.VerticalVelocity, 0f) * _playerController.ActionDeltaTime);
 
             if (_playerController.IsGround())
             {

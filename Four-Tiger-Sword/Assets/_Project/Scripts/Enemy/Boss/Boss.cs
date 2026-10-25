@@ -69,7 +69,8 @@ public abstract class Boss : Enemy
     protected override void Update()
     {
         base.Update();
-        CurrentPhase?.OnUpdate(this);
+        if (ActionDeltaTime > 0f && EnemyStat != null && !EnemyStat.IsDead)
+            CurrentPhase?.OnUpdate(this);
     }
 
     // ── 페이즈 팩토리 (구체 보스가 반드시 구현) ──────────────────────────────

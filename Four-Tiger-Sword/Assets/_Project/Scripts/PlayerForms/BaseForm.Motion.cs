@@ -146,7 +146,7 @@ public abstract partial class BaseForm
 
         Vector3 before = _playerController.transform.position;
         Vector3 delta = direction * distance;
-        delta.y = _playerController.VerticalVelocity * Time.deltaTime;
+        delta.y = _playerController.VerticalVelocity * _playerController.ActionDeltaTime;
         _playerController.Controller.Move(delta);
         _approachTravel += Vector3.ProjectOnPlane(_playerController.transform.position - before, Vector3.up).magnitude;
         // Blocked movement is consumed, never accumulated into a later catch-up teleport.

@@ -118,6 +118,7 @@ public class WeaponActionData
 [Serializable]
 public class ActionBalanceSettings
 {
+    public bool EnableV2;
     [Tooltip("이 타수의 데미지")]
     public float Damage = 10;
 
@@ -134,6 +135,7 @@ public class ActionBalanceSettings
 [Serializable]
 public class HitBalanceSettings
 {
+    public bool EnableV2;
     [Tooltip("이 히트의 데미지 (0이면 WeaponActionData의 기본 Damage 사용)")]
     public float Damage = 0;
 
@@ -160,9 +162,14 @@ public class HitExecutionSettings
     public float Duration = 0.05f;
 }
 
+public enum HitStopScope { Global = 0, Attacker = 1, Victim = 2, Both = 3 }
+public enum HitStopStacking { Replace = 0, Extend = 1, Maximum = 2 }
+
 [Serializable]
 public class HitStopSettings
 {
+    [Tooltip("기존에 이 채널을 사용하지 않던 특수 공격에서도 명시적으로 적용합니다.")]
+    public bool EnableV2;
     [Tooltip("켜면 이 항목의 히트스탑을 적용합니다. 끄면 개별 히트는 공격 설정, 공격은 PlayerController 기본값을 사용합니다.")]
     public bool OverrideHitStop;
 
@@ -171,6 +178,9 @@ public class HitStopSettings
 
     [Range(0f, 1f), Tooltip("히트스탑 중 시간 배율. 0이면 완전 정지, 1이면 정상 속도입니다.")]
     public float HitStopTimeScale = 0.05f;
+
+    public HitStopScope Scope = HitStopScope.Global;
+    public HitStopStacking Stacking = HitStopStacking.Replace;
 }
 
 [Serializable]
@@ -313,11 +323,24 @@ public class AttackSlashSettings
 
     [Min(0.01f), Tooltip("공격 속도 1 기준 이펙트 수명 (초)")]
     public float SlashVFXLifetime = 0.22f;
+
+    [Min(0.01f), Tooltip("원본 파티클 재생 배율. 공격 속도와 함께 적용합니다.")]
+    public float PlaybackSpeed = 1f;
+
+    [Tooltip("자동 타격 동기화 시 Hit Start Time에 더할 시간. 음수면 검기 시작을 앞당깁니다.")]
+    public float TimeOffset;
+
+    [Tooltip("켜면 검기가 공격 중 플레이어의 이동/회전을 따라갑니다.")]
+    public bool FollowPlayer;
+
+    [Tooltip("다단 공격의 홀수 타격에서 Z 회전을 반대로 적용합니다. 개별 타격 회전 설정 시 끕니다.")]
+    public bool AlternateDirection = true;
 }
 
 [Serializable]
 public class AttackCameraSettings
 {
+    public CombatCameraV2Settings V2 = new CombatCameraV2Settings();
     public AttackCameraProfile CameraProfile;
 
     [Min(0f), Tooltip("적중 시 화면 흔들림 배율. 0=끄기, 1=Impulse Source 기본 세기, 2=2배")]
@@ -333,11 +356,19 @@ public class AttackCameraSettings
 [Serializable]
 public class AttackFeedbackSettings
 {
+    [Tooltip("신규 피드백 실행 경로를 사용합니다. 기존 특수 공격의 연출은 기본값에서 유지됩니다.")]
+    public bool EnableV2;
     [Tooltip("이 공격의 기본 피격 이펙트. HitEvents가 없어도 적용됩니다.")]
     public HitVfxSettings HitEffect = new HitVfxSettings();
 
     [Tooltip("휘두르는 사운드")]
     public AudioClip SwingSound;
+
+    [Tooltip("각 타격 판정이 시작될 때 재생할 휘두름 사운드. 비워두면 기존 Swing Sound를 사용합니다.")]
+    public CombatSoundSettings SwingAudio = new CombatSoundSettings();
+
+    [Tooltip("실제 적중 시 재생할 사운드. 비워두면 폼의 공통 타격음을 사용합니다.")]
+    public CombatSoundSettings HitAudio = new CombatSoundSettings();
 
     [InspectorName("히트스탑")]
     public HitStopSettings HitStop = new HitStopSettings();
@@ -355,6 +386,19 @@ public class AttackFeedbackSettings
 [Serializable]
 public class HitFeedbackSettings
 {
+    public CombatCameraV2Settings CameraV2 = new CombatCameraV2Settings();
+    [Tooltip("켜면 이 타격의 검기 프리팹/시간/위치를 공격 기본값 대신 사용합니다.")]
+    public bool OverrideSlashVFX;
+
+    [InspectorName("검기 이펙트")]
+    public AttackSlashSettings Slash = new AttackSlashSettings();
+
+    [Tooltip("지정하면 이 타격의 휘두름 사운드를 공격 기본값 대신 사용합니다.")]
+    public CombatSoundSettings SwingAudio = new CombatSoundSettings();
+
+    [Tooltip("지정하면 이 타격의 적중 사운드를 공격 기본값 대신 사용합니다.")]
+    public CombatSoundSettings HitAudio = new CombatSoundSettings();
+
     [Tooltip("켜면 이 히트의 크기/회전을 아래 설정으로 덮어씁니다. 끄면 공격의 Hit Effect 설정을 사용합니다.")]
     public bool OverrideHitVFX;
 

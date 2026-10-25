@@ -102,7 +102,7 @@ public static class WaterCombatRegression
             Check(water.IsSkillBuffActive && Mathf.Approximately(stats.GetStat(StatType.ST_ATK), 120f)
                 && Mathf.Approximately(water.HeavyAttackDamageMultiplier, 1.3f), "Skill buffs not applied.");
             water.BeginAttack();
-            typeof(WaterForm).GetMethod("OnHitEnemy", Hidden).Invoke(water, new object[] { go });
+            typeof(WaterForm).GetMethod("OnHitEnemy", Hidden).Invoke(water, new object[] { go, null, null });
             water.EndAttack();
             Check(water.WaterGauge == 112f, "Normal hit gain.");
             passed.Add("skill use +100 / normal hit +12 / configured animation exists");
@@ -112,7 +112,7 @@ public static class WaterCombatRegression
             Check(attack.IsCharging && water.WaterGauge == 112f, "Direct charge starts without spending.");
             Set(input, "AttackHeldTime", 0.4f); attack.Update();
             Check(attack.IsHeavyAttack && water.WaterGauge == 12f, "Direct heavy spends once.");
-            typeof(WaterForm).GetMethod("OnHitEnemy", Hidden).Invoke(water, new object[] { go });
+            typeof(WaterForm).GetMethod("OnHitEnemy", Hidden).Invoke(water, new object[] { go, null, null });
             Check(water.WaterGauge == 12f, "Heavy hit must not regenerate its cost.");
             attack.Update(); attack.Update();
             Check(water.WaterGauge == 12f, "Held input spent repeatedly."); attack.Exit();
@@ -341,7 +341,7 @@ public static class WaterCombatRegression
             fireTick.Invoke(fire, new object[] { 0.25f });
             fireTick.Invoke(fire, new object[] { 0.75f });
             Check(!verifyFireDrain || (Mathf.Abs(hpBefore - stats.CurrentHp - stats.MaxHp * 0.02f) < 0.01f
-                && stats.Shield == 100f && drainDamageEvents == 0 && drainHpEvents == 2,
+                && stats.Shield == 100f && drainDamageEvents == 0 && drainHpEvents == 2),
                 $"Fire drain: before={hpBefore}, after={stats.CurrentHp}, max={stats.MaxHp}, shield={stats.Shield}, damageEvents={drainDamageEvents}, hpEvents={drainHpEvents}.");
             stats.OnDamageTaken -= damageListener; stats.OnHpChanged -= hpListener;
             fireData.FireUltimateHealthDrainPercentPerSecond = 0f;
@@ -354,12 +354,12 @@ public static class WaterCombatRegression
             Physics.SyncTransforms();
             var execute = typeof(BaseForm).GetMethod("ExecuteHit", Hidden);
             fire.BeginAttack(); hpBefore = stats.CurrentHp; damageBefore = receiver.TotalDamage;
-            execute.Invoke(fire, new object[] { hitStep, 1f, 0f, new HashSet<IDamageable>() });
+            execute.Invoke(fire, new object[] { hitStep, 1f, 0f, new HashSet<IDamageable>(), null });
             float normalHeal = stats.CurrentHp - hpBefore;
             Check(normalHeal > 0f && Mathf.Abs(normalHeal - (receiver.TotalDamage - damageBefore) * 0.1f) < 0.01f, $"Fire normal lifesteal: heal={normalHeal}, damage={receiver.TotalDamage - damageBefore}, hp={hpBefore}, rate={fireData.FireUltimateNormalLifeStealPercent}.");
             fire.EndAttack();
             fire.BeginSkill(); hpBefore = stats.CurrentHp; damageBefore = receiver.TotalDamage;
-            execute.Invoke(fire, new object[] { hitStep, 1f, 0f, new HashSet<IDamageable>() });
+            execute.Invoke(fire, new object[] { hitStep, 1f, 0f, new HashSet<IDamageable>(), null });
             Check(stats.CurrentHp - hpBefore > normalHeal
                 && Mathf.Abs(stats.CurrentHp - hpBefore - (receiver.TotalDamage - damageBefore) * 0.25f) < 0.01f, "Fire skill lifesteal.");
             fire.EndSkill();
@@ -369,7 +369,7 @@ public static class WaterCombatRegression
                 && Mathf.Approximately(stats.GetStat(StatType.ST_ATK_SPD), 1f)
                 && fire.IncomingDamageMultiplier == 1f && fire.OutgoingDamageMultiplier == 1f, "Manual ultimate deactivation.");
             fire.BeginAttack(); hpBefore = stats.CurrentHp;
-            execute.Invoke(fire, new object[] { hitStep, 1f, 0f, new HashSet<IDamageable>() });
+            execute.Invoke(fire, new object[] { hitStep, 1f, 0f, new HashSet<IDamageable>(), null });
             Check(stats.CurrentHp == hpBefore, "Lifesteal persisted after deactivation.");
             fire.EndAttack();
             fire.BeginUltimate(); forms.ChangeForm(water);
@@ -465,11 +465,11 @@ public static class WaterCombatRegression
             enemyObstacle.transform.position = go.transform.position + Vector3.right * 2f;
             Physics.SyncTransforms();
             var woodHit = typeof(WoodForm).GetMethod("OnHitEnemy", Hidden);
-            woodHit.Invoke(wood, new object[] { enemyObstacle });
-            woodHit.Invoke(wood, new object[] { enemyObstacle });
+            woodHit.Invoke(wood, new object[] { enemyObstacle, null, null });
+            woodHit.Invoke(wood, new object[] { enemyObstacle, null, null });
             var woodTarget = enemyObstacle.GetComponent<WoodTargetEffects>();
             Check(woodTarget.Stacks == 2 && enemyObstacle.GetComponent<StatusEffectHandler>()?.Get<VulnerabilityEffect>() == null, "Wood premature max stacks.");
-            woodHit.Invoke(wood, new object[] { enemyObstacle });
+            woodHit.Invoke(wood, new object[] { enemyObstacle, null, null });
             var woodStatus = enemyObstacle.GetComponent<StatusEffectHandler>();
             Check(woodTarget.Stacks == 3 && woodStatus.Get<VulnerabilityEffect>() != null, "Wood max stacks did not apply vulnerability.");
             damageBefore = receiver.TotalDamage;
