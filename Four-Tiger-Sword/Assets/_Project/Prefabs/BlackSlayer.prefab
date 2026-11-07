@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 7534111117260522318}
   - component: {fileID: 6180681534181457786}
   - component: {fileID: 5652246926823162577}
+  - component: {fileID: 8930774049446639888}
   m_Layer: 8
   m_Name: BlackSlayer
   m_TagString: Untagged
@@ -78,6 +79,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   EnemyStat: {fileID: 0}
   stateName: 
+  HurtDuration: 0.5
   _targetMemoryDuration: 4
   ApproachTimeout: 6
   ApproachStuckTimeout: 1.5
@@ -189,6 +191,27 @@ MonoBehaviour:
   RegisteredStacks:
   - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
   - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
+--- !u!114 &8930774049446639888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2897307517416127197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52537b332a0aa094e9b77be005bc49d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDeathFade
+  _delay: 3
+  _duration: 2
+  _targets:
+  - Renderer: {fileID: 4098399359618767517}
+    Materials:
+    - {fileID: 2100000, guid: 9fe3cceabea7cf1479518fe744094192, type: 2}
+  - Renderer: {fileID: 5856683251093563998}
+    Materials:
+    - {fileID: 2100000, guid: 9fe3cceabea7cf1479518fe744094192, type: 2}
 --- !u!1001 &2634388068083966008
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -314,7 +337,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 7b9f8a5ff3b01b447bca139d1a176b16, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: bd426093047d9dc47ba6b066daf55d3f, type: 2}
+      objectReference: {fileID: 2100000, guid: 5ae63bcb5405ded4ab49b1ed6fcf4d89, type: 2}
     - target: {fileID: 919132149155446097, guid: 7b9f8a5ff3b01b447bca139d1a176b16, type: 3}
       propertyPath: m_Name
       value: Black Slayer sickle
@@ -327,6 +350,11 @@ PrefabInstance:
 --- !u!4 &4687177110982660401 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7b9f8a5ff3b01b447bca139d1a176b16, type: 3}
+  m_PrefabInstance: {fileID: 5081902898461013722}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &5856683251093563998 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 7b9f8a5ff3b01b447bca139d1a176b16, type: 3}
   m_PrefabInstance: {fileID: 5081902898461013722}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7023762619838630536
@@ -454,7 +482,7 @@ PrefabInstance:
     - target: {fileID: 6760712823575414357, guid: 0f1b8e6a01e74ed49a9f902b81dda89d, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: bd426093047d9dc47ba6b066daf55d3f, type: 2}
+      objectReference: {fileID: 2100000, guid: 5ae63bcb5405ded4ab49b1ed6fcf4d89, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -463,6 +491,11 @@ PrefabInstance:
       addedObject: {fileID: 4687177110982660401}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0f1b8e6a01e74ed49a9f902b81dda89d, type: 3}
+--- !u!137 &4098399359618767517 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6760712823575414357, guid: 0f1b8e6a01e74ed49a9f902b81dda89d, type: 3}
+  m_PrefabInstance: {fileID: 7292050169886399688}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7113481257855138595 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0f1b8e6a01e74ed49a9f902b81dda89d, type: 3}

@@ -6,6 +6,7 @@ public class PlayerAirAttackState : IPlayerState
     private enum Phase { Start, Loop, Finish }
     private Phase _phase;
     private LayerMask _savedExcludeLayers;
+    private bool _collisionOverrideActive;
 
     public bool IsComplete { get; private set; }
     public bool IsFinishing => _phase == Phase.Finish;
@@ -23,6 +24,7 @@ public class PlayerAirAttackState : IPlayerState
         _playerController.VerticalVelocity = 0f;
         _savedExcludeLayers = _playerController.Controller.excludeLayers;
         _playerController.Controller.excludeLayers |= LayerMask.GetMask("Enemy");
+        _collisionOverrideActive = true;
         _playerController.FormManager.CurrentForm.BeginAirAttack();
     }
 
@@ -53,6 +55,9 @@ public class PlayerAirAttackState : IPlayerState
         else
         {
             _playerController.FormManager.CurrentForm.UpdateAirAttack(out bool isComplete);
+            if (isComplete || _playerController.FormManager.CurrentForm is BaseForm form
+                && form.IsCurrentActionExecutionComplete)
+                RestoreCollision();
             IsComplete = isComplete;
         }
     }
@@ -60,6 +65,13 @@ public class PlayerAirAttackState : IPlayerState
     public void Exit()
     {
         _playerController.FormManager.CurrentForm.EndAirAttack();
+        RestoreCollision();
+    }
+
+    private void RestoreCollision()
+    {
+        if (!_collisionOverrideActive) return;
         _playerController.Controller.excludeLayers = _savedExcludeLayers;
+        _collisionOverrideActive = false;
     }
 }

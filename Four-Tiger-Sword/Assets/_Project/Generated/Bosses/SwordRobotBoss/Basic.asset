@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed15fbba9d9648d498ebedde4059bdb4, type: 3}
+  m_Name: Basic
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterDefaultAttackSO
+  animName: Basic
+  engageRange: 20
+  executeRange: 3.7
+  weight: 1
+  minimumRange: 0
+  preferredRange: 3
+  cooldown: 0
+  repeatWeightMultiplier: 0.5
+  attackSpeed: 1
+  staggerLevel: 3
+  isParryable: 1
+  telegraphDuration: 0.467
+  SwingAudio:
+    Clip: {fileID: 8300000, guid: c84a40134ba634f4c8030fad451d0654, type: 3}
+    Accent: {fileID: 0}
+    Volume: 0.42
+    AccentVolume: 0.28
+    PitchRange: {x: 0.97, y: 1.03}
+  HitAudio:
+    Clip: {fileID: 8300000, guid: 47c8889c3da34b54e897c6e11e3b3fa8, type: 3}
+    Accent: {fileID: 0}
+    Volume: 0.68
+    AccentVolume: 0.28
+    PitchRange: {x: 0.97, y: 1.03}
+  LandingAudio:
+    Clip: {fileID: 0}
+    Accent: {fileID: 0}
+    Volume: 0.65
+    AccentVolume: 0.3
+    PitchRange: {x: 0.97, y: 1.03}
+  damage: 1.1
+  knockbackForce: 20
+  startupAnimName: 
+  animationStartDelay: 0
+  hitStartTime: 0.467
+  hitDuration: 0.2
+  attackDuration: 1.667
+  hitBoxShape: 0
+  hitBoxOffset: {x: 0, y: 1, z: 1.8}
+  hitBoxRadius: 2
+  hitBoxSize: {x: 1, y: 1, z: 1}
+  hitBoxHeight: 2

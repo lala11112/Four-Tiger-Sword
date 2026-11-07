@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>One confirmed death pays once; disabling, clearing or destroying an enemy never pays.</summary>
@@ -8,6 +9,8 @@ public sealed class EnemyGoldReward : MonoBehaviour
 {
     private Enemy _enemy;
     private PlayerWallet _wallet;
+    private PlayerItemRuntime _items;
+    private readonly List<ItemDefinition> _itemRewards = new List<ItemDefinition>();
     private int _amount;
     private bool _initialized, _subscribed, _paid;
 
@@ -18,9 +21,26 @@ public sealed class EnemyGoldReward : MonoBehaviour
         Unsubscribe();
         _wallet = wallet;
         _amount = amount;
+        _items = null;
+        _itemRewards.Clear();
         _enemy = GetComponent<Enemy>();
         _initialized = true;
         Subscribe();
+    }
+
+    /// <summary>Snapshots a boss reward without adding the legacy stage gold a second time.</summary>
+    public void Initialize(PlayerWallet wallet, PlayerItemRuntime items, BossRewardGroupSO group)
+    {
+        if (group == null) throw new ArgumentNullException(nameof(group));
+        if (!group.Validate(out string error)) throw new ArgumentException(error, nameof(group));
+        if (group.items.Count > 0 && (items == null || items.Catalog == null || !items.IsInitialized))
+            throw new ArgumentException("Boss item rewards require the initialized run item inventory.", nameof(items));
+        foreach (var definition in group.items)
+            if (items.Catalog.Find(definition.itemId) != definition)
+                throw new ArgumentException("Boss reward item is not in the run's item catalog: " + definition.itemId, nameof(group));
+        Initialize(wallet, group.gold);
+        _items = items;
+        _itemRewards.AddRange(group.items);
     }
 
     private void Subscribe()
@@ -41,7 +61,19 @@ public sealed class EnemyGoldReward : MonoBehaviour
         if (_paid || !_initialized || !isActiveAndEnabled) return;
         _paid = true;
         Unsubscribe();
-        if (_wallet != null) _wallet.AddGold(_amount);
+        var wallet = _wallet;
+        var items = _items;
+        int amount = _amount;
+        var rewards = _itemRewards.ToArray();
+        if (wallet != null) wallet.AddGold(amount);
+        if (items == null || !items.IsInitialized || items.Catalog == null) return;
+        // Ownership is checked again at death: acquiring an item after spawn skips it without compensation.
+        foreach (var definition in rewards)
+        {
+            if (definition == null || items.Catalog.Find(definition.itemId) != definition) continue;
+            try { items.TryAddItem(definition.itemId); }
+            catch (Exception error) { Debug.LogWarning("[Boss Reward] Item grant failed: " + error.Message, this); }
+        }
     }
 
     private void OnEnable() => Subscribe();

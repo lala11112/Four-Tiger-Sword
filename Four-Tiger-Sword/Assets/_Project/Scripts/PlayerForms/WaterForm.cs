@@ -218,7 +218,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
                     power: KnockbackMotion.Power(_heavyDashDirection, step.KnockbackForce),
                     poiseDamage: step.PoiseDamage, staggerResistLevel: step.StaggerResistLevel,
                     impactSound: ResolveHitSound(step), category: PlayerAttackCategory.Heavy,
-                    sourceDamageMultiplier: DamageSourceMultiplier, hasSourceDamageSnapshot: true);
+                    sourceDamageMultiplier: DamageSourceMultiplier, hasSourceDamageSnapshot: true, isDirectPlayerHit: true);
                 var result = DamageManager.Apply(hit, target, component.gameObject);
                 if (!result.Applied) continue;
                 if (!HasHeavyChainTarget)
@@ -259,11 +259,6 @@ public class WaterForm : BaseForm, IHeavyAttackForm
         ApplySkillBuff();
         PrepareSkillAttack();
     }
-    public override void BeginSwitchAttack()
-    {
-        base.BeginSwitchAttack();
-        PrepareSkillAttack();
-    }
     private void PrepareSkillAttack()
     {
         _savedExcludeLayers = _playerController.Controller.excludeLayers;
@@ -276,11 +271,15 @@ public class WaterForm : BaseForm, IHeavyAttackForm
     protected override void ExecuteHit(WeaponActionData step, float damage, float poiseDamage, HashSet<IDamageable> targets, HitEvent hitEvent = null)
         => base.ExecuteHit(step,
             damage * (_currentAction == ActionType.HeavyAttack ? HeavyAttackDamageMultiplier : 1f),
-            poiseDamage, _currentAction == ActionType.Skill || _currentAction == ActionType.SwitchAttack ? _dashHitTargets : targets, hitEvent);
+            poiseDamage, _currentAction == ActionType.Skill ? _dashHitTargets : targets, hitEvent);
 
     public override void UpdateSkill(out bool isComplete)
     {
+        bool executionWasComplete = IsCurrentActionExecutionComplete;
         base.UpdateSkill(out isComplete);
+        if (IsCurrentActionExecutionComplete) RestoreSkillCollision();
+        // The animation can outlast the original dash. Its tail must not query new swept targets.
+        if (executionWasComplete) return;
         var step = _weaponActionData.SkillSteps[_skillStep];
         if (_playerController.ActionDeltaTime <= 0f || _timer < FirstHitTime(step)) return;
         Vector3 end = _playerController.Controller.bounds.center;
@@ -291,7 +290,8 @@ public class WaterForm : BaseForm, IHeavyAttackForm
             if (!(target is Component component) || !_dashHitTargets.Add(target)) continue;
             HitEvent hitEvent = FirstHitEvent(step, out int hitIndex);
             var result = DamageManager.Apply(EffectHit(step.Damage, step: step,
-                power: CustomKnockbackPower(step, hitEvent, component.transform)), target, component.gameObject);
+                power: CustomKnockbackPower(step, hitEvent, component.transform)).WithDirectPlayerHit(),
+                target, component.gameObject);
             if (result.Applied)
             {
                 ConfirmHitFeedback(step, component, result, hitEvent, hitIndex, legacyFeedbackDisabled: true);
@@ -320,6 +320,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
     public override void BeginUltimate()
     {
         base.BeginUltimate();
+        _ultimateExecutionRestored = false;
         _playerController.SetAnimationSpeed(FixedActionSpeed);
         _ultimateActive = true;
         _ultimateElapsed = 0f; _ultimateHits = 0;
@@ -335,11 +336,23 @@ public class WaterForm : BaseForm, IHeavyAttackForm
         // _playerController.Animator.CrossFade("WaterDance", 0.1f);
     }
     public override bool BlocksIncomingDamage(float damage, Vector3 power, object source = null) => _ultimateActive;
+    protected override float CurrentActionElapsed => _currentAction == ActionType.Ultimate ? _ultimateElapsed : base.CurrentActionElapsed;
+    protected override bool IsFinalRecoveryStep => _currentAction == ActionType.Ultimate || base.IsFinalRecoveryStep;
+    protected override bool HasCompletedRequiredActionHits => _currentAction == ActionType.Ultimate
+        ? _ultimateHits >= 10
+        : _currentAction == ActionType.Skill ? _timer >= (CurrentRecoveryStep?.Duration ?? float.PositiveInfinity)
+        : base.HasCompletedRequiredActionHits;
+
     public override void UpdateUltimate(out bool isComplete) => AdvanceUltimate(_playerController.ActionDeltaTime, out isComplete);
     private void AdvanceUltimate(float dt, out bool isComplete)
     {
         _playerController.SetAnimationSpeed(FixedActionSpeed);
         _ultimateElapsed += Mathf.Max(0f, dt) * FixedActionSpeed;
+        if (IsCurrentActionExecutionComplete)
+        {
+            isComplete = CompleteActionExecution(true);
+            return;
+        }
         var cameraStep = _weaponActionData.UltimateSteps?.Count > 0 ? _weaponActionData.UltimateSteps[0] : null;
         if (HasCameraV2(cameraStep))
             UpdateAttackCamera(cameraStep, _ultimateElapsed / 2f);
@@ -355,7 +368,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
             {
                 if (target == null) continue;
                 var hit = EffectHit(1.2f, step: step, hitEvent: hitEvent,
-                    power: CustomKnockbackPower(step, hitEvent, target.transform));
+                    power: CustomKnockbackPower(step, hitEvent, target.transform)).WithDirectPlayerHit();
                 var result = DamageManager.Apply(hit, (IDamageable)target, target.gameObject);
                 if (!result.Applied) continue;
 
@@ -365,22 +378,31 @@ public class WaterForm : BaseForm, IHeavyAttackForm
             // A newly applied attacker stop postpones any remaining scheduled hits.
             if (_playerController.ActionDeltaTime <= 0f) break;
         }
-        isComplete = _ultimateHits >= 10;
+        if (_ultimateHits >= 10) RestoreUltimateExecution();
+        isComplete = CompleteActionExecution(_ultimateHits >= 10);
     }
-    public override void EndUltimate()
+    private bool _ultimateExecutionRestored;
+    private void RestoreUltimateExecution()
     {
+        if (_ultimateExecutionRestored) return;
+        _ultimateExecutionRestored = true;
         if (_ultimateTarget != null && _playerController.Controller.enabled)
         {
             Vector3 desired = _ultimateTarget.position - _ultimateTarget.forward * 1.5f;
             _playerController.Controller.Move(Vector3.ProjectOnPlane(desired - _playerController.transform.position, Vector3.up));
         }
         CleanupActionEffects();
+    }
+    public override void EndUltimate()
+    {
+        RestoreUltimateExecution();
         base.EndUltimate();
     }
     public override void CleanupTransientEffects()
     {
         CleanupActionEffects();
         RemoveSkillBuff();
+        base.CleanupTransientEffects();
     }
 
     public override void CleanupStageEffects()

@@ -133,9 +133,10 @@ namespace Baekho.Generated.a3355a1c8240244a995e4f671b0dc48bb
                 cursor = launchTime;
                 _fired++;
                 if (_fired == 1) EndTelegraph();
-                if (!IsActive || _exitHandled) return;
+                if (!IsActive || _exitHandled || !CanContinueAction) return;
                 SpawnProjectile();
-                if (!IsActive || _exitHandled) return;
+                if (!IsActive || _exitHandled || !CanContinueAction) return;
+                if (_fired >= _count) EndNormalAttackArmor();
             }
 
             if (!AdvanceProjectiles(Mathf.Max(0f, end - cursor) / rate)) return;
@@ -149,13 +150,14 @@ namespace Baekho.Generated.a3355a1c8240244a995e4f671b0dc48bb
         public override void OnParried()
         {
             base.OnParried();
-            Exit();
+            if (WasParried) Exit();
         }
 
         public override void Exit()
         {
             if (_exitHandled) return;
             _exitHandled = true;
+            EndNormalAttackArmor();
             ClearProjectiles();
             if (_rootMotionChanged)
             {
@@ -172,7 +174,7 @@ namespace Baekho.Generated.a3355a1c8240244a995e4f671b0dc48bb
 
         private bool OwnerInterrupted()
         {
-            return _enemy == null || !_enemy.isActiveAndEnabled
+            return !CanContinueAction || _enemy == null || !_enemy.isActiveAndEnabled
                 || _enemy.EnemyStat == null || _enemy.EnemyStat.IsDead
                 || _enemy.IsHurt || _enemy.IsGroggy || _enemy.IsRoot
                 || _enemy.IsKnockbacking || _enemy.IsSelfDestructing
@@ -381,6 +383,7 @@ namespace Baekho.Generated.a3355a1c8240244a995e4f671b0dc48bb
                 source: this,
                 impactSound: ResolveHitSound());
             BroadcastHit();
+            if (!IsActive || IsFinished || !CanContinueAction) return;
             DamageResult result = DamageManager.Apply(info, target, contact.gameObject);
             if (result.Outcome == DamageOutcome.Parried)
                 OnParried();

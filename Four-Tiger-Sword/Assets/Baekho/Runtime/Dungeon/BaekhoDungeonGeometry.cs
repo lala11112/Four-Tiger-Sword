@@ -185,15 +185,24 @@ namespace StudioBaekho
             var right = rotation * Vector3.right;
             int ground = LayerMask.NameToLayer(style.groundLayer);
             if (ground < 0) throw new ArgumentException("Unknown ground layer: " + style.groundLayer);
-            PlacePiece(style.floor, parent, middle - Vector3.up * (style.floorThickness * 0.5f),
+            var floor = PlacePiece(style.floor, parent, middle - Vector3.up * (style.floorThickness * 0.5f),
                 new Vector3(width, style.floorThickness, length), rotation, ground,
-                tiledAxes: BaekhoPieceTilingAxes.XZ).name = "Floor";
+                tiledAxes: BaekhoPieceTilingAxes.XZ);
+            floor.name = "Floor";
+            if (style.appearance) SetPieceMaterial(floor, style.appearance.floorMaterial);
             for (int side = -1; side <= 1; side += 2)
-                PlacePiece(style.wall, parent, middle + right * (side * (width + style.wallThickness) * 0.5f) + Vector3.up * (style.wallHeight * 0.5f),
-                    new Vector3(style.wallThickness, style.wallHeight, length), rotation, 0).name = side < 0 ? "LeftWall" : "RightWall";
-            PlacePiece(style.CeilingPiece, parent, middle + Vector3.up * (style.wallHeight + style.ceilingThickness * 0.5f),
+            {
+                var size = new Vector3(style.wallThickness, style.wallHeight, length);
+                var wall = PlacePiece(style.wall, parent, middle + right * (side * (width + style.wallThickness) * 0.5f) + Vector3.up * (style.wallHeight * 0.5f),
+                    size, rotation, 0);
+                wall.name = side < 0 ? "LeftWall" : "RightWall";
+                ApplyWallAppearance(wall, size, style);
+            }
+            var ceiling = PlacePiece(style.CeilingPiece, parent, middle + Vector3.up * (style.wallHeight + style.ceilingThickness * 0.5f),
                 new Vector3(width + style.wallThickness * 2f, style.ceilingThickness, length), rotation, 0,
-                tiledAxes: BaekhoPieceTilingAxes.XZ).name = "Ceiling";
+                tiledAxes: BaekhoPieceTilingAxes.XZ);
+            ceiling.name = "Ceiling";
+            if (style.appearance) SetPieceMaterial(ceiling, style.appearance.wallMaterial);
             BuildSegmentLights(style, parent, middle, rotation, width, length);
         }
 
@@ -299,7 +308,7 @@ namespace StudioBaekho
                 if (closure != null && closure.template != null)
                 {
                     PlaceWallSection(closure.template, closure.templateLocalBounds, closure.localCenter,
-                        closure.localRotation, closure.size, module, parent, "ClosedWall_" + socket.id);
+                        closure.localRotation, closure.size, module, parent, "ClosedWall_" + socket.id, style);
                     if (closure.additionalSections != null)
                         for (int i = 0; i < closure.additionalSections.Length; i++)
                         {
@@ -307,15 +316,17 @@ namespace StudioBaekho
                             if (section == null || section.template == null)
                                 throw new ArgumentException("Missing wall section on " + module.name + "/" + socket.id);
                             PlaceWallSection(section.template, section.templateLocalBounds, section.localCenter,
-                                section.localRotation, section.size, module, parent, "ClosedWallFoundation_" + socket.id + "_" + i);
+                                section.localRotation, section.size, module, parent, "ClosedWallFoundation_" + socket.id + "_" + i, style);
                         }
                     if (closure.replaceWhenClosed != null)
                         foreach (var filler in closure.replaceWhenClosed)
                             if (filler != null) filler.SetActive(false);
                     return;
                 }
-                PlacePiece(style.cap, parent, center, new Vector3(socket.width, height, thickness), rotation, 0,
-                    tiledAxes: BaekhoPieceTilingAxes.X).name = "Closed_" + socket.id;
+                var size = new Vector3(socket.width, height, thickness);
+                var cap = PlacePiece(style.cap, parent, center, size, rotation, 0, tiledAxes: BaekhoPieceTilingAxes.X);
+                cap.name = "Closed_" + socket.id;
+                ApplyWallAppearance(cap, size, style);
                 return;
             }
             bool corridorIsWider = openWidth > socket.width;
@@ -330,20 +341,42 @@ namespace StudioBaekho
                 center = position + Vector3.up * (height * 0.5f) + forward * (thickness * 0.5f);
             }
             for (int side = -1; side <= 1; side += 2)
-                PlacePiece(style.cap, parent, center + right * (side * (clearWidth + shoulder) * 0.5f),
-                    new Vector3(shoulder, height, thickness), rotation, 0, tiledAxes: BaekhoPieceTilingAxes.X).name =
-                    (corridorIsWider ? "CorridorShoulder_" : "DoorShoulder_") + socket.id;
+            {
+                var size = new Vector3(shoulder, height, thickness);
+                var cap = PlacePiece(style.cap, parent, center + right * (side * (clearWidth + shoulder) * 0.5f),
+                    size, rotation, 0, tiledAxes: BaekhoPieceTilingAxes.X);
+                cap.name = (corridorIsWider ? "CorridorShoulder_" : "DoorShoulder_") + socket.id;
+                ApplyWallAppearance(cap, size, style);
+            }
         }
 
         private static void PlaceWallSection(GameObject template, Bounds localBounds, Vector3 localCenter,
-            Quaternion localRotation, Vector3 size, BaekhoMapModule module, Transform parent, string name)
+            Quaternion localRotation, Vector3 size, BaekhoMapModule module, Transform parent, string name, BaekhoCorridorStyle style)
         {
             if (!Positive(size) || !Positive(localBounds.size))
                 throw new ArgumentException("Invalid closed wall metadata on " + module.name);
             var piece = new BaekhoPrefabPiece { prefab = template, localBounds = localBounds };
             Vector3 center = parent.InverseTransformPoint(module.transform.TransformPoint(localCenter));
             Quaternion rotation = Quaternion.Inverse(parent.rotation) * module.transform.rotation * localRotation;
-            PlacePiece(piece, parent, center, size, rotation, template.layer).name = name;
+            var wall = PlacePiece(piece, parent, center, size, rotation, template.layer);
+            wall.name = name;
+            ApplyWallAppearance(wall, size, style);
+        }
+
+        private static void ApplyWallAppearance(GameObject wall, Vector3 size, BaekhoCorridorStyle style)
+        {
+            if (style.appearance) BaekhoWallAppearance.Apply(wall.transform, new Bounds(Vector3.zero, size), style.appearance);
+        }
+
+        private static void SetPieceMaterial(GameObject piece, Material material)
+        {
+            if (!material) return;
+            foreach (var renderer in piece.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                var materials = renderer.sharedMaterials;
+                for (int i = 0; i < materials.Length; i++) materials[i] = material;
+                renderer.sharedMaterials = materials;
+            }
         }
 
         public static void SetLayerRecursively(GameObject root, int layer)

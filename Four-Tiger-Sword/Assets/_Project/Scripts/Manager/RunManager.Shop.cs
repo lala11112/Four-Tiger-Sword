@@ -22,8 +22,9 @@ public sealed partial class RunManager
     public bool TryOpenShop(UnityEngine.Object owner)
     {
         if (IsShopOpen) return owner != null && owner == _shopOwner && ShopContextIsCurrent();
-        if (!isActiveAndEnabled || !OwnerIsAvailable(owner) || State != RunState.Playing || _transition != null
+        if (!isActiveAndEnabled || !OwnerIsAvailable(owner) || State != RunState.Playing || _transition != null || IsMapOpen
             || player == null || !player.isActiveAndEnabled || player.IsStageTransitioning
+            || player.IsMapPaused
             || player.StatManager == null || player.StatManager.CurrentHp <= 0f
             || stageManager == null || !stageManager.IsReady || stageManager.Result == null
             || stageManager.Result.root == null) return false;
@@ -74,6 +75,7 @@ public sealed partial class RunManager
 
     private void Update()
     {
+        UpdateMapSession();
         if (!IsShopOpen) return;
         if (!ShopContextIsCurrent() || !OwnerIsAvailable(_shopOwner)
             || _shopWorldPause == null || !_shopWorldPause.IsValid) CloseShop();
@@ -138,8 +140,10 @@ public sealed partial class RunManager
     private void SuspendPlayerAndCloseShop()
     {
         bool wasOpen = IsShopOpen;
+        bool mapWasOpen = IsMapOpen;
         // Return camera ownership before the transition captures its restoration state.
         // World time remains zero until the player is blocked; no gameplay frame can escape.
+        if (mapWasOpen) ClearMapSession(_mapPlayer != null && !_mapPlayer.IsStageTransitioning, false);
         if (wasOpen) ClearShopSession(_shopPlayer != null && !_shopPlayer.IsStageTransitioning);
         try
         {
@@ -147,7 +151,9 @@ public sealed partial class RunManager
         }
         finally
         {
+            ReleaseMapWorldPause();
             ReleaseShopWorldPause();
+            if (mapWasOpen) NotifyMapOpenChanged(false);
             if (wasOpen) NotifyShopOpenChanged(false);
         }
     }
@@ -155,7 +161,7 @@ public sealed partial class RunManager
     private void RefreshRunCursor()
     {
         if (player != null && player.IsFinisherSelecting) return;
-        bool playing = isActiveAndEnabled && State == RunState.Playing && !IsShopOpen;
+        bool playing = isActiveAndEnabled && State == RunState.Playing && !IsShopOpen && !IsMapOpen;
         Cursor.visible = !playing;
         Cursor.lockState = playing ? CursorLockMode.Locked : CursorLockMode.None;
     }
@@ -179,6 +185,17 @@ public sealed partial class RunManager
         if (wasOpen) NotifyShopOpenChanged(false);
     }
 
-    private void OnEnable() => RefreshRunCursor();
-    private void OnDisable() => CleanupShopOnShutdown();
+    private void OnEnable()
+    {
+        RefreshRunCursor();
+        if (Application.isPlaying && _hasPending && State == RunState.Preparing && _transition == null)
+            BeginPending();
+    }
+    private void OnDisable()
+    {
+        CancelStagePresentation();
+        ReleaseUpgradeSavePause();
+        CleanupMapOnShutdown();
+        CleanupShopOnShutdown();
+    }
 }

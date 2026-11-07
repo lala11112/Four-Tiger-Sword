@@ -47,9 +47,9 @@ public abstract partial class BaseForm : IForm
     {
         get
         {
-            if (!HasSteps(_weaponActionData?.SkillSteps)) return false;
-            foreach (var step in _weaponActionData.SkillSteps)
-                if (!(step.Duration > 0f) || float.IsInfinity(step.Duration)) return false;
+            if (!HasSteps(_weaponActionData?.SwitchAttackSteps)) return false;
+            foreach (var step in _weaponActionData.SwitchAttackSteps)
+                if (!IsUsableNormalStep(step)) return false;
             return true;
         }
     }
@@ -82,6 +82,7 @@ public abstract partial class BaseForm : IForm
     {
         if (_skillCooldownTimer > 0f) _skillCooldownTimer -= Time.deltaTime;
         if (_ultimateCooldownTimer > 0f) _ultimateCooldownTimer -= Time.deltaTime;
+        UpdateChainBuff(Time.deltaTime);
         OnTick(Time.deltaTime);
     }
 

@@ -75,6 +75,15 @@ public sealed class CombatActorClock : MonoBehaviour
         Apply();
     }
 
+    /// <summary>Transfers the current action speed and local hit stop to a replacement visual rig.</summary>
+    public void BindAnimator(Animator animator)
+    {
+        if (_animator == animator) { Apply(); return; }
+        if (_animator != null) _animator.speed = _animationSpeed;
+        _animator = animator;
+        Apply();
+    }
+
     public void SetMovementModifier(object owner, float scale)
     {
         if (owner == null || !KnockbackMotion.IsFinite(scale)) return;

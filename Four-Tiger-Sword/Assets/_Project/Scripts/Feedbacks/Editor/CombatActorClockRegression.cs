@@ -78,12 +78,12 @@ public static class CombatActorClockRegression
             enemy.CombatLabPassive = false;
             Check(!enemy.CombatLabPassive, "Passive toggles before Start do not require an initialized state machine.");
             var body = a.gameObject.AddComponent<CapsuleCollider>();
-            var machine = new StateMachine();
+            var brain = new FixtureBrain(enemy);
+            brain.Initialize();
+            var machine = brain.StateMachine;
             var activeAction = new FixtureState(() => body.enabled = false);
-            var passiveState = new FixturePassiveState();
             machine.ChangeState(activeAction);
-            typeof(Enemy).GetField("_stateMachine", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(enemy, machine);
-            typeof(Enemy).GetField("_passiveState", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(enemy, passiveState);
+            typeof(Enemy).GetProperty(nameof(Enemy.Brain)).SetValue(enemy, brain);
             enemy.CombatLabPassive = true;
             Check(body.enabled, "Passive transition preserves a live body collider when an interrupted state restores a stale disabled snapshot.");
             var reaction = new FixtureReactionState();
@@ -176,6 +176,16 @@ public static class CombatActorClockRegression
         public void Update() { }
         public void Exit() => _onExit?.Invoke();
     }
-    private sealed class FixturePassiveState : FixtureState { public FixturePassiveState() : base(null) { } }
+    private sealed class FixtureBrain : EnemyBrainBase
+    {
+        public FixtureBrain(Enemy enemy) : base(enemy) { }
+        public StateMachine StateMachine => Machine;
+        protected override void BuildBehavior()
+        {
+            IdleState = new FixtureIdleState();
+            ReturnState = IdleState;
+        }
+    }
+    private sealed class FixtureIdleState : FixtureState { public FixtureIdleState() : base(null) { } }
     private sealed class FixtureReactionState : FixtureState { public FixtureReactionState() : base(null) { } }
 }

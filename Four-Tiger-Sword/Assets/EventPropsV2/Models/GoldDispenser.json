@@ -1,0 +1,422 @@
+{
+  "id": "GoldDispenser",
+  "heightMeters": 1.85,
+  "modelFile": "GoldDispenser.fbx",
+  "front": "Blender -Y; Unity infer exported Basis markers",
+  "parts": [
+    {
+      "name": "Use_Button",
+      "pivotBlender": [
+        0.3439773619174957,
+        -0.481568306684494,
+        0.9870654344558716
+      ],
+      "role": "moving",
+      "triangles": 1892
+    },
+    {
+      "name": "Body",
+      "pivotBlender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "role": "static",
+      "triangles": 60888
+    },
+    {
+      "name": "Coin_Payout_Gate",
+      "pivotBlender": [
+        -0.07976286113262177,
+        -0.4486660957336426,
+        0.7677175402641296
+      ],
+      "role": "moving",
+      "triangles": 432
+    }
+  ],
+  "clips": [
+    {
+      "name": "Use",
+      "duration": 4,
+      "loop": false,
+      "rewardTime": 2,
+      "tracks": [
+        {
+          "part": "Use_Button",
+          "kind": "move",
+          "axis": "Y",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.0
+            },
+            {
+              "time": 0.27,
+              "value": 0.014955536768466662
+            },
+            {
+              "time": 0.5,
+              "value": 0.0
+            },
+            {
+              "time": 4.0,
+              "value": 0.0
+            }
+          ]
+        },
+        {
+          "part": "Coin_Payout_Gate",
+          "kind": "rotate",
+          "axis": "X",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.0
+            },
+            {
+              "time": 0.77,
+              "value": 0.0
+            },
+            {
+              "time": 1.4,
+              "value": -62.0
+            },
+            {
+              "time": 2.5,
+              "value": -62.0
+            },
+            {
+              "time": 3.2,
+              "value": 0.0
+            },
+            {
+              "time": 4.0,
+              "value": 0.0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "EP_amber",
+      "baseColor": [
+        0.7799999713897705,
+        0.4399999976158142,
+        0.11999999731779099,
+        1.0
+      ],
+      "metallic": 0.6200000047683716,
+      "roughness": 0.2800000011920929,
+      "emission": [
+        0.7799999713897705,
+        0.4399999976158142,
+        0.11999999731779099
+      ],
+      "emissionStrength": 0.05999999865889549,
+      "transparent": false,
+      "texture": "Textures/EP_amber_BaseColor.png",
+      "normalTexture": "Textures/EP_amber_Normal.png",
+      "roughnessTexture": "Textures/EP_amber_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_amber_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_silver",
+      "baseColor": [
+        0.49000000953674316,
+        0.5899999737739563,
+        0.6600000262260437,
+        1.0
+      ],
+      "metallic": 0.8199999928474426,
+      "roughness": 0.25999999046325684,
+      "emission": [
+        0.49000000953674316,
+        0.5899999737739563,
+        0.6600000262260437
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_silver_BaseColor.png",
+      "normalTexture": "Textures/EP_silver_Normal.png",
+      "roughnessTexture": "Textures/EP_silver_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_silver_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_steel",
+      "baseColor": [
+        0.08500000089406967,
+        0.13500000536441803,
+        0.20499999821186066,
+        1.0
+      ],
+      "metallic": 0.5799999833106995,
+      "roughness": 0.38999998569488525,
+      "emission": [
+        0.08500000089406967,
+        0.13500000536441803,
+        0.20499999821186066
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_steel_BaseColor.png",
+      "normalTexture": "Textures/EP_steel_Normal.png",
+      "roughnessTexture": "Textures/EP_steel_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_steel_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_rubber",
+      "baseColor": [
+        0.012000000104308128,
+        0.01899999938905239,
+        0.02800000086426735,
+        1.0
+      ],
+      "metallic": 0.05000000074505806,
+      "roughness": 0.699999988079071,
+      "emission": [
+        0.012000000104308128,
+        0.01899999938905239,
+        0.02800000086426735
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_panel",
+      "baseColor": [
+        0.15000000596046448,
+        0.23000000417232513,
+        0.3199999928474426,
+        1.0
+      ],
+      "metallic": 0.5199999809265137,
+      "roughness": 0.36000001430511475,
+      "emission": [
+        0.15000000596046448,
+        0.23000000417232513,
+        0.3199999928474426
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_panel_BaseColor.png",
+      "normalTexture": "Textures/EP_panel_Normal.png",
+      "roughnessTexture": "Textures/EP_panel_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_panel_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_dark",
+      "baseColor": [
+        0.02199999988079071,
+        0.03799999877810478,
+        0.06199999898672104,
+        1.0
+      ],
+      "metallic": 0.3499999940395355,
+      "roughness": 0.47999998927116394,
+      "emission": [
+        0.02199999988079071,
+        0.03799999877810478,
+        0.06199999898672104
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_dark_BaseColor.png",
+      "normalTexture": "Textures/EP_dark_Normal.png",
+      "roughnessTexture": "Textures/EP_dark_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_dark_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_Icon_ink",
+      "baseColor": [
+        0.012000000104308128,
+        0.02800000086426735,
+        0.04600000008940697,
+        1.0
+      ],
+      "metallic": 0.3499999940395355,
+      "roughness": 0.41999998688697815,
+      "emission": [
+        0.012000000104308128,
+        0.02800000086426735,
+        0.04600000008940697
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_gold",
+      "baseColor": [
+        0.5699999928474426,
+        0.28999999165534973,
+        0.04500000178813934,
+        1.0
+      ],
+      "metallic": 0.8299999833106995,
+      "roughness": 0.25999999046325684,
+      "emission": [
+        0.5699999928474426,
+        0.28999999165534973,
+        0.04500000178813934
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_golddark",
+      "baseColor": [
+        0.23000000417232513,
+        0.10499999672174454,
+        0.017999999225139618,
+        1.0
+      ],
+      "metallic": 0.7200000286102295,
+      "roughness": 0.36000001430511475,
+      "emission": [
+        0.23000000417232513,
+        0.10499999672174454,
+        0.017999999225139618
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_goldlight",
+      "baseColor": [
+        0.9300000071525574,
+        0.6600000262260437,
+        0.2199999988079071,
+        1.0
+      ],
+      "metallic": 0.6800000071525574,
+      "roughness": 0.23999999463558197,
+      "emission": [
+        0.9300000071525574,
+        0.6600000262260437,
+        0.2199999988079071
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_ivory",
+      "baseColor": [
+        0.800000011920929,
+        0.8799999952316284,
+        0.8700000047683716,
+        1.0
+      ],
+      "metallic": 0.47999998927116394,
+      "roughness": 0.23000000417232513,
+      "emission": [
+        0.800000011920929,
+        0.8799999952316284,
+        0.8700000047683716
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_cyan",
+      "baseColor": [
+        0.014999999664723873,
+        0.6399999856948853,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.10000000149011612,
+      "roughness": 0.23999999463558197,
+      "emission": [
+        0.014999999664723873,
+        0.6399999856948853,
+        1.0
+      ],
+      "emissionStrength": 2.200000047683716,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_glass",
+      "baseColor": [
+        0.10000000149011612,
+        0.23000000417232513,
+        0.2800000011920929,
+        0.054999999701976776
+      ],
+      "metallic": 0.0,
+      "roughness": 0.20000000298023224,
+      "emission": [
+        0.2199999988079071,
+        0.4300000071525574,
+        0.550000011920929
+      ],
+      "emissionStrength": 0.0,
+      "transparent": true,
+      "texture": ""
+    },
+    {
+      "name": "EP_gold",
+      "baseColor": [
+        0.6600000262260437,
+        0.3700000047683716,
+        0.09000000357627869,
+        1.0
+      ],
+      "metallic": 0.8299999833106995,
+      "roughness": 0.25999999046325684,
+      "emission": [
+        0.6600000262260437,
+        0.3700000047683716,
+        0.09000000357627869
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_gold_BaseColor.png",
+      "normalTexture": "Textures/EP_gold_Normal.png",
+      "roughnessTexture": "Textures/EP_gold_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_gold_MetallicSmoothness.png"
+    }
+  ],
+  "boundsBlender": [
+    [
+      -0.5747911334037781,
+      -0.7866612076759338,
+      0.0
+    ],
+    [
+      0.6510644555091858,
+      0.3938291668891907,
+      1.8499999046325684
+    ]
+  ],
+  "triangles": 63212,
+  "metadata": {
+    "height_m": 1.85,
+    "interaction_height_m": 0.99,
+    "animation": "Use: button presses, payout flap opens and closes. Stored and collected coins are solid meshes.",
+    "colliders": [
+      {
+        "type": "box",
+        "center": [
+          0,
+          0,
+          0.92
+        ],
+        "size": [
+          1.07,
+          0.68,
+          1.84
+        ]
+      }
+    ]
+  },
+  "normalizationScale": 0.9970357845644442
+}

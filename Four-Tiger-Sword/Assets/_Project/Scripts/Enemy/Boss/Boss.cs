@@ -2,161 +2,291 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// 모든 보스의 추상 기반 클래스.
-///
-/// [SOLID 설계 원칙]
-/// - SRP : 페이즈 전환은 Boss, 보호막은 BossShield, 패시브는 IBossPhase가 각각 담당.
-/// - OCP : 새 보스는 Boss를 상속하고 CreatePhases()만 구현하면 되며, 이 클래스는 수정 불필요.
-/// - LSP : Boss는 Enemy의 모든 컨텍스트에서 투명하게 대체 가능.
-/// - ISP : IBossPhase는 페이즈에 필요한 메서드만 포함.
-/// - DIP : Boss는 IBossPhase 추상화에만 의존하며 구체 페이즈 타입을 알지 못함.
-///
-/// [사용법]
-/// 1. Boss를 상속한 구체 보스 클래스를 생성합니다.
-/// 2. CreatePhases()를 오버라이드하여 페이즈 목록을 반환합니다.
-///    (HP 임계값 내림차순 정렬 권장 — 아니어도 내부에서 자동 정렬)
-/// 3. BossShield 컴포넌트가 자동 부착됩니다.
-/// </summary>
+/// <summary>Enemy-compatible combat actor with independent boss phases and patterns.</summary>
 [RequireComponent(typeof(BossShield))]
 public abstract class Boss : Enemy
 {
     [Header("보스 공통 데이터")]
     [SerializeField] protected BossData BossData;
-
-    [Tooltip("HP 임계값 내림차순으로 나열합니다. (높은 HP% 페이즈 먼저)")]
+    [Tooltip("전투 순서대로 설정합니다. 각 체력을 소진하면 다음 페이즈로 부활합니다.")]
     [SerializeField] protected List<BossPhaseData> PhaseDatas;
+    [Min(.01f), Tooltip("공유 페이즈 데이터를 변경하지 않고 이 보스의 각 페이즈 최대 체력에 적용할 배율입니다.")]
+    public float PhaseHealthMultiplier = 1f;
 
-    // ── 런타임 상태 ──────────────────────────────────────────────────────────
+    [Header("피격 표현")]
+    [Tooltip("일반 피격에도 현재 동작을 유지하고 별도 피격 오버레이를 재생합니다. 넉백 저항은 별도로 설정합니다.")]
+    public bool UseOverlayForOrdinaryHits;
+    [Tooltip("일반 피격의 넉백과 그로 인한 행동 취소를 막습니다. 강인도 붕괴에 의한 그로기는 유지합니다.")]
+    public bool ResistDamageKnockback;
+
+    [Header("패턴 간격")]
+    [Min(0f), Tooltip("패턴을 정상 완료한 뒤 회복 시간에 더하는 초 단위 대기. 패링·실패와 콤보 내부 간격에는 적용하지 않습니다.")]
+    public float AdditionalPatternRecovery;
+
+    [Header("회피 및 접근")]
+    public BossMobilitySettings Mobility = new BossMobilitySettings();
+
+    [Header("전술 전투 대상")]
+    [Tooltip("전투 시작부터 유지할 대상. 비어 있으면 Player 태그를 한 번 찾아 연결합니다. 시야/탐색 상태와 무관합니다.")]
+    [SerializeField] private Transform _combatTarget;
+    private bool _explicitCombatTarget;
+    private float _nextTargetResolve;
+    private PlayerStatManager _targetStats;
+    private Transform _cachedStatsTarget;
+
+    public BossCombatProfileSO ActiveCombatProfile => (CurrentPhase as BossPhaseBase)?.Configuration?.combatProfile;
+    public Transform CombatTarget
+    {
+        get
+        {
+            if (_combatTarget == null || !_combatTarget.gameObject.activeInHierarchy) return null;
+            if (_cachedStatsTarget != _combatTarget)
+            {
+                _cachedStatsTarget = _combatTarget;
+                _targetStats = _combatTarget.GetComponentInParent<PlayerStatManager>();
+            }
+            return _targetStats != null && _targetStats.CurrentHp <= 0f ? null : _combatTarget;
+        }
+    }
+
+    public override Transform DetectedTarget => ActiveCombatProfile != null ? CombatTarget : base.DetectedTarget;
+    private bool HasBossAttackArmor => ActiveCombatProfile != null
+        && !PendingGroggy && !IsGroggy && CurrentAction?.HasBossArmor == true;
+    protected override bool ResistsOrdinaryHitReaction => HasBossAttackArmor
+        || UseOverlayForOrdinaryHits && !PendingGroggy && !IsGroggy;
+    protected override bool ResistsKnockback => ResistDamageKnockback && !PendingGroggy && !IsGroggy
+        || HasBossAttackArmor && CurrentAction?.AllowsKnockbackDuringBossArmor != true;
+
+    /// <summary>Encounter-owned target. Null explicitly suspends combat until a target is assigned.</summary>
+    public void SetCombatTarget(Transform target)
+    {
+        _explicitCombatTarget = true;
+        _combatTarget = target;
+        _cachedStatsTarget = null;
+        _targetStats = null;
+    }
+
+    internal override void SenseTarget()
+    {
+        if (ActiveCombatProfile == null) { base.SenseTarget(); return; }
+        // Binding a combat participant is not a vision/patrol/search behavior.
+        if (_explicitCombatTarget || _combatTarget != null || Time.time < _nextTargetResolve) return;
+        _nextTargetResolve = Time.time + 1f;
+        _combatTarget = GameObject.FindGameObjectWithTag("Player")?.transform;
+    }
 
     private List<IBossPhase> _phases;
     private int _currentPhaseIndex = -1;
+    private bool _transitionStarted;
+    private bool _reviveStarted;
+    private float _transitionElapsed;
+    private float _downSeconds, _holdSeconds, _reviveSeconds;
+    private float _reviveAt, _transitionDuration;
+    private MonsterSkillDataSO _activeSkillSet;
+    private bool _phaseExited;
+    private bool _ended;
+    private BossPhaseData _musicConfiguration;
 
-    /// <summary>현재 활성 페이즈. 아직 어떤 페이즈도 진입하지 않았으면 null.</summary>
-    protected IBossPhase CurrentPhase
-        => (_phases != null && _currentPhaseIndex >= 0) ? _phases[_currentPhaseIndex] : null;
+    public BossData Data => BossData != null ? BossData : GetComponent<EnemyStat>()?.Data as BossData;
+    public IReadOnlyList<BossPhaseData> PhaseConfiguration => PhaseDatas != null
+        ? (IReadOnlyList<BossPhaseData>)PhaseDatas : Array.Empty<BossPhaseData>();
 
+    public int PhaseIndex => _currentPhaseIndex;
+    public IBossPhase CurrentPhase => _phases != null && _currentPhaseIndex >= 0
+        ? _phases[_currentPhaseIndex] : null;
+    public bool IsTransitioning { get; private set; }
+    public bool IsInvulnerable => isActiveAndEnabled && !IsDead && (IsTransitioning
+        || CurrentAction is BossPhaseBurstAction burst && burst.IsInvulnerable
+        || !CombatLabPassive && ActiveCombatProfile != null && CombatTarget != null
+            && (Brain as BossBrain)?.Tactical?.IsInvulnerableEntryPending == true);
+    public int PhaseGeneration { get; private set; }
+    public float ReviveProgress => IsTransitioning
+        ? Mathf.Clamp01((_transitionElapsed - _reviveAt) / _reviveSeconds) : 0f;
+    internal bool IsReviving => _transitionElapsed >= _reviveAt;
+    internal float DownProgress => _downSeconds > 0f ? Mathf.Clamp01(_transitionElapsed / _downSeconds) : 1f;
+    public float HpPercent => EnemyStat != null && EnemyStat.MaxHp > 0f
+        ? EnemyStat.CurrentHp / EnemyStat.MaxHp : 0f;
+    public override MonsterSkillDataSO ActiveSkillSet => _activeSkillSet != null
+        ? _activeSkillSet : base.ActiveSkillSet;
     protected BossShield Shield { get; private set; }
-
-    /// <summary>현재 HP 비율 (0.0 ~ 1.0).</summary>
-    public float HpPercent => EnemyStat.MaxHp > 0 ? (float)EnemyStat.CurrentHp / EnemyStat.MaxHp : 0f;
-
-    // ── 이벤트 ───────────────────────────────────────────────────────────────
-
-    /// <summary>페이즈가 전환될 때 발생합니다. (새 페이즈 인덱스, 새 IBossPhase)</summary>
     public event Action<int, IBossPhase> OnPhaseChanged;
+    public event Action<int> OnPhaseDepleted;
+    /// <summary>Raised once before the next rig is sampled in its get-up pose.</summary>
+    public event Action<int> OnPhaseReviveStarted;
 
-    // ── Unity 생명주기 ────────────────────────────────────────────────────────
+    protected virtual void Awake() => Shield = GetComponent<BossShield>();
 
-    protected virtual void Awake()
+    protected virtual void OnDestroy() => EndPhases();
+
+    protected override void OnEnable()
     {
-        Shield = GetComponent<BossShield>();
+        base.OnEnable();
+        if (!IsDead && _musicConfiguration != null) SetPhaseMusic(_musicConfiguration);
     }
 
-    protected override void Start()
+    protected override void OnDisable()
     {
-        base.Start();
-
-        _phases = CreatePhases();
-
-        // 임계값 내림차순 정렬 (높은 HP% 페이즈가 먼저 오도록)
-        _phases.Sort((a, b) => b.HpThreshold.CompareTo(a.HpThreshold));
-
-        // 게임 시작 시 초기 페이즈 결정 (통상 HP 100%이므로 인덱스 0)
-        CheckPhaseTransition();
+        base.OnDisable();
+        BossMusicService.Release(this);
     }
 
-    protected override void Update()
+    protected override IEnemyBrain CreateBrain()
     {
-        base.Update();
-        if (ActionDeltaTime > 0f && EnemyStat != null && !EnemyStat.IsDead)
-            CurrentPhase?.OnUpdate(this);
+        _ended = false;
+        if (Shield == null) Shield = GetComponent<BossShield>();
+        if (Data != null) Shield?.SetAbsorption(Data.initialShield);
+        _activeSkillSet = base.ActiveSkillSet;
+        _phases = CreatePhases() ?? new List<IBossPhase>();
+        _phases.RemoveAll(phase => phase == null);
+        if (float.IsNaN(PhaseHealthMultiplier) || float.IsInfinity(PhaseHealthMultiplier) || PhaseHealthMultiplier <= 0f)
+            throw new InvalidOperationException($"{name}: Boss phase health multiplier must be finite and positive.");
+        foreach (var phase in _phases)
+        {
+            float maxHp = phase.MaxHp * PhaseHealthMultiplier;
+            if (float.IsNaN(maxHp) || float.IsInfinity(maxHp) || maxHp <= 0f)
+                throw new InvalidOperationException($"{name}: Boss phase HP must be finite and positive.");
+        }
+        _currentPhaseIndex = -1;
+        IsTransitioning = false;
+        _transitionStarted = false;
+        PhaseGeneration = 0;
+        _phaseExited = false;
+        if (_phases.Count > 0) EnterPhase(0);
+        return new BossBrain(this);
     }
 
-    // ── 페이즈 팩토리 (구체 보스가 반드시 구현) ──────────────────────────────
-
-    /// <summary>
-    /// 이 보스의 페이즈 목록을 생성하여 반환합니다.
-    /// HP 임계값 내림차순(높은 값 먼저)으로 반환하는 것을 권장합니다.
-    /// </summary>
     protected abstract List<IBossPhase> CreatePhases();
 
-    // ── 데미지 처리 ───────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// 데미지 처리 순서:
-    /// 1. 현재 페이즈의 패시브 보정 (감소율 등)
-    /// 2. BossShield 흡수
-    /// 3. 실제 HP 차감 (base.TakeDamage)
-    /// 4. 페이즈 전환 체크
-    /// </summary>
-    ///
-    /// 
-    /*
-    public override void TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE,
-                                    bool isCritical = false, Vector3 power = default, float poiseDamage = 20f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE)
+    public override DamageResult TakeDamage(float damage,
+        ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false,
+        Vector3 power = default, float poiseDamage = 100f,
+        StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE,
+        bool isParryable = true, object source = null)
     {
+        // Validate before touching shield state or invoking a phase's damage hook.
+        if (IsInvulnerable || !CanReceiveDamage(damage)) return default;
         float modified = CurrentPhase?.ModifyIncomingDamage(damage, this) ?? damage;
-        modified = Shield.Absorb(modified);
-
-        if (modified > 0)
-            base.TakeDamage((int)modified, damageType, isCritical, power);
-
-        CheckPhaseTransition();
-    }
-    */
-
-    // ── 연계 공격 요청 ────────────────────────────────────────────────────────
-
-    /// <summary>
-    /// 쿨타임을 무시하고 즉시 다음 스킬을 실행합니다.
-    /// EnemyAction 내부에서 콤보 연계에 사용합니다.
-    ///
-    /// [동작 원리]
-    /// EnemyAttackState는 CurrentAction.IsFinished를 감지해 FSM을 전환합니다.
-    /// 이 메서드는 현재 액션을 새 액션으로 교체하고 Enter()를 즉시 호출합니다.
-    /// 새 액션의 IsFinished가 false이므로 AttackState는 계속 실행되며,
-    /// 다음 프레임부터 새 액션의 Update()가 호출됩니다. (Telegraph 없이 즉시 연계)
-    /// </summary>
-    public void RequestImmediateSkill(MonsterSkillData skill)
-    {
-        if (skill == null) return;
-
-        CurrentAction?.Exit();
-
-        var newAction = skill.CreateAction(this);
-        newAction.Enter();
-        CurrentAction = newAction;
-    }
-
-    // ── 페이즈 전환 내부 로직 ────────────────────────────────────────────────
-
-    private void CheckPhaseTransition()
-    {
-        if (_phases == null || _phases.Count == 0) return;
-
-        // 현재 HP%에서 진입 가능한 최고 인덱스 페이즈를 찾습니다.
-        int target = _currentPhaseIndex;
-        for (int i = 0; i < _phases.Count; i++)
+        if (float.IsNaN(modified) || float.IsInfinity(modified) || modified < 0f) return default;
+        if (Shield == null) Shield = GetComponent<BossShield>();
+        float remaining = Shield != null ? Shield.Absorb(modified) : modified;
+        float absorbed = modified - remaining;
+        DamageResult result = base.TakeDamage(remaining, damageType, isCritical, power,
+            poiseDamage, staggerResistLevel, isParryable, source);
+        (Brain as BossBrain)?.Tactical?.Mobility.RecordHit(result.HealthDamage, Time.frameCount);
+        if (IsDead)
         {
-            if (HpPercent <= _phases[i].HpThreshold)
-                target = i;
+            (Brain as BossBrain)?.CancelPattern();
+            EndPhases();
         }
-
-        // 여러 페이즈를 한 번에 건너뛰는 경우도 OnExit/OnEnter를 순서대로 호출합니다.
-        while (_currentPhaseIndex < target)
-            TransitionToPhase(_currentPhaseIndex + 1);
+        return new DamageResult(result.Outcome, result.HealthDamage,
+            result.ShieldDamage + absorbed, result.Killed);
     }
 
-    private void TransitionToPhase(int newIndex)
+    /// <summary>Queues an action replacement at the brain's next safe update boundary.</summary>
+    public void RequestImmediateSkill(MonsterSkillData skill)
+        => (Brain as BossBrain)?.RequestSkill(skill);
+
+    protected override bool TryHandleHealthDepleted()
     {
-        CurrentPhase?.OnExit(this);
-        _currentPhaseIndex = newIndex;
-        CurrentPhase.OnEnter(this);
-
-        OnPhaseChanged?.Invoke(newIndex, CurrentPhase);
-
-        Debug.Log($"<color=cyan>[Boss:{name}] 페이즈 {newIndex + 1} 진입 " +
-                  $"(HP {HpPercent * 100f:0.0}%)</color>");
+        if (IsTransitioning) return true;
+        if (IsDead || _ended || _phases == null || _currentPhaseIndex < 0
+            || _currentPhaseIndex + 1 >= _phases.Count) return false;
+        IsTransitioning = true;
+        PhaseGeneration++;
+        _transitionStarted = false;
+        _reviveStarted = false;
+        _transitionElapsed = 0f;
+        _downSeconds = Duration(Data != null ? Data.phaseDownSeconds : 1f, 1f);
+        _holdSeconds = Duration(Data != null ? Data.phaseHoldSeconds : .5f, .5f);
+        _reviveSeconds = Mathf.Max(.01f, Duration(Data != null ? Data.phaseReviveSeconds : 1.5f, 1.5f));
+        _reviveAt = _downSeconds + _holdSeconds;
+        _transitionDuration = _reviveAt + _reviveSeconds;
+        OnPhaseDepleted?.Invoke(_currentPhaseIndex);
+        return true;
     }
+
+    // Called only after the previous action/reaction state has exited its callback stack.
+    internal void BeginPhaseTransition()
+    {
+        if (!IsTransitioning || _transitionStarted || IsDead) return;
+        _transitionStarted = true;
+        CancelCurrentAction();
+        GetComponent<StatusEffectHandler>()?.ClearAll();
+        GetComponent<FormTargetEffects>()?.ResetForNewPhase();
+        GetComponent<WoodTargetEffects>()?.ResetForNewPhase();
+        ResetForBossPhase();
+        ExitCurrentPhase();
+    }
+
+    internal void TickPhaseTransition(float deltaTime)
+    {
+        if (!IsTransitioning || IsDead || !isActiveAndEnabled
+            || float.IsNaN(deltaTime) || float.IsInfinity(deltaTime) || deltaTime < 0f) return;
+        BeginPhaseTransition();
+        if (!IsTransitioning || IsDead || !isActiveAndEnabled || CombatLabPassive || deltaTime == 0f) return;
+        _transitionElapsed = Mathf.Min(_transitionElapsed + deltaTime, _transitionDuration);
+        if (!_reviveStarted && _transitionElapsed >= _reviveAt)
+        {
+            _reviveStarted = true;
+            OnPhaseReviveStarted?.Invoke(_currentPhaseIndex + 1);
+            if (!IsTransitioning || IsDead || !isActiveAndEnabled) return;
+        }
+        if (_transitionElapsed < _transitionDuration) return;
+        ResetForBossPhase();
+        // End the invulnerability latch before invoking the next phase's enter hooks.
+        IsTransitioning = false;
+        _transitionStarted = false;
+        EnterPhase(_currentPhaseIndex + 1);
+        if (!IsDead && !IsTransitioning) StartAttackCooldown();
+    }
+
+    private static float Duration(float value, float fallback)
+        => !float.IsNaN(value) && !float.IsInfinity(value) && value >= 0f ? value : fallback;
+
+    internal void TickPhase() => CurrentPhase?.OnUpdate(this);
+
+    internal void EndPhases()
+    {
+        if (_ended) return;
+        _ended = true;
+        IsTransitioning = false;
+        ExitCurrentPhase();
+        EnemyStat?.SetPhaseMultipliers(1f, 1f);
+        Shield?.SetAbsorption(0f);
+        BossMusicService.Release(this);
+    }
+
+    private void EnterPhase(int index)
+    {
+        _currentPhaseIndex = index;
+        _phaseExited = false;
+        EnemyStat?.SetPhaseMaxHp(CurrentPhase.MaxHp * PhaseHealthMultiplier);
+        if (EnemyStat != null) EnemyStat.CurrentHp = EnemyStat.MaxHp;
+        if (CurrentPhase.SkillSet != null) _activeSkillSet = CurrentPhase.SkillSet;
+        var configuration = (CurrentPhase as BossPhaseBase)?.Configuration;
+        EnemyStat?.SetPhaseMultipliers(configuration != null ? configuration.atkMultiplier : 1f,
+            configuration != null ? configuration.defMultiplier : 1f);
+        if (configuration != null)
+        {
+            if (configuration.overrideShield) Shield?.SetAbsorption(configuration.shieldAmount);
+            if (configuration.musicMode != BossMusicMode.Keep)
+            {
+                _musicConfiguration = configuration;
+                SetPhaseMusic(configuration);
+            }
+        }
+        CurrentPhase.OnEnter(this);
+        OnPhaseChanged?.Invoke(index, CurrentPhase);
+    }
+
+    private void ExitCurrentPhase()
+    {
+        if (_phaseExited || CurrentPhase == null) return;
+        _phaseExited = true;
+        CurrentPhase.OnExit(this);
+    }
+
+    private void SetPhaseMusic(BossPhaseData configuration)
+        => BossMusicService.Set(this, configuration.musicMode, configuration.musicClip,
+            configuration.musicVolume, configuration.musicFadeSeconds);
 }

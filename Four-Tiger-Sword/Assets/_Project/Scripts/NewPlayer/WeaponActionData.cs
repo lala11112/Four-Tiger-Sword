@@ -37,7 +37,6 @@ public class HitEvent
     public float Duration { get => Execution.Duration; set => Execution.Duration = value; }
     public float Damage { get => Balance.Damage; set => Balance.Damage = value; }
     public float PoiseDamage { get => Balance.PoiseDamage; set => Balance.PoiseDamage = value; }
-    public StaggerResistLevel StaggerResistLevel { get => Balance.StaggerResistLevel; set => Balance.StaggerResistLevel = value; }
     public bool OverrideKnockbackForce { get => Balance.OverrideKnockbackForce; set => Balance.OverrideKnockbackForce = value; }
     public float KnockbackForce { get => Balance.KnockbackForce; set => Balance.KnockbackForce = value; }
     public bool OverrideHitStop { get => Feedback.HitStop.OverrideHitStop; set => Feedback.HitStop.OverrideHitStop = value; }
@@ -66,6 +65,8 @@ public class WeaponActionData
     public string AnimationName { get => Execution.AnimationName; set => Execution.AnimationName = value; }
     public float Duration { get => Execution.Duration; set => Execution.Duration = value; }
     public float ComboTransitionTime { get => Execution.ComboTransitionTime; set => Execution.ComboTransitionTime = value; }
+    public float RecoveryCancelTime { get => Execution.RecoveryCancelTime; set => Execution.RecoveryCancelTime = value; }
+    public float ActionCancelTime { get => Execution.ActionCancelTime; set => Execution.ActionCancelTime = value; }
     public float Damage { get => Balance.Damage; set => Balance.Damage = value; }
     public float PoiseDamage { get => Balance.PoiseDamage; set => Balance.PoiseDamage = value; }
     public float HitStartTime { get => Execution.HitStartTime; set => Execution.HitStartTime = value; }
@@ -141,9 +142,6 @@ public class HitBalanceSettings
 
     [Tooltip("이 히트의 강인도 데미지 (0이면 WeaponActionData의 기본 PoiseDamage 사용)")]
     public float PoiseDamage = 10f;
-
-    [Tooltip("이 히트의 경직 저항 값")]
-    public StaggerResistLevel StaggerResistLevel = StaggerResistLevel.NONE;
 
     [Tooltip("켜면 이 히트에 아래 Knockback Force를 적용합니다. 끄면 공격의 기본 Knockback Force를 사용합니다.")]
     public bool OverrideKnockbackForce;
@@ -270,11 +268,17 @@ public class AttackExecutionSettings
     [Tooltip("애니메이터에 재생할 트리거 또는 State 이름")]
     public string AnimationName;
 
-    [Tooltip("이 공격 애니메이션의 총 지속 시간")]
+    [InspectorName("공격 실행 시간 (Duration)"), Tooltip("이 단계의 판정·자동 이동을 실행하는 총 시간(공격속도 1 기준 초). 입력이 없으면 이 시간과 현재 동작 애니메이션의 끝 중 더 늦은 시점까지 재생합니다. 후딜 전환 시점과는 별개입니다.")]
     public float Duration = 0.5f;
 
-    [Tooltip("다음 콤보 입력을 받아들이기 시작하는 시간 (이 시간 이후에 공격을 누르면 콤보 발동)")]
+    [InspectorName("다음 타수 전환 시간 (Combo Transition Time)"), Tooltip("현재 일반 공격 타수 시작 기준 다음 타수를 시작할 수 있는 시간(초). 유효한 버퍼 입력도 이 시점에 실행되며, 마지막 타격 종료 전에는 연결하지 않습니다. 마지막 타수에는 적용하지 않습니다.")]
     public float ComboTransitionTime = 0.3f;
+
+    [InspectorName("이동 전환 시간 (Recovery Cancel Time)"), Tooltip("현재 단계 시작 기준 이동 입력으로 후딜을 취소할 수 있는 시간(초). 일반 공격·스킬·궁극기에 적용하며, 스킬·궁극기는 마지막 단계에서만 허용합니다. 마지막 타격 종료 전에는 취소하지 않습니다. -1은 조기 전환 비활성입니다.")]
+    public float RecoveryCancelTime = -1f;
+
+    [InspectorName("다른 공격 전환 시간 (Action Cancel Time)"), Tooltip("현재 단계 시작 기준 일반 공격·스킬·궁극기 입력으로 후딜을 취소할 수 있는 시간(초). 일반 공격의 후속 타수는 Combo Transition Time을 사용하고, 마지막 타수에서 새 일반 콤보를 시작할 때는 이 값을 사용합니다. 스킬·궁극기는 마지막 단계에서만 허용하며, 마지막 타격 종료 전에는 취소하지 않습니다. -1은 조기 전환 비활성입니다.")]
+    public float ActionCancelTime = -1f;
 
     [Tooltip("이 타수의 선딜레이")]
     public float HitStartTime = 0.1f;
@@ -340,7 +344,8 @@ public class AttackSlashSettings
 [Serializable]
 public class AttackCameraSettings
 {
-    public CombatCameraV2Settings V2 = new CombatCameraV2Settings();
+    [SerializeReference, InspectorName("개별 카메라 설정")]
+    public CombatCameraV2Settings V2;
     public AttackCameraProfile CameraProfile;
 
     [Min(0f), Tooltip("적중 시 화면 흔들림 배율. 0=끄기, 1=Impulse Source 기본 세기, 2=2배")]
@@ -356,15 +361,17 @@ public class AttackCameraSettings
 [Serializable]
 public class AttackFeedbackSettings
 {
-    [Tooltip("신규 피드백 실행 경로를 사용합니다. 기존 특수 공격의 연출은 기본값에서 유지됩니다.")]
-    public bool EnableV2;
     [Tooltip("이 공격의 기본 피격 이펙트. HitEvents가 없어도 적용됩니다.")]
     public HitVfxSettings HitEffect = new HitVfxSettings();
 
-    [Tooltip("휘두르는 사운드")]
-    public AudioClip SwingSound;
+    // Compatibility alias: SwingAudio.Clip is the only serialized swing clip.
+    public AudioClip SwingSound
+    {
+        get => SwingAudio?.Clip;
+        set { SwingAudio ??= new CombatSoundSettings(); SwingAudio.Clip = value; }
+    }
 
-    [Tooltip("각 타격 판정이 시작될 때 재생할 휘두름 사운드. 비워두면 기존 Swing Sound를 사용합니다.")]
+    [Tooltip("각 타격 판정이 시작될 때 재생할 휘두름 사운드.")]
     public CombatSoundSettings SwingAudio = new CombatSoundSettings();
 
     [Tooltip("실제 적중 시 재생할 사운드. 비워두면 폼의 공통 타격음을 사용합니다.")]
@@ -386,7 +393,8 @@ public class AttackFeedbackSettings
 [Serializable]
 public class HitFeedbackSettings
 {
-    public CombatCameraV2Settings CameraV2 = new CombatCameraV2Settings();
+    [SerializeReference, InspectorName("개별 타격 카메라 설정")]
+    public CombatCameraHitSettings CameraV2;
     [Tooltip("켜면 이 타격의 검기 프리팹/시간/위치를 공격 기본값 대신 사용합니다.")]
     public bool OverrideSlashVFX;
 

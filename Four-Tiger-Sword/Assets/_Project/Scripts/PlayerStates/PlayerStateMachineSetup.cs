@@ -16,7 +16,6 @@ public class PlayerStateMachineSetup
         var airAttack = new PlayerAirAttackState(_playerController);
         var skill = new PlayerSkillState(_playerController);
         var ultimate = new PlayerUltimateState(_playerController);
-        var parry = new PlayerParryState(_playerController);
         var counter = new PlayerCounterState(_playerController);
         var switchAttack = new PlayerSwitchAttackState(_playerController);
         _playerController.SwitchAttackState = switchAttack;
@@ -24,26 +23,26 @@ public class PlayerStateMachineSetup
         var hit = new PlayerHitState(_playerController);
         var stagger = new PlayerStaggerState(_playerController);
         var knockback = new PlayerKnockbackState(_playerController);
+        var knockdown = new PlayerKnockdownState(_playerController);
 
-        // Numeric form parries must win over movement and simultaneous action inputs.
-        // Any-state death/hit reactions are still evaluated first by StateMachine.
-        ParryTransitions(stateMachine, idle, move, attack, parry, counter, switchAttack);
+        // The F reservation wins over locomotion and normal actions; death/hit reactions still win.
+        ChainSkillTransitions(stateMachine, idle, move, attack, dash, switchAttack);
         GroundTransitions(stateMachine, idle, move, jump, fall, dash, attack);
         AirTransitions(stateMachine, idle, move, jump, fall);
         DashTransitions(stateMachine, idle, move, dash);
         AttackTransitions(stateMachine, idle, move, jump, attack, dash, skill, ultimate);
         AirAttackTransitions(stateMachine, idle, move, jump, fall, airAttack);
-        SkillTransitions(stateMachine, idle, move, skill, jump);
-        UltimateTransitions(stateMachine, idle, move, ultimate);
-        CounterTransitions(stateMachine, idle, move, counter, switchAttack);
+        SkillTransitions(stateMachine, idle, move, skill, jump, attack, ultimate);
+        UltimateTransitions(stateMachine, idle, move, ultimate, attack, skill);
+        CounterTransitions(stateMachine, idle, move, counter);
         stateMachine.AddTransition(switchAttack, idle, () => switchAttack.IsComplete
             && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(switchAttack, move, () => switchAttack.IsComplete
             && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
         AnyTransitions(stateMachine, die);
-        HitReactionTransitions(stateMachine, hit, idle, move, fall);
-        HitReactionTransitions(stateMachine, stagger, idle, move, fall);
-        HitReactionTransitions(stateMachine, knockback, idle, move, fall);
+        foreach (var reaction in new PlayerHitState[] { hit, stagger, knockback, knockdown })
+            HitReactionTransitions(stateMachine, reaction, idle, move, fall,
+                jump, dash, attack, airAttack, skill, ultimate, switchAttack);
         stateMachine.AddTransition(attack, counter, () =>
             _playerController.FormManager.CurrentForm is EarthForm earth && earth.GuardCounterReady);
         stateMachine.ChangeState(idle);
@@ -95,12 +94,14 @@ public class PlayerStateMachineSetup
         stateMachine.AddTransition(attack, jump, () => _playerController.Input.JumpBuffer.IsActive && _playerController.CanJump());
         stateMachine.AddTransition(attack, dash, () => _playerController.Input.DashBuffer.IsActive && _playerController.CanDash);
 
-        // 일반 공격은 콤보 가능 시점/종료를 기다리지 않고 스킬로 캔슬합니다.
-        // 완료 프레임에도 즉시 발동하도록 Idle/Move 복귀보다 먼저 검사합니다.
-        stateMachine.AddTransition(attack, skill, () => !attack.IsHeavyAttack
-            && _playerController.Input.SkillBuffer.IsActive && _playerController.CanSkill);
-        stateMachine.AddTransition(attack, ultimate, () => !attack.IsHeavyAttack
+        // Other combat actions use their own gate and take priority over movement or Idle.
+        stateMachine.AddTransition(attack, skill, () => attack.CanCancelToAction
+            && attack.HasSkillRequest && _playerController.CanSkill);
+        stateMachine.AddTransition(attack, ultimate, () => attack.CanCancelToAction
             && _playerController.Input.UltimateBuffer.IsActive && _playerController.CanUltimate);
+
+        stateMachine.AddTransition(attack, move, () => attack.CanCancelToMove
+            && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
 
         stateMachine.AddTransition(attack, idle, () => attack.IsAttackComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(attack, move, () => attack.IsAttackComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
@@ -115,55 +116,81 @@ public class PlayerStateMachineSetup
         stateMachine.AddTransition(airAttack, move, () => airAttack.IsComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
 
-    private void SkillTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerRunState move, PlayerSkillState skill, PlayerJumpState jump)
+    private void SkillTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerRunState move,
+        PlayerSkillState skill, PlayerJumpState jump, PlayerAttackState attack, PlayerUltimateState ultimate)
     {
         stateMachine.AddTransition(idle, skill, () => _playerController.Input.SkillBuffer.IsActive && _playerController.CanSkill);
         stateMachine.AddTransition(move, skill, () => _playerController.Input.SkillBuffer.IsActive && _playerController.CanSkill);
 
         stateMachine.AddTransition(skill, jump, () => _playerController.Input.JumpBuffer.IsActive && _playerController.CanJump());
 
+        stateMachine.AddTransition(skill, ultimate, () => skill.CanCancelToAction
+            && _playerController.Input.UltimateBuffer.IsActive && _playerController.CanUltimate);
+        stateMachine.AddTransition(skill, attack, () => skill.CanCancelToAction
+            && _playerController.Input.AttackBuffer.IsActive);
+        stateMachine.AddTransition(skill, move, () => skill.CanCancelToMove
+            && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
+
         stateMachine.AddTransition(skill, idle, () => skill.IsComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
-        stateMachine.AddTransition(skill, move, () => skill.IsComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
 
-    private void UltimateTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerRunState move, PlayerUltimateState ultimate)
+    private void UltimateTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerRunState move,
+        PlayerUltimateState ultimate, PlayerAttackState attack, PlayerSkillState skill)
     {
         stateMachine.AddTransition(idle, ultimate, () => _playerController.Input.UltimateBuffer.IsActive && _playerController.CanUltimate);
         stateMachine.AddTransition(move, ultimate, () => _playerController.Input.UltimateBuffer.IsActive && _playerController.CanUltimate);
 
+        stateMachine.AddTransition(ultimate, skill, () => ultimate.CanCancelToAction
+            && _playerController.Input.SkillBuffer.IsActive && _playerController.CanSkill);
+        stateMachine.AddTransition(ultimate, attack, () => ultimate.CanCancelToAction
+            && _playerController.Input.AttackBuffer.IsActive);
+        stateMachine.AddTransition(ultimate, move, () => ultimate.CanCancelToMove
+            && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
+
         stateMachine.AddTransition(ultimate, idle, () => ultimate.IsComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
-        stateMachine.AddTransition(ultimate, move, () => ultimate.IsComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
 
-    private void ParryTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerRunState move, PlayerAttackState attack, PlayerParryState parry, PlayerCounterState counter, PlayerSwitchAttackState switchAttack)
+    private void ChainSkillTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerRunState move,
+        PlayerAttackState attack, PlayerDashState dash, PlayerSwitchAttackState switchAttack)
     {
-        // 다른 폼 숫자 입력 + 공유 쿨타임 종료 + 지상 + 적 예고 활성.
-        stateMachine.AddTransition(idle, parry, () => _playerController.HasFormParryRequest);
-        stateMachine.AddTransition(move, parry, () => _playerController.HasFormParryRequest);
-        stateMachine.AddTransition(attack, parry, () => _playerController.HasFormParryRequest);
-
-        // 반격 윈도우 중 공격 입력 → 반격 상태 전환 (idle/move 복귀보다 우선 평가)
-        stateMachine.AddTransition(parry, counter, () => parry.CanCounter && !_playerController.IsKnockbacking);
-        stateMachine.AddTransition(parry, switchAttack, () => parry.IsComplete && _playerController.HasPendingSwitchAttack);
-
-        // 반격 미사용 시 모션 종료 후 복귀
-        stateMachine.AddTransition(parry, idle, () => parry.IsComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
-        stateMachine.AddTransition(parry, move, () => parry.IsComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
+        bool Requested() => _playerController.Input.ChainSkillBuffer.IsActive
+            && _playerController.FormManager.CanUseReadyChainSkill;
+        stateMachine.AddTransition(idle, switchAttack, Requested);
+        stateMachine.AddTransition(move, switchAttack, Requested);
+        stateMachine.AddTransition(attack, switchAttack, () => attack.CanChainSwitch && Requested());
+        stateMachine.AddTransition(dash, switchAttack, () => dash.IsDashComplete && Requested());
     }
 
-    private void CounterTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerRunState move, PlayerCounterState counter, PlayerSwitchAttackState switchAttack)
+    private void CounterTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerRunState move, PlayerCounterState counter)
     {
-        stateMachine.AddTransition(counter, switchAttack, () => counter.IsComplete && _playerController.HasPendingSwitchAttack);
         // 반격 모션 종료 후 복귀
         stateMachine.AddTransition(counter, idle, () => counter.IsComplete && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(counter, move, () => counter.IsComplete && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
 
     private void HitReactionTransitions(StateMachine stateMachine, PlayerHitState reaction,
-        PlayerIdleState idle, PlayerRunState move, PlayerFallState fall)
+        PlayerIdleState idle, PlayerRunState move, PlayerFallState fall,
+        PlayerJumpState jump, PlayerDashState dash, PlayerAttackState attack,
+        PlayerAirAttackState airAttack, PlayerSkillState skill, PlayerUltimateState ultimate,
+        PlayerSwitchAttackState switchAttack)
     {
         // 사망 전이 이후 등록되어 치명타는 피격 모션보다 사망을 우선합니다.
         stateMachine.AddAnyTransition(reaction, () => _playerController.PendingHitReaction == reaction.Reaction);
+        // Buffered actions exit directly, without an extra Idle/Run frame consuming recovery inputs.
+        bool ReadyOnGround() => reaction.IsComplete && _playerController.IsGround();
+        stateMachine.AddTransition(reaction, switchAttack, () => ReadyOnGround()
+            && _playerController.Input.ChainSkillBuffer.IsActive && _playerController.FormManager.CanUseReadyChainSkill);
+        stateMachine.AddTransition(reaction, jump, () => reaction.IsComplete
+            && _playerController.Input.JumpBuffer.IsActive && _playerController.CanJump());
+        stateMachine.AddTransition(reaction, dash, () => ReadyOnGround()
+            && _playerController.Input.DashBuffer.IsActive && _playerController.CanDash);
+        stateMachine.AddTransition(reaction, airAttack, () => reaction.IsComplete && !_playerController.IsGround()
+            && _playerController.Input.AttackBuffer.IsActive);
+        stateMachine.AddTransition(reaction, attack, () => ReadyOnGround() && _playerController.Input.AttackBuffer.IsActive);
+        stateMachine.AddTransition(reaction, skill, () => ReadyOnGround()
+            && _playerController.Input.SkillBuffer.IsActive && _playerController.CanSkill);
+        stateMachine.AddTransition(reaction, ultimate, () => ReadyOnGround()
+            && _playerController.Input.UltimateBuffer.IsActive && _playerController.CanUltimate);
         stateMachine.AddTransition(reaction, fall, () => reaction.IsComplete && !_playerController.IsGround());
         stateMachine.AddTransition(reaction, move, () => reaction.IsComplete
             && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);

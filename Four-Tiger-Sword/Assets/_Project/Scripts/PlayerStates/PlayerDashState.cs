@@ -7,6 +7,7 @@ public class PlayerDashState : IPlayerState
     private float _dashTimer;
     private Vector3 _dashDirection;
     private bool _started;
+    private bool _successfulDodge;
 
     public bool IsDashComplete{ get; private set; }
 
@@ -15,12 +16,15 @@ public class PlayerDashState : IPlayerState
     public void Enter()
     {
         IsDashComplete = false;
+        _successfulDodge = false;
         _dashTimer = 0;
         _playerController.Input.DashBuffer.Consume();
         _started = _playerController.TryBeginDash();
         if (!_started) { IsDashComplete = true; return; }
 
-        if(_playerController.Input.MoveInput.sqrMagnitude > 0.01f)
+        // Use the same entry-time input for both movement and animation, including backward input.
+        bool hasMoveInput = _playerController.Input.MoveInput.sqrMagnitude > 0.01f;
+        if(hasMoveInput)
         {
             _dashDirection = _playerController.Movement.GetMoveDirection();
             _dashDirection.y = 0;
@@ -31,6 +35,27 @@ public class PlayerDashState : IPlayerState
         {
             _dashDirection = _playerController.transform.forward * -1f;
         }
+
+        _playerController.SetAnimationSpeed(1f);
+        if (_playerController.Animator != null)
+        {
+            _playerController.Animator.applyRootMotion = false;
+            string animationName = hasMoveInput
+                ? _playerController.DashAnimationName
+                : _playerController.BackstepAnimationName;
+            if (!TryPlayAnimation(animationName)) TryPlayAnimation("Idle");
+        }
+    }
+
+    private bool TryPlayAnimation(string stateName)
+    {
+        if (string.IsNullOrWhiteSpace(stateName)) return false;
+        var animator = _playerController.Animator;
+        if (animator.runtimeAnimatorController == null) return false;
+        int hash = Animator.StringToHash(stateName);
+        if (!animator.HasState(0, hash)) return false;
+        animator.CrossFade(hash, 0.05f, 0, 0f);
+        return true;
     }
 
     public void Update()
@@ -55,5 +80,13 @@ public class PlayerDashState : IPlayerState
     public void Exit()
     {
         if (_started) _playerController.StartDashCooldown();
+    }
+
+    /// <summary>Only the first real attack avoided during this dash readies the water chain.</summary>
+    public bool TryConfirmSuccessfulDodge()
+    {
+        if (!_started || IsDashComplete || _successfulDodge) return false;
+        _successfulDodge = true;
+        return true;
     }
 }

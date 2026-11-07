@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: UnityBaked__Character_Hair__3__Hair_Root_Lining_Matched.002
-  m_Shader: {fileID: 4800000, guid: 0dde7f0097aeb2541aea684ca0ad0e3c, type: 3}
+  m_Shader: {fileID: 4800000, guid: a4c8f68acf7c9844e97a36914026acb1, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
@@ -16,18 +16,19 @@ Material:
   - _ALPHA_CUTOFF_ON
   - _CAST_SHADOWS_ON
   - _COLORRAMPLIGHTINGSTAGE_BEFORELIGHTING
+  - _CUSTOM_AMBIENT_LIGHT_ON
   - _FADEUVSET_UV1
   - _GREYSCALESTAGE_BEFORELIGHTING
   - _HEIGHTGRADIENTPOSITIONSPACE_LOCAL
-  - _LIGHTMODEL_CLASSIC
+  - _LIGHTMODEL_TOON
   - _MATCAPBLENDMODE_MULTIPLY
-  - _OUTLINETYPE_NONE
+  - _OUTLINETYPE_CONSTANT
   - _RECEIVEDSHADOWSTYPE_CLASSIC
   - _RECEIVE_SHADOWS_ON
   - _REFLECTIONS_NONE
-  - _RIMLIGHTINGSTAGE_BEFORELIGHTING
+  - _RIMLIGHTINGSTAGE_AFTERLIGHTING
   - _SHADINGMODEL_BASIC
-  - _SPECULARMODEL_NONE
+  - _SPECULARMODEL_TOON
   - _TEXTUREBLENDINGMODE_RGB
   - _TEXTUREBLENDINGSOURCE_VERTEXCOLOR
   - _TRIPLANARNORMALSPACE_WORLD
@@ -201,7 +202,7 @@ Material:
     - _ContrastBrightnessOn: 0
     - _ContrastLM: 1
     - _CullingMode: 2
-    - _CustomAmbientLightOn: 0
+    - _CustomAmbientLightOn: 1
     - _CustomShadowColorOn: 0
     - _Cutoff: 0.5
     - _DepthColoringOn: 0
@@ -279,7 +280,7 @@ Material:
     - _IntersectionFadeFactor: 1
     - _IntersectionFadeOn: 0
     - _IntersectionGlowOn: 0
-    - _LightModel: 1
+    - _LightModel: 2
     - _LightmapColorCorrection: 0
     - _Matcap: 0
     - _MatcapBlend: 1
@@ -290,22 +291,22 @@ Material:
     - _MaxFadeDistance: 250
     - _MaxGradientHeight: 0.75
     - _MaxInflate: 0.2
-    - _MaxRim: 1
+    - _MaxRim: 0.98
     - _Metallic: 0
     - _MetallicMapOn: 0
     - _MinDistanceToFade: 0
     - _MinGradientHeight: 0
     - _MinInflate: 0
-    - _MinRim: 0
+    - _MinRim: 0.78
     - _Mode: 0
     - _NearFade: 0
     - _NormalInfluence: 0.5
     - _NormalMapEnabled: 0
     - _NormalStrength: 1
     - _OcclusionStrength: 1
-    - _OutlineMode: 8
-    - _OutlineThickness: 1
-    - _OutlineType: 0
+    - _OutlineMode: 6
+    - _OutlineThickness: 0.045
+    - _OutlineType: 2
     - _Parallax: 0.02
     - _Pixelate: 0
     - _PixelateSize: 32
@@ -318,9 +319,9 @@ Material:
     - _Reflections: 0
     - _ReflectionsAtten: 0.5
     - _RenderPreset: 1
-    - _RimAttenuation: 1
+    - _RimAttenuation: 0
     - _RimLighting: 0
-    - _RimLightingStage: 0
+    - _RimLightingStage: 2
     - _SSSAtten: 1
     - _SSSFrontAtten: 0.3
     - _SSSFrontPower: 3
@@ -334,17 +335,17 @@ Material:
     - _ShadowCutoff: 0.2
     - _ShakeBlend: 1
     - _ShakeSpeedMult: 1
-    - _Shininess: 16
+    - _Shininess: 13
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
-    - _SpecularAtten: 0.5
+    - _SpecularAtten: 0.25
     - _SpecularHighlights: 1
-    - _SpecularModel: 0
-    - _SpecularToonCutoff: 0.35
-    - _SpecularToonSmoothness: 0
+    - _SpecularModel: 2
+    - _SpecularToonCutoff: 0.5
+    - _SpecularToonSmoothness: 0.075
     - _SpherizeNormals: 0
     - _SrcBlend: 1
-    - _StencilRef: 1
+    - _StencilRef: 64
     - _StochasticSampling: 0
     - _StochasticScale: 3.464
     - _StochasticSkew: 0.57735026
@@ -353,9 +354,9 @@ Material:
     - _TextureBlendingMode: 0
     - _TextureBlendingSource: 0
     - _TimingSeed: 0
-    - _ToonCutoff: 0.5
+    - _ToonCutoff: 0.34
     - _ToonFactor: 0
-    - _ToonSmoothness: 0.5
+    - _ToonSmoothness: 0.065
     - _TopNormalStrength: 1
     - _TriplanarMappingOn: 0
     - _TriplanarNoiseTransitionOn: 0
@@ -391,7 +392,7 @@ Material:
     m_Colors:
     - _AOColor: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _CustomAmbientColor: {r: 0.65, g: 0.65, b: 0.65, a: 1}
+    - _CustomAmbientColor: {r: 0.5, g: 0.48, b: 0.53, a: 1}
     - _DepthGlowColor: {r: 1, g: 0.9869999, b: 0.6, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
     - _FadeBurnColor: {r: 1, g: 1, b: 0, a: 1}
@@ -404,8 +405,8 @@ Material:
     - _HitColor: {r: 1, g: 1, b: 1, a: 1}
     - _HologramColor: {r: 1.25, g: 2.8, b: 6.8, a: 1}
     - _HologramLineDirection: {r: 0, g: 1, b: 0, a: 0}
-    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
-    - _RimColor: {r: 1, g: 1, b: 1, a: 1}
+    - _OutlineColor: {r: 0.2, g: 0.075, b: 0.095, a: 1}
+    - _RimColor: {r: 0.65, g: 0.71, b: 0.83, a: 1}
     - _RimOffset: {r: 0, g: 0, b: 0, a: 0}
     - _SSSColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShakeMaxDisplacement: {r: 0.1, g: 0.1, b: 0.1, a: 0}

@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9047343e9f5d4281b2e0e9c555e972be, type: 3}
+  m_Name: Phase2_Combat
+  m_EditorClassIdentifier: Assembly-CSharp::BossCombatProfileSO
+  decisionInterval: 0.2
+  preferredMinDistance: 2.4
+  preferredMaxDistance: 3.3
+  turnSpeed: 220
+  movementTimeout: 4
+  stuckTimeout: 1
+  repathInterval: 0.2
+  strafeDuration: 0.8
+  repositionDuration: 0.4
+  failureRecovery: 0.25
+  parryRecovery: 1
+  patterns:
+  - pattern: {fileID: 11400000, guid: 6a62043369786e84d89a85a7228580af, type: 2}
+    condition:
+      minimumDistance: 0
+      maximumDistance: 3.8
+      minimumAngle: 0
+      maximumAngle: 100
+      minimumHpPercent: 0
+      maximumHpPercent: 1
+      visibility: 1
+      readySkill: {fileID: 0}
+    weight: 3
+    cooldown: 2
+    recovery: 0.35
+    repeatMultiplier: 0.2
+    preferredDistance: 3
+  - pattern: {fileID: 11400000, guid: 9ecee6169762209498adfab861cd9310, type: 2}
+    condition:
+      minimumDistance: 0
+      maximumDistance: 4.1
+      minimumAngle: 0
+      maximumAngle: 110
+      minimumHpPercent: 0
+      maximumHpPercent: 1
+      visibility: 1
+      readySkill: {fileID: 0}
+    weight: 2
+    cooldown: 5
+    recovery: 0.4
+    repeatMultiplier: 0.2
+    preferredDistance: 3
+  - pattern: {fileID: 11400000, guid: e72cd5cdb9c3a8a4787f2fdb6ad753a2, type: 2}
+    condition:
+      minimumDistance: 4
+      maximumDistance: 11
+      minimumAngle: 0
+      maximumAngle: 65
+      minimumHpPercent: 0
+      maximumHpPercent: 1
+      visibility: 1
+      readySkill: {fileID: 0}
+    weight: 3.5
+    cooldown: 6
+    recovery: 0.4
+    repeatMultiplier: 0.2
+    preferredDistance: 3
+  - pattern: {fileID: 11400000, guid: 6389d9b5391117048928ad01ca87548e, type: 2}
+    condition:
+      minimumDistance: 0
+      maximumDistance: 4.5
+      minimumAngle: 0
+      maximumAngle: 180
+      minimumHpPercent: 0
+      maximumHpPercent: 1
+      visibility: 1
+      readySkill: {fileID: 0}
+    weight: 2.5
+    cooldown: 7
+    recovery: 0.5
+    repeatMultiplier: 0.2
+    preferredDistance: 3
+  - pattern: {fileID: 11400000, guid: 6daa308f08f4e2846a3789743698700e, type: 2}
+    condition:
+      minimumDistance: 0
+      maximumDistance: 4.5
+      minimumAngle: 100
+      maximumAngle: 180
+      minimumHpPercent: 0
+      maximumHpPercent: 1
+      visibility: 1
+      readySkill: {fileID: 0}
+    weight: 6
+    cooldown: 7
+    recovery: 0.5
+    repeatMultiplier: 0.2
+    preferredDistance: 3

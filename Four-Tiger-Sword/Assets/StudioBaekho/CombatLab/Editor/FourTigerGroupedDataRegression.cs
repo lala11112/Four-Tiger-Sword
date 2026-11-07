@@ -73,8 +73,8 @@ public static class FourTigerGroupedDataRegression
             var attack = clone.Actions.ComboSteps[0];
             Check(!ReferenceEquals(clone.Actions, source.Actions) && !ReferenceEquals(clone.CommonBalance, source.CommonBalance)
                 && !ReferenceEquals(clone.CommonExecution, source.CommonExecution) && !ReferenceEquals(clone.CommonFeedback, source.CommonFeedback)
-                && !ReferenceEquals(clone.FormBalance, source.FormBalance) && !ReferenceEquals(clone.FormExecution, source.FormExecution)
-                && !ReferenceEquals(clone.FormFeedback, source.FormFeedback), "All serialized form groups are owned by the clone");
+                && !ReferenceEquals(clone.FormBalance, source.FormBalance) && !ReferenceEquals(clone.FormExecution, source.FormExecution),
+                "All serialized form groups are owned by the clone");
             Check(!ReferenceEquals(attack, first) && !ReferenceEquals(attack.Balance, first.Balance)
                 && !ReferenceEquals(attack.Execution, first.Execution) && !ReferenceEquals(attack.Feedback.HitStop, first.Feedback.HitStop)
                 && !ReferenceEquals(attack.HitEvents[1].Feedback.HitStop, first.HitEvents[1].Feedback.HitStop), "Attack and hit groups are deep cloned");

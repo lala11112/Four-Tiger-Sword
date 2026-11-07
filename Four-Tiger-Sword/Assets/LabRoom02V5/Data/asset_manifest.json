@@ -1,0 +1,1436 @@
+{
+  "unit": "meter",
+  "reference_grid_m": 2,
+  "asset_count": 35,
+  "revised_asset_ids": [
+    33
+  ],
+  "removed_asset_ids": [
+    34
+  ],
+  "unchanged_asset_count": 34,
+  "mesh_objects_per_asset": 1,
+  "unity_pipeline": "URP",
+  "assets": [
+    {
+      "id": 1,
+      "slug": "triple_energy_tank",
+      "label_ko": "3연 에너지 탱크 연결 장치",
+      "dimensions_m": [
+        3.799999952316284,
+        2.1999998092651367,
+        4.599999904632568
+      ],
+      "mount": "floor",
+      "basis_ko": "기존 단일 탱크 높이4.03m 대비 3연 연결장치",
+      "parts": 1,
+      "triangles": 18928,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        -12.0,
+        12.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_01_triple_energy_tank_front.png",
+      "fbx": "models_fbx/R2_01_triple_energy_tank.fbx",
+      "glb": "models_glb/R2_01_triple_energy_tank.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/01_triple_energy_tank_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 147,
+      "material_slots": 11,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 2,
+      "slug": "multi_monitor_workstation",
+      "label_ko": "다중 모니터 연구 책상",
+      "dimensions_m": [
+        5.400000095367432,
+        1.5,
+        2.3499999046325684
+      ],
+      "mount": "floor",
+      "basis_ko": "기존 책상 모니터 포함높이2.336m; 상판높이1.05m",
+      "parts": 1,
+      "triangles": 9164,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        -6.0,
+        12.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_02_multi_monitor_workstation_front.png",
+      "fbx": "models_fbx/R2_02_multi_monitor_workstation.fbx",
+      "glb": "models_glb/R2_02_multi_monitor_workstation.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/02_multi_monitor_workstation_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 77,
+      "material_slots": 7,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 3,
+      "slug": "compact_workstation",
+      "label_ko": "소형 모니터 작업대",
+      "dimensions_m": [
+        3.200000047683716,
+        1.25,
+        1.7500001192092896
+      ],
+      "mount": "floor",
+      "basis_ko": "서랍장과 낮은 모니터 조립체,상판1.05m",
+      "parts": 1,
+      "triangles": 2872,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        0.0,
+        12.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_03_compact_workstation_front.png",
+      "fbx": "models_fbx/R2_03_compact_workstation.fbx",
+      "glb": "models_glb/R2_03_compact_workstation.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/03_compact_workstation_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 26,
+      "material_slots": 7,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 4,
+      "slug": "red_control_console",
+      "label_ko": "붉은 화면 조작 콘솔",
+      "dimensions_m": [
+        1.649999976158142,
+        1.0499999523162842,
+        1.75
+      ],
+      "mount": "floor",
+      "basis_ko": "기존 콘솔 체급,독립경사패널",
+      "parts": 1,
+      "triangles": 2308,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        6.0,
+        12.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_04_red_control_console_front.png",
+      "fbx": "models_fbx/R2_04_red_control_console.fbx",
+      "glb": "models_glb/R2_04_red_control_console.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/04_red_control_console_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 19,
+      "material_slots": 7,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 6,
+      "slug": "lab_swivel_chair",
+      "label_ko": "연구용 회전의자",
+      "dimensions_m": [
+        1.2599999904632568,
+        1.2400000095367432,
+        1.7699999809265137
+      ],
+      "mount": "floor",
+      "basis_ko": "기존 의자외곽1.2622x1.2401x1.7719m;좌판0.72m",
+      "parts": 1,
+      "triangles": 2984,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        12.0,
+        12.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_06_lab_swivel_chair_front.png",
+      "fbx": "models_fbx/R2_06_lab_swivel_chair.fbx",
+      "glb": "models_glb/R2_06_lab_swivel_chair.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/06_lab_swivel_chair_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 34,
+      "material_slots": 5,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 7,
+      "slug": "tall_equipment_cabinet",
+      "label_ko": "대형 장비 캐비닛",
+      "dimensions_m": [
+        1.7999999523162842,
+        1.0999999046325684,
+        2.450000047683716
+      ],
+      "mount": "floor",
+      "basis_ko": "기존 전력캐비닛1.78x1.14x2.16m보다 높은 외함",
+      "parts": 1,
+      "triangles": 7408,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        18.0,
+        12.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_07_tall_equipment_cabinet_front.png",
+      "fbx": "models_fbx/R2_07_tall_equipment_cabinet.fbx",
+      "glb": "models_glb/R2_07_tall_equipment_cabinet.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/07_tall_equipment_cabinet_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 56,
+      "material_slots": 6,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 8,
+      "slug": "medium_vertical_crate",
+      "label_ko": "중형 세로 장비함",
+      "dimensions_m": [
+        1.2999999523162842,
+        0.8999999761581421,
+        1.600000023841858
+      ],
+      "mount": "floor",
+      "basis_ko": "중형세로함",
+      "parts": 1,
+      "triangles": 6440,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        -18.0,
+        6.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_08_medium_vertical_crate_front.png",
+      "fbx": "models_fbx/R2_08_medium_vertical_crate.fbx",
+      "glb": "models_glb/R2_08_medium_vertical_crate.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/08_medium_vertical_crate_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 46,
+      "material_slots": 6,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 9,
+      "slug": "low_wide_crate",
+      "label_ko": "낮은 가로 수납함",
+      "dimensions_m": [
+        1.7999999523162842,
+        0.949999988079071,
+        0.8999999761581421
+      ],
+      "mount": "floor",
+      "basis_ko": "최종 이미지약2:1가로형",
+      "parts": 1,
+      "triangles": 5464,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        -12.0,
+        6.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_09_low_wide_crate_front.png",
+      "fbx": "models_fbx/R2_09_low_wide_crate.fbx",
+      "glb": "models_glb/R2_09_low_wide_crate.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/09_low_wide_crate_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 38,
+      "material_slots": 6,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 13,
+      "slug": "long_safety_barrier",
+      "label_ko": "긴 직선 안전 배리어",
+      "dimensions_m": [
+        4.0,
+        0.44999998807907104,
+        0.800000011920929
+      ],
+      "mount": "floor",
+      "basis_ko": "원본낮은안전벽,2m타일2칸",
+      "parts": 1,
+      "triangles": 4148,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        -6.0,
+        6.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_13_long_safety_barrier_front.png",
+      "fbx": "models_fbx/R2_13_long_safety_barrier.fbx",
+      "glb": "models_glb/R2_13_long_safety_barrier.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/13_long_safety_barrier_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 39,
+      "material_slots": 6,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 14,
+      "slug": "corner_safety_barrier",
+      "label_ko": "모서리 안전 배리어",
+      "dimensions_m": [
+        2.0,
+        2.0,
+        0.800000011920929
+      ],
+      "mount": "floor",
+      "basis_ko": "2m코너모듈",
+      "parts": 1,
+      "triangles": 6808,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        0.0,
+        6.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_14_corner_safety_barrier_front.png",
+      "fbx": "models_fbx/R2_14_corner_safety_barrier.fbx",
+      "glb": "models_glb/R2_14_corner_safety_barrier.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/14_corner_safety_barrier_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 62,
+      "material_slots": 6,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 28,
+      "slug": "reward_claim_terminal",
+      "label_ko": "보상 지급 단말",
+      "dimensions_m": [
+        1.4500000476837158,
+        1.0499999523162842,
+        2.450000047683716
+      ],
+      "mount": "floor",
+      "basis_ko": "넓은 독립형 보상 화면과 지급 트레이",
+      "parts": 1,
+      "triangles": 4336,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        6.0,
+        6.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_28_reward_claim_terminal_front.png",
+      "fbx": "models_fbx/R2_28_reward_claim_terminal.fbx",
+      "glb": "models_glb/R2_28_reward_claim_terminal.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/28_reward_claim_terminal_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 36,
+      "material_slots": 8,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 29,
+      "slug": "emergency_power_generator",
+      "label_ko": "비상 발전기",
+      "dimensions_m": [
+        2.799999713897705,
+        1.6000001430511475,
+        2.200000047683716
+      ],
+      "mount": "floor",
+      "basis_ko": "낮고 넓은 독립 발전기, 기존 콘솔 체급",
+      "parts": 1,
+      "triangles": 8340,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        12.0,
+        6.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_29_emergency_power_generator_front.png",
+      "fbx": "models_fbx/R2_29_emergency_power_generator.fbx",
+      "glb": "models_glb/R2_29_emergency_power_generator.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/29_emergency_power_generator_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 56,
+      "material_slots": 8,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 30,
+      "slug": "equipment_service_workbench",
+      "label_ko": "장비 정비 작업대",
+      "dimensions_m": [
+        3.4000000953674316,
+        1.5499999523162842,
+        2.3499999046325684
+      ],
+      "mount": "floor",
+      "basis_ko": "기존 책상 높이와 맞춘 작업대 및 정비 암",
+      "parts": 1,
+      "triangles": 7692,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        18.0,
+        6.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_30_equipment_service_workbench_front.png",
+      "fbx": "models_fbx/R2_30_equipment_service_workbench.fbx",
+      "glb": "models_glb/R2_30_equipment_service_workbench.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/30_equipment_service_workbench_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 63,
+      "material_slots": 7,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 31,
+      "slug": "sample_analysis_machine",
+      "label_ko": "시료 분석기",
+      "dimensions_m": [
+        2.4000000953674316,
+        1.5,
+        2.5999999046325684
+      ],
+      "mount": "floor",
+      "basis_ko": "독립형 유리 분석 챔버와 제어 장치",
+      "parts": 1,
+      "triangles": 7340,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        -18.0,
+        0.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_31_sample_analysis_machine_front.png",
+      "fbx": "models_fbx/R2_31_sample_analysis_machine.fbx",
+      "glb": "models_glb/R2_31_sample_analysis_machine.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/31_sample_analysis_machine_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 57,
+      "material_slots": 11,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 32,
+      "slug": "circular_warp_point",
+      "label_ko": "원형 바닥 워프 포인트",
+      "dimensions_m": [
+        2.799999952316284,
+        2.799999952316284,
+        0.18000000715255737
+      ],
+      "mount": "surface",
+      "basis_ko": "2m 바닥 타일보다 넓은 낮은 원형 도착 지점",
+      "parts": 1,
+      "triangles": 5988,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source": "V3 corrected single mesh, geometry unchanged",
+      "position_m": [
+        -12.0,
+        0.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_32_circular_warp_point_front.png",
+      "fbx": "models_fbx/R2_32_circular_warp_point.fbx",
+      "glb": "models_glb/R2_32_circular_warp_point.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/32_circular_warp_point_emission.png",
+      "emission_mask_uv_channel": 1,
+      "interaction_role": "map selectable warp destination",
+      "warp_destination_local_m": [
+        0.0,
+        0.0,
+        0.18000000715255737
+      ],
+      "source_part_count": 33,
+      "material_slots": 7,
+      "unity_mesh_object_count": 1
+    },
+    {
+      "id": 33,
+      "slug": "stage_exit_elevator",
+      "label_ko": "다음 스테이지 이동 엘리베이터",
+      "dimensions_m": [
+        4.800000190734863,
+        4.599999904632568,
+        10.0
+      ],
+      "mount": "floor",
+      "basis_ko": "가로4.8m 깊이4.6m 높이10m 유지, 승강실 및 상부 승강로를 불투명 외벽으로 밀폐",
+      "group": "elevator",
+      "purpose_ko": "앞쪽 승하차 입구를 제외한 승강실과 상부 승강로가 외벽으로 둘러싸인 다음 스테이지 승강기",
+      "parts": 1,
+      "source_part_count": 137,
+      "triangles": 13828,
+      "material_slots": 9,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_33_stage_exit_elevator.fbx",
+      "glb": "models_glb/R2_33_stage_exit_elevator.glb",
+      "front_preview": "previews/front/R2_33_stage_exit_elevator_front.png",
+      "emission_mask": "emission_masks/33_stage_exit_elevator_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "stage_exit_trigger_local_m": [
+        0.0,
+        0.15,
+        0.5
+      ],
+      "clear_cabin_dimensions_m": [
+        3.2,
+        2.8,
+        3.1
+      ],
+      "visual_lift_travel_m": 5.5,
+      "interaction_role": "next_stage_exit",
+      "car_roof_top_m": 3.85,
+      "raised_car_roof_top_m": 9.35,
+      "guide_rail_top_m": 9.45
+    },
+    {
+      "id": 35,
+      "slug": "medical_supply_station",
+      "label_ko": "의료 보급 스테이션",
+      "dimensions_m": [
+        2.5999999046325684,
+        1.4000000953674316,
+        2.999999761581421
+      ],
+      "mount": "floor",
+      "group": "technology",
+      "basis_ko": "V4 목적성 선별 및 기존 대형 연구실 설비 대비 크기 조정",
+      "parts": 1,
+      "triangles": 6092,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "position_m": [
+        -6.0,
+        0.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_35_medical_supply_station_front.png",
+      "fbx": "models_fbx/R2_35_medical_supply_station.fbx",
+      "glb": "models_glb/R2_35_medical_supply_station.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/35_medical_supply_station_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 41,
+      "material_slots": 9,
+      "unity_mesh_object_count": 1,
+      "source": "V3 corrected single mesh, V4 enlarged with baked affine transform"
+    },
+    {
+      "id": 37,
+      "slug": "equipment_storage_rack",
+      "label_ko": "장비 보관 랙",
+      "dimensions_m": [
+        3.4000000953674316,
+        1.2000000476837158,
+        2.9000000953674316
+      ],
+      "mount": "floor",
+      "group": "technology",
+      "basis_ko": "V4 목적성 선별 및 기존 대형 연구실 설비 대비 크기 조정",
+      "parts": 1,
+      "triangles": 5000,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "position_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_37_equipment_storage_rack_front.png",
+      "fbx": "models_fbx/R2_37_equipment_storage_rack.fbx",
+      "glb": "models_glb/R2_37_equipment_storage_rack.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/37_equipment_storage_rack_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 38,
+      "material_slots": 8,
+      "unity_mesh_object_count": 1,
+      "source": "V3 corrected single mesh, V4 enlarged with baked affine transform"
+    },
+    {
+      "id": 42,
+      "slug": "air_purification_tower",
+      "label_ko": "공기 정화 타워",
+      "dimensions_m": [
+        2.0,
+        2.0,
+        3.5999999046325684
+      ],
+      "mount": "floor",
+      "group": "utilities",
+      "basis_ko": "V4 목적성 선별 및 기존 대형 연구실 설비 대비 크기 조정",
+      "parts": 1,
+      "triangles": 8248,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "position_m": [
+        6.0,
+        0.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_42_air_purification_tower_front.png",
+      "fbx": "models_fbx/R2_42_air_purification_tower.fbx",
+      "glb": "models_glb/R2_42_air_purification_tower.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/42_air_purification_tower_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 39,
+      "material_slots": 8,
+      "unity_mesh_object_count": 1,
+      "source": "V3 corrected single mesh, V4 enlarged with baked affine transform"
+    },
+    {
+      "id": 43,
+      "slug": "coolant_pump_station",
+      "label_ko": "냉각수 펌프 장치",
+      "dimensions_m": [
+        3.4000000953674316,
+        2.0,
+        2.700000047683716
+      ],
+      "mount": "floor",
+      "group": "utilities",
+      "basis_ko": "V4 목적성 선별 및 기존 대형 연구실 설비 대비 크기 조정",
+      "parts": 1,
+      "triangles": 6472,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "root_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "position_m": [
+        12.0,
+        0.0,
+        0.0
+      ],
+      "root_pivot": "bottom footprint center",
+      "front": "-Y",
+      "front_preview": "previews/front/R2_43_coolant_pump_station_front.png",
+      "fbx": "models_fbx/R2_43_coolant_pump_station.fbx",
+      "glb": "models_glb/R2_43_coolant_pump_station.glb",
+      "export_groups": [
+        "Combined"
+      ],
+      "emission_mask": "emission_masks/43_coolant_pump_station_emission.png",
+      "emission_mask_uv_channel": 1,
+      "source_part_count": 40,
+      "material_slots": 10,
+      "unity_mesh_object_count": 1,
+      "source": "V3 corrected single mesh, V4 enlarged with baked affine transform"
+    },
+    {
+      "id": 47,
+      "slug": "diagnostic_scan_bed",
+      "label_ko": "진단 스캔 침대",
+      "dimensions_m": [
+        2.8000001907348633,
+        4.199999809265137,
+        2.5999999046325684
+      ],
+      "mount": "floor",
+      "group": "research",
+      "purpose_ko": "환자용 침대와 진단 스캔 아치",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 25,
+      "triangles": 3612,
+      "material_slots": 7,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_47_diagnostic_scan_bed.fbx",
+      "glb": "models_glb/R2_47_diagnostic_scan_bed.glb",
+      "front_preview": "previews/front/R2_47_diagnostic_scan_bed_front.png",
+      "emission_mask": "emission_masks/47_diagnostic_scan_bed_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        18.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": 48,
+      "slug": "fume_hood_workbench",
+      "label_ko": "밀폐 환기 실험대",
+      "dimensions_m": [
+        3.5999999046325684,
+        1.7999999523162842,
+        3.4000000953674316
+      ],
+      "mount": "floor",
+      "group": "research",
+      "purpose_ko": "환기 후드와 보호창을 갖춘 실험 작업 공간",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 35,
+      "triangles": 4200,
+      "material_slots": 9,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_48_fume_hood_workbench.fbx",
+      "glb": "models_glb/R2_48_fume_hood_workbench.glb",
+      "front_preview": "previews/front/R2_48_fume_hood_workbench_front.png",
+      "emission_mask": "emission_masks/48_fume_hood_workbench_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        -18.0,
+        -6.0,
+        0.0
+      ]
+    },
+    {
+      "id": 49,
+      "slug": "specimen_centrifuge",
+      "label_ko": "시료 원심분리기",
+      "dimensions_m": [
+        2.799999952316284,
+        2.6000001430511475,
+        2.299999952316284
+      ],
+      "mount": "floor",
+      "group": "research",
+      "purpose_ko": "원형 회전실과 시료 로터가 보이는 분석 장비",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 48,
+      "triangles": 5500,
+      "material_slots": 9,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_49_specimen_centrifuge.fbx",
+      "glb": "models_glb/R2_49_specimen_centrifuge.glb",
+      "front_preview": "previews/front/R2_49_specimen_centrifuge_front.png",
+      "emission_mask": "emission_masks/49_specimen_centrifuge_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        -12.0,
+        -6.0,
+        0.0
+      ]
+    },
+    {
+      "id": 50,
+      "slug": "cryogenic_storage_freezer",
+      "label_ko": "극저온 시료 냉동고",
+      "dimensions_m": [
+        3.0,
+        1.7999999523162842,
+        3.4000000953674316
+      ],
+      "mount": "floor",
+      "group": "research",
+      "purpose_ko": "단열 저장실과 시료 보관 서랍",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 40,
+      "triangles": 5456,
+      "material_slots": 8,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_50_cryogenic_storage_freezer.fbx",
+      "glb": "models_glb/R2_50_cryogenic_storage_freezer.glb",
+      "front_preview": "previews/front/R2_50_cryogenic_storage_freezer_front.png",
+      "emission_mask": "emission_masks/50_cryogenic_storage_freezer_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        -6.0,
+        -6.0,
+        0.0
+      ]
+    },
+    {
+      "id": 51,
+      "slug": "chemical_drum_rack",
+      "label_ko": "화학물질 드럼 보관대",
+      "dimensions_m": [
+        3.5999999046325684,
+        1.7999999523162842,
+        2.799999952316284
+      ],
+      "mount": "floor",
+      "group": "research",
+      "purpose_ko": "대형 밀폐 드럼과 유출 방지 받침",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 39,
+      "triangles": 5132,
+      "material_slots": 6,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_51_chemical_drum_rack.fbx",
+      "glb": "models_glb/R2_51_chemical_drum_rack.glb",
+      "front_preview": "previews/front/R2_51_chemical_drum_rack_front.png",
+      "emission_mask": "emission_masks/51_chemical_drum_rack_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        0.0,
+        -6.0,
+        0.0
+      ]
+    },
+    {
+      "id": 52,
+      "slug": "sterilization_autoclave",
+      "label_ko": "고압 멸균기",
+      "dimensions_m": [
+        3.4000000953674316,
+        2.4000000953674316,
+        3.200000047683716
+      ],
+      "mount": "floor",
+      "group": "infrastructure",
+      "purpose_ko": "압력 잠금 원형 해치를 갖춘 멸균 설비",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 50,
+      "triangles": 5344,
+      "material_slots": 9,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_52_sterilization_autoclave.fbx",
+      "glb": "models_glb/R2_52_sterilization_autoclave.glb",
+      "front_preview": "previews/front/R2_52_sterilization_autoclave_front.png",
+      "emission_mask": "emission_masks/52_sterilization_autoclave_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        6.0,
+        -6.0,
+        0.0
+      ]
+    },
+    {
+      "id": 53,
+      "slug": "server_bank",
+      "label_ko": "대형 서버 뱅크",
+      "dimensions_m": [
+        3.5999999046325684,
+        1.5,
+        3.5999999046325684
+      ],
+      "mount": "floor",
+      "group": "infrastructure",
+      "purpose_ko": "두 개의 노출 서버 슬롯과 냉각 통풍 구조",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 207,
+      "triangles": 24484,
+      "material_slots": 8,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_53_server_bank.fbx",
+      "glb": "models_glb/R2_53_server_bank.glb",
+      "front_preview": "previews/front/R2_53_server_bank_front.png",
+      "emission_mask": "emission_masks/53_server_bank_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        12.0,
+        -6.0,
+        0.0
+      ]
+    },
+    {
+      "id": 54,
+      "slug": "power_distribution_switchboard",
+      "label_ko": "전력 분배반",
+      "dimensions_m": [
+        3.4000000953674316,
+        1.2999999523162842,
+        3.299999713897705
+      ],
+      "mount": "floor",
+      "group": "infrastructure",
+      "purpose_ko": "큰 차단기와 전력 계측 패널",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 78,
+      "triangles": 6664,
+      "material_slots": 8,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_54_power_distribution_switchboard.fbx",
+      "glb": "models_glb/R2_54_power_distribution_switchboard.glb",
+      "front_preview": "previews/front/R2_54_power_distribution_switchboard_front.png",
+      "emission_mask": "emission_masks/54_power_distribution_switchboard_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        18.0,
+        -6.0,
+        0.0
+      ]
+    },
+    {
+      "id": 55,
+      "slug": "twin_ventilation_fan_wall",
+      "label_ko": "대형 이중 환기팬",
+      "dimensions_m": [
+        4.400000095367432,
+        1.0000001192092896,
+        3.4000000953674316
+      ],
+      "mount": "floor",
+      "group": "infrastructure",
+      "purpose_ko": "두 개의 대형 팬으로 읽히는 독립 환기 벽체",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 51,
+      "triangles": 9540,
+      "material_slots": 5,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_55_twin_ventilation_fan_wall.fbx",
+      "glb": "models_glb/R2_55_twin_ventilation_fan_wall.glb",
+      "front_preview": "previews/front/R2_55_twin_ventilation_fan_wall_front.png",
+      "emission_mask": "emission_masks/55_twin_ventilation_fan_wall_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        -18.0,
+        -12.0,
+        0.0
+      ]
+    },
+    {
+      "id": 56,
+      "slug": "overhead_pipe_bridge",
+      "label_ko": "상부 배관 연결대",
+      "dimensions_m": [
+        4.400000095367432,
+        1.5,
+        4.0
+      ],
+      "mount": "floor",
+      "group": "infrastructure",
+      "purpose_ko": "설비 사이 배관을 지지하는 높이 있는 연결 프레임",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 37,
+      "triangles": 5788,
+      "material_slots": 5,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_56_overhead_pipe_bridge.fbx",
+      "glb": "models_glb/R2_56_overhead_pipe_bridge.glb",
+      "front_preview": "previews/front/R2_56_overhead_pipe_bridge_front.png",
+      "emission_mask": "emission_masks/56_overhead_pipe_bridge_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        -12.0,
+        -12.0,
+        0.0
+      ]
+    },
+    {
+      "id": 57,
+      "slug": "safety_glass_partition",
+      "label_ko": "안전 관찰 유리벽",
+      "dimensions_m": [
+        4.199999809265137,
+        0.8999999761581421,
+        3.200000286102295
+      ],
+      "mount": "floor",
+      "group": "safety",
+      "purpose_ko": "실험 구역과 이동 구역을 구분하는 보호벽",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 29,
+      "triangles": 2716,
+      "material_slots": 6,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_57_safety_glass_partition.fbx",
+      "glb": "models_glb/R2_57_safety_glass_partition.glb",
+      "front_preview": "previews/front/R2_57_safety_glass_partition_front.png",
+      "emission_mask": "emission_masks/57_safety_glass_partition_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        -6.0,
+        -12.0,
+        0.0
+      ]
+    },
+    {
+      "id": 58,
+      "slug": "surveillance_camera_pillar",
+      "label_ko": "보안 감시 카메라 타워",
+      "dimensions_m": [
+        2.200000286102295,
+        1.799999713897705,
+        3.5999996662139893
+      ],
+      "mount": "floor",
+      "group": "safety",
+      "purpose_ko": "방향이 다른 두 카메라와 모니터가 있는 감시 기둥",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 30,
+      "triangles": 3816,
+      "material_slots": 8,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_58_surveillance_camera_pillar.fbx",
+      "glb": "models_glb/R2_58_surveillance_camera_pillar.glb",
+      "front_preview": "previews/front/R2_58_surveillance_camera_pillar_front.png",
+      "emission_mask": "emission_masks/58_surveillance_camera_pillar_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        0.0,
+        -12.0,
+        0.0
+      ]
+    },
+    {
+      "id": 59,
+      "slug": "decontamination_booth",
+      "label_ko": "제독 부스",
+      "dimensions_m": [
+        3.200000047683716,
+        2.5999996662139893,
+        3.799999952316284
+      ],
+      "mount": "floor",
+      "group": "safety",
+      "purpose_ko": "바닥 배수판과 측면 분사구를 갖춘 제독 공간",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 58,
+      "triangles": 5816,
+      "material_slots": 8,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_59_decontamination_booth.fbx",
+      "glb": "models_glb/R2_59_decontamination_booth.glb",
+      "front_preview": "previews/front/R2_59_decontamination_booth_front.png",
+      "emission_mask": "emission_masks/59_decontamination_booth_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        6.0,
+        -12.0,
+        0.0
+      ]
+    },
+    {
+      "id": 60,
+      "slug": "emergency_wash_station",
+      "label_ko": "비상 세척 설비",
+      "dimensions_m": [
+        2.799999952316284,
+        1.7999999523162842,
+        3.4000000953674316
+      ],
+      "mount": "floor",
+      "group": "safety",
+      "purpose_ko": "상부 샤워와 세안용 세척대",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 31,
+      "triangles": 4280,
+      "material_slots": 6,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_60_emergency_wash_station.fbx",
+      "glb": "models_glb/R2_60_emergency_wash_station.glb",
+      "front_preview": "previews/front/R2_60_emergency_wash_station_front.png",
+      "emission_mask": "emission_masks/60_emergency_wash_station_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        12.0,
+        -12.0,
+        0.0
+      ]
+    },
+    {
+      "id": 61,
+      "slug": "secure_storage_vault",
+      "label_ko": "보안 보관 금고",
+      "dimensions_m": [
+        3.0,
+        2.200000286102295,
+        3.4000000953674316
+      ],
+      "mount": "floor",
+      "group": "safety",
+      "purpose_ko": "큰 잠금 장치와 인증 패널을 갖춘 장비 금고",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비",
+      "parts": 1,
+      "source_part_count": 47,
+      "triangles": 5992,
+      "material_slots": 8,
+      "nonmanifold_edges": 0,
+      "degenerate_faces": 0,
+      "uv_channels": [
+        "UVMap",
+        "EmissionMaskUV"
+      ],
+      "fbx": "models_fbx/R2_61_secure_storage_vault.fbx",
+      "glb": "models_glb/R2_61_secure_storage_vault.glb",
+      "front_preview": "previews/front/R2_61_secure_storage_vault_front.png",
+      "emission_mask": "emission_masks/61_secure_storage_vault_emission.png",
+      "emission_mask_uv_channel": 1,
+      "front": "-Y",
+      "root_pivot": "bottom footprint center",
+      "unity_mesh_object_count": 1,
+      "export_groups": [
+        "Combined"
+      ],
+      "position_m": [
+        18.0,
+        -12.0,
+        0.0
+      ]
+    }
+  ]
+}

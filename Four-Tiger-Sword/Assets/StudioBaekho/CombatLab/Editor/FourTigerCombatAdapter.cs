@@ -571,11 +571,11 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             if (!IsSupported(source)) throw new ArgumentException("지원되는 폼 에셋이 아닙니다.");
             if (source.Actions == null || source.CommonBalance == null || source.CommonExecution == null || source.CommonFeedback == null)
                 throw new ArgumentException("폼의 Actions / CommonBalance / CommonExecution / CommonFeedback 그룹이 필요합니다.");
-            if (source is WaterFormActionDataSO waterGroups && (waterGroups.FormBalance == null || waterGroups.FormExecution == null || waterGroups.FormFeedback == null)
+            if (source is WaterFormActionDataSO waterGroups && (waterGroups.FormBalance == null || waterGroups.FormExecution == null)
                 || source is FireFormActionDataSO fireGroups && (fireGroups.FormBalance == null || fireGroups.FormExecution == null)
                 || source is EarthFormActionDataSO earthGroups && (earthGroups.FormBalance == null || earthGroups.FormExecution == null)
                 || source is WoodFormActionDataSO woodGroups && (woodGroups.FormBalance == null || woodGroups.FormExecution == null))
-                throw new ArgumentException("폼의 FormBalance / FormExecution / FormFeedback 그룹이 필요합니다.");
+                throw new ArgumentException("폼의 FormBalance / FormExecution 그룹이 필요합니다.");
             string id = NormalizeActionId(actionId);
             if (id == "heavy" && !(source is WaterFormActionDataSO))
                 throw new ArgumentException("현재 게임에서 이 폼의 강공격은 구현되어 있지 않습니다.");

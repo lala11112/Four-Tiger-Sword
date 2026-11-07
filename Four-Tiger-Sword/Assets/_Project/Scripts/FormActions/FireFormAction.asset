@@ -12,20 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4a81cb3897436c46882329f462be168, type: 3}
   m_Name: FireFormAction
   m_EditorClassIdentifier: Assembly-CSharp::WeaponActionDataSO
-  WeaponName: Fire
   Actions:
     ComboSteps:
     - Balance:
+        EnableV2: 0
         Damage: 1.2
         PoiseDamage: 20
-        KnockbackForce: 11
-        StaggerResistLevel: 4
+        KnockbackForce: 10
+        StaggerResistLevel: 2
       Execution:
         AnimationName: InSlash
-        Duration: 1.2666668
-        ComboTransitionTime: 1
-        HitStartTime: 0.38333333
-        HitDuration: 0.08333334
+        Duration: 1.4000001
+        ComboTransitionTime: 0.5
+        RecoveryCancelTime: 0.7
+        ActionCancelTime: 0.7
+        HitStartTime: 0.35
+        HitDuration: 0.06666666
         Hitbox:
           HitBoxOffset: {x: 0, y: 0, z: 1.2}
           HitBoxShape: 0
@@ -99,19 +101,18 @@ MonoBehaviour:
           TargetApproach:
             UseTargetApproach: 1
             FollowMovingTarget: 1
-            TargetFollowSpeed: 6
+            TargetFollowSpeed: 15
             TargetFollowRotationSpeed: 720
-            StopDistance: 0.25
+            StopDistance: 0.1
             ApproachAlignmentAngle: 15
-            ApproachEndTime: 1
-            RotationEndTime: 1
-            MaxApproachDistance: 2
+            ApproachEndTime: 0.35
+            RotationEndTime: 0.35
+            MaxApproachDistance: 2.5
       Feedback:
         HitEffect:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: 4ee7b1224a6ce024f93e54eadb019e3c, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: 4ee7b1224a6ce024f93e54eadb019e3c, type: 3}
           Accent: {fileID: 0}
@@ -125,9 +126,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 0
           HitStopDuration: 0.08
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 0
@@ -145,22 +149,27 @@ MonoBehaviour:
           FollowPlayer: 1
           AlternateDirection: 1
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
           OverrideCameraShakeDirection: 0
           CameraShakeDirection: {x: 0, y: -1, z: 0}
       HitEvents: []
     - Balance:
+        EnableV2: 0
         Damage: 1.5
         PoiseDamage: 100
-        KnockbackForce: 13
+        KnockbackForce: 17
         StaggerResistLevel: 4
       Execution:
         AnimationName: OutSlash
-        Duration: 1.5000001
-        ComboTransitionTime: 1
-        HitStartTime: 0.38333333
-        HitDuration: 0.116666675
+        Duration: 1.4000001
+        ComboTransitionTime: 0.35
+        RecoveryCancelTime: 0.5
+        ActionCancelTime: 0.5
+        HitStartTime: 0.15
+        HitDuration: 0.08333333
         Hitbox:
           HitBoxOffset: {x: 0, y: 0, z: 1}
           HitBoxShape: 1
@@ -246,7 +255,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: 4ee7b1224a6ce024f93e54eadb019e3c, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: 4ee7b1224a6ce024f93e54eadb019e3c, type: 3}
           Accent: {fileID: 0}
@@ -260,9 +268,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 0
           HitStopDuration: 0.08
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 0
@@ -280,22 +291,27 @@ MonoBehaviour:
           FollowPlayer: 1
           AlternateDirection: 1
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
           OverrideCameraShakeDirection: 0
           CameraShakeDirection: {x: 0, y: -1, z: 0}
       HitEvents: []
     - Balance:
+        EnableV2: 0
         Damage: 2.2
         PoiseDamage: 20
-        KnockbackForce: 15
+        KnockbackForce: 20
         StaggerResistLevel: 3
       Execution:
         AnimationName: Fire1
-        Duration: 1.3333334
+        Duration: 2.1666667
         ComboTransitionTime: 0
-        HitStartTime: 0.13333334
-        HitDuration: 0.1
+        RecoveryCancelTime: 0.65
+        ActionCancelTime: 0.65
+        HitStartTime: 0.43333334
+        HitDuration: 0.06666666
         Hitbox:
           HitBoxOffset: {x: 0, y: 0, z: 1.5}
           HitBoxShape: 0
@@ -369,9 +385,9 @@ MonoBehaviour:
           TargetApproach:
             UseTargetApproach: 1
             FollowMovingTarget: 1
-            TargetFollowSpeed: 6
+            TargetFollowSpeed: 15
             TargetFollowRotationSpeed: 720
-            StopDistance: 0.25
+            StopDistance: 0.1
             ApproachAlignmentAngle: 15
             ApproachEndTime: 0.13333334
             RotationEndTime: 0.06666667
@@ -381,7 +397,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: fe9f380adc1e9574c8d5d58e419d6000, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: fe9f380adc1e9574c8d5d58e419d6000, type: 3}
           Accent: {fileID: 0}
@@ -395,33 +410,41 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 0
           HitStopDuration: 0.08
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 1
-          TrailStartTime: 0.06666667
-          TrailEndTime: 0.3
+          TrailStartTime: 0.36666667
+          TrailEndTime: 0.53333336
         Slash:
           SlashVFX: {fileID: 1485466043327710, guid: 3e914ef784028124db1daf7002a87cc8, type: 3}
-          SlashVFXStartTime: 0.105
-          SlashVFXOffset: {x: 0, y: 0.05, z: -1.4}
-          SlashVFXRotation: {x: 0, y: 0, z: 90}
-          SlashVFXScale: 0.6
-          SlashVFXLifetime: 0.42
+          SlashVFXStartTime: 0.4
+          SlashVFXOffset: {x: 0, y: 0, z: -1.05}
+          SlashVFXRotation: {x: 10, y: 0, z: -35}
+          SlashVFXScale: 0.65
+          SlashVFXLifetime: 0.25
           PlaybackSpeed: 2.6
           TimeOffset: -0.02
           FollowPlayer: 1
           AlternateDirection: 0
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
           OverrideCameraShakeDirection: 0
           CameraShakeDirection: {x: 0, y: -1, z: 0}
       HitEvents: []
+    FinisherStep:
+      rid: -2
     AirAttackStep:
       Balance:
+        EnableV2: 0
         Damage: 37
         PoiseDamage: 10
         KnockbackForce: 8
@@ -430,6 +453,8 @@ MonoBehaviour:
         AnimationName: FireAirEnd
         Duration: 0.5
         ComboTransitionTime: 0.3
+        RecoveryCancelTime: -1
+        ActionCancelTime: -1
         HitStartTime: 0.1
         HitDuration: 0.1
         Hitbox:
@@ -508,7 +533,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
           Accent: {fileID: 8300000, guid: 619c07e2a6608cf4bbb8eab877a6df1f, type: 3}
@@ -522,9 +546,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 0
           HitStopDuration: 0.08
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 0
@@ -542,6 +569,8 @@ MonoBehaviour:
           FollowPlayer: 1
           AlternateDirection: 1
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
           OverrideCameraShakeDirection: 0
@@ -549,6 +578,7 @@ MonoBehaviour:
       HitEvents: []
     CounterStep:
       Balance:
+        EnableV2: 0
         Damage: 1.2
         PoiseDamage: 10
         KnockbackForce: 8
@@ -557,6 +587,8 @@ MonoBehaviour:
         AnimationName: OutSlash
         Duration: 1.267
         ComboTransitionTime: 0
+        RecoveryCancelTime: -1
+        ActionCancelTime: -1
         HitStartTime: 0.5
         HitDuration: 0.1
         Hitbox:
@@ -644,7 +676,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
           Accent: {fileID: 0}
@@ -658,9 +689,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 0
           HitStopDuration: 0.08
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 0
@@ -678,6 +712,8 @@ MonoBehaviour:
           FollowPlayer: 1
           AlternateDirection: 1
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
           OverrideCameraShakeDirection: 0
@@ -685,14 +721,17 @@ MonoBehaviour:
       HitEvents: []
     SkillSteps:
     - Balance:
+        EnableV2: 0
         Damage: 0
         PoiseDamage: 0
         KnockbackForce: 15
         StaggerResistLevel: 4
       Execution:
         AnimationName: ComboSlash
-        Duration: 2.767
+        Duration: 4
         ComboTransitionTime: 0
+        RecoveryCancelTime: 2.2166665
+        ActionCancelTime: 2.2166665
         HitStartTime: 0
         HitDuration: 0
         Hitbox:
@@ -834,7 +873,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
           Accent: {fileID: 8300000, guid: c0befd74da8d7994ab761bf6878fda58, type: 3}
@@ -848,9 +886,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 0
           HitStopDuration: 0.08
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 0
@@ -868,21 +909,25 @@ MonoBehaviour:
           FollowPlayer: 1
           AlternateDirection: 1
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
           OverrideCameraShakeDirection: 0
           CameraShakeDirection: {x: 0, y: -1, z: 0}
       HitEvents:
       - Balance:
+          EnableV2: 0
           Damage: 1.2
           PoiseDamage: 50
-          StaggerResistLevel: 2
           OverrideKnockbackForce: 0
           KnockbackForce: 8
         Execution:
-          StartTime: 0.8
-          Duration: 0.05
+          StartTime: 0.68333334
+          Duration: 0.06666666
         Feedback:
+          CameraV2:
+            rid: -2
           OverrideSlashVFX: 0
           Slash:
             SlashVFX: {fileID: 0}
@@ -913,19 +958,24 @@ MonoBehaviour:
             Scale: {x: 1, y: 1, z: 1}
             Rotation: {x: 0, y: 0, z: 0}
           HitStop:
+            EnableV2: 0
             OverrideHitStop: 0
             HitStopDuration: 0.08
             HitStopTimeScale: 0.05
+            Scope: 0
+            Stacking: 0
       - Balance:
+          EnableV2: 0
           Damage: 1.4
           PoiseDamage: 60
-          StaggerResistLevel: 3
           OverrideKnockbackForce: 0
           KnockbackForce: 8
         Execution:
-          StartTime: 1.5
-          Duration: 0.05
+          StartTime: 2.0333333
+          Duration: 0.083333254
         Feedback:
+          CameraV2:
+            rid: -2
           OverrideSlashVFX: 0
           Slash:
             SlashVFX: {fileID: 0}
@@ -956,54 +1006,149 @@ MonoBehaviour:
             Scale: {x: 1, y: 1, z: 1}
             Rotation: {x: 0, y: 0, z: 0}
           HitStop:
+            EnableV2: 0
             OverrideHitStop: 0
             HitStopDuration: 0.08
             HitStopTimeScale: 0.05
-      - Balance:
-          Damage: 2
-          PoiseDamage: 80
-          StaggerResistLevel: 4
-          OverrideKnockbackForce: 0
-          KnockbackForce: 8
-        Execution:
-          StartTime: 2.2
-          Duration: 0.05
-        Feedback:
-          OverrideSlashVFX: 0
-          Slash:
-            SlashVFX: {fileID: 0}
-            SlashVFXStartTime: -1
-            SlashVFXOffset: {x: 0, y: 1, z: 0}
-            SlashVFXRotation: {x: 0, y: 0, z: 0}
-            SlashVFXScale: 1
-            SlashVFXLifetime: 0.22
-            PlaybackSpeed: 1
-            TimeOffset: 0
-            FollowPlayer: 0
-            AlternateDirection: 1
-          SwingAudio:
-            Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
-            Accent: {fileID: 0}
-            Volume: 0.55
-            AccentVolume: 0.28
-            PitchRange: {x: 0.97, y: 1.03}
-          HitAudio:
-            Clip: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
-            Accent: {fileID: 0}
-            Volume: 0.68
-            AccentVolume: 0.28
-            PitchRange: {x: 0.97, y: 1.03}
-          OverrideHitVFX: 0
-          HitEffect:
-            Prefab: {fileID: 0}
-            Scale: {x: 1, y: 1, z: 1}
-            Rotation: {x: 0, y: 0, z: 0}
-          HitStop:
-            OverrideHitStop: 0
-            HitStopDuration: 0.08
-            HitStopTimeScale: 0.05
+            Scope: 0
+            Stacking: 0
+    SwitchAttackSteps:
+    - Balance:
+        EnableV2: 0
+        Damage: 2.2
+        PoiseDamage: 20
+        KnockbackForce: 15
+        StaggerResistLevel: 3
+      Execution:
+        AnimationName: S_SP_Skill_3
+        Duration: 4.4
+        ComboTransitionTime: 4.4
+        RecoveryCancelTime: -1
+        ActionCancelTime: -1
+        HitStartTime: 1.4
+        HitDuration: 0.3
+        Hitbox:
+          HitBoxOffset: {x: 0, y: 1, z: 1}
+          HitBoxShape: 0
+          HitBoxRadius: 2
+          HitBoxSize: {x: 1, y: 1, z: 1}
+          HitBoxHeight: 2
+        Movement:
+          UseDistanceMovement: 1
+          ForwardDistance: 0
+          MovementStartTime: 0.08
+          MovementEndTime: 0.3
+          MovementProgress:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          UntargetedDistanceMultiplier: 1
+          ThrustCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          ThrustMultiplier: 10
+          TargetApproach:
+            UseTargetApproach: 0
+            FollowMovingTarget: 1
+            TargetFollowSpeed: 6
+            TargetFollowRotationSpeed: 720
+            StopDistance: 0.25
+            ApproachAlignmentAngle: 15
+            ApproachEndTime: 0.3
+            RotationEndTime: 0.2
+            MaxApproachDistance: 2
+      Feedback:
+        HitEffect:
+          Prefab: {fileID: 0}
+          Scale: {x: 1, y: 1, z: 1}
+          Rotation: {x: 0, y: 0, z: 0}
+        SwingAudio:
+          Clip: {fileID: 0}
+          Accent: {fileID: 0}
+          Volume: 0.65
+          AccentVolume: 0.3
+          PitchRange: {x: 0.97, y: 1.03}
+        HitAudio:
+          Clip: {fileID: 0}
+          Accent: {fileID: 0}
+          Volume: 0.65
+          AccentVolume: 0.3
+          PitchRange: {x: 0.97, y: 1.03}
+        HitStop:
+          EnableV2: 0
+          OverrideHitStop: 0
+          HitStopDuration: 0.08
+          HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
+        Trail:
+          DisableTrail: 0
+          UseCustomTrailTiming: 1
+          TrailStartTime: 1.3
+          TrailEndTime: 1.8
+        Slash:
+          SlashVFX: {fileID: 0}
+          SlashVFXStartTime: -1
+          SlashVFXOffset: {x: 0, y: 1, z: 0}
+          SlashVFXRotation: {x: 0, y: 0, z: 0}
+          SlashVFXScale: 1
+          SlashVFXLifetime: 0.22
+          PlaybackSpeed: 1
+          TimeOffset: 0
+          FollowPlayer: 0
+          AlternateDirection: 1
+        Camera:
+          V2:
+            rid: -2
+          CameraProfile: {fileID: 0}
+          CameraShakeStrength: 0.1
+          OverrideCameraShakeDirection: 0
+          CameraShakeDirection: {x: 0, y: -1, z: 0}
+      HitEvents: []
     UltimateSteps:
     - Balance:
+        EnableV2: 0
         Damage: 10
         PoiseDamage: 10
         KnockbackForce: 8
@@ -1012,6 +1157,8 @@ MonoBehaviour:
         AnimationName: FireUlt
         Duration: 2
         ComboTransitionTime: 0
+        RecoveryCancelTime: -1
+        ActionCancelTime: -1
         HitStartTime: 1
         HitDuration: 0.5
         Hitbox:
@@ -1090,7 +1237,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: c0befd74da8d7994ab761bf6878fda58, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: c0befd74da8d7994ab761bf6878fda58, type: 3}
           Accent: {fileID: 0}
@@ -1104,9 +1250,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 0
           HitStopDuration: 0.08
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 0
@@ -1124,6 +1273,8 @@ MonoBehaviour:
           FollowPlayer: 0
           AlternateDirection: 1
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.1
           OverrideCameraShakeDirection: 0
@@ -1131,6 +1282,13 @@ MonoBehaviour:
       HitEvents: []
   CommonBalance:
     UltimateCooldown: 30
+    FormSp:
+      MaxSp: 100
+      DepletionSeconds: 30
+      RecoverySeconds: 20
+      ExhaustionRecoveryRatio: 0.2
+      ExhaustedAttackMultiplier: 0.8
+      ExhaustedAttackSpeedMultiplier: 0.8
   CommonExecution:
     ParryAnimationName: Parry
     AirAttackStartAnimationName: FireAirStart
@@ -1138,7 +1296,6 @@ MonoBehaviour:
     AirAttackLoopAnimationName: FireAirIdle
   CommonFeedback:
     HitVFX: {fileID: 1766868900565162, guid: f82a1a892a042c1438f8f4704a37e11b, type: 3}
-    HitSound: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
     HitAudio:
       Clip: {fileID: 8300000, guid: 6bab9b9f43f3cd24dab143b9bff2b293, type: 3}
       Accent: {fileID: 0}
@@ -1151,10 +1308,18 @@ MonoBehaviour:
       Volume: 0.68
       AccentVolume: 0.28
       PitchRange: {x: 0.97, y: 1.03}
+  ChainSettings:
+    Enabled: 1
+    Trigger: 1
+    ReadyDuration: 5
+    BuffDuration: 20
+    AttackBonusPercent: 30
+    AttackSpeedBonusPercent: 0
+    VulnerabilityBonusPercent: 0
+  _chainSettingsVersion: 1
   FormBalance:
     FireSkillBuffDuration: 6
     FireSkillAttackBonusPercent: 20
-    FireUltimateHealthDrainPercentPerSecond: 2
     FireUltimateDamageDealtBonusPercent: 50
     FireUltimateDamageTakenBonusPercent: 30
     FireUltimateAttackSpeedBonusPercent: 30
@@ -1164,3 +1329,8 @@ MonoBehaviour:
     FireSkillRadius: 3
     FireEnhancedSkillRadius: 5
     FireExplosionDelay: 0.15
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }

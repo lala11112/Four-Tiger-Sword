@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum PlayerHitReaction { None, Hit, Stagger, Knockback }
+public enum PlayerHitReaction { None, Hit, Stagger, Knockback, Knockdown }
 
 /// <summary>피격 중 행동을 막고 중력을 처리합니다. 경직/넉백도 같은 복귀 규칙을 사용합니다.</summary>
 public class PlayerHitState : IPlayerState
@@ -9,6 +9,7 @@ public class PlayerHitState : IPlayerState
     protected float Elapsed;
     protected Vector3 HitVelocity;
     private bool _previousRootMotion;
+    private bool _ownsRootMotion;
 
     public bool IsComplete { get; private set; }
     public virtual PlayerHitReaction Reaction => PlayerHitReaction.Hit;
@@ -17,16 +18,17 @@ public class PlayerHitState : IPlayerState
 
     public PlayerHitState(PlayerController player) => Player = player;
 
-    public void Enter()
+    public virtual void Enter()
     {
         Player.CancelPendingSwitchAttack();
         Player.StopParryKnockback();
         _previousRootMotion = Player.Animator.applyRootMotion;
+        _ownsRootMotion = true;
         Player.Animator.applyRootMotion = false;
         RestartReaction();
     }
 
-    private void RestartReaction()
+    protected virtual void RestartReaction()
     {
         HitVelocity = Player.ConsumeHitReaction();
         Elapsed = 0f;
@@ -39,25 +41,29 @@ public class PlayerHitState : IPlayerState
             TryPlay("Idle");
     }
 
-    private bool TryPlay(string stateName)
+    protected bool TryPlay(string stateName)
     {
         if (string.IsNullOrWhiteSpace(stateName)) return false;
         int hash = Animator.StringToHash(stateName);
         if (!Player.Animator.HasState(0, hash)) return false;
-        Player.Animator.CrossFade(hash, 0.05f, 0, 0f);
+        Player.Animator.CrossFadeInFixedTime(hash, 0.02f, 0, 0f);
         return true;
     }
 
-    public void Update()
+    public virtual void Update() => UpdateReaction(Player.ActionDeltaTime);
+
+    protected virtual void UpdateReaction(float deltaTime)
     {
         // StateMachine은 동일 타입으로 재진입하지 않으므로 연속 피격은 여기서 갱신합니다.
         if (Player.PendingHitReaction != PlayerHitReaction.None)
             RestartReaction();
 
-        ClearActionBuffers();
+        // Inputs sampled in the final recovery window may start on the first unlocked frame.
+        if (Elapsed + deltaTime < Duration - Mathf.Max(0f, Player.HitRecoveryInputBufferWindow))
+            ClearActionBuffers();
         Player.Movement.ApplyGravity();
-        Vector3 displacement = GetKnockbackDisplacement(Player.ActionDeltaTime);
-        displacement.y = Player.VerticalVelocity * Player.ActionDeltaTime;
+        Vector3 displacement = GetKnockbackDisplacement(deltaTime);
+        displacement.y = Player.VerticalVelocity * deltaTime;
         if (Player.Controller.enabled)
         {
             CollisionFlags flags = Player.Controller.Move(displacement);
@@ -65,8 +71,8 @@ public class PlayerHitState : IPlayerState
                 Player.VerticalVelocity = 0f;
         }
 
-        Elapsed += Player.ActionDeltaTime;
-        IsComplete = Elapsed >= Mathf.Max(0f, Duration);
+        Elapsed += deltaTime;
+        IsComplete = Elapsed + 0.000001f >= Mathf.Max(0f, Duration);
     }
 
     protected virtual Vector3 GetKnockbackDisplacement(float deltaTime) => Vector3.zero;
@@ -78,12 +84,23 @@ public class PlayerHitState : IPlayerState
         Player.Input.UltimateBuffer.Consume();
         Player.Input.JumpBuffer.Consume();
         Player.Input.DashBuffer.Consume();
+        Player.Input.ChainSkillBuffer.Consume();
+        Player.Input.ConsumeFormInput();
     }
 
-    public void Exit()
+    public virtual void Exit()
     {
-        Player.Animator.applyRootMotion = _previousRootMotion;
+        if (_ownsRootMotion && Player.Animator != null)
+            Player.Animator.applyRootMotion = _previousRootMotion;
+        _ownsRootMotion = false;
         Player.SetAnimationSpeed(1f);
         HitVelocity = Vector3.zero;
+    }
+
+    public void Cancel()
+    {
+        Player.ConsumeHitReaction();
+        IsComplete = true;
+        Exit();
     }
 }

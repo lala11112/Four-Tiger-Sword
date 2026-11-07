@@ -1,0 +1,457 @@
+{
+  "id": "BloodDonor",
+  "heightMeters": 1.85,
+  "modelFile": "BloodDonor.fbx",
+  "front": "Blender -Y; Unity infer exported Basis markers",
+  "parts": [
+    {
+      "name": "Body",
+      "pivotBlender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "role": "static",
+      "triangles": 34300
+    },
+    {
+      "name": "Donor_Cuff_Hinge",
+      "pivotBlender": [
+        0.6762913465499878,
+        -0.22052977979183197,
+        1.0977482795715332
+      ],
+      "role": "moving",
+      "triangles": 1576
+    },
+    {
+      "name": "Blood_Pump",
+      "pivotBlender": [
+        -0.24993376433849335,
+        -0.4165562689304352,
+        1.4505959749221802
+      ],
+      "role": "moving",
+      "triangles": 380
+    }
+  ],
+  "clips": [
+    {
+      "name": "Use",
+      "duration": 4,
+      "loop": false,
+      "rewardTime": 2,
+      "tracks": [
+        {
+          "part": "Donor_Cuff_Hinge",
+          "kind": "rotate",
+          "axis": "X",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.0
+            },
+            {
+              "time": 0.4,
+              "value": 0.0
+            },
+            {
+              "time": 1.15,
+              "value": 65.0
+            },
+            {
+              "time": 3.15,
+              "value": 65.0
+            },
+            {
+              "time": 4.0,
+              "value": 0.0
+            }
+          ]
+        },
+        {
+          "part": "Blood_Pump",
+          "kind": "move",
+          "axis": "Z",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.0
+            },
+            {
+              "time": 1.15,
+              "value": 0.0
+            },
+            {
+              "time": 1.65,
+              "value": -0.029403972767104276
+            },
+            {
+              "time": 2.15,
+              "value": 0.0
+            },
+            {
+              "time": 2.65,
+              "value": -0.029403972767104276
+            },
+            {
+              "time": 3.15,
+              "value": 0.0
+            },
+            {
+              "time": 4.0,
+              "value": 0.0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "EP_dark",
+      "baseColor": [
+        0.02199999988079071,
+        0.03799999877810478,
+        0.06199999898672104,
+        1.0
+      ],
+      "metallic": 0.3499999940395355,
+      "roughness": 0.47999998927116394,
+      "emission": [
+        0.02199999988079071,
+        0.03799999877810478,
+        0.06199999898672104
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_dark_BaseColor.png",
+      "normalTexture": "Textures/EP_dark_Normal.png",
+      "roughnessTexture": "Textures/EP_dark_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_dark_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_steel",
+      "baseColor": [
+        0.08500000089406967,
+        0.13500000536441803,
+        0.20499999821186066,
+        1.0
+      ],
+      "metallic": 0.5799999833106995,
+      "roughness": 0.38999998569488525,
+      "emission": [
+        0.08500000089406967,
+        0.13500000536441803,
+        0.20499999821186066
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_steel_BaseColor.png",
+      "normalTexture": "Textures/EP_steel_Normal.png",
+      "roughnessTexture": "Textures/EP_steel_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_steel_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_rubber",
+      "baseColor": [
+        0.012000000104308128,
+        0.01899999938905239,
+        0.02800000086426735,
+        1.0
+      ],
+      "metallic": 0.05000000074505806,
+      "roughness": 0.699999988079071,
+      "emission": [
+        0.012000000104308128,
+        0.01899999938905239,
+        0.02800000086426735
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_edge",
+      "baseColor": [
+        0.2800000011920929,
+        0.3700000047683716,
+        0.46000000834465027,
+        1.0
+      ],
+      "metallic": 0.7200000286102295,
+      "roughness": 0.3100000023841858,
+      "emission": [
+        0.2800000011920929,
+        0.3700000047683716,
+        0.46000000834465027
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_edge_BaseColor.png",
+      "normalTexture": "Textures/EP_edge_Normal.png",
+      "roughnessTexture": "Textures/EP_edge_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_edge_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_panel",
+      "baseColor": [
+        0.15000000596046448,
+        0.23000000417232513,
+        0.3199999928474426,
+        1.0
+      ],
+      "metallic": 0.5199999809265137,
+      "roughness": 0.36000001430511475,
+      "emission": [
+        0.15000000596046448,
+        0.23000000417232513,
+        0.3199999928474426
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_panel_BaseColor.png",
+      "normalTexture": "Textures/EP_panel_Normal.png",
+      "roughnessTexture": "Textures/EP_panel_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_panel_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_silver",
+      "baseColor": [
+        0.49000000953674316,
+        0.5899999737739563,
+        0.6600000262260437,
+        1.0
+      ],
+      "metallic": 0.8199999928474426,
+      "roughness": 0.25999999046325684,
+      "emission": [
+        0.49000000953674316,
+        0.5899999737739563,
+        0.6600000262260437
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_silver_BaseColor.png",
+      "normalTexture": "Textures/EP_silver_Normal.png",
+      "roughnessTexture": "Textures/EP_silver_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_silver_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_amber",
+      "baseColor": [
+        0.7799999713897705,
+        0.4399999976158142,
+        0.11999999731779099,
+        1.0
+      ],
+      "metallic": 0.6200000047683716,
+      "roughness": 0.2800000011920929,
+      "emission": [
+        0.7799999713897705,
+        0.4399999976158142,
+        0.11999999731779099
+      ],
+      "emissionStrength": 0.05999999865889549,
+      "transparent": false,
+      "texture": "Textures/EP_amber_BaseColor.png",
+      "normalTexture": "Textures/EP_amber_Normal.png",
+      "roughnessTexture": "Textures/EP_amber_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_amber_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_cyan",
+      "baseColor": [
+        0.014999999664723873,
+        0.6399999856948853,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.10000000149011612,
+      "roughness": 0.23999999463558197,
+      "emission": [
+        0.014999999664723873,
+        0.6399999856948853,
+        1.0
+      ],
+      "emissionStrength": 2.200000047683716,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "BloodDonor_clear_vessel_shell",
+      "baseColor": [
+        0.2199999988079071,
+        0.4300000071525574,
+        0.550000011920929,
+        0.054999999701976776
+      ],
+      "metallic": 0.0,
+      "roughness": 0.05999999865889549,
+      "emission": [
+        0.2199999988079071,
+        0.4300000071525574,
+        0.550000011920929
+      ],
+      "emissionStrength": 0.0,
+      "transparent": true,
+      "texture": ""
+    },
+    {
+      "name": "EP_red",
+      "baseColor": [
+        0.3799999952316284,
+        0.00800000037997961,
+        0.024000000208616257,
+        1.0
+      ],
+      "metallic": 0.11999999731779099,
+      "roughness": 0.25,
+      "emission": [
+        0.3799999952316284,
+        0.00800000037997961,
+        0.024000000208616257
+      ],
+      "emissionStrength": 0.20000000298023224,
+      "transparent": false,
+      "texture": "Textures/EP_red_BaseColor.png",
+      "normalTexture": "Textures/EP_red_Normal.png",
+      "roughnessTexture": "Textures/EP_red_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_red_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_screen",
+      "baseColor": [
+        0.00800000037997961,
+        0.054999999701976776,
+        0.11500000208616257,
+        1.0
+      ],
+      "metallic": 0.20000000298023224,
+      "roughness": 0.30000001192092896,
+      "emission": [
+        0.00800000037997961,
+        0.054999999701976776,
+        0.11500000208616257
+      ],
+      "emissionStrength": 0.15000000596046448,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_ink",
+      "baseColor": [
+        0.012000000104308128,
+        0.02800000086426735,
+        0.04600000008940697,
+        1.0
+      ],
+      "metallic": 0.3499999940395355,
+      "roughness": 0.41999998688697815,
+      "emission": [
+        0.012000000104308128,
+        0.02800000086426735,
+        0.04600000008940697
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_rim",
+      "baseColor": [
+        0.47999998927116394,
+        0.6399999856948853,
+        0.7200000286102295,
+        1.0
+      ],
+      "metallic": 0.7799999713897705,
+      "roughness": 0.25,
+      "emission": [
+        0.47999998927116394,
+        0.6399999856948853,
+        0.7200000286102295
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_red",
+      "baseColor": [
+        0.46000000834465027,
+        0.017999999225139618,
+        0.04500000178813934,
+        1.0
+      ],
+      "metallic": 0.30000001192092896,
+      "roughness": 0.27000001072883606,
+      "emission": [
+        0.46000000834465027,
+        0.017999999225139618,
+        0.04500000178813934
+      ],
+      "emissionStrength": 0.11999999731779099,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_redlight",
+      "baseColor": [
+        0.9800000190734863,
+        0.15000000596046448,
+        0.20000000298023224,
+        1.0
+      ],
+      "metallic": 0.25,
+      "roughness": 0.23999999463558197,
+      "emission": [
+        0.9800000190734863,
+        0.15000000596046448,
+        0.20000000298023224
+      ],
+      "emissionStrength": 0.2199999988079071,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_white",
+      "baseColor": [
+        0.699999988079071,
+        0.9399999976158142,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.30000001192092896,
+      "roughness": 0.20000000298023224,
+      "emission": [
+        0.699999988079071,
+        0.9399999976158142,
+        1.0
+      ],
+      "emissionStrength": 0.30000001192092896,
+      "transparent": false,
+      "texture": ""
+    }
+  ],
+  "boundsBlender": [
+    [
+      -0.5880794525146484,
+      -0.8938808441162109,
+      -2.9802322387695312e-08
+    ],
+    [
+      0.9139580726623535,
+      0.38274165987968445,
+      1.850000023841858
+    ]
+  ],
+  "triangles": 36256,
+  "metadata": {
+    "interactionHeightMeters": 1.02,
+    "defaultState": "Idle",
+    "construction": "Solid chamfered rigid meshes, real fluid vessels, geometric status icons",
+    "animationDescription": "Cuff lowers onto armrest; pump piston cycles twice; returns to idle"
+  },
+  "normalizationScale": 0.9801324255701426
+}

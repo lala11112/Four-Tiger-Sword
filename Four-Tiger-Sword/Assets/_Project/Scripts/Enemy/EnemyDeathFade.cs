@@ -34,6 +34,9 @@ public sealed class EnemyDeathFade : MonoBehaviour
     private float _elapsed;
     private bool _playing;
     private bool _materialsApplied;
+    private Transform _visualRoot;
+
+    public void BindVisualRoot(Transform visualRoot) => _visualRoot = visualRoot;
 
     public void BeginFade()
     {
@@ -65,6 +68,7 @@ public sealed class EnemyDeathFade : MonoBehaviour
         foreach (var target in _targets)
         {
             if (target.Renderer == null || target.Materials == null) continue;
+            if (_visualRoot != null && !target.Renderer.transform.IsChildOf(_visualRoot)) continue;
             var originalMaterials = target.Renderer.sharedMaterials;
             if (target.Materials.Length != originalMaterials.Length) continue;
 

@@ -1,0 +1,172 @@
+{
+  "version": 1,
+  "attackId": "a08babf2b48684e72bc1f482c3b6e8f9c",
+  "typeId": "Baekho.Generated.a08babf2b48684e72bc1f482c3b6e8f9c.MonsterDashDoubleReturnSO",
+  "name": "돌진 2연타 후 원위치 후퇴",
+  "description": "기존 감지·공격 선택·쿨타임 조건을 만족하고 플레이어가 6m 이내에 있으면 실행합니다. 기본값은 0.15초 준비 후 돌진 시작 순간의 플레이어 위치를 향해 18m/s로 이동하여 1.2m 앞에서 멈춥니다. 도착 0.05초 후부터 0.2초 간격으로 두 번 공격하며, 각 판정은 0.08초간 유지되고 대상당 한 번씩 ATK×0.5의 피해를 시도합니다. 마지막 판정 종료 0.05초 후 전방을 바라본 채 20m/s로 출발 위치까지 후퇴하고 0.15초 후 종료합니다. 이동 중에는 공격 판정이 없으며, 플레이어가 피하면 빗나갑니다. 벽·NavMesh 경계를 관통하지 않고, 복귀 경로가 막히면 안전한 위치에서 멈춥니다. 패링이나 피격 등으로 중단되면 남은 타격과 복귀를 취소하고 이동 설정을 복구합니다. 타이밍과 이동 속도에는 attackSpeed가 적용됩니다. 기존 속성·치명타·경직·사운드 규칙을 유지하며, Attack/Move 애니메이션은 해당 상태가 있을 때만 사용합니다.",
+  "defaults": {
+    "animName": "Attack",
+    "engageRange": 6,
+    "executeRange": 6,
+    "weight": 100,
+    "minimumRange": 0,
+    "preferredRange": 4,
+    "cooldown": 0,
+    "repeatWeightMultiplier": 0.5,
+    "attackSpeed": 1,
+    "staggerLevel": 1,
+    "isParryable": true,
+    "telegraphDuration": 0.15,
+    "SwingAudio": {
+      "Clip": null,
+      "Accent": null,
+      "Volume": 0.65,
+      "AccentVolume": 0.3,
+      "PitchRange": [
+        0.97,
+        1.03
+      ]
+    },
+    "HitAudio": {
+      "Clip": null,
+      "Accent": null,
+      "Volume": 0.65,
+      "AccentVolume": 0.3,
+      "PitchRange": [
+        0.97,
+        1.03
+      ]
+    },
+    "LandingAudio": {
+      "Clip": null,
+      "Accent": null,
+      "Volume": 0.65,
+      "AccentVolume": 0.3,
+      "PitchRange": [
+        0.97,
+        1.03
+      ]
+    },
+    "startupTime": 0.15,
+    "dashSpeed": 18,
+    "returnSpeed": 20,
+    "maxDashDistance": 6,
+    "stopDistance": 1.2,
+    "firstHitDelay": 0.05,
+    "hitInterval": 0.2,
+    "hitDuration": 0.08,
+    "returnDelay": 0.05,
+    "recoveryTime": 0.15,
+    "firstDamage": 0.5,
+    "secondDamage": 0.5,
+    "knockbackForce": 0,
+    "hitBoxOffset": [
+      0,
+      1,
+      0.9
+    ],
+    "hitBoxRadius": 0.85,
+    "obstacleMask": -5,
+    "dashAnimName": "Move",
+    "returnAnimName": "Move"
+  },
+  "preview": {
+    "shapes": [
+      {
+        "shape": "path",
+        "start": 0.15,
+        "end": 0.25,
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "radius": 0.5,
+        "size": [
+          1,
+          2,
+          1
+        ],
+        "height": 2,
+        "points": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1.8
+          ]
+        ]
+      },
+      {
+        "shape": "sphere",
+        "start": 0.3,
+        "end": 0.38,
+        "offset": [
+          0,
+          1,
+          2.7
+        ],
+        "radius": 0.85,
+        "size": [
+          1.7,
+          1.7,
+          1.7
+        ],
+        "height": 1.7,
+        "points": []
+      },
+      {
+        "shape": "sphere",
+        "start": 0.5,
+        "end": 0.58,
+        "offset": [
+          0,
+          1,
+          2.7
+        ],
+        "radius": 0.85,
+        "size": [
+          1.7,
+          1.7,
+          1.7
+        ],
+        "height": 1.7,
+        "points": []
+      },
+      {
+        "shape": "path",
+        "start": 0.63,
+        "end": 0.72,
+        "offset": [
+          0,
+          0,
+          0
+        ],
+        "radius": 0.5,
+        "size": [
+          1,
+          2,
+          1
+        ],
+        "height": 2,
+        "points": [
+          [
+            0,
+            0,
+            1.8
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    ]
+  },
+  "previewSupported": true
+}

@@ -15,7 +15,7 @@ public abstract partial class BaseForm
     public bool CanSelectFinisher => _normalAttackActive && !_finisherAttackActive
         && _currentAction == ActionType.Attack && _comboStep == 1
         && CurrentNormalAttackStep != null
-        && _timer >= FinisherSelectionStart && _timer < CurrentNormalAttackStep.Duration;
+        && _timer >= LastNormalAttackHitEnd && _timer < CurrentNormalAttackStep.Duration;
     public float FinisherSelectionWindowRemaining => CanSelectFinisher
         ? Mathf.Max(0f, CurrentNormalAttackStep.Duration - _timer) : 0f;
 
@@ -31,7 +31,8 @@ public abstract partial class BaseForm
             && step.Balance != null && step.Feedback?.Trail != null && step.Feedback.Camera != null
             && step.Duration > 0f && !float.IsInfinity(step.Duration) && !float.IsNaN(step.Duration);
 
-    private float FinisherSelectionStart
+    // Both finisher selection and recovery cancellation must preserve every authored hit.
+    private float LastNormalAttackHitEnd
     {
         get
         {

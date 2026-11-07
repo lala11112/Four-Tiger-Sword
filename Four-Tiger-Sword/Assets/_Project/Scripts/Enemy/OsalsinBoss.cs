@@ -10,10 +10,8 @@ using UnityEngine;
 ///
 /// [인스펙터 설정]
 /// PhaseDatas 리스트에 4개의 BossPhaseData SO를 순서대로 배치합니다.
-///   [0] 화(火) — triggerHpPercent : 100
-///   [1] 수(水) — triggerHpPercent : 80
-///   [2] 목(木) — triggerHpPercent : 60
-///   [3] 토(土) — triggerHpPercent : 40
+///   [0] 화(火), [1] 수(水), [2] 목(木), [3] 토(土).
+/// 각 데이터의 phaseMaxHp를 모두 소진하면 빈사 후 다음 페이즈로 부활합니다.
 /// </summary>
 public class OsalsinBoss : Boss
 {
@@ -61,7 +59,7 @@ public class OsalsinBoss : Boss
     // BossPhaseBase를 상속하여 필요한 메서드만 오버라이드합니다.
     // =========================================================================
 
-    // ── 화(火) 페이즈 [100% ~ 80%] ───────────────────────────────────────────
+    // ── 화(火) 페이즈 ───────────────────────────────────────────────────────
 
     private sealed class FirePhase : BossPhaseBase
     {
@@ -80,7 +78,7 @@ public class OsalsinBoss : Boss
         }
     }
 
-    // ── 수(水) 페이즈 [80% ~ 60%] ────────────────────────────────────────────
+    // ── 수(水) 페이즈 ───────────────────────────────────────────────────────
 
     private sealed class WaterPhase : BossPhaseBase
     {
@@ -99,7 +97,7 @@ public class OsalsinBoss : Boss
         }
     }
 
-    // ── 목(木) 페이즈 [60% ~ 40%] ────────────────────────────────────────────
+    // ── 목(木) 페이즈 ───────────────────────────────────────────────────────
 
     private sealed class WoodPhase : BossPhaseBase
     {
@@ -118,7 +116,7 @@ public class OsalsinBoss : Boss
         }
     }
 
-    // ── 토(土) 페이즈 [40% ~ 20%] ────────────────────────────────────────────
+    // ── 토(土) 마지막 페이즈 ────────────────────────────────────────────────
 
     private sealed class EarthPhase : BossPhaseBase
     {
@@ -148,10 +146,10 @@ public class OsalsinBoss : Boss
         /// 하수인 1마리당 15% 데미지 감소 (최대 75%).
         /// 하수인을 처치하면 감소율이 줄어듭니다.
         /// </summary>
-        public override int ModifyIncomingDamage(int rawDamage, Boss boss)
+        public override float ModifyIncomingDamage(float rawDamage, Boss boss)
         {
             float reduction = Mathf.Min(_osalsin.AliveMinionCount * ReductionPerMinion, MaxReduction);
-            return Mathf.RoundToInt(rawDamage * (1f - reduction));
+            return rawDamage * (1f - reduction);
         }
     }
 }

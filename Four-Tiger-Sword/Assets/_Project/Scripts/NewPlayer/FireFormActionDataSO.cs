@@ -3,6 +3,13 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "FireFormAction", menuName = "Combat/Forms/Fire")]
 public class FireFormActionDataSO : WeaponActionDataSO
 {
+    protected override FormChainSettings CreateDefaultChainSettings() => new FormChainSettings
+    {
+        Enabled = true,
+        Trigger = FormChainTrigger.OtherFormFinalHit,
+        AttackBonusPercent = 30f
+    };
+
     [InspectorName("폼 밸런스 (Balance)")]
     public FireFormBalanceSettings FormBalance = new FireFormBalanceSettings();
     [InspectorName("폼 동작·판정 (Execution)")]
@@ -12,7 +19,6 @@ public class FireFormActionDataSO : WeaponActionDataSO
     public float FireEnhancedSkillRadius { get => FormExecution.FireEnhancedSkillRadius; set => FormExecution.FireEnhancedSkillRadius = value; }
     public float FireSkillBuffDuration { get => FormBalance.FireSkillBuffDuration; set => FormBalance.FireSkillBuffDuration = value; }
     public float FireSkillAttackBonusPercent { get => FormBalance.FireSkillAttackBonusPercent; set => FormBalance.FireSkillAttackBonusPercent = value; }
-    public float FireUltimateHealthDrainPercentPerSecond { get => FormBalance.FireUltimateHealthDrainPercentPerSecond; set => FormBalance.FireUltimateHealthDrainPercentPerSecond = value; }
     public float FireUltimateDamageDealtBonusPercent { get => FormBalance.FireUltimateDamageDealtBonusPercent; set => FormBalance.FireUltimateDamageDealtBonusPercent = value; }
     public float FireUltimateDamageTakenBonusPercent { get => FormBalance.FireUltimateDamageTakenBonusPercent; set => FormBalance.FireUltimateDamageTakenBonusPercent = value; }
     public float FireUltimateAttackSpeedBonusPercent { get => FormBalance.FireUltimateAttackSpeedBonusPercent; set => FormBalance.FireUltimateAttackSpeedBonusPercent = value; }
@@ -44,8 +50,6 @@ public class FireFormBalanceSettings
     public float FireSkillAttackBonusPercent = 20f;
 
     [Header("Fire Toggle Ultimate")]
-    [Min(0f), Tooltip("궁극기 유지 중 초당 최대 체력 소모율(%). 보호막/피격 효과를 무시하며 체력이 1이 되면 자동 해제됩니다. 0이면 소모하지 않습니다.")]
-    public float FireUltimateHealthDrainPercentPerSecond = 2f;
     [Min(0f), Tooltip("궁극기 중 주는 피해 증가율(%)")]
     public float FireUltimateDamageDealtBonusPercent = 50f;
     [Min(0f), Tooltip("궁극기 중 받는 피해 증가율(%)")]

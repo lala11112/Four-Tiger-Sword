@@ -27,6 +27,7 @@ public class FormEffectRunner : MonoBehaviour
 
     public IEnumerator DelayedExplosion(float impactDelay, float explosionDelay, float radius, HitInfo hit)
     {
+        hit = hit.WithoutDirectPlayerHit();
         yield return new WaitForSeconds(impactDelay);
         if (!CanTick) yield break;
         if (!(_owner.StateMachine.CurrentState is PlayerSkillState)) yield break;
@@ -40,6 +41,7 @@ public class FormEffectRunner : MonoBehaviour
 
     public IEnumerator DelayedHits(Component target, HitInfo hit, GameObject vfx)
     {
+        hit = hit.WithoutDirectPlayerHit();
         for (int i = 0; i < 5; i++)
         {
             yield return new WaitForSeconds(0.3f);
@@ -53,6 +55,7 @@ public class FormEffectRunner : MonoBehaviour
 
     public IEnumerator Field(float delay, float duration, float radius, HitInfo hit, float healFraction)
     {
+        hit = hit.WithoutDirectPlayerHit();
         yield return new WaitForSeconds(delay);
         if (!CanTick) yield break;
         if (healFraction > 0f ? !(_owner.StateMachine.CurrentState is PlayerUltimateState)

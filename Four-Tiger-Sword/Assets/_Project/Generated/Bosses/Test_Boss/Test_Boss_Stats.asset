@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e14778ea8d650bd49bb7d3033efcdc59, type: 3}
+  m_Name: Test_Boss_Stats
+  m_EditorClassIdentifier: Assembly-CSharp::BossData
+  elementType: 1
+  maxHp: 4800
+  baseAtk: 150
+  baseDef: 150
+  criticalChance: 0.05
+  criticalDamage: 1.5
+  combatRange: 10
+  combatExitRange: 14
+  knockbackMoveTime: 0.16
+  knockbackMaxDistance: 0.6
+  attackCooldown: 1.4
+  monsterSkillData: {fileID: 11400000, guid: 431b7ae4f80682f45898de99b2d9afca, type: 2}
+  staggerResistLevel: 3
+  bossId: 3c234fa5f355302418ca178e57d36942
+  bossName: Test_Boss
+  phaseDownSeconds: 1
+  phaseHoldSeconds: 0.5
+  phaseReviveSeconds: 1.5
+  groggyDamageMult: 1.5
+  enableWeakness: 0
+  weaknessElement: 0
+  weakDamageMult: 1.5
+  enableResistance: 0
+  resistElement: 0
+  resistDamageMult: 0.5
+  statusImmunityList:
+  - Airborne
+  initialShield: 0
+  rewardGroup: {fileID: 11400000, guid: 3623dd1b570fe3d48a58cdbabff0e6c0, type: 2}

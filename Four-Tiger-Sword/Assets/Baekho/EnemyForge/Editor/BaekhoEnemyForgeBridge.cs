@@ -29,7 +29,7 @@ namespace StudioBaekho.EnemyForge
         private static StringComparison PathComparison => Application.platform == RuntimePlatform.WindowsEditor ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         public sealed class Parameters
         {
-            [ToolParameter("catalog, assets_search, validate, build, status, preview_open, preview_frame, preview_close, compiler_info, refresh, compilation_status or validate_attack")]
+            [ToolParameter("catalog, assets_search, analyze_model, animation_info, validate, validate_configuration, build, status, preview_open, preview_frame, preview_close, compiler_info, refresh, compilation_status or validate_attack")]
             public string action { get; set; }
             [ToolParameter("Absolute expected Unity project root. Access is rejected if it does not match the connected project.")]
             public string expectedProjectRoot { get; set; }
@@ -56,12 +56,23 @@ namespace StudioBaekho.EnemyForge
                 string project = RequireProject((string)parameters?["expectedProjectRoot"]);
                 string action = (string)parameters?["action"];
                 var payload = parameters?["payload"] as JObject ?? new JObject();
+                // Build hashes must retain the exact submitted bytes; the builder normalizes
+                // only after hash verification. Read/preview operations can normalize here.
+                if (action == "analyze_model" || action == "preview_open" || action == "preview_frame")
+                {
+                    payload = (JObject)payload.DeepClone();
+                    if (payload["blueprint"] is JObject input) payload["blueprint"] = BaekhoEnemyForgeBoss.Normalize(input);
+                    else if (action == "analyze_model") payload = BaekhoEnemyForgeBoss.Normalize(payload);
+                }
                 object result;
                 switch (action)
                 {
-                    case "catalog": RequireReady(false); result = BaekhoEnemyForgeCatalog.Get(); break;
+                    case "catalog": RequireReady(false); result = BaekhoEnemyForgeCatalog.Get((string)payload["kind"] ?? "normal"); break;
                     case "assets_search": RequireReady(false); result = BaekhoEnemyForgeCatalog.SearchAssets(payload); break;
+                    case "analyze_model": RequireReady(true); result = BaekhoEnemyForgeModelAnalysis.Analyze(payload["blueprint"] as JObject ?? payload); break;
+                    case "animation_info": RequireReady(false); result = BaekhoEnemyForgeAnimation.Inspect(payload["controller"] as JObject); break;
                     case "validate": RequireReady(false); result = BaekhoEnemyForgeBuilder.Validate(payload["blueprint"] as JObject ?? payload); break;
+                    case "validate_configuration": RequireReady(false); result = BaekhoEnemyForgeBuilder.ValidateConfiguration(payload["blueprint"] as JObject ?? payload); break;
                     case "build": result = Build(project, payload); break;
                     case "status": result = Status(project, payload); break;
                     case "preview_open": case "preview_frame": case "preview_close": result = BaekhoEnemyForgePreview.Handle(action, payload); break;
@@ -283,11 +294,12 @@ namespace StudioBaekho.EnemyForge
             check((bool)BaekhoEnemyForgeBuilder.Validate(blueprint, false)["valid"], "Drone template validates");
             blueprint["stats"]["maxHp"] = 0; check(!(bool)BaekhoEnemyForgeBuilder.Validate(blueprint, false)["valid"], "zero HP rejected");
             blueprint = (JObject)catalog["template"].DeepClone(); blueprint["animation"]["states"]["Move"] = null;
+            blueprint["animation"]["move"] = null;
             check(!(bool)BaekhoEnemyForgeBuilder.Validate(blueprint, false)["valid"], "missing Move rejected");
             blueprint = (JObject)catalog["template"].DeepClone(); blueprint["name"] = "../escape";
             check(!(bool)BaekhoEnemyForgeBuilder.Validate(blueprint, false)["valid"], "path traversal rejected");
             check(BaekhoEnemyForgeCatalog.Resolve(catalog["template"]["model"], typeof(GameObject)) != null, "model localId round trip");
-            return "PASS: " + checks + " enemy forge catalog/validation checks; " + BaekhoEnemyForgePreview.RunGeometryRegression();
+            return "PASS: " + checks + " enemy forge catalog/validation checks; " + BaekhoEnemyForgePreview.RunGeometryRegression() + "; " + BaekhoEnemyForgeModelAnalysis.RunRegression();
         }
 
         /// <summary>Disposable integration fixtures; source prefab/SOs/controllers must remain byte-identical.</summary>
@@ -348,6 +360,7 @@ namespace StudioBaekho.EnemyForge
                     if (clip == null) continue;
                     var alternate = (JObject)blueprint.DeepClone(); alternate["name"] = "EnemyForgeModelRegression_" + Guid.NewGuid().ToString("N"); alternate["model"] = reference.DeepClone();
                     foreach (var state in ((JObject)alternate["animation"]["states"]).Properties().ToArray()) state.Value = BaekhoEnemyForgeCatalog.AssetRef(clip);
+                    alternate["animation"]["move"] = null;
                     if (!(bool)BaekhoEnemyForgeBuilder.Validate(alternate)["valid"]) continue;
                     string alternateFolder = BaekhoEnemyForgeBuilder.OutputFolder(alternate); folders.Add(alternateFolder);
                     var alternateResult = BaekhoEnemyForgeBuilder.Build(alternate); reports.Add(alternateResult);

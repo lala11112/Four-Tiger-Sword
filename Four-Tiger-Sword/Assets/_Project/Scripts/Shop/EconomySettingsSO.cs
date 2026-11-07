@@ -10,6 +10,8 @@ public sealed class EconomySettingsSO : ScriptableObject
     [Min(1)] public int baseItemCount = 3;
     [Min(0)] public int healingPrice = 20;
     [Range(0.01f, 1f)] public float healingFraction = 0.3f;
+    [Range(0.01f, 0.99f)] public float saleFraction = 0.5f;
+    [Range(0f, 1f)] public float fusionUpgradeChance = 0.5f;
     [Min(0.1f)] public float interactionDistance = 2.5f;
 
     public bool Validate(out string error)
@@ -20,6 +22,10 @@ public sealed class EconomySettingsSO : ScriptableObject
             error = "The shop's base item count must be positive.";
         else if (!Finite(healingFraction) || healingFraction <= 0f || healingFraction > 1f)
             error = "The shop healing fraction must be greater than zero and at most one.";
+        else if (!Finite(saleFraction) || saleFraction <= 0f || saleFraction >= 1f)
+            error = "The sale fraction must be greater than zero and less than one.";
+        else if (!Finite(fusionUpgradeChance) || fusionUpgradeChance < 0f || fusionUpgradeChance > 1f)
+            error = "The fusion upgrade chance must be between zero and one.";
         else if (!Finite(interactionDistance) || interactionDistance <= 0f)
             error = "The shop interaction distance must be positive and finite.";
         else { error = null; return true; }

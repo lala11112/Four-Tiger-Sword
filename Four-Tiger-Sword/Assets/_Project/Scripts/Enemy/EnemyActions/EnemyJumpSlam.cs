@@ -19,7 +19,10 @@ public class EnemyJumpSlam : EnemyAction
     private Phase _phase;
     private Vector3 _jumpStartPos;
     private Vector3 _jumpTargetPos;
-    private bool _movementUnlocked;
+    private bool _movementUnlocked = true;
+    private bool _navigationDisabledForJump;
+    public override bool SupportsBossPolicy => true;
+    protected override float BossInitialStartupDuration => _data.startupTime;
 
     public EnemyJumpSlam(MonsterJumpSlamSO data, Enemy enemy)
         : base(data, enemy)
@@ -30,7 +33,10 @@ public class EnemyJumpSlam : EnemyAction
 
     public override void Enter()
     {
+        _movementUnlocked = true;
+        _navigationDisabledForJump = false;
         base.Enter();
+        if (!CanContinueAction) return;
         _phase = Phase.Startup;
         _hitTargets.Clear();
         _movementUnlocked = false;
@@ -43,17 +49,22 @@ public class EnemyJumpSlam : EnemyAction
 
     public override void Update()
     {
+        if (!CanContinueAction) return;
+        float previousTime = _timer;
         base.Update();
+        if (!CanContinueAction) return;
 
         switch (_phase)
         {
             case Phase.Startup:
-                FaceTarget();
+                if (HasBossPolicy) TickBossPreparation(previousTime, _timer, 0f, _data.startupTime);
+                else FaceTarget();
                 if (_timer >= _data.startupTime)
                 {
                     BeginJump();
                     _timer = 0f;
                     _phase = Phase.Jump;
+                    SetBossStage(BossAttackStage.Active);
                 }
                 break;
 
@@ -62,8 +73,11 @@ public class EnemyJumpSlam : EnemyAction
                 if (_timer >= _data.jumpDuration)
                 {
                     Land();
+                    if (!CanContinueAction) return;
+                    EndNormalAttackArmor();
                     _timer = 0f;
                     _phase = Phase.Recovery;
+                    SetBossStage(BossAttackStage.Recovery);
                 }
                 break;
 
@@ -76,9 +90,10 @@ public class EnemyJumpSlam : EnemyAction
 
     public override void Exit()
     {
+        if (!IsActive) return;
         base.Exit(); // 예고가 아직 활성 상태라면 여기서 종료
         // 상태가 중단될 경우에도 NavMeshAgent 복구
-        if (!_nav.enabled)
+        if (_navigationDisabledForJump)
         {
             RestoreNavigation(_enemy.transform.position);
         }
@@ -100,7 +115,12 @@ public class EnemyJumpSlam : EnemyAction
         _jumpStartPos = _enemy.transform.position;
 
         // 도약 시점의 플레이어 위치를 목표로 고정 (이후 플레이어가 움직여도 방향 불변)
-        if (_enemy.DetectedTarget != null)
+        if (HasBossPolicy)
+        {
+            Vector3 target = BossAimPoint;
+            _jumpTargetPos = new Vector3(target.x, _jumpStartPos.y, target.z);
+        }
+        else if (_enemy.DetectedTarget != null)
         {
             Vector3 t = _enemy.DetectedTarget.position;
             _jumpTargetPos = new Vector3(t.x, _jumpStartPos.y, t.z);
@@ -111,6 +131,7 @@ public class EnemyJumpSlam : EnemyAction
         }
 
         // 공중 이동 중 NavMesh 간섭 차단
+        _navigationDisabledForJump = true;
         _nav.enabled = false;
     }
 
@@ -128,7 +149,7 @@ public class EnemyJumpSlam : EnemyAction
 
         // 낙하 방향으로 적 회전 (선택)
         Vector3 moveDir = (_jumpTargetPos - _jumpStartPos).normalized;
-        if (moveDir != Vector3.zero)
+        if (!HasBossPolicy && moveDir != Vector3.zero)
             _enemy.transform.rotation = Quaternion.LookRotation(moveDir);
     }
 
@@ -155,6 +176,7 @@ public class EnemyJumpSlam : EnemyAction
 
     private void RestoreNavigation(Vector3 desiredPosition)
     {
+        _navigationDisabledForJump = false;
         // 공중에서 중단된 경우 먼저 지면을 찾은 뒤 에이전트를 켭니다.
         var filter = new NavMeshQueryFilter { agentTypeID = _nav.agentTypeID, areaMask = _nav.areaMask };
         float searchRadius = Mathf.Max(2f, _data.jumpHeight + 1f);
@@ -177,6 +199,7 @@ public class EnemyJumpSlam : EnemyAction
 
         foreach (var col in Physics.OverlapSphere(center, _data.slamRadius, _playerLayer))
         {
+            if (!CanContinueAction) return;
             var damageable = col.GetComponentInParent<IDamageable>();
             if (damageable == null || !_hitTargets.Add(damageable)) continue;
 
@@ -186,6 +209,7 @@ public class EnemyJumpSlam : EnemyAction
                 new HitInfo(_data.damage * _enemy.EnemyStat.GetStat(EnemyStatType.ATK), _enemy.Element, _enemy.EnemyStat.GetStat(EnemyStatType.CriticalChance),
                             _enemy.EnemyStat.GetStat(EnemyStatType.CriticalDamage), power: knockback, staggerResistLevel: _data.staggerLevel, isParryable: _data.isParryable, source: this, impactSound: ResolveHitSound()),
                 damageable, col.gameObject);
+            if (!CanContinueAction) return;
         }
     }
 }

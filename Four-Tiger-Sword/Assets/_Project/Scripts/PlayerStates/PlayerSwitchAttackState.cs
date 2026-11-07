@@ -1,4 +1,4 @@
-/// <summary>Automatic attack from a committed form switch. It never spends E SP or starts E cooldown.</summary>
+/// <summary>Consumes a ready chain after the previous state has exited, then plays its dedicated attack.</summary>
 public sealed class PlayerSwitchAttackState : IPlayerState
 {
     private readonly PlayerController _player;
@@ -9,8 +9,8 @@ public sealed class PlayerSwitchAttackState : IPlayerState
 
     public void Enter()
     {
-        _form = _player.TakePendingSwitchAttack();
-        IsComplete = _form == null;
+        _form = null;
+        IsComplete = !_player.FormManager.TryUseReadyChainSkill(out _form);
         ClearInputs();
         _form?.BeginSwitchAttack();
     }
@@ -39,6 +39,7 @@ public sealed class PlayerSwitchAttackState : IPlayerState
         _player.Input.UltimateBuffer.Consume();
         _player.Input.DashBuffer.Consume();
         _player.Input.JumpBuffer.Consume();
+        _player.Input.ChainSkillBuffer.Consume();
         _player.Input.ConsumeFormInput();
     }
 }

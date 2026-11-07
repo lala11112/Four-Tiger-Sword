@@ -1,8 +1,8 @@
 // Edit Mode: Unity Pipeline run_script, KnockbackRegression.Run.
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 
@@ -12,6 +12,7 @@ public static class KnockbackRegression
     private sealed class ActionProbe : EnemyAction
     {
         public ActionProbe(MonsterSkillData data, Enemy enemy) : base(data, enemy) { }
+        public void BeginRecovery() => EndNormalAttackArmor();
     }
     public static string Run()
     {
@@ -57,6 +58,7 @@ public static class KnockbackRegression
         var original = SceneManager.GetActiveScene();
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
         MonsterDefaultAttackSO skill = null;
+        EnemyData data = null;
         try
         {
             // Edit Mode does not simulate NavMeshAgents. Exercise state ownership separately
@@ -66,17 +68,28 @@ public static class KnockbackRegression
             var animator = go.AddComponent<Animator>();
             var enemy = go.AddComponent<Enemy>();
             enemy.EnemyStat = go.GetComponent<EnemyStat>();
-            enemy.EnemyStat.CurrentHp = 1000;
-            var values = (Dictionary<EnemyStatType, float>)typeof(EnemyStat).GetField("finalValues", Hidden).GetValue(enemy.EnemyStat);
-            values[EnemyStatType.KnockbackResistance] = 2f;
-            values[EnemyStatType.KnockbackDuration] = 0.25f;
+            var authoredData = AssetDatabase.LoadAssetAtPath<EnemyData>("Assets/_Project/EnemyStats/Drone.asset");
+            check(authoredData != null, "Default Drone stat data is missing.");
+            data = UnityEngine.Object.Instantiate(authoredData);
+            typeof(EnemyStat).GetField("baseData", Hidden).SetValue(enemy.EnemyStat, data);
+            typeof(EnemyStat).GetMethod("InitializeFromData", Hidden).Invoke(enemy.EnemyStat, null);
+            enemy.GetComponent<PoiseHandler>().ResetPoise();
+            check(enemy.EnemyStat.Data == data && enemy.EnemyStat.CurrentHp == data.maxHp
+                && enemy.KnockbackMoveTime == data.knockbackMoveTime
+                && enemy.KnockbackMaxDistance == data.knockbackMaxDistance,
+                "Enemy knockback settings must come from its actual stat data.");
             typeof(Enemy).GetProperty("Animator").SetValue(enemy, animator);
+            var clock = CombatActorClock.GetOrCreate(enemy);
+            typeof(CombatActorClock).GetMethod("Awake", Hidden).Invoke(clock, null);
+            typeof(Enemy).GetProperty("ActorClock").SetValue(enemy, clock);
             var stop = typeof(Enemy).GetMethod("StopKnockback", Hidden);
             var begin = typeof(Enemy).GetMethod("BeginKnockback", Hidden);
             var gate = typeof(Enemy).GetMethod("CanReceiveKnockback", Hidden);
             var tick = typeof(Enemy).GetMethod("UpdateKnockback", Hidden);
             Func<int> locks = () => (int)typeof(Enemy).GetField("_moveLockCount", Hidden).GetValue(enemy);
-            Action start = () => begin.Invoke(enemy, new object[] { Vector3.right * 8f, 0.25f });
+            Action start = () => begin.Invoke(enemy,
+                new object[] { Vector3.right * 8f, enemy.KnockbackMoveTime, enemy.KnockbackMaxDistance });
+            Action stopMotion = () => stop.Invoke(enemy, new object[] { "regression" });
             Action<StaggerResistLevel> hit = level => enemy.TakeDamage(1f, power: Vector3.right * 10f,
                 poiseDamage: 0f, staggerResistLevel: level);
             foreach (StaggerResistLevel resistance in Enum.GetValues(typeof(StaggerResistLevel)))
@@ -101,24 +114,26 @@ public static class KnockbackRegression
                 "Monster movement lasts beyond impact window.");
             start();
             check(locks() == 2, "Repeated hit leaked a lock.");
-            values[EnemyStatType.KnockbackDuration] = 10f;
-            check((float)typeof(Enemy).GetField("_knockbackDurationSnapshot", Hidden).GetValue(enemy) == 0.25f,
+            float originalMoveTime = data.knockbackMoveTime;
+            data.knockbackMoveTime = 10f;
+            check((float)typeof(Enemy).GetField("_knockbackMoveDuration", Hidden).GetValue(enemy) == originalMoveTime,
                 "Duration did not remain a snapshot.");
-            stop.Invoke(enemy, null);
+            data.knockbackMoveTime = originalMoveTime;
+            stopMotion();
             check(!enemy.IsKnockbacking && locks() == 1 && animator.applyRootMotion,
                 "External lock/root motion restoration failed.");
-            stop.Invoke(enemy, null);
+            stopMotion();
             check(locks() == 1, "Double stop released another owner's lock.");
             enemy.UnlockMovement();
-            begin.Invoke(enemy, new object[] { Vector3.right * 1000f, 1f });
+            begin.Invoke(enemy, new object[] { Vector3.right * 1000f, enemy.KnockbackMoveTime, enemy.KnockbackMaxDistance });
             var cappedVelocity = (Vector3)typeof(Enemy).GetField("_knockbackVelocity", Hidden).GetValue(enemy);
             float moveTime = (float)typeof(Enemy).GetField("_knockbackMoveDuration", Hidden).GetValue(enemy);
             check(KnockbackMotion.ImpactDisplacement(cappedVelocity, 0f, 1f, moveTime).magnitude <= enemy.KnockbackMaxDistance + 0.001f,
                 "Heavy hit exceeded distance cap.");
-            stop.Invoke(enemy, null);
+            stopMotion();
 
             // Missing Hit controllers freeze locomotion, re-hits refresh recovery, Exit restores playback.
-            animator.speed = 0.75f;
+            clock.SetAnimationSpeed(0.75f);
             var hurt = new EnemyHurtState(enemy);
             hurt.Enter();
             check(animator.speed == 0f && locks() == 1, "Missing-hit fallback kept walking or failed to lock.");
@@ -136,7 +151,6 @@ public static class KnockbackRegression
             hit(StaggerResistLevel.HIGH);
             check(enemy.HurtVersion == revision && !enemy.IsHurt, "Super armor entered a hit animation.");
             enemy.StaggerResistLevel = StaggerResistLevel.NONE;
-            values[EnemyStatType.KnockbackDuration] = 0.25f;
             start(); go.SetActive(false);
             // Non-ExecuteAlways behaviours do not receive normal lifecycle callbacks in Edit Mode.
             typeof(Enemy).GetMethod("OnDisable", Hidden).Invoke(enemy, null);
@@ -148,10 +162,31 @@ public static class KnockbackRegression
             check(!enemy.IsKnockbacking && go.transform.position == before, "Off-navmesh fallback moved transform.");
             skill = ScriptableObject.CreateInstance<MonsterDefaultAttackSO>();
             skill.isParryable = false;
+            enemy.IsHurt = enemy.IsGroggy = enemy.PendingGroggy = false;
             var action = new ActionProbe(skill, enemy);
             enemy.CurrentAction = action; action.Enter();
+            check(action.IsActive && action.HasNormalAttackArmor, "An accepted normal attack did not gain armor.");
+            float armoredHp = enemy.EnemyStat.CurrentHp;
+            revision = enemy.HurtVersion;
             hit(StaggerResistLevel.HIGH);
-            check(!action.IsActive, "Manual attack movement was not interrupted.");
+            check(action.IsActive && action.HasNormalAttackArmor && !enemy.IsHurt && !enemy.IsKnockbacking
+                && enemy.HurtVersion == revision && enemy.EnemyStat.CurrentHp == armoredHp - 1f
+                && !(bool)gate.Invoke(enemy, new object[] { StaggerResistLevel.HIGH }),
+                "Normal attack armor must retain damage while resisting ordinary stagger and knockback.");
+            action.BeginRecovery();
+            hit(StaggerResistLevel.HIGH);
+            check(!action.IsActive && !action.HasNormalAttackArmor && enemy.IsHurt
+                && enemy.HurtVersion == revision + 1 && !enemy.IsKnockbacking,
+                "Unarmored recovery must be interrupted while the off-navmesh safety guard prevents movement.");
+            enemy.IsHurt = false;
+            enemy.GetComponent<PoiseHandler>().ResetPoise();
+            action = new ActionProbe(skill, enemy);
+            enemy.CurrentAction = action; action.Enter();
+            enemy.GetComponent<PoiseHandler>().ForceBreak();
+            check(enemy.PendingGroggy && !action.IsActive && !action.HasNormalAttackArmor && enemy.CurrentAction == null,
+                "A real poise break must cancel a normal armored action immediately.");
+            enemy.PendingGroggy = false;
+            enemy.GetComponent<PoiseHandler>().ResetPoise();
             start();
             enemy.TakeDamage(10000f, power: Vector3.right * 10f, poiseDamage: 0f, staggerResistLevel: StaggerResistLevel.HIGH);
             check(!enemy.IsKnockbacking && locks() == 0 && enemy.EnemyStat.IsDead, "Death leaked knockback state.");
@@ -162,6 +197,7 @@ public static class KnockbackRegression
             SceneManager.SetActiveScene(original);
             EditorSceneManager.CloseScene(scene, true);
             if (skill != null) UnityEngine.Object.DestroyImmediate(skill);
+            if (data != null) UnityEngine.Object.DestroyImmediate(data);
         }
     }
 }

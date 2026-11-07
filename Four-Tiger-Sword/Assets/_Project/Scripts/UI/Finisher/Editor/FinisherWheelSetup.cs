@@ -28,11 +28,9 @@ public static class FinisherWheelSetup
             resources = ScriptableObject.CreateInstance<FinisherWheelResources>();
             AssetDatabase.CreateAsset(resources, Path);
         }
-        if (resources.Font == null)
+        var font = BoundaryZeroTypography.GetFont();
+        if (resources.Font != font)
         {
-            var font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/_Project/Font/NotoSansKR SDF.asset");
-            if (font == null)
-                throw new InvalidOperationException("The existing NotoSansKR SDF font is missing.");
             resources.Configure(font);
             EditorUtility.SetDirty(resources);
         }

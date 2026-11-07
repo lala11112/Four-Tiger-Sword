@@ -26,6 +26,7 @@ namespace StudioBaekho.EnemyForge
             ["PoiseHandler"] = new[] { "_maxPoise", "_poiseRegen", "_breakDuration" },
             ["NavMeshAgent"] = new[] { "m_Speed", "m_Acceleration", "m_AngularSpeed", "m_Radius", "m_Height", "m_BaseOffset", "m_StoppingDistance" },
             ["SphereCollider"] = new[] { "m_Radius", "m_Center" },
+            ["CapsuleCollider"] = new[] { "m_Radius", "m_Height", "m_Center", "m_Direction" },
             ["FanVisionSensor"] = new[] { "_range", "_halfAngle", "_proximityRange", "_rayCount", "_heightOffset", "_visibilityMask" },
             ["EnemyDeathFade"] = new[] { "_delay", "_duration" }
         };
@@ -359,20 +360,22 @@ namespace StudioBaekho.EnemyForge
             finally { Object.DestroyImmediate(instance); }
         }
 
-        public static JObject Get()
+        public static JObject Get(string kind = "normal")
         {
-            var template = AssetDatabase.LoadAssetAtPath<GameObject>(TemplatePath) ?? throw new InvalidDataException("Drone prefab was not found: " + TemplatePath);
-            var stat = template.GetComponent<EnemyStat>() ?? throw new InvalidDataException("Drone has no EnemyStat.");
+            if (kind != "normal" && kind != "boss") throw new InvalidDataException("Unknown monster kind.");
+            string templatePath = kind == "boss" ? BaekhoEnemyForgeBoss.TemplatePath : TemplatePath;
+            var template = AssetDatabase.LoadAssetAtPath<GameObject>(templatePath) ?? throw new InvalidDataException("Template prefab was not found: " + templatePath);
+            var stat = template.GetComponent<EnemyStat>() ?? throw new InvalidDataException(template.name + " has no EnemyStat.");
             var statSerialized = new SerializedObject(stat);
-            var data = statSerialized.FindProperty("baseData").objectReferenceValue as EnemyData ?? throw new InvalidDataException("Drone has no EnemyData.");
+            var data = statSerialized.FindProperty("baseData").objectReferenceValue as EnemyData ?? throw new InvalidDataException(template.name + " has no EnemyData.");
             var stats = Describe(data);
             ((JArray)stats["fields"]).Where(f => (string)f["path"] == "monsterSkillData").ToList().ForEach(f => f.Remove());
             ((JObject)stats["defaults"]).Remove("monsterSkillData");
             var warnings = new JArray();
-            if (data.criticalChance < 0f || data.criticalChance > 1f) warnings.Add("Drone 치명 확률 원본값은 " + data.criticalChance + "이며 실제 런타임 확률 " + (Mathf.Clamp01(data.criticalChance) * 100f) + "%로 불러왔습니다.");
+            if (data.criticalChance < 0f || data.criticalChance > 1f) warnings.Add(template.name + " 치명 확률 원본값은 " + data.criticalChance + "이며 실제 런타임 확률 " + (Mathf.Clamp01(data.criticalChance) * 100f) + "%로 불러왔습니다.");
             stats["defaults"]["criticalChance"] = Mathf.Clamp01(data.criticalChance);
             var enemy = template.GetComponent<Enemy>();
-            if (enemy.StaggerResistLevel != data.staggerResistLevel) warnings.Add("Drone의 EnemyData 경직저항과 Enemy 경직저항이 다릅니다. 실제 Enemy 값 " + enemy.StaggerResistLevel + "을 기준으로 불러왔습니다.");
+            if (kind != "boss" && enemy.StaggerResistLevel != data.staggerResistLevel) warnings.Add(template.name + "의 EnemyData 경직저항과 Enemy 경직저항이 다릅니다. 실제 Enemy 값 " + enemy.StaggerResistLevel + "을 기준으로 불러왔습니다.");
             stats["defaults"]["staggerResistLevel"] = (int)enemy.StaggerResistLevel;
 
             var components = new JObject(); var componentFields = new JObject();
@@ -403,25 +406,61 @@ namespace StudioBaekho.EnemyForge
                     states[state.state.name] = AssetRef(FirstClip(motion));
                 }
             var idleClip = AssetDatabase.LoadAllAssetsAtPath(AssetDatabase.GetAssetPath(modelSource)).OfType<AnimationClip>().FirstOrDefault(c => c.name.IndexOf("Idle", StringComparison.OrdinalIgnoreCase) >= 0);
-            states["Idle"] = AssetRef(idleClip) ?? states["Move"]?.DeepClone();
-            states["Groggy"] = states["Idle"]?.DeepClone();
-            warnings.Add("Drone에 전용 Groggy 클립이 없어 초기 매핑은 Idle 클립을 사용합니다. 필요하면 그로기 클립을 지정하세요.");
+            if (states["Idle"] == null || states["Idle"].Type == JTokenType.Null) states["Idle"] = AssetRef(idleClip) ?? states["Move"]?.DeepClone();
+            if (states["Groggy"] == null || states["Groggy"].Type == JTokenType.Null)
+            {
+                states["Groggy"] = states["Idle"]?.DeepClone();
+                if (states["Groggy"] is JObject) warnings.Add("템플릿에 전용 Groggy 클립이 없어 초기 매핑은 Idle 클립을 사용합니다. 필요하면 그로기 클립을 지정하세요.");
+            }
             var attacks = new JArray();
             if (data.monsterSkillData?.skillData != null)
                 foreach (var skill in data.monsterSkillData.skillData.Where(s => s != null)) attacks.Add(Config(skill));
             var hp = template.transform.Find("HpBar"); var vfx = template.transform.Find("VFXPoint");
-            var blueprint = new JObject { ["version"] = 1, ["name"] = "NewEnemy", ["template"] = AssetRef(template), ["model"] = AssetRef(modelSource),
+            var blueprint = new JObject { ["version"] = 3, ["kind"] = kind, ["name"] = kind == "boss" ? "NewBoss" : "NewEnemy", ["template"] = AssetRef(template), ["model"] = AssetRef(modelSource),
                 ["modelTransform"] = new JObject { ["position"] = model == null ? Vector(0, 0, 0) : Vector(model.localPosition.x, model.localPosition.y, model.localPosition.z),
                     ["rotation"] = model == null ? Vector(0, 0, 0) : Vector(model.localEulerAngles.x, model.localEulerAngles.y, model.localEulerAngles.z),
                     ["scale"] = model == null ? Vector(1, 1, 1) : Vector(model.localScale.x, model.localScale.y, model.localScale.z) },
                 ["stats"] = stats["defaults"], ["components"] = components,
-                ["animation"] = new JObject { ["mode"] = "clips", ["controller"] = AssetRef(animator?.runtimeAnimatorController), ["states"] = states },
+                ["animation"] = new JObject { ["mode"] = "clips", ["controller"] = AssetRef(animator?.runtimeAnimatorController), ["states"] = states,
+                    ["move"] = BaekhoEnemyForgeAnimation.ImportMove(controller, warnings) },
                 ["attacks"] = attacks, ["selfDestruct"] = data.monsterSkillData?.selfDestruct == null ? null : Config(data.monsterSkillData.selfDestruct),
+                ["anchors"] = new JObject { ["hpBar"] = "auto", ["vfx"] = "auto" },
                 ["hpBarPosition"] = hp == null ? Vector(0, 3, 0) : Vector(hp.localPosition.x, hp.localPosition.y, hp.localPosition.z),
                 ["vfxPosition"] = vfx == null ? Vector(0, 2, 0) : Vector(vfx.localPosition.x, vfx.localPosition.y, vfx.localPosition.z) };
-            return new JObject { ["projectRoot"] = Path.GetFullPath(Path.Combine(Application.dataPath, "..")).Replace('\\', '/'), ["unityVersion"] = Application.unityVersion,
-                ["assets"] = Assets(), ["attacks"] = new JArray(TypeCache.GetTypesDerivedFrom<MonsterSkillData>().Where(t => !t.IsAbstract && !t.ContainsGenericParameters && IsRegistered(t)).OrderBy(t => t.FullName).Select(AttackDefinition)),
+            if (blueprint["animation"]["move"]?.Type == JTokenType.Null) ((JObject)blueprint["animation"]).Remove("move");
+            if (kind == "boss")
+            {
+                blueprint["boss"] = BaekhoEnemyForgeBoss.Defaults(); blueprint["selfDestruct"] = null;
+                blueprint["boss"]["phases"][0]["phaseMaxHp"] = blueprint["stats"]["maxHp"].DeepClone();
+                if (states["PhaseDown"] == null) states["PhaseDown"] = states["Die"]?.DeepClone() ?? JValue.CreateNull();
+                if (states["PhaseRevive"] == null) states["PhaseRevive"] = JValue.CreateNull();
+                blueprint["stats"]["staggerResistLevel"] = (int)StaggerResistLevel.HIGH;
+                blueprint["animation"]["mode"] = "controller";
+                foreach (JObject config in attacks.OfType<JObject>().ToArray()) if (typeof(MonsterSelfDestructSO).IsAssignableFrom(AttackType((string)config["typeId"]))) config.Remove();
+                foreach (JObject config in attacks.OfType<JObject>())
+                    if (string.IsNullOrWhiteSpace((string)config["values"]["animName"]))
+                    {
+                        string stateName = (string)config["typeId"] == typeof(MonsterDashAttackSO).FullName ? "Dash" : "Attack_" + attacks.IndexOf(config);
+                        config["values"]["animName"] = stateName; states[stateName] = null;
+                        warnings.Add("원본 공격의 상태명이 비어 있어 " + stateName + "으로 지정했습니다. 해당 클립을 연결하세요.");
+                    }
+                var required = new HashSet<string>(new[] { "Idle", "Move", "Groggy" }.Concat(attacks.Select(a => (string)a["values"]["animName"])));
+                if (required.Any(state => states[state] == null || states[state].Type == JTokenType.Null))
+                {
+                    blueprint["animation"]["mode"] = "clips";
+                    warnings.Add("기존 보스 컨트롤러의 애니메이션 연결이 누락되어 있습니다. 필수 상태에 모델과 호환되는 클립을 연결한 뒤 생성하세요. 원본 컨트롤러는 변경하지 않습니다.");
+                }
+            }
+            var definitions = new JArray(TypeCache.GetTypesDerivedFrom<MonsterSkillData>().Where(t => !t.IsAbstract && !t.ContainsGenericParameters && (kind != "boss" || !typeof(MonsterSelfDestructSO).IsAssignableFrom(t)) && IsRegistered(t)).OrderBy(t => t.FullName).Select(AttackDefinition));
+            var assets = Assets();
+            // Existing defaults can refer to shared SFX/VFX outside _Project. Include those exact
+            // dependencies without expanding the AI context to every third-party asset in Assets.
+            IncludeReferencedAssets(assets, blueprint, definitions);
+            var result = new JObject { ["projectRoot"] = Path.GetFullPath(Path.Combine(Application.dataPath, "..")).Replace('\\', '/'), ["unityVersion"] = Application.unityVersion, ["kind"] = kind,
+                ["assets"] = assets, ["attacks"] = definitions,
                 ["statsFields"] = stats["fields"], ["componentFields"] = componentFields, ["template"] = blueprint, ["warnings"] = warnings };
+            if (kind == "boss") result["boss"] = BaekhoEnemyForgeBoss.Catalog();
+            return result;
         }
 
         public static AnimationClip FirstClip(Motion motion)
@@ -434,6 +473,31 @@ namespace StudioBaekho.EnemyForge
 
         private static JObject Config(MonsterSkillData skill)
             => new JObject { ["id"] = Guid.NewGuid().ToString("D"), ["typeId"] = skill.GetType().FullName, ["values"] = Describe(skill)["defaults"] };
+
+        private static void IncludeReferencedAssets(JArray assets, params JToken[] sources)
+        {
+            var seen = new HashSet<string>(assets.OfType<JObject>().Select(a => (string)a["guid"] + ":" + (string)a["localId"]));
+            void Visit(JToken token)
+            {
+                if (token == null) return;
+                if (token is JObject reference && reference["guid"]?.Type == JTokenType.String && reference["localId"]?.Type == JTokenType.String)
+                {
+                    var asset = Resolve(reference);
+                    var canonical = AssetRef(asset);
+                    if (canonical == null || !seen.Add((string)canonical["guid"] + ":" + (string)canonical["localId"])) return;
+                    if (asset is AnimationClip clip) { canonical["duration"] = clip.length; canonical["rig"] = clip.humanMotion ? "humanoid" : "generic"; }
+                    if (asset is GameObject model)
+                    {
+                        var animator = model.GetComponentInChildren<Animator>(true);
+                        canonical["rig"] = animator == null ? "none" : animator.isHuman ? "humanoid" : "generic";
+                    }
+                    assets.Add(canonical);
+                    return;
+                }
+                foreach (var child in token.Children()) Visit(child);
+            }
+            foreach (var source in sources) Visit(source);
+        }
 
         private static JArray Assets()
         {

@@ -171,7 +171,7 @@ public static class FormDataGroupingTests
             Check(preset != null && preset.actionAsset == reloaded && preset.actionId == action, "Exported preset/subasset relationship lost");
             Applied(water, reloaded, action, true);
             var serialized = new SerializedObject(reloaded);
-            foreach (string property in new[] { "Actions.ComboSteps.Array.data[0].Balance.Damage", "Actions.ComboSteps.Array.data[0].Execution.Movement.MovementProgress", "Actions.ComboSteps.Array.data[0].Feedback.HitStop.HitStopDuration", "FormBalance.WaterGaugePerSegment", "FormExecution.AreaRadius", "FormFeedback.DelayedHitVFX" })
+            foreach (string property in new[] { "Actions.ComboSteps.Array.data[0].Balance.Damage", "Actions.ComboSteps.Array.data[0].Execution.Movement.MovementProgress", "Actions.ComboSteps.Array.data[0].Feedback.HitStop.HitStopDuration", "FormBalance.WaterGaugePerSegment", "FormExecution.AreaRadius" })
                 Check(serialized.FindProperty(property) != null, "Grouped path not serialized after export: " + property);
             foreach (var step in Steps(reloaded)) foreach (var hit in step.HitEvents ?? new List<HitEvent>()) Check(hit.Balance != null && hit.Execution != null && hit.Feedback.HitStop != null, "Export lost hit groups");
         }

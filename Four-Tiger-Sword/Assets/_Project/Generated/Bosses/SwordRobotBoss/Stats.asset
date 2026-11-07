@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e14778ea8d650bd49bb7d3033efcdc59, type: 3}
+  m_Name: Stats
+  m_EditorClassIdentifier: Assembly-CSharp::BossData
+  elementType: 0
+  maxHp: 17160
+  baseAtk: 315
+  baseDef: 450
+  criticalChance: 0
+  criticalDamage: 1.5
+  combatRange: 30
+  combatExitRange: 40
+  knockbackMoveTime: 0.16
+  knockbackMaxDistance: 0.65
+  attackCooldown: 0
+  monsterSkillData: {fileID: 11400000, guid: 59d4e36b75341064c993b02d48c5813f, type: 2}
+  staggerResistLevel: 1
+  bossId: sword_robot_guardian
+  bossName: "\uCCA0\uAC80 \uC218\uBB38\uC7A5"
+  phaseDownSeconds: 2.667
+  phaseHoldSeconds: 0.65
+  phaseReviveSeconds: 2.167
+  groggyDamageMult: 1.5
+  enableWeakness: 0
+  weaknessElement: 0
+  weakDamageMult: 1.5
+  enableResistance: 0
+  resistElement: 0
+  resistDamageMult: 0.5
+  statusImmunityList:
+  - Airborne
+  initialShield: 0
+  rewardGroup: {fileID: 11400000, guid: 41a2595b7b434c24a8bbda6328eda9dc, type: 2}

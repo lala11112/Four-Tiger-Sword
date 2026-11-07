@@ -98,7 +98,10 @@ public static class BaekhoItemCombatRegression
         {
             var data = Asset<T>();
             data.SkillSteps = new List<WeaponActionData> { Step() };
+            data.SwitchAttackSteps = new List<WeaponActionData> { Step() };
             data.ComboSteps = new List<WeaponActionData> { Step() };
+            // These checks isolate item/E behavior; dedicated chain-effect checks cover enabled buffs.
+            data.ChainSettings.Enabled = false;
             return data;
         }
 
@@ -146,7 +149,7 @@ public static class BaekhoItemCombatRegression
             Verify(fixture);
             VerifyGeometry(fixture);
         }
-        return "PASS: Edit Mode combat checks plus real Fire/Iron/Earth overlaps, Wood area/no-pull and Water swept hits.";
+        return "PASS: Edit Mode combat checks plus independent Fire/Iron/Water switch shapes, preserved Earth/Wood E geometry and Water E swept hits.";
     }
 
     private static void Verify(Fixture fixture)
@@ -223,6 +226,8 @@ public static class BaekhoItemCombatRegression
             fire, water, new WoodForm(data), earth, new IronForm(ironData)
         }, new[] { 20f, 15f, 18f, 15f, 20f });
         data.SkillSteps[0].Duration = float.NaN;
+        Require(form.CanSwitchAttack, "Malformed E data disabled the independently authored switch attack.");
+        data.SwitchAttackSteps[0].Duration = float.NaN;
         Require(!form.CanSwitchAttack, "Malformed duration was accepted as a switch attack.");
     }
 
@@ -301,42 +306,39 @@ public static class BaekhoItemCombatRegression
         var fire = new FireForm(fireData); fixture.Bind(fire); fire.BeginSwitchAttack();
         target.transform.position = Origin + Vector3.right * 2f;
         Physics.SyncTransforms();
-        Require(Query(fire, fireData.SkillSteps[0], Origin) > 0, "Fire switch lost its radius override.");
+        Require(Query(fire, fireData.SwitchAttackSteps[0], Origin) == 0, "Fire switch inherited E's radius override.");
+        fireData.SwitchAttackSteps[0].HitBoxRadius = 2.5f;
+        Require(Query(fire, fireData.SwitchAttackSteps[0], Origin) > 0, "Fire switch ignored its own authored radius.");
         fire.EndSwitchAttack();
+        fire.BeginSkill();
+        Require(Query(fire, fireData.SkillSteps[0], Origin) > 0, "Fire E lost its radius override.");
+        fire.EndSkill();
 
         var ironData = fixture.Data<IronFormActionDataSO>();
-        ironData.SkillSteps[0].HitBoxShape = HitBoxShape.Box;
-        ironData.SkillSteps[0].HitBoxSize = new Vector3(.2f, .5f, 3f);
+        ironData.SwitchAttackSteps[0].HitBoxShape = HitBoxShape.Box;
+        ironData.SwitchAttackSteps[0].HitBoxSize = new Vector3(.2f, .5f, 3f);
         var iron = new IronForm(ironData); fixture.Bind(iron); iron.BeginSwitchAttack();
         target.transform.position = Origin + Vector3.forward * 2f; Physics.SyncTransforms();
-        Require(Query(iron, ironData.SkillSteps[0], Origin) > 0, "Iron switch ignored its authored box shape.");
+        Require(Query(iron, ironData.SwitchAttackSteps[0], Origin) > 0, "Iron switch ignored its authored box shape.");
         iron.EndSwitchAttack();
 
         var earthData = fixture.Data<EarthFormActionDataSO>(); earthData.SkillDashHitRadius = .25f;
-        var earth = new EarthForm(earthData); fixture.Bind(earth); earth.BeginSwitchAttack();
+        var earth = new EarthForm(earthData); fixture.Bind(earth); earth.BeginSkill();
         typeof(EarthForm).GetField("_sweepStart", Hidden).SetValue(earth, Origin - Vector3.right * 3f);
         typeof(EarthForm).GetField("_sweepEnd", Hidden).SetValue(earth, Origin + Vector3.right * 3f);
         target.transform.position = Origin + Vector3.right; Physics.SyncTransforms();
-        Require(Query(earth, earthData.SkillSteps[0], Origin) > 0, "Earth switch lost its swept dash hitbox.");
-        earth.EndSwitchAttack();
+        Require(Query(earth, earthData.SkillSteps[0], Origin) > 0, "Earth E lost its swept dash hitbox.");
+        earth.EndSkill();
 
         var woodData = fixture.Data<WoodFormActionDataSO>();
         woodData.SkillRadius = .5f; woodData.SkillCenterOffset = Vector3.forward * 2f;
-        var wood = new WoodForm(woodData); fixture.Bind(wood); wood.BeginSwitchAttack();
+        var wood = new WoodForm(woodData); fixture.Bind(wood); wood.BeginSkill();
         target.transform.position = Origin + woodData.SkillCenterOffset; Physics.SyncTransforms();
         receiver.Calls = 0;
         typeof(WoodForm).GetMethod("ApplyGather", Hidden).Invoke(wood, null);
-        Require(receiver.Calls == 1, "Wood switch lost its configured area center/radius.");
+        Require(receiver.Calls == 1, "Wood E lost its configured area center/radius.");
         var effects = target.GetComponent<WoodTargetEffects>();
-        Require(effects != null && effects.Stacks == woodData.StacksPerHit,
-            "Wood switch must apply its passive stack, not E's maximum-stack bonus.");
-        Near((float)typeof(WoodTargetEffects).GetField("_pullRemaining", Hidden).GetValue(effects), 0f,
-            "Wood switch applied E-only pull.");
-        wood.EndSwitchAttack();
-        fixture.Stats.AddSp(fixture.Stats.MaxSp);
-        wood.BeginSkill();
-        typeof(WoodForm).GetMethod("ApplyGather", Hidden).Invoke(wood, null);
-        Require(effects.Stacks == woodData.MaximumStacks,
+        Require(effects != null && effects.Stacks == woodData.MaximumStacks,
             "Wood E lost its immediate maximum-stack effect.");
         Require((float)typeof(WoodTargetEffects).GetField("_pullRemaining", Hidden).GetValue(effects) > 0f,
             "Wood E lost its pull while the switch attack was separated.");
@@ -347,15 +349,21 @@ public static class BaekhoItemCombatRegression
         Set(fixture.Player, nameof(PlayerController.Controller), controller);
         var waterData = fixture.Data<WaterFormActionDataSO>();
         waterData.SkillSteps[0].HitBoxRadius = .2f;
-        var water = new WaterForm(waterData); fixture.Bind(water); water.BeginSwitchAttack();
+        var water = new WaterForm(waterData); fixture.Bind(water); water.BeginSkill();
         Vector3 center = controller.bounds.center;
         typeof(WaterForm).GetField("_trailStart", Hidden).SetValue(water, center - Vector3.right * 2f);
         target.transform.position = center - Vector3.right; Physics.SyncTransforms();
         receiver.Calls = 0;
-        water.UpdateSwitchAttack(out _);
-        Require(receiver.Calls == 1, "Water switch lost its between-frame swept hit.");
-        water.EndSwitchAttack();
+        water.UpdateSkill(out _);
+        Require(receiver.Calls == 1, "Water E lost its between-frame swept hit.");
+        water.EndSkill();
         Require((controller.excludeLayers & LayerMask.GetMask("Enemy")) == 0, "Water sweep collision mask did not restore.");
+        water.BeginSwitchAttack();
+        Require((controller.excludeLayers & LayerMask.GetMask("Enemy")) == 0,
+            "Water switch inherited E's collision exclusion.");
+        Require(Query(water, waterData.SwitchAttackSteps[0], Origin) == 0,
+            "Water switch inherited the previous E swept path.");
+        water.EndSwitchAttack();
     }
 
     private static WeaponActionData Step() => new WeaponActionData

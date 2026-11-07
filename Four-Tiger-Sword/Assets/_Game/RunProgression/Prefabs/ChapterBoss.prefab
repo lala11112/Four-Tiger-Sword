@@ -946,6 +946,7 @@ GameObject:
   - component: {fileID: 6647316638718145824}
   - component: {fileID: 4692022181365070455}
   - component: {fileID: 6486005895961029162}
+  - component: {fileID: 6241324172447316}
   m_Layer: 8
   m_Name: ChapterBoss
   m_TagString: Untagged
@@ -1117,6 +1118,24 @@ MonoBehaviour:
   RegisteredStacks:
   - {fileID: 11400000, guid: b370556a5742d8a4291cbedc97fcbae0, type: 2}
   - {fileID: 11400000, guid: c51aff436caf6e545888ec21fd7a34e7, type: 2}
+--- !u!114 &6241324172447316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3356962088715611696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52537b332a0aa094e9b77be005bc49d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDeathFade
+  _delay: 0.35
+  _duration: 2
+  _targets:
+  - Renderer: {fileID: 162079201221171307}
+    Materials:
+    - {fileID: 2100000, guid: d0f1a88b35ad519459815b1cc42b7a88, type: 2}
 --- !u!1 &3486386756767641032
 GameObject:
   m_ObjectHideFlags: 0
@@ -2320,7 +2339,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f6b4112edd792bd439575b123b8af574, type: 2}
+  - {fileID: 2100000, guid: eec7fdc8f3c0e10478d0f49ac28ffb93, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -29,6 +29,8 @@ namespace StudioBaekho
         public BaekhoPrefabPiece cap = new BaekhoPrefabPiece();
         [Tooltip("Optional ceiling visual. An unassigned ceiling reuses the floor piece, including its measured bounds and placement mode.")]
         public BaekhoPrefabPiece ceiling = new BaekhoPrefabPiece();
+        [Tooltip("Optional modular wall/floor appearance. Unassigned styles keep their authored visuals and physics unchanged.")]
+        public BaekhoArchitectureProfile appearance;
         [Min(0.01f)] public float wallThickness = 0.25f;
         [Min(0.01f)] public float wallHeight = 3f;
         [Min(0.01f)] public float floorThickness = 0.2f;

@@ -1,26 +1,35 @@
 캐릭터 Unity 패키지 사용 안내
 
-확인한 Unity 버전: 6000.3.21f1 (Unity 6.3)
-재질: Built-in Render Pipeline의 Standard 셰이더
+확인 버전: Unity 6000.3.21f1 (Unity 6.3)
+재질: Built-in Render Pipeline / Standard
 
-가져오기
-1. Unity 프로젝트에서 character_unity_humanoid.unitypackage를 열고 전체 항목을 Import합니다.
-2. Assets/Character_Humanoid.prefab을 씬에 배치합니다.
-3. 프리팹의 Animator에 사용할 Humanoid 애니메이션 컨트롤러를 연결합니다.
+사용 방법
+1. unitypackage를 열고 모든 항목을 Import합니다.
+2. Assets/CharacterPackage/Character_Humanoid.prefab을 씬에 배치합니다.
+3. Animator에 사용할 Humanoid 애니메이션 컨트롤러를 연결합니다.
+   FBX를 직접 배치하는 대신 정리된 프리팹을 사용하세요.
 
-포함된 동작 확인하기
-Animator의 Controller에 Assets/FullBody_Rig_Check.controller를 연결한 뒤 Play를 누릅니다.
-약 34초 동안 팔·다리·몸통·목 동작을 확인할 수 있습니다. 시작과 끝은 A 자세입니다.
+정리된 구성
+- 몸, 머리카락, 속옷, 상의, 치마, 왼쪽 토시, 오른쪽 토시, 리본: 렌더러 8개.
+- 리본 5개를 Ribbons 하나로 합쳤습니다. 각 리본의 모양, UV와 웨이트는 유지했습니다.
+- 좌우 토시는 각각 천 물리를 설정할 수 있도록 분리했습니다.
+- 같은 재질을 반복해서 사용하던 의상 슬롯을 정리했습니다.
+- 서로 다른 재질 26개와 텍스처 23개는 실제 참조되는 파일이므로 유지했습니다.
+- 테스트 장면, 테스트 애니메이션, 비교용 캐릭터와 보정 실험 파일은 포함하지 않았습니다.
 
-포함 파일
-- Character.fbx: Humanoid Avatar와 스킨 메시가 포함된 캐릭터 모델
-- Character_Humanoid.prefab: 캐릭터와 상완 비틀림 보정용 Unity 기본 제약
-- Unity_Import_Materials, Unity_Import_Textures: 재질과 텍스처
-- FullBody_Rig_Check.anim, FullBody_Rig_Check.controller: 전신 확인 동작
-- Character_Rig_Check.fbx: 동작 교환용 원본
+리그
+- 모델의 기본 자세는 A 포즈이며, Unity Humanoid의 기준 자세는 보정된 T 포즈입니다.
+- 기존 본, 가중치와 상완 비틀림 보정용 Unity 기본 제약은 유지했습니다.
+- 마지막 손 모양/팔 충돌 보정 실험은 적용하지 않았습니다.
+- 프리팹의 본과 제약 오브젝트는 동작에 필요하므로 삭제하지 마세요.
 
-사용 메모
-- 실제 사용에는 Character_Humanoid.prefab을 배치하세요. 모델 FBX만 배치하면 프리팹에 포함된 상완 비틀림 보정이 적용되지 않습니다.
+Magica Cloth 2
+플러그인과 천 물리 설정은 포함하지 않습니다. 별도로 설치한 뒤 필요한 의상 렌더러에
+MeshCloth를 설정하세요. 양쪽 토시는 각각 설정할 수 있으며, 리본은 Ribbons 렌더러를 사용합니다.
+고정할 영역과 캐릭터 충돌체는 사용할 프로젝트에서 지정하세요.
+
+참고
+- FBX는 Avatar 및 원본 메시를 제공하고 Character_Meshes.asset은 정리된 의상/리본 메시를 제공합니다.
+  프리팹, FBX, 메시, 재질, 텍스처를 함께 유지하세요.
 - URP/HDRP 프로젝트에서는 해당 렌더링 방식에 맞게 재질을 변환해야 합니다.
-- 옷·토시·리본에는 기본 스킨 가중치가 있습니다. Magica Cloth 2 플러그인과 물리 설정은 포함되어 있지 않습니다. 사용할 경우 받는 프로젝트에서 별도로 설치하고 설정하세요.
-- Blender 편집 파일은 이 Unity 패키지에 포함되지 않습니다.
+- 이전 버전 위에 Import해도 과거 패키지의 테스트 파일은 자동 삭제되지 않습니다.

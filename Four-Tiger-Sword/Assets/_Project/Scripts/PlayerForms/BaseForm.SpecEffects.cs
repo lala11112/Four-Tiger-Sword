@@ -78,9 +78,14 @@ public abstract partial class BaseForm
     public virtual float OutgoingDamageMultiplier => 1f;
     public virtual float IncomingDamageMultiplier => 1f;
     protected virtual void OnDamageDealt(GameObject target, DamageResult result, WeaponActionData step = null, HitEvent hitEvent = null)
-        => OnHitEnemy(target, step, hitEvent);
+    {
+        if (!result.Applied) return;
+        NotifyFinalComboHit(target);
+        ApplyChainVulnerability(target, result);
+        OnHitEnemy(target, step, hitEvent);
+    }
     public virtual bool BlocksIncomingDamage(float damage, Vector3 incomingPower, object source = null) => false;
-    public virtual void CleanupTransientEffects() { }
+    public virtual void CleanupTransientEffects() => RemoveChainBuff();
 
     // A stage boundary clears world targets/effects while player buffs and resources persist.
     public virtual void CleanupStageEffects()

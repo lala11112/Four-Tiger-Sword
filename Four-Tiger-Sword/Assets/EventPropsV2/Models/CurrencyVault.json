@@ -1,0 +1,557 @@
+{
+  "id": "CurrencyVault",
+  "heightMeters": 1.25,
+  "modelFile": "CurrencyVault.fbx",
+  "front": "Blender -Y; Unity infer exported Basis markers",
+  "parts": [
+    {
+      "name": "Body",
+      "pivotBlender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "role": "static",
+      "triangles": 18862
+    },
+    {
+      "name": "Vault_Lid_Left",
+      "pivotBlender": [
+        -0.3474980592727661,
+        0.0,
+        1.1417791843414307
+      ],
+      "role": "moving",
+      "triangles": 2632
+    },
+    {
+      "name": "Vault_Lid_Right",
+      "pivotBlender": [
+        0.3474980592727661,
+        0.0,
+        1.1417791843414307
+      ],
+      "role": "moving",
+      "triangles": 2444
+    },
+    {
+      "name": "Vault_Crystal_Tray",
+      "pivotBlender": [
+        0.0,
+        0.0,
+        0.6949960589408875
+      ],
+      "role": "moving",
+      "triangles": 2528
+    }
+  ],
+  "clips": [
+    {
+      "name": "Use",
+      "duration": 4,
+      "loop": false,
+      "rewardTime": 2,
+      "tracks": [
+        {
+          "part": "Vault_Crystal_Tray",
+          "kind": "move",
+          "axis": "Z",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.0
+            },
+            {
+              "time": 1.35,
+              "value": 0.0
+            },
+            {
+              "time": 1.9,
+              "value": 0.22835584817223933
+            },
+            {
+              "time": 2.75,
+              "value": 0.22835584817223933
+            },
+            {
+              "time": 3.2,
+              "value": 0.0
+            },
+            {
+              "time": 4.0,
+              "value": 0.0
+            }
+          ]
+        },
+        {
+          "part": "Vault_Lid_Left",
+          "kind": "move",
+          "axis": "X",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.0
+            },
+            {
+              "time": 0.6,
+              "value": 0.0
+            },
+            {
+              "time": 1.6,
+              "value": -0.44678318120655525
+            },
+            {
+              "time": 2.9,
+              "value": -0.44678318120655525
+            },
+            {
+              "time": 3.87,
+              "value": 0.0
+            },
+            {
+              "time": 4.0,
+              "value": 0.0
+            }
+          ]
+        },
+        {
+          "part": "Vault_Lid_Left",
+          "kind": "move",
+          "axis": "Z",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.0
+            },
+            {
+              "time": 0.6,
+              "value": 0.0
+            },
+            {
+              "time": 1.0,
+              "value": 0.0198570302758469
+            },
+            {
+              "time": 3.4,
+              "value": 0.0198570302758469
+            },
+            {
+              "time": 3.87,
+              "value": 0.0
+            },
+            {
+              "time": 4.0,
+              "value": 0.0
+            }
+          ]
+        },
+        {
+          "part": "Vault_Lid_Right",
+          "kind": "move",
+          "axis": "X",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.0
+            },
+            {
+              "time": 0.6,
+              "value": 0.0
+            },
+            {
+              "time": 1.6,
+              "value": 0.44678318120655525
+            },
+            {
+              "time": 2.9,
+              "value": 0.44678318120655525
+            },
+            {
+              "time": 3.87,
+              "value": 0.0
+            },
+            {
+              "time": 4.0,
+              "value": 0.0
+            }
+          ]
+        },
+        {
+          "part": "Vault_Lid_Right",
+          "kind": "move",
+          "axis": "Z",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.0
+            },
+            {
+              "time": 0.6,
+              "value": 0.0
+            },
+            {
+              "time": 1.0,
+              "value": 0.0198570302758469
+            },
+            {
+              "time": 3.4,
+              "value": 0.0198570302758469
+            },
+            {
+              "time": 3.87,
+              "value": 0.0
+            },
+            {
+              "time": 4.0,
+              "value": 0.0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "EP_dark",
+      "baseColor": [
+        0.02199999988079071,
+        0.03799999877810478,
+        0.06199999898672104,
+        1.0
+      ],
+      "metallic": 0.3499999940395355,
+      "roughness": 0.47999998927116394,
+      "emission": [
+        0.02199999988079071,
+        0.03799999877810478,
+        0.06199999898672104
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_dark_BaseColor.png",
+      "normalTexture": "Textures/EP_dark_Normal.png",
+      "roughnessTexture": "Textures/EP_dark_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_dark_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_steel",
+      "baseColor": [
+        0.08500000089406967,
+        0.13500000536441803,
+        0.20499999821186066,
+        1.0
+      ],
+      "metallic": 0.5799999833106995,
+      "roughness": 0.38999998569488525,
+      "emission": [
+        0.08500000089406967,
+        0.13500000536441803,
+        0.20499999821186066
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_steel_BaseColor.png",
+      "normalTexture": "Textures/EP_steel_Normal.png",
+      "roughnessTexture": "Textures/EP_steel_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_steel_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_rubber",
+      "baseColor": [
+        0.012000000104308128,
+        0.01899999938905239,
+        0.02800000086426735,
+        1.0
+      ],
+      "metallic": 0.05000000074505806,
+      "roughness": 0.699999988079071,
+      "emission": [
+        0.012000000104308128,
+        0.01899999938905239,
+        0.02800000086426735
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_edge",
+      "baseColor": [
+        0.2800000011920929,
+        0.3700000047683716,
+        0.46000000834465027,
+        1.0
+      ],
+      "metallic": 0.7200000286102295,
+      "roughness": 0.3100000023841858,
+      "emission": [
+        0.2800000011920929,
+        0.3700000047683716,
+        0.46000000834465027
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_edge_BaseColor.png",
+      "normalTexture": "Textures/EP_edge_Normal.png",
+      "roughnessTexture": "Textures/EP_edge_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_edge_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_panel",
+      "baseColor": [
+        0.15000000596046448,
+        0.23000000417232513,
+        0.3199999928474426,
+        1.0
+      ],
+      "metallic": 0.5199999809265137,
+      "roughness": 0.36000001430511475,
+      "emission": [
+        0.15000000596046448,
+        0.23000000417232513,
+        0.3199999928474426
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_panel_BaseColor.png",
+      "normalTexture": "Textures/EP_panel_Normal.png",
+      "roughnessTexture": "Textures/EP_panel_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_panel_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_silver",
+      "baseColor": [
+        0.49000000953674316,
+        0.5899999737739563,
+        0.6600000262260437,
+        1.0
+      ],
+      "metallic": 0.8199999928474426,
+      "roughness": 0.25999999046325684,
+      "emission": [
+        0.49000000953674316,
+        0.5899999737739563,
+        0.6600000262260437
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_silver_BaseColor.png",
+      "normalTexture": "Textures/EP_silver_Normal.png",
+      "roughnessTexture": "Textures/EP_silver_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_silver_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_amber",
+      "baseColor": [
+        0.7799999713897705,
+        0.4399999976158142,
+        0.11999999731779099,
+        1.0
+      ],
+      "metallic": 0.6200000047683716,
+      "roughness": 0.2800000011920929,
+      "emission": [
+        0.7799999713897705,
+        0.4399999976158142,
+        0.11999999731779099
+      ],
+      "emissionStrength": 0.05999999865889549,
+      "transparent": false,
+      "texture": "Textures/EP_amber_BaseColor.png",
+      "normalTexture": "Textures/EP_amber_Normal.png",
+      "roughnessTexture": "Textures/EP_amber_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_amber_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_screen",
+      "baseColor": [
+        0.00800000037997961,
+        0.054999999701976776,
+        0.11500000208616257,
+        1.0
+      ],
+      "metallic": 0.20000000298023224,
+      "roughness": 0.30000001192092896,
+      "emission": [
+        0.00800000037997961,
+        0.054999999701976776,
+        0.11500000208616257
+      ],
+      "emissionStrength": 0.15000000596046448,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_cyan",
+      "baseColor": [
+        0.014999999664723873,
+        0.6399999856948853,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.10000000149011612,
+      "roughness": 0.23999999463558197,
+      "emission": [
+        0.014999999664723873,
+        0.6399999856948853,
+        1.0
+      ],
+      "emissionStrength": 2.200000047683716,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_ivory",
+      "baseColor": [
+        0.800000011920929,
+        0.8799999952316284,
+        0.8700000047683716,
+        1.0
+      ],
+      "metallic": 0.47999998927116394,
+      "roughness": 0.23000000417232513,
+      "emission": [
+        0.800000011920929,
+        0.8799999952316284,
+        0.8700000047683716
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_violetlight",
+      "baseColor": [
+        0.6000000238418579,
+        0.3799999952316284,
+        0.9200000166893005,
+        1.0
+      ],
+      "metallic": 0.3499999940395355,
+      "roughness": 0.20999999344348907,
+      "emission": [
+        0.6000000238418579,
+        0.3799999952316284,
+        0.9200000166893005
+      ],
+      "emissionStrength": 0.27000001072883606,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_white",
+      "baseColor": [
+        0.699999988079071,
+        0.9399999976158142,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.30000001192092896,
+      "roughness": 0.20000000298023224,
+      "emission": [
+        0.699999988079071,
+        0.9399999976158142,
+        1.0
+      ],
+      "emissionStrength": 0.30000001192092896,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_violet",
+      "baseColor": [
+        0.23999999463558197,
+        0.09000000357627869,
+        0.5299999713897705,
+        1.0
+      ],
+      "metallic": 0.44999998807907104,
+      "roughness": 0.25,
+      "emission": [
+        0.23999999463558197,
+        0.09000000357627869,
+        0.5299999713897705
+      ],
+      "emissionStrength": 0.15000000596046448,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_violetdark",
+      "baseColor": [
+        0.06499999761581421,
+        0.02500000037252903,
+        0.1899999976158142,
+        1.0
+      ],
+      "metallic": 0.550000011920929,
+      "roughness": 0.28999999165534973,
+      "emission": [
+        0.06499999761581421,
+        0.02500000037252903,
+        0.1899999976158142
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "CurrencyVault_violetlight",
+      "baseColor": [
+        0.6299999952316284,
+        0.07999999821186066,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.30000001192092896,
+      "roughness": 0.25,
+      "emission": [
+        0.6299999952316284,
+        0.07999999821186066,
+        1.0
+      ],
+      "emissionStrength": 2.5,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_violet",
+      "baseColor": [
+        0.4000000059604645,
+        0.11999999731779099,
+        0.7799999713897705,
+        1.0
+      ],
+      "metallic": 0.30000001192092896,
+      "roughness": 0.25,
+      "emission": [
+        0.4000000059604645,
+        0.11999999731779099,
+        0.7799999713897705
+      ],
+      "emissionStrength": 1.2000000476837158,
+      "transparent": false,
+      "texture": ""
+    }
+  ],
+  "boundsBlender": [
+    [
+      -0.7347100973129272,
+      -0.6761318445205688,
+      0.0
+    ],
+    [
+      0.7347100973129272,
+      0.536636233329773,
+      1.2500001192092896
+    ]
+  ],
+  "triangles": 26466,
+  "metadata": {
+    "interactionHeightMeters": 1.05,
+    "defaultState": "Closed, all currency crystals enclosed",
+    "construction": "Solid chamfered rigid meshes, real fluid vessels, geometric status icons",
+    "animationDescription": "Opaque lids lift then slide outward, revealing three crystals, and reseal"
+  },
+  "normalizationScale": 0.9928515137923449
+}

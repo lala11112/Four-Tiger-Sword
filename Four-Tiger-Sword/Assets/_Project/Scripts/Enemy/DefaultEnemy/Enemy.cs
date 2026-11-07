@@ -33,8 +33,11 @@ public class Enemy : MonoBehaviour, IDamageable
     // CombatIdle에서 공격을 선택했을 때 true → ApproachState 전환 트리거
     public bool HasSelectedAttack { get; set; }
 
-    private StateMachine _stateMachine;
-    private IPlayerState _passiveState;
+    public IEnemyBrain Brain { get; private set; }
+    public bool IsDead => _isDie;
+    public bool EncounterPatrolOnly { get; private set; }
+    internal Vector3 PatrolOrigin { get; private set; }
+    public virtual MonsterSkillDataSO ActiveSkillSet => EnemyStat?.MonsterSkillData;
     private bool _combatLabPassive;
     /// <summary>Experiment policy only: retain hit reactions and motion while suppressing autonomous actions.</summary>
     public bool CombatLabPassive
@@ -50,12 +53,9 @@ public class Enemy : MonoBehaviour, IDamageable
                 foreach (var collider in GetComponentsInChildren<Collider>(true))
                     if (collider.enabled && collider.GetComponentInParent<Enemy>() == this)
                         activeBodyColliders.Add(collider);
-                if (CurrentAction?.IsActive == true) CurrentAction.Exit();
-                CurrentAction = null;
-                HasSelectedAttack = false;
+                CancelCurrentAction();
                 IsSelfDestructing = false;
-                if (_stateMachine != null && !_isDie && !IsHurt && !IsGroggy && !IsRoot)
-                    _stateMachine.ChangeState(_passiveState);
+                Brain?.SetPassive(true);
                 if (_navMeshAgent != null && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
                 { _navMeshAgent.ResetPath(); _navMeshAgent.velocity = Vector3.zero; }
                 // Action Exit restores its own earlier collider snapshot. Passive mode must
@@ -63,12 +63,10 @@ public class Enemy : MonoBehaviour, IDamageable
                 if (!_isDie && EnemyStat?.IsDead != true)
                     foreach (var collider in activeBodyColliders) if (collider != null) collider.enabled = true;
             }
-            else if (_stateMachine != null && _passiveState != null && _stateMachine.CurrentState == _passiveState)
-                _stateMachine.ChangeState(new EnemyIdleState(this));
+            else Brain?.SetPassive(false);
             SyncMovementLock();
         }
     }
-    private EnemySelfDestructState _selfDestructState;
     public bool IsSelfDestructing { get; private set; }
     private IEnemySensor _sensor;
     private NavMeshAgent _navMeshAgent;
@@ -89,21 +87,18 @@ public class Enemy : MonoBehaviour, IDamageable
     [Min(0.1f)] public float FailedAttackRetryDelay = 1f;
     private float _targetMemoryExpiresAt = float.NegativeInfinity;
     public Vector3 LastKnownTargetPosition { get; private set; }
-    public bool HasTargetMemory => Time.time < _targetMemoryExpiresAt;
+    public bool HasTargetMemory => !EncounterPatrolOnly && Time.time < _targetMemoryExpiresAt;
     private readonly Dictionary<MonsterSkillData, float> _skillReadyAt = new();
     private MonsterSkillData _lastAttack;
-    private bool _isTargetInCombatRange => DetectedTarget != null
-        && Vector3.Distance(transform.position, DetectedTarget.position) <= CombatRange;
-    private bool _isTargetOutOfCombatRange => DetectedTarget == null
-        || Vector3.Distance(transform.position, DetectedTarget.position) > CombatExitRange;
     // 현재 선택한 공격의 실행 사거리(executeRange) 안에 플레이어가 들어왔는지
-    public bool IsInExecuteRange => !IsKnockbacking && CurrentAction != null && DetectedTarget != null
+    public bool IsInExecuteRange => !EncounterPatrolOnly && !IsKnockbacking && CurrentAction != null && DetectedTarget != null
         && Vector3.Distance(transform.position, DetectedTarget.position) >= CurrentAction.SkillData.minimumRange
         && Vector3.Distance(transform.position, DetectedTarget.position) <= CurrentAction.SkillData.executeRange;
-    public Transform DetectedTarget
+    public virtual Transform DetectedTarget
     {
         get
         {
+            if (EncounterPatrolOnly) return null;
             var sensed = _sensor?.DetectedTarget;
             if (sensed != null && sensed.gameObject.activeInHierarchy) return sensed;
             return null;
@@ -113,9 +108,11 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool IsHurt = false;
     public bool PendingGroggy = false;
     private bool _isDie = false;
+    private EnemyHitFlash _hitFlash;
 
     public bool IsSilenced => GetComponent<StatusEffectHandler>()?.Get<SilenceEffect>() is { IsExpired: false };
-    public bool CanAttack => !IsKnockbacking && !IsSilenced && _attackCooldownTimer <= 0f;
+    internal bool IsAttackCooldownReady => _attackCooldownTimer <= 0f;
+    public bool CanAttack => !EncounterPatrolOnly && !IsKnockbacking && !IsSilenced && IsAttackCooldownReady;
     public bool IsAttackFinished => CurrentAction?.IsFinished ?? true;
 
     public Animator Animator { get; private set; }
@@ -127,6 +124,17 @@ public class Enemy : MonoBehaviour, IDamageable
     public float ActionDeltaTime => ActorClock != null ? ActorClock.DeltaTime : Time.deltaTime;
     public float ActionTimeScale => ActorClock != null ? ActorClock.TimeScale : 1f;
     public float ActionTime => ActorClock != null ? ActorClock.Time : Time.time;
+    /// <summary>Switches the visual rig without resetting actor time, navigation, or combat state.</summary>
+    public void BindAnimator(Animator animator)
+    {
+        if (animator == null) throw new System.ArgumentNullException(nameof(animator));
+        Animator = animator;
+        _directionController = null;
+        _directionParametersCached = false;
+        ActorClock = CombatActorClock.GetOrCreate(this);
+        ActorClock.BindAnimator(animator);
+    }
+
     public void SetAnimationSpeed(float speed)
     {
         if (ActorClock != null) ActorClock.SetAnimationSpeed(speed);
@@ -168,65 +176,14 @@ public class Enemy : MonoBehaviour, IDamageable
             enabled = false;
             return;
         }
+        PatrolOrigin = transform.position;
 
         DamageTextManager.Instance?.Register(this);
         GetComponentInChildren<EnemyHpBar>(true)?.Setup(this);
 
-        // 상태 머신 초기화
-        {
-            _stateMachine = new StateMachine();
-            _passiveState = new PassiveState();
-
-            var idleState = new EnemyIdleState(this);
-            var traceState = new EnemyTraceState(this);
-            var combatIdleState = new EnemyCombatIdleState(this);
-            var approachState = new EnemyApproachState(this);
-            var attackState = new EnemyAttackState(this);
-            var hurtState = new EnemyHurtState(this);
-            var dieState = new EnemyDieState(this);
-            var groggyState = new EnemyGroggyState(this);
-            var rootState = new EnemyRootState(this);
-            _selfDestructState = new EnemySelfDestructState(this);
-            // Idle → Trace: 플레이어 감지 또는 피격 어그로
-            _stateMachine.AddTransition(idleState, traceState, () => DetectedTarget != null || HasTargetMemory);
-
-            // Trace → CombatIdle: 플레이어가 전투 범위 안
-            _stateMachine.AddTransition(traceState, combatIdleState, () => _isTargetInCombatRange);
-            _stateMachine.AddTransition(traceState, idleState, () => DetectedTarget == null && !HasTargetMemory);
-
-            // CombatIdle → Trace: 플레이어가 이탈 범위 밖
-            _stateMachine.AddTransition(combatIdleState, traceState, () => _isTargetOutOfCombatRange);
-            // CombatIdle → Approach: 공격 선택 완료
-            _stateMachine.AddTransition(combatIdleState, approachState, () => HasSelectedAttack);
-
-            // Approach → Attack: 실행 사거리 안에 플레이어 진입
-            _stateMachine.AddTransition(approachState, attackState, () => IsInExecuteRange);
-            // Approach → Trace: 플레이어가 이탈 범위 밖으로 이탈
-            _stateMachine.AddTransition(approachState, traceState, () => _isTargetOutOfCombatRange);
-            _stateMachine.AddTransition(approachState, combatIdleState, () => CurrentAction == null);
-
-            // Attack → CombatIdle: 공격 완료 (쿨타임 + 배회)
-            _stateMachine.AddTransition(attackState, combatIdleState, () => IsAttackFinished);
-
-            _stateMachine.AddTransition(rootState, traceState, () => !IsRoot);
-
-            // Hurt → Trace 복귀
-            _stateMachine.AddTransition(hurtState, traceState, () => !IsHurt);
-            _stateMachine.AddTransition(groggyState, traceState, () => !IsGroggy);
-
-            _stateMachine.AddAnyTransition(dieState, () => _isDie);
-            _stateMachine.AddAnyTransition(_selfDestructState, () => IsSelfDestructing);
-            _stateMachine.AddAnyTransition(hurtState, () => IsHurt && !IsGroggy);
-            _stateMachine.AddAnyTransition(groggyState, () => IsGroggy);
-            _stateMachine.AddAnyTransition(rootState, () => IsRoot);
-
-            _stateMachine.ChangeState(CombatLabPassive ? _passiveState : idleState);
-            if (CombatLabPassive)
-            {
-                if (_navMeshAgent.enabled && _navMeshAgent.isOnNavMesh) _navMeshAgent.ResetPath();
-                SyncMovementLock();
-            }
-        }
+        // Components must be ready before a specialized brain enters its first phase.
+        Brain = CreateBrain();
+        Brain.Initialize();
 
         _rigs = GetComponentsInChildren<Rigidbody>();
 
@@ -236,50 +193,31 @@ public class Enemy : MonoBehaviour, IDamageable
         }
     }
 
+    protected virtual IEnemyBrain CreateBrain() => new NormalEnemyBrain(this);
+
+    protected virtual void OnEnable() => Brain?.Resume();
+
     protected virtual void Update()
     {
-        if (_stateMachine == null) return;
+        if (Brain == null) return;
         if (_isDie)
         {
-            // 사망 상태 진입(진행 중 공격 정리)은 수행하되 감지/추적 계산은 멈춥니다.
-            if (!(_stateMachine.CurrentState is EnemyDieState))
-            {
-                _stateMachine.Update();
-                stateName = _stateMachine.CurrentState.GetType().ToString();
-                SetDirectionAnimation(0f, 0f);
-            }
+            Brain.Tick(false);
+            stateName = Brain.StateName;
+            SetDirectionAnimation(0f, 0f);
             return;
         }
         UpdateAttackCooldown(); // World clock: local impact stops never lengthen cooldowns.
         bool canAct = ActionDeltaTime > 0f;
         if (canAct)
-        {
             UpdateKnockback(ActionDeltaTime);
-            if (!CombatLabPassive)
-            {
-                TryStartSelfDestruct();
-                _sensor?.DetectTarget();
-                if (DetectedTarget != null) RememberTargetPosition(DetectedTarget.position);
-            }
-        }
-        _stateMachine.Update(canAct && !CombatLabPassive, canAct && !CombatLabPassive);
-        if (CombatLabPassive && canAct)
-        {
-            if (_stateMachine.CurrentState is EnemyHurtState || _stateMachine.CurrentState is EnemyGroggyState
-                || _stateMachine.CurrentState is EnemyRootState)
-                _stateMachine.CurrentState.Update();
-            if (!IsHurt && !IsGroggy && !IsRoot && !_isDie && _stateMachine.CurrentState != _passiveState)
-                _stateMachine.ChangeState(_passiveState);
-        }
-        stateName = _stateMachine.CurrentState.GetType().ToString(); //디버그 전용
+        Brain.Tick(canAct);
+        stateName = Brain.StateName;
 
         Vector3 worldVelocity = !IsKnockbacking && !IsHurt && !IsGroggy && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh
             ? _navMeshAgent.velocity : Vector3.zero;
         Vector3 localVelocity = transform.InverseTransformDirection(worldVelocity);
         SetDirectionAnimation(localVelocity.x, localVelocity.z);
-
-        //Debug.Log(_stateMachine.CurrentState.GetType().ToString());
-
 
     }
 
@@ -306,8 +244,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public virtual DamageResult TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 100f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE, bool isParryable = true, object source = null)
     {
-        if (EnemyStat == null) EnemyStat = GetComponent<EnemyStat>();
-        if (!isActiveAndEnabled || _isDie || EnemyStat == null || EnemyStat.CurrentHp <= 0 || damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return default;
+        if (!CanReceiveDamage(damage)) return default;
         float hpBefore = EnemyStat.CurrentHp;
 
         GetComponent<PoiseHandler>()?.TakePoiseDamage(poiseDamage);
@@ -316,8 +253,11 @@ public class Enemy : MonoBehaviour, IDamageable
         var attacker = GameObject.FindGameObjectWithTag("Player");
         if (attacker != null) RememberTargetPosition(attacker.transform.position);
 
-        if (!IsGroggy && StaggerResistLevel != StaggerResistLevel.SUPER_ARMOR
-            && (staggerResistLevel >= StaggerResistLevel || PendingGroggy))
+        bool awaitingNormalGroggy = !(this is Boss) && PendingGroggy && !IsSelfDestructing;
+        bool inflictedStagger = !awaitingNormalGroggy && !ResistsOrdinaryHitReaction && !IsGroggy
+            && StaggerResistLevel != StaggerResistLevel.SUPER_ARMOR
+            && (staggerResistLevel >= StaggerResistLevel || PendingGroggy);
+        if (inflictedStagger)
         {
             IsHurt = true;
             HurtVersion++;
@@ -325,6 +265,15 @@ public class Enemy : MonoBehaviour, IDamageable
 
         EnemyStat.CurrentHp = Mathf.Max(0f, EnemyStat.CurrentHp - damage);
         float healthDamage = hpBefore - EnemyStat.CurrentHp;
+        // A boss may consume this health bar without confirming the actor's death.
+        // Latch before callbacks so reentrant hits cannot consume another phase.
+        bool healthDepletionHandled = EnemyStat.CurrentHp <= 0f && TryHandleHealthDepleted();
+        if (healthDamage > 0f)
+        {
+            if (_hitFlash == null)
+                _hitFlash = GetComponent<EnemyHitFlash>() ?? gameObject.AddComponent<EnemyHitFlash>();
+            _hitFlash.Play();
+        }
         OnDamaged?.Invoke(healthDamage, damageType, isCritical);
 
         if (EnemyStat.CurrentHp > 0f) TryStartSelfDestruct();
@@ -333,22 +282,32 @@ public class Enemy : MonoBehaviour, IDamageable
         if (power != Vector3.zero && CanReceiveKnockback(staggerResistLevel) && !IsSelfDestructing && EnemyStat.CurrentHp > 0f)
             ApplyKnockback(power, source);
 
-        if (EnemyStat.CurrentHp <= 0)
+        if (EnemyStat.CurrentHp <= 0f && !healthDepletionHandled && !_isDie)
         {
             Die();
             OnDied?.Invoke();
         }
-        return new DamageResult(DamageOutcome.Applied, healthDamage, killed: EnemyStat.CurrentHp <= 0f);
+        return new DamageResult(DamageOutcome.Applied, healthDamage, killed: IsDead,
+            causedOrdinaryStagger: inflictedStagger);
     }
 
-    private void TryStartSelfDestruct()
+    /// <summary>Return true to consume an exhausted health bar without a final death.</summary>
+    protected virtual bool TryHandleHealthDepleted() => false;
+
+    protected bool CanReceiveDamage(float damage)
     {
-        if (_isDie || CombatLabPassive || IsSelfDestructing || _stateMachine == null || _selfDestructState == null) return;
-        var data = EnemyStat.MonsterSkillData?.selfDestruct;
-        if (data == null || !data.ShouldTrigger(EnemyStat)) return;
+        if (EnemyStat == null) EnemyStat = GetComponent<EnemyStat>();
+        return isActiveAndEnabled && !EncounterPatrolOnly && !_isDie && EnemyStat != null && EnemyStat.CurrentHp > 0f
+            && damage >= 0f && !float.IsNaN(damage) && !float.IsInfinity(damage);
+    }
+
+    private void TryStartSelfDestruct() => Brain?.TryStartSelfDestruct();
+
+    internal void BeginSelfDestruct()
+    {
+        ClearNormalHitChain();
         IsSelfDestructing = true;
         StopKnockback();
-        _stateMachine.ChangeState(_selfDestructState);
     }
 
     public void CompleteSelfDestruct(EnemySelfDestruct action)
@@ -364,8 +323,12 @@ public class Enemy : MonoBehaviour, IDamageable
     /// <summary>
     /// 공격의 경직 등급에 따라 넉백 허용 여부를 확인합니다.
     /// </summary>
+    protected virtual bool ResistsOrdinaryHitReaction => !PendingGroggy && !IsGroggy
+        && CurrentAction?.HasNormalAttackArmor == true;
+    protected virtual bool ResistsKnockback => ResistsOrdinaryHitReaction;
+
     private bool CanReceiveKnockback(StaggerResistLevel attackLevel)
-        => StaggerResistLevel != StaggerResistLevel.SUPER_ARMOR
+        => !ResistsKnockback && StaggerResistLevel != StaggerResistLevel.SUPER_ARMOR
             && (IsGroggy || PendingGroggy || attackLevel >= StaggerResistLevel);
 
     private void ApplyKnockback(Vector3 power, object source = null)
@@ -377,6 +340,7 @@ public class Enemy : MonoBehaviour, IDamageable
         float maxDistance = KnockbackMaxDistance;
         if (velocity.sqrMagnitude <= 0f || !KnockbackMotion.IsFinite(duration) || duration <= 0f
             || !KnockbackMotion.IsFinite(maxDistance) || maxDistance <= 0f) return;
+        CurrentAction?.OnKnockbackReceived();
         // Stop manual dash/jump displacement before taking ownership of movement.
         if (CurrentAction?.IsActive == true) CurrentAction.Exit();
         if (_navMeshAgent == null) _navMeshAgent = GetComponent<NavMeshAgent>();
@@ -445,6 +409,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private void Die()
     {
         _isDie = true;
+        ClearNormalHitChain();
         CombatHitStopService.ReleaseOwner(this);
         ActorClock?.ClearStops();
         StopKnockback();
@@ -454,11 +419,11 @@ public class Enemy : MonoBehaviour, IDamageable
 
     protected virtual void OnDisable()
     {
+        ClearNormalHitChain();
         CombatHitStopService.ReleaseOwner(this);
         ActorClock?.ClearStops();
-        if (CurrentAction?.IsActive == true) CurrentAction.Exit();
-        CurrentAction = null;
-        HasSelectedAttack = false;
+        CancelCurrentAction();
+        Brain?.Suspend();
         StopKnockback();
         OnTelegraphEnd(null);
     }
@@ -507,17 +472,101 @@ public class Enemy : MonoBehaviour, IDamageable
         _targetMemoryExpiresAt = Time.time + _targetMemoryDuration;
     }
 
+    internal virtual void SenseTarget()
+    {
+        if (EncounterPatrolOnly) return;
+        _sensor?.DetectTarget();
+        if (DetectedTarget != null) RememberTargetPosition(DetectedTarget.position);
+    }
+
+    /// <summary>Lets the first encounter wave patrol safely before the player enters its room.</summary>
+    public void SetEncounterPatrolOnly(bool patrolOnly)
+    {
+        if (EncounterPatrolOnly == patrolOnly) return;
+        EncounterPatrolOnly = patrolOnly;
+        if (!patrolOnly) return;
+        ClearNormalHitChain();
+        _targetMemoryExpiresAt = float.NegativeInfinity;
+        CancelCurrentAction();
+        (Brain as NormalEnemyBrain)?.ReturnToPatrol();
+    }
+
+    /// <summary>Records an entry cue once. Attacking still requires ordinary target detection.</summary>
+    public void RememberEncounterPosition(Vector3 position)
+    {
+        if (EncounterPatrolOnly || !KnockbackMotion.IsFinite(position.x)
+            || !KnockbackMotion.IsFinite(position.y) || !KnockbackMotion.IsFinite(position.z)) return;
+        RememberTargetPosition(position);
+    }
+
+    public bool IsSkillReady(MonsterSkillData skill) => skill != null
+        && (!_skillReadyAt.TryGetValue(skill, out float readyAt) || Time.time >= readyAt);
+
+    public void CancelCurrentAction()
+    {
+        if (CurrentAction?.IsActive == true) CurrentAction.Exit();
+        CurrentAction = null;
+        HasSelectedAttack = false;
+    }
+
     public float GetAttackSelectionWeight(MonsterSkillData skill, float distance)
     {
-        if (skill == null || skill is MonsterSelfDestructSO || skill.weight <= 0f || distance < skill.minimumRange
+        if (EncounterPatrolOnly || skill == null || skill is MonsterSelfDestructSO || skill.weight <= 0f || distance < skill.minimumRange
             || distance > skill.engageRange || skill.minimumRange > skill.executeRange
-            || (_skillReadyAt.TryGetValue(skill, out float readyAt) && Time.time < readyAt))
+            || !IsSkillReady(skill))
             return 0f;
         float preferred = skill.preferredRange > 0f ? skill.preferredRange : skill.executeRange;
         float span = Mathf.Max(0.1f, skill.engageRange - skill.minimumRange);
         float suitability = 1f - Mathf.Clamp01(Mathf.Abs(distance - preferred) / span);
         return skill.weight * Mathf.Lerp(0.25f, 1f, suitability)
             * (skill == _lastAttack ? Mathf.Clamp01(skill.repeatWeightMultiplier) : 1f);
+    }
+
+    internal MonsterSkillData SelectAttackSkill(bool executeRangeOnly = false)
+    {
+        var target = DetectedTarget;
+        var skills = ActiveSkillSet?.skillData;
+        if (target == null || skills == null) return null;
+        float distance = Vector3.Distance(transform.position, target.position);
+        float totalWeight = 0f;
+        foreach (var skill in skills)
+            if (!executeRangeOnly || skill != null && distance <= skill.executeRange)
+                totalWeight += GetAttackSelectionWeight(skill, distance);
+        if (totalWeight <= 0f) return null;
+        float roll = UnityEngine.Random.Range(0f, totalWeight);
+        MonsterSkillData fallback = null;
+        foreach (var skill in skills)
+        {
+            if (executeRangeOnly && (skill == null || distance > skill.executeRange)) continue;
+            float weight = GetAttackSelectionWeight(skill, distance);
+            if (weight <= 0f) continue;
+            fallback = skill;
+            roll -= weight;
+            if (roll <= 0f) return skill;
+        }
+        return fallback;
+    }
+
+    /// <summary>Receives credit only for a confirmed direct player hit that caused this call's stagger.</summary>
+    public void RecordDirectPlayerStagger()
+    {
+        if (!isActiveAndEnabled || this is Boss || IsDead || EnemyStat?.CurrentHp <= 0f
+            || !IsHurt || IsGroggy || PendingGroggy || IsRoot || IsSelfDestructing
+            || CombatLabPassive || EncounterPatrolOnly) return;
+        (Brain as NormalEnemyBrain)?.RecordDirectStagger();
+    }
+
+    internal void ClearNormalHitChain() => (Brain as NormalEnemyBrain)?.ClearHitChain();
+
+    internal void StopKnockbackForCounter() => StopKnockback("counter-started");
+
+    internal void OnPoiseBroken()
+    {
+        PendingGroggy = true;
+        if (this is Boss || IsSelfDestructing) return;
+        ClearNormalHitChain();
+        // Stop current hit windows immediately. The brain enters groggy on its next safe tick.
+        CancelCurrentAction();
     }
 
     public void RecordAttackStarted(MonsterSkillData skill)
@@ -561,9 +610,28 @@ public class Enemy : MonoBehaviour, IDamageable
             _navMeshAgent.isStopped = _moveLockCount > 0 || CombatLabPassive;
     }
 
+    internal void SetNavigationRotation(bool updateRotation)
+    {
+        if (_navMeshAgent == null) return;
+        // Knockback owns the live rotation flag until it releases its movement lock.
+        if (IsKnockbacking) _knockbackUpdateRotation = updateRotation;
+        else _navMeshAgent.updateRotation = updateRotation;
+    }
+
     protected void ResetAttackCooldown()
     {
         _attackCooldownTimer = 0f;
+    }
+
+    /// <summary>Called after the brain has exited its previous reaction/action state.</summary>
+    internal void ResetForBossPhase()
+    {
+        StopKnockback();
+        IsHurt = IsGroggy = IsRoot = PendingGroggy = IsSelfDestructing = false;
+        GetComponent<PoiseHandler>()?.ResetPoise();
+        _skillReadyAt.Clear();
+        _lastAttack = null;
+        ResetAttackCooldown();
     }
 
     public virtual void OnTelegraphStart(EnemyAction action)
@@ -579,10 +647,4 @@ public class Enemy : MonoBehaviour, IDamageable
         _telegraphInstance = null;
     }
 
-    private sealed class PassiveState : IPlayerState
-    {
-        public void Enter() { }
-        public void Update() { }
-        public void Exit() { }
-    }
 }

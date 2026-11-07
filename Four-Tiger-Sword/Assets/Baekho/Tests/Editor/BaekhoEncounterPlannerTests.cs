@@ -125,6 +125,115 @@ namespace StudioBaekho.Tests
             Assert.Throws<ArgumentException>(() => BaekhoEncounterPlanner.Plan(20, new[] { -1, 5 }, 0));
         }
 
+        [Test]
+        public void EmptyAndSingleEnemyCompositionsDoNotCreateEmptyWaves()
+        {
+            Assert.That(BaekhoEncounterPlanner.SplitIntoWaves(Array.Empty<int>(), Array.Empty<int>(), 20, 6, 1), Is.Empty);
+            Assert.That(BaekhoEncounterPlanner.SplitIntoWaves(new[] { 0, 0 }, new[] { 2, 5 }, 20, 6, 1), Is.Empty);
+            var waves = BaekhoEncounterPlanner.SplitIntoWaves(new[] { 0, 1 }, new[] { 2, 75 }, 20, 6, 1);
+            Assert.That(waves.Count, Is.EqualTo(1));
+            Assert.That(waves[0].Cost, Is.EqualTo(75));
+            Assert.That(waves[0].EnemyCount, Is.EqualTo(1));
+            CollectionAssert.AreEqual(new[] { 0, 1 }, waves[0].Counts);
+        }
+
+        [Test]
+        public void CheapEnemiesRespectTheHardPerWaveCountLimit()
+        {
+            var waves = BaekhoEncounterPlanner.SplitIntoWaves(new[] { 25 }, new[] { 1 }, 20, 6, 3);
+            Assert.That(waves.Count, Is.EqualTo(5));
+            foreach (var wave in waves)
+            {
+                Assert.That(wave.EnemyCount, Is.EqualTo(5));
+                Assert.That(wave.Cost, Is.EqualTo(5));
+            }
+            AssertWavesPreserveComposition(waves, new[] { 25 }, new[] { 1 }, 6);
+        }
+
+        [Test]
+        public void CostTargetCreatesBalancedWavesWithLighterWavesFirst()
+        {
+            var waves = BaekhoEncounterPlanner.SplitIntoWaves(new[] { 7 }, new[] { 10 }, 20, 6, 4);
+            Assert.That(waves.Count, Is.EqualTo(4));
+            Assert.That(waves[0].Cost, Is.EqualTo(10));
+            Assert.That(waves[1].Cost, Is.EqualTo(20));
+            Assert.That(waves[2].Cost, Is.EqualTo(20));
+            Assert.That(waves[3].Cost, Is.EqualTo(20));
+            AssertWavesPreserveComposition(waves, new[] { 7 }, new[] { 10 }, 6);
+        }
+
+        [Test]
+        public void MixedWavesPreserveTheOriginalAllocationAndSeed()
+        {
+            int[] costs = { 2, 5, 4 };
+            for (int seed = 0; seed < 40; seed++)
+            {
+                var plan = BaekhoEncounterPlanner.Plan(70, costs, seed);
+                var savedCounts = (int[])plan.Counts.Clone();
+                var waves = BaekhoEncounterPlanner.SplitIntoWaves(plan.Counts, costs, 20, 6, seed);
+                var repeated = BaekhoEncounterPlanner.SplitIntoWaves(plan.Counts, costs, 20, 6, seed);
+                Assert.That(waves.Count, Is.EqualTo(repeated.Count));
+                for (int i = 0; i < waves.Count; i++)
+                {
+                    CollectionAssert.AreEqual(waves[i].Counts, repeated[i].Counts);
+                    Assert.That(waves[i].Cost, Is.EqualTo(repeated[i].Cost));
+                }
+                AssertWavesPreserveComposition(waves, savedCounts, costs, 6);
+                CollectionAssert.AreEqual(savedCounts, plan.Counts);
+            }
+            CollectionAssert.AreEqual(new[] { 2, 5, 4 }, costs);
+        }
+
+        [Test]
+        public void LargeIndividualPricesUseExactWaveCountArithmetic()
+        {
+            var waves = BaekhoEncounterPlanner.SplitIntoWaves(new[] { 2 }, new[] { 1000000000 }, int.MaxValue, 6, 1);
+            Assert.That(waves.Count, Is.EqualTo(1));
+            Assert.That(waves[0].Cost, Is.EqualTo(2000000000));
+            var expensive = BaekhoEncounterPlanner.SplitIntoWaves(new[] { 2 }, new[] { 1000000000 }, 20, 6, 1);
+            Assert.That(expensive.Count, Is.EqualTo(2));
+            AssertWavesPreserveComposition(expensive, new[] { 2 }, new[] { 1000000000 }, 6);
+        }
+
+        [Test]
+        public void InvalidWaveInputsFailBeforeDistribution()
+        {
+            Assert.Throws<ArgumentNullException>(() => BaekhoEncounterPlanner.SplitIntoWaves(null, new[] { 1 }, 20, 6, 0));
+            Assert.Throws<ArgumentNullException>(() => BaekhoEncounterPlanner.SplitIntoWaves(new[] { 1 }, null, 20, 6, 0));
+            Assert.Throws<ArgumentException>(() => BaekhoEncounterPlanner.SplitIntoWaves(new[] { 1 }, new[] { 1, 2 }, 20, 6, 0));
+            Assert.Throws<ArgumentException>(() => BaekhoEncounterPlanner.SplitIntoWaves(new[] { -1 }, new[] { 1 }, 20, 6, 0));
+            Assert.Throws<ArgumentException>(() => BaekhoEncounterPlanner.SplitIntoWaves(new[] { 0 }, new[] { 0 }, 20, 6, 0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => BaekhoEncounterPlanner.SplitIntoWaves(new[] { 0 }, new[] { 1 }, 0, 6, 0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => BaekhoEncounterPlanner.SplitIntoWaves(new[] { 0 }, new[] { 1 }, 20, 0, 0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => BaekhoEncounterPlanner.SplitIntoWaves(new[] { 2 }, new[] { int.MaxValue }, 20, 6, 0));
+        }
+
+        private static void AssertWavesPreserveComposition(IReadOnlyList<BaekhoEncounterWave> waves,
+            int[] counts, int[] costs, int maxEnemies)
+        {
+            var totals = new int[counts.Length];
+            int previousCost = 0;
+            foreach (var wave in waves)
+            {
+                Assert.That(wave.EnemyCount, Is.InRange(1, maxEnemies));
+                Assert.That(wave.Counts.Length, Is.EqualTo(counts.Length));
+                Assert.That(wave.Cost, Is.GreaterThanOrEqualTo(previousCost));
+                long cost = 0;
+                int enemies = 0;
+                for (int i = 0; i < counts.Length; i++)
+                {
+                    Assert.That(wave.Counts[i], Is.GreaterThanOrEqualTo(0));
+                    totals[i] += wave.Counts[i];
+                    enemies += wave.Counts[i];
+                    cost += (long)wave.Counts[i] * costs[i];
+                }
+                Assert.That(cost, Is.EqualTo(wave.Cost));
+                Assert.That(enemies, Is.EqualTo(wave.EnemyCount));
+                previousCost = wave.Cost;
+            }
+            CollectionAssert.AreEqual(counts, totals);
+        }
+
         private static void CheckEveryCostVector(int[] costs, int index, int maxCost, int maxBudget)
         {
             if (index < costs.Length)

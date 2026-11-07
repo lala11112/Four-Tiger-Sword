@@ -59,6 +59,7 @@ GameObject:
   - component: {fileID: 758665443227626957}
   - component: {fileID: 9153447627390353593}
   - component: {fileID: 907558713481610124}
+  - component: {fileID: 5264001746257882518}
   m_Layer: 0
   m_Name: "\uAD00\uCE21_\uAD50\uC804\uC2E4"
   m_TagString: Untagged
@@ -1557,6 +1558,7 @@ Transform:
   - {fileID: 2571166778655085950}
   - {fileID: 5326495326538725072}
   - {fileID: 8558353239534326730}
+  - {fileID: 2342428687455106016}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &9153447627390353593
@@ -2078,6 +2080,24 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: cbc7bfe846af43043bdd8420c5fcbac1, type: 2}
   m_BuildHeightMesh: 0
+--- !u!114 &5264001746257882518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 909933313122582966}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 520f4474fe544a1086a0902a9b9e81c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageMapAnchors
+  playerSpawn: {fileID: 0}
+  exitPoint: {fileID: 0}
+  bossSpawn: {fileID: 0}
+  shopPoint: {fileID: 0}
+  teleportPoint: {fileID: 2342428687455106016}
+  exitSize: {x: 2, y: 3, z: 2}
 --- !u!1 &1546707703829202153
 GameObject:
   m_ObjectHideFlags: 0
@@ -2830,6 +2850,37 @@ MonoBehaviour:
   label: enemy 1
   kind: enemy
   contentKey: 
+--- !u!1 &6730204353342465916
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2342428687455106016}
+  m_Layer: 0
+  m_Name: TeleportPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2342428687455106016
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6730204353342465916}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.50712776, z: -0, w: 0.8618709}
+  m_LocalPosition: {x: -0.4966005, y: 1.055, z: -0.5061191}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 758665443227626957}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7972889826440289947
 GameObject:
   m_ObjectHideFlags: 0

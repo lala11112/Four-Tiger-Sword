@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a9daac3d817e6743869e2a6992fbe60, type: 3}
+  m_Name: Phase2_OpeningBurst
+  m_EditorClassIdentifier: Assembly-CSharp::BossPhaseBurstSkillSO
+  animName: Charge
+  engageRange: 20
+  executeRange: 1000
+  weight: 1
+  minimumRange: 0
+  preferredRange: 3
+  cooldown: 0
+  repeatWeightMultiplier: 0.5
+  attackSpeed: 1
+  staggerLevel: 3
+  playerHitReaction: 1
+  playerDownSeconds: 0.3
+  playerGetUpSeconds: 0.5
+  isParryable: 0
+  telegraphDuration: 2.5
+  SwingAudio:
+    Clip: {fileID: 8300000, guid: c84a40134ba634f4c8030fad451d0654, type: 3}
+    Accent: {fileID: 0}
+    Volume: 0.42
+    AccentVolume: 0.28
+    PitchRange: {x: 0.97, y: 1.03}
+  HitAudio:
+    Clip: {fileID: 8300000, guid: 47c8889c3da34b54e897c6e11e3b3fa8, type: 3}
+    Accent: {fileID: 0}
+    Volume: 0.68
+    AccentVolume: 0.28
+    PitchRange: {x: 0.97, y: 1.03}
+  LandingAudio:
+    Clip: {fileID: 0}
+    Accent: {fileID: 0}
+    Volume: 0.65
+    AccentVolume: 0.3
+    PitchRange: {x: 0.97, y: 1.03}
+  radius: 12
+  heightTolerance: 4
+  chargeDuration: 2.5
+  activeDuration: 0.15
+  recoveryTime: 1.2
+  damage: 2
+  knockbackForce: 38
+  preparationDuration: 0.53333336
+  chargePoseNormalized: 0.19512194
+  releaseHitDelay: 0.93333334

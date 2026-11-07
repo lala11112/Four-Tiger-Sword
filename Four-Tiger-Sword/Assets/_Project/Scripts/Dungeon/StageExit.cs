@@ -13,6 +13,11 @@ public sealed class StageExit : MonoBehaviour
 
     public void Initialize(StageManager stage, PlayerController player, Vector3 size, int generation)
     {
+        // A Resources material keeps its shader in player builds; Shader.Find alone does not.
+        var markerMaterial = Resources.Load<Material>("StageExitMarker");
+        if (markerMaterial == null || markerMaterial.shader == null)
+            throw new System.InvalidOperationException("Stage exit marker material is missing or has no shader.");
+
         _stage = stage; _player = player; _generation = generation;
         _trigger = gameObject.AddComponent<BoxCollider>();
         _trigger.isTrigger = true;
@@ -28,7 +33,7 @@ public sealed class StageExit : MonoBehaviour
         Destroy(collider);
         var renderer = visual.GetComponent<Renderer>();
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        _material = new Material(Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Unlit/Color"));
+        _material = new Material(markerMaterial);
         renderer.sharedMaterial = _material;
         SetAvailable(false);
     }

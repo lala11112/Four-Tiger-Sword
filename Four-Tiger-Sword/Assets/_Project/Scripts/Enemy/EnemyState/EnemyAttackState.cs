@@ -18,7 +18,7 @@ public class EnemyAttackState : IPlayerState
 
     public void Enter()
     {
-        if (_enemy.IsSilenced)
+        if (_enemy.EncounterPatrolOnly || _enemy.IsSilenced)
         {
             _enemy.CurrentAction?.Exit();
             _enemy.CurrentAction = null;
@@ -35,7 +35,7 @@ public class EnemyAttackState : IPlayerState
 
     public void Update()
     {
-        if (_enemy.IsSilenced)
+        if (_enemy.EncounterPatrolOnly || _enemy.IsSilenced)
         {
             _enemy.CurrentAction?.Exit();
             _enemy.CurrentAction = null;

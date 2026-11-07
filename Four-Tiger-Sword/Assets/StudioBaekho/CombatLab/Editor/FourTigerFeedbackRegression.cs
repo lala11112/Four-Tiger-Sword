@@ -44,6 +44,8 @@ public static class FourTigerFeedbackRegression
             first.HitEvents = new List<HitEvent> {
                 Hit(false, 1.8f, .8f, .1f), Hit(false, 2.3f, .9f, .3f)
             };
+            Check(first.Feedback.Camera.V2 == null && first.HitEvents[0].Feedback.CameraV2 == null,
+                "Untuned attack and hit cameras inherit without storing repeated camera blocks");
             var second = Step(profile, 1000, 2f);
             var third = Step(null, 0, .07f);
             source.Actions.ComboSteps = new List<WeaponActionData> { first, second, third };
@@ -85,8 +87,8 @@ public static class FourTigerFeedbackRegression
             var hitClone = FourTigerCombatAdapter.CloneAndApply(source, perHit, owned, "normal-1", 2);
             var hitAttack = hitClone.Actions.ComboSteps[0];
             Near(hitAttack.HitEvents[0].Feedback.HitStop.HitStopDuration, .035f, "Only the selected hit gets the absolute stop duration");
-            Check(hitAttack.HitEvents[0].Feedback.HitStop.OverrideHitStop && hitAttack.Feedback.EnableV2,
-                "Edited hit enables its local override and the v2 custom-action route");
+            Check(hitAttack.HitEvents[0].Feedback.HitStop.OverrideHitStop && hitAttack.HitEvents[0].Feedback.HitStop.EnableV2,
+                "Edited hit enables its local override and the hit-stop custom-action route");
             Check(hitAttack.HitEvents[0].Feedback.HitStop.Scope == HitStopScope.Both,
                 "Edited local stop scope survives clone application");
             Check(JsonUtility.ToJson(hitAttack.HitEvents[1]) == untouchedHit,
@@ -123,6 +125,7 @@ public static class FourTigerFeedbackRegression
                 "Editing a motion axis preserves the inherited FOV curve's keys, tangents and wrap modes");
 
             var inlineSource = Object.Instantiate(source); owned.Add(inlineSource);
+            inlineSource.Actions.ComboSteps[0].Feedback.Camera.V2 = new CombatCameraV2Settings();
             inlineSource.Actions.ComboSteps[0].Feedback.Camera.V2.Shake.Mode = CombatFeedbackChannelMode.Override;
             inlineSource.Actions.ComboSteps[0].Feedback.Camera.V2.Shake.Translation = new Vector3(.2f, 0, 0);
             var response = FourTigerCombatAdapter.CloneAndApply(inlineSource,
@@ -135,6 +138,10 @@ public static class FourTigerFeedbackRegression
                 Candidate("hit-shake", new ParameterValue("step.0.hit.0.camera.shake.duration", .4f)), owned, "normal-1", 2);
             Near(inheritedHit.Actions.ComboSteps[0].HitEvents[0].Feedback.CameraV2.Shake.Translation.x, .2f,
                 "Editing an inherited hit shake's duration preserves the effective step amplitude");
+            Check(inheritedHit.Actions.ComboSteps[0].HitEvents[0].Feedback.CameraV2.GetType() == typeof(CombatCameraHitSettings),
+                "An edited hit stores only hit camera channels instead of an unused attack motion block");
+            Check(!adapter.DescribeCurves(guid, "normal-1").Any(c => c.id.StartsWith("step.0.hit.0.camera.motion.", StringComparison.Ordinal)),
+                "Per-hit authoring does not expose attack-progress motion curves");
 
             var profileV2 = Object.Instantiate(profile); owned.Add(profileV2);
             profileV2.EnableV2 = true;
@@ -179,6 +186,7 @@ public static class FourTigerFeedbackRegression
             keepStep.HitEvents[0].Feedback.HitStop.OverrideHitStop = true;
             keepStep.HitEvents[0].Feedback.HitStop.HitStopDuration = .123f;
             keepStep.HitEvents[0].Feedback.HitStop.HitStopTimeScale = .15f;
+            keepStep.Feedback.Camera.V2 = new CombatCameraV2Settings();
             keepStep.Feedback.Camera.V2.Mode = CombatFeedbackChannelMode.Override;
             keepStep.Feedback.Camera.V2.Motion.FovOffset = new AnimationCurve(new Keyframe(0, -4, .7f, -.3f), new Keyframe(1, 0));
             keepStep.Feedback.Camera.V2.Impact.Mode = CombatFeedbackChannelMode.Override;
@@ -240,6 +248,25 @@ public static class FourTigerFeedbackRegression
             Check(preset.candidate.origin == "ai-edited" && preset.candidate.revision == 3
                 && preset.candidate.curves.Count == 1 && preset.candidate.curves[0].keys.Count == 3,
                 "Candidate copy and preset reload preserve editing provenance and curve patches");
+
+            var hitCameraPatch = Candidate("per-hit-camera", new ParameterValue("step.0.hit.0.camera.shake.translation.x", .35f),
+                new ParameterValue("step.0.hit.0.camera.shake.duration", .4f));
+            hitCameraPatch.curves.Add(Curve("step.0.hit.0.camera.impact.positionX", 0, .2f, 0));
+            string hitExportPath = folder + "/HitPreset.asset";
+            adapter.Export(Request(guid, "normal-1", hitCameraPatch), hitCameraPatch, hitExportPath);
+            AssetDatabase.ImportAsset(hitExportPath, ImportAssetOptions.ForceUpdate);
+            var hitPreset = AssetDatabase.LoadAssetAtPath<CombatLabPreset>(hitExportPath);
+            var savedHitForm = hitPreset.actionAsset as WaterFormActionDataSO;
+            Check(savedHitForm != null, "Per-hit camera export reloads its playable form");
+            var savedHitCamera = savedHitForm.Actions.ComboSteps[0].HitEvents[0].Feedback.CameraV2;
+            Check(savedHitCamera != null && savedHitCamera.GetType() == typeof(CombatCameraHitSettings),
+                "Preset serialization retains the compact per-hit camera type");
+            Near(savedHitCamera.Shake.Translation.x, .35f, "Per-hit preset reload preserves its absolute shake");
+            Check(savedHitCamera.Impact.PositionX.length == 3 && savedHitCamera.Impact.Mode == CombatFeedbackChannelMode.Override,
+                "Per-hit preset reload preserves its authored impact curve and activation");
+            Check(savedHitForm.Actions.ComboSteps[0].Feedback.Camera.V2 == null
+                && savedHitForm.Actions.ComboSteps[0].HitEvents[1].Feedback.CameraV2 == null,
+                "Editing one hit leaves the inherited step and other hit camera blocks absent");
 
             var secondPatch = Candidate("second", new ParameterValue("step.0.hitstop.duration", .025f),
                 new ParameterValue("step.0.hitstop.scope", (float)HitStopScope.Victim));

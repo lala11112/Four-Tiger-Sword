@@ -20,6 +20,21 @@ namespace StudioBaekho
         }
     }
 
+    /// <summary>A portion of an encounter, in the original catalog order.</summary>
+    public sealed class BaekhoEncounterWave
+    {
+        public int[] Counts { get; }
+        public int Cost { get; }
+        public int EnemyCount { get; }
+
+        internal BaekhoEncounterWave(int[] counts, int cost, int enemyCount)
+        {
+            Counts = counts;
+            Cost = cost;
+            EnemyCount = enemyCount;
+        }
+    }
+
     /// <summary>
     /// Maximizes spending with at least two species and at most half of the monsters
     /// in the cheapest price tier. Equal prices omit the price-tier restriction.
@@ -144,6 +159,104 @@ namespace StudioBaekho
             }
 
             return new BaekhoEncounterPlan(counts, best * divisor, budget, relaxed);
+        }
+
+        /// <summary>
+        /// Preserves the planned composition while balancing its cost across waves.
+        /// The enemy limit is hard; target cost is soft when prices cannot divide evenly.
+        /// Lighter waves are returned first. Uses only its own seeded random source.
+        /// </summary>
+        public static IReadOnlyList<BaekhoEncounterWave> SplitIntoWaves(int[] counts, int[] costs,
+            int targetCostPerWave, int maxEnemiesPerWave, int seed)
+        {
+            if (counts == null) throw new ArgumentNullException(nameof(counts));
+            if (costs == null) throw new ArgumentNullException(nameof(costs));
+            if (counts.Length != costs.Length)
+                throw new ArgumentException("Counts and costs must have the same catalog order and length.");
+            if (targetCostPerWave <= 0) throw new ArgumentOutOfRangeException(nameof(targetCostPerWave));
+            if (maxEnemiesPerWave <= 0) throw new ArgumentOutOfRangeException(nameof(maxEnemiesPerWave));
+
+            long totalCost = 0;
+            int totalEnemies = 0;
+            var species = new List<int>();
+            for (int i = 0; i < counts.Length; i++)
+            {
+                if (counts[i] < 0) throw new ArgumentException("Enemy counts must be nonnegative.", nameof(counts));
+                if (costs[i] <= 0) throw new ArgumentException("Enemy costs must be positive.", nameof(costs));
+                totalCost += (long)counts[i] * costs[i];
+                if (totalCost > int.MaxValue)
+                    throw new ArgumentOutOfRangeException(nameof(counts), "Total encounter cost exceeds the supported integer budget.");
+                totalEnemies += counts[i];
+                if (counts[i] > 0) species.Add(i);
+            }
+            if (totalEnemies == 0) return Array.Empty<BaekhoEncounterWave>();
+
+            int waveCount = (int)Math.Min(totalEnemies, Math.Max(
+                (totalCost + targetCostPerWave - 1) / targetCostPerWave,
+                ((long)totalEnemies + maxEnemiesPerWave - 1) / maxEnemiesPerWave));
+            var waveCounts = new int[waveCount][];
+            var waveCosts = new int[waveCount];
+            var waveEnemyCounts = new int[waveCount];
+            for (int i = 0; i < waveCount; i++) waveCounts[i] = new int[counts.Length];
+
+            var random = new Random(seed);
+            for (int i = species.Count - 1; i > 0; i--)
+            {
+                int other = random.Next(i + 1);
+                int swap = species[i];
+                species[i] = species[other];
+                species[other] = swap;
+            }
+            // Stable ordering retains the seeded order among equally costly species.
+            for (int i = 1; i < species.Count; i++)
+            {
+                int value = species[i];
+                int j = i - 1;
+                while (j >= 0 && costs[species[j]] < costs[value])
+                {
+                    species[j + 1] = species[j];
+                    j--;
+                }
+                species[j + 1] = value;
+            }
+
+            var candidates = new List<int>(waveCount);
+            foreach (int index in species)
+            {
+                for (int enemy = 0; enemy < counts[index]; enemy++)
+                {
+                    candidates.Clear();
+                    int lowestCost = int.MaxValue;
+                    int lowestCount = int.MaxValue;
+                    for (int wave = 0; wave < waveCount; wave++)
+                    {
+                        if (waveEnemyCounts[wave] >= maxEnemiesPerWave) continue;
+                        if (waveCosts[wave] < lowestCost ||
+                            (waveCosts[wave] == lowestCost && waveEnemyCounts[wave] < lowestCount))
+                        {
+                            candidates.Clear();
+                            lowestCost = waveCosts[wave];
+                            lowestCount = waveEnemyCounts[wave];
+                        }
+                        if (waveCosts[wave] == lowestCost && waveEnemyCounts[wave] == lowestCount)
+                            candidates.Add(wave);
+                    }
+                    int selected = candidates[random.Next(candidates.Count)];
+                    waveCounts[selected][index]++;
+                    waveCosts[selected] += costs[index];
+                    waveEnemyCounts[selected]++;
+                }
+            }
+
+            var waves = new List<BaekhoEncounterWave>(waveCount);
+            for (int i = 0; i < waveCount; i++)
+            {
+                var wave = new BaekhoEncounterWave(waveCounts[i], waveCosts[i], waveEnemyCounts[i]);
+                int position = waves.Count;
+                while (position > 0 && waves[position - 1].Cost > wave.Cost) position--;
+                waves.Insert(position, wave);
+            }
+            return waves;
         }
 
         private static int GreatestCommonDivisor(int a, int b)

@@ -57,8 +57,14 @@ public abstract partial class BaseForm
         }
         else if (step.HitDuration > 0f && step.HitStartTime <= step.Duration)
             _followEndTime = step.HitStartTime;
+        if (_currentAction == ActionType.Attack && !_finisherAttackActive)
+            _followEndTime = ResolveNormalAttackFollowEndTime(step, _followEndTime);
         _followEndTime = Mathf.Clamp(_followEndTime, 0f, Mathf.Max(0f, step.Duration));
     }
+
+    // Forms opt into an earlier cutoff without changing legacy chase or finisher movement.
+    protected virtual float ResolveNormalAttackFollowEndTime(WeaponActionData step, float lastHitStart)
+        => lastHitStart;
 
     private void FollowAttackTarget(WeaponActionData step, float previousTime, float currentTime)
     {

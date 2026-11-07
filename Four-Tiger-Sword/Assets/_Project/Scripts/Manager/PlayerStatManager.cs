@@ -13,6 +13,7 @@ public class PlayerStatManager : MonoBehaviour
     private Dictionary<StatType, float> finalValues = new(); // 최종 계산된 값 (실제 사용하는 값)
 
     private bool _initialized;
+    private float _permanentHealthRatio, _permanentAttackRatio, _permanentDefenseRatio;
     private readonly Dictionary<object, ItemResourceModifiers> _itemResourceModifiers = new(ReferenceSourceComparer.Instance);
 
     private readonly struct ItemResourceModifiers
@@ -67,6 +68,7 @@ public class PlayerStatManager : MonoBehaviour
     public void Initialize(PlayerStatData data)
     {
         baseData = data;
+        _permanentHealthRatio = _permanentAttackRatio = _permanentDefenseRatio = 0f;
         baseValues.Clear();
         addValues.Clear();
         multValues.Clear();
@@ -168,6 +170,26 @@ public class PlayerStatManager : MonoBehaviour
         if (source != null && _itemResourceModifiers.Remove(source)) RecalculateAll();
     }
 
+    /// <summary>Replaces permanent growth without accumulating or removing form, skill, or item effects.</summary>
+    public void SetPermanentUpgradeRatios(float healthRatio, float attackRatio, float defenseRatio, bool refillHealth = false)
+    {
+        if (!IsFinite(healthRatio) || !IsFinite(attackRatio) || !IsFinite(defenseRatio)
+            || healthRatio < 0f || attackRatio < 0f || defenseRatio < 0f)
+            throw new ArgumentException("Permanent upgrade ratios must be finite and nonnegative.");
+        EnsureInitialized();
+        bool changed = _permanentHealthRatio != healthRatio || _permanentAttackRatio != attackRatio
+            || _permanentDefenseRatio != defenseRatio;
+        _permanentHealthRatio = healthRatio;
+        _permanentAttackRatio = attackRatio;
+        _permanentDefenseRatio = defenseRatio;
+        if (changed) RecalculateAll();
+        if (refillHealth && _currentHp != MaxHp)
+        {
+            _currentHp = MaxHp;
+            NotifyResourceChanged(OnHpChanged, _currentHp, MaxHp);
+        }
+    }
+
     // === 스탯 재계산: 버프 적용 후 각 스탯별로 계산 ===
     private void RecalculateStat(StatType stat)
     {
@@ -196,7 +218,9 @@ public class PlayerStatManager : MonoBehaviour
             else if (stat == StatType.ST_SP) add += modifiers.MaxSpAdd;
             else if (stat == StatType.ST_SP_REGEN) add += modifiers.SpRegenAdd;
         }
-        double result = (baseValues.GetValueOrDefault(stat) + add) * (1d + mult);
+        double permanentRatio = stat == StatType.ST_HP ? _permanentHealthRatio
+            : stat == StatType.ST_ATK ? _permanentAttackRatio : stat == StatType.ST_DEF ? _permanentDefenseRatio : 0d;
+        double result = (baseValues.GetValueOrDefault(stat) * (1d + permanentRatio) + add) * (1d + mult);
         return ApplyClamp(stat, (float)Math.Max(-float.MaxValue, Math.Min(float.MaxValue, result)));
     }
 
@@ -205,9 +229,26 @@ public class PlayerStatManager : MonoBehaviour
         float hpBefore = _currentHp, spBefore = _currentSp;
         _currentHp = Mathf.Clamp(_currentHp, 0f, MaxHp);
         _currentSp = Mathf.Clamp(_currentSp, 0f, MaxSp);
-        OnStatsChanged?.Invoke();
-        if (previousMaxHp != MaxHp || hpBefore != _currentHp) OnHpChanged?.Invoke(_currentHp, MaxHp);
-        if (previousMaxSp != MaxSp || spBefore != _currentSp) OnSpChanged?.Invoke(_currentSp, MaxSp);
+        // Resource replacement is already committed. A view failure must not prevent the other
+        // resource listeners (or the inventory transaction) from observing the final state.
+        if (OnStatsChanged != null)
+            foreach (Action callback in OnStatsChanged.GetInvocationList())
+            {
+                try { callback(); }
+                catch (Exception error) { Debug.LogWarning("[Stats] Stat observer failed: " + error, this); }
+            }
+        if (previousMaxHp != MaxHp || hpBefore != _currentHp) NotifyResourceChanged(OnHpChanged, _currentHp, MaxHp);
+        if (previousMaxSp != MaxSp || spBefore != _currentSp) NotifyResourceChanged(OnSpChanged, _currentSp, MaxSp);
+    }
+
+    private void NotifyResourceChanged(Action<float, float> listeners, float current, float maximum)
+    {
+        if (listeners == null) return;
+        foreach (Action<float, float> callback in listeners.GetInvocationList())
+        {
+            try { callback(current, maximum); }
+            catch (Exception error) { Debug.LogWarning("[Stats] Resource observer failed: " + error, this); }
+        }
     }
 
     // === 범위 제한: 특정 스탯이 말도 안 되는 값 되는 거 방지 ===

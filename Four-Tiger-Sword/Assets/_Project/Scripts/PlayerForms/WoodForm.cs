@@ -47,12 +47,20 @@ public class WoodForm : BaseForm
         _softTarget = null;
     }
     public override void UpdateSkill(out bool isComplete) => AdvanceSkill(_playerController.ActionDeltaTime, out isComplete);
+    protected override bool IsFinalRecoveryStep => _currentAction == ActionType.Skill || base.IsFinalRecoveryStep;
+    protected override bool HasCompletedRequiredActionHits => _currentAction == ActionType.Skill
+        ? _skillApplied : base.HasCompletedRequiredActionHits;
     private void AdvanceSkill(float dt, out bool isComplete)
     {
         var step = _woodData.SkillSteps[0];
         if (!_skillActive) { isComplete = true; return; }
         _playerController.SetAnimationSpeed(AttackSpeed);
         _timer += Mathf.Max(0f, dt) * AttackSpeed;
+        if (IsCurrentActionExecutionComplete)
+        {
+            isComplete = CompleteActionExecution(true, _currentAction != ActionType.SwitchAttack);
+            return;
+        }
         if (HasCameraV2(step))
             UpdateAttackCamera(step, _timer / Mathf.Max(0.01f, step.Duration));
         if (!_skillApplied && _timer >= FirstHitTime(step))
@@ -62,7 +70,8 @@ public class WoodForm : BaseForm
             PlaySwingSound(step, hitEvent, eventIndex);
             ApplyGather();
         }
-        isComplete = _timer >= Mathf.Max(step.Duration, FirstHitTime(step));
+        isComplete = CompleteActionExecution(_timer >= Mathf.Max(step.Duration, FirstHitTime(step)),
+            _currentAction != ActionType.SwitchAttack);
     }
     private void ApplyGather()
     {
@@ -73,7 +82,7 @@ public class WoodForm : BaseForm
         {
             if (target.GetComponent<EnemyStat>()?.IsDead == true) continue;
             var result = DamageManager.Apply(EffectHit(Mathf.Max(0f, _woodData.SkillDamageMultiplier),
-                step: step, hitEvent: hitEvent, power: CustomKnockbackPower(step, hitEvent, target.transform)),
+                step: step, hitEvent: hitEvent, power: CustomKnockbackPower(step, hitEvent, target.transform)).WithDirectPlayerHit(),
                 (IDamageable)target, target.gameObject);
             if (!result.Applied) continue;
             ConfirmHitFeedback(step, target, result, hitEvent, hitIndex, legacyFeedbackDisabled: true);
@@ -110,6 +119,7 @@ public class WoodForm : BaseForm
         {
             if (target.GetComponent<EnemyStat>()?.IsDead == true) continue;
             var handler = target.GetComponent<StatusEffectHandler>() ?? target.gameObject.AddComponent<StatusEffectHandler>();
+            if (!handler.CanApply(typeof(SilenceEffect))) continue;
             float duration = Mathf.Max(0.01f, _woodData.SilenceDuration);
             var silence = handler.Get<SilenceEffect>();
             if (silence == null || silence.IsExpired) handler.Apply(new SilenceEffect(duration));
@@ -138,6 +148,7 @@ public class WoodForm : BaseForm
         _skillActive = false;
         UltimateFieldRemaining = 0f;
         RemoveElementBuff();
+        base.CleanupTransientEffects();
     }
 
     public override void CleanupStageEffects()

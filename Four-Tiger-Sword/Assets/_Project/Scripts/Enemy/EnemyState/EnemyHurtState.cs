@@ -36,10 +36,12 @@ public class EnemyHurtState : IPlayerState
 
     public void Update()
     {
+        if (_enemy.Brain is NormalEnemyBrain brain && brain.TryCounterFromHurt()) return;
         if (_hurtVersion != _enemy.HurtVersion) RestartReaction();
         _remaining -= _enemy.ActionDeltaTime;
         if (_remaining > 0f || _enemy.IsKnockbacking) return;
         _enemy.IsHurt = false;
+        _enemy.ClearNormalHitChain();
         // 정상 종료 시에만 그로기로 이어집니다. 사망 등으로 중단되면 예약하지 않습니다.
         if (_enemy.PendingGroggy)
         {
@@ -54,5 +56,6 @@ public class EnemyHurtState : IPlayerState
         _freezeFallback = false;
         _enemy.UnlockMovement();
         _enemy.IsHurt = false;
+        _enemy.ClearNormalHitChain();
     }
 }

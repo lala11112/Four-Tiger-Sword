@@ -22,7 +22,7 @@ public class FormTargetEffects : MonoBehaviour
         {
             var stats = GetComponent<EnemyStat>();
             return stats == null ? 0f : Mathf.Max(0f, stats.GetStat(EnemyStatType.DEF)
-                - stats.GetBaseStat(EnemyStatType.DEF) * ArmorReductionRatio);
+                - stats.GetPhaseBaseStat(EnemyStatType.DEF) * ArmorReductionRatio);
         }
     }
 
@@ -32,7 +32,7 @@ public class FormTargetEffects : MonoBehaviour
         if (++FireStacks < 6) return;
         FireStacks = 0; // 폭발 자체는 추가 스택을 발생시키지 않습니다.
         // 예약 중에도 다음 6스택을 쌓을 수 있으며 각 폭발은 독립적으로 처리합니다.
-        StartCoroutine(DelayedFireExplosion(explosion, delay));
+        StartCoroutine(DelayedFireExplosion(explosion.WithoutDirectPlayerHit(), delay));
     }
 
     private IEnumerator DelayedFireExplosion(HitInfo explosion, float delay)
@@ -53,7 +53,8 @@ public class FormTargetEffects : MonoBehaviour
     private bool CanReceiveExplosion()
     {
         var stats = GetComponent<EnemyStat>();
-        return isActiveAndEnabled && (stats == null || !stats.IsDead);
+        return isActiveAndEnabled && (stats == null || !stats.IsDead)
+            && GetComponent<Boss>()?.IsInvulnerable != true;
     }
 
     private void CancelFireExplosions()
@@ -64,6 +65,8 @@ public class FormTargetEffects : MonoBehaviour
 
     public void ApplyArmorShred(bool skill)
     {
+        if (!CanReceiveExplosion()) return;
+        if (GetComponent<Boss>()?.Data?.IsImmuneTo("DefenseReduction") == true) return;
         if (skill) SkillArmorTime = 10f;
         else BasicArmorTime = 5f;
     }
@@ -77,6 +80,11 @@ public class FormTargetEffects : MonoBehaviour
     private void OnDisable()
     {
         if (_enemy != null) _enemy.OnDied -= CancelFireExplosions;
+        ResetForNewPhase();
+    }
+
+    public void ResetForNewPhase()
+    {
         CancelFireExplosions();
         BasicArmorTime = SkillArmorTime = 0f;
     }

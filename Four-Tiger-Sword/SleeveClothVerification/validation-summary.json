@@ -1,0 +1,29 @@
+{
+  "scope": ["Assets/_Project/Scenes/Game Scene.unity", "Assets/CharacterPackage/Character_MeshCloth.prefab"],
+  "configuration": {
+    "clothComponents": ["Sleeve_L_MeshCloth", "Sleeve_R_MeshCloth"],
+    "fixedBand": "Upper 22 percent along the upper-arm to wrist axis",
+    "collision": "Per-side upper-arm and forearm capsules plus existing torso capsule",
+    "maxDistanceMeters": 0.035,
+    "teleportReset": true,
+    "editorBuildResults": "Success for both sleeves in scene and prefab",
+    "existingClothSettingsPreserved": true
+  },
+  "runtimeObservations": {
+    "method": "Unity Play Mode in an isolated character scene; observations collected in this session",
+    "motions": ["Idle", "Standard Run", "S_Attack1", "3 meter teleport"],
+    "durationSeconds": 12.0140686,
+    "sampledFrames": 669,
+    "finiteCoordinates": true,
+    "leftBuild": "Success",
+    "rightBuild": "Success",
+    "bothTeamsEnabled": true,
+    "bothProxyMeshesPresent": true,
+    "largestObservedMovableSolverOffsetMeters": 0.0350001045,
+    "fixedAnchorSnapshot": "Read-only snapshot found final displayed fixed anchors at their animated positions",
+    "consoleDuringVerification": "The last console query during verification returned no error or warning entries",
+    "visualCapture": "attack.png",
+    "measurementLimit": "Display-offset arrays were discarded because their reference positions can belong to different frames. A later gated sampling attempt produced no samples and is not used as evidence. The proposed additional baked-mesh comparison was not run because Unity exited."
+  },
+  "cleanup": "Removed the temporary validation scene and restored the original TitleScene startup entry after Unity exited."
+}

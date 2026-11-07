@@ -6,7 +6,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-/// <summary>Disposable fixtures for independent form endurance, exhaustion and combat calculations.</summary>
+/// <summary>Disposable fixtures verifying form holding has no endurance penalty and preserves combat calculations.</summary>
 public static class FormSpRegression
 {
     private sealed class ProbeForm : BaseForm
@@ -60,8 +60,8 @@ public static class FormSpRegression
             form.OnFormSpChanged += changed =>
             {
                 Check(ReferenceEquals(changed, form), "Notification identifies the owning form.");
-                Check(changed.CurrentFormSp >= 0f && changed.CurrentFormSp <= changed.MaxFormSp,
-                    "Notification observes committed, bounded state.");
+                Near(changed.CurrentFormSp, changed.MaxFormSp, "Notification observes a full form resource.");
+                Check(!changed.IsFormSpExhausted, "Notification observes cleared exhaustion.");
                 notifications++;
             };
             form.UpdateFormSp(60f, true, false);
@@ -70,42 +70,36 @@ public static class FormSpRegression
             form.UpdateFormSp(-1f, true, true);
             form.UpdateFormSp(float.NaN, true, true);
             form.UpdateFormSp(float.PositiveInfinity, false, false);
-            Near(form.CurrentFormSp, 100f, "Holding outside combat, full recovery and invalid deltas preserve SP.");
+            Near(form.CurrentFormSp, 100f, "Active, inactive and invalid ticks preserve full SP.");
             Check(notifications == 0, "Unchanged state does not notify.");
-            form.UpdateFormSp(15f, true, true);
-            Near(form.CurrentFormSp, 50f, "Half depletion duration consumes half the meter.");
-            Check(!form.IsFormSpExhausted, "Partial depletion does not exhaust.");
-            form.UpdateFormSp(15f, true, true);
-            Near(form.CurrentFormSp, 0f, "Thirty seconds depletes exactly to zero.");
-            Check(form.IsFormSpExhausted, "Reaching zero latches exhaustion.");
-            form.UpdateFormSp(1f, false, false);
-            Near(form.CurrentFormSp, 5f, "Inactive recovery begins immediately outside combat.");
-            Check(form.IsFormSpExhausted, "Recovery below twenty percent preserves exhaustion.");
-            form.UpdateFormSp(30f, true, false);
-            Near(form.CurrentFormSp, 5f, "Reactivating outside combat holds current SP.");
-            Check(form.IsFormSpExhausted, "Reactivation does not clear exhaustion.");
-            form.UpdateFormSp(3f, false, true);
-            Near(form.CurrentFormSp, 20f, "Four inactive seconds reach the release threshold.");
-            Check(!form.IsFormSpExhausted, "Reaching twenty percent releases exhaustion.");
-            form.UpdateFormSp(100f, false, false);
-            Near(form.CurrentFormSp, 100f, "Recovery clamps at maximum.");
-            Check(notifications == 5, "Each accepted resource change emits one notification.");
-            form.UpdateFormSp(100f, false, false);
-            Check(notifications == 5, "A full form does not repeatedly notify.");
+            foreach (bool active in new[] { false, true })
+                foreach (bool combat in new[] { false, true })
+                {
+                    form.UpdateFormSp(1000f, active, combat);
+                    Near(form.CurrentFormSp, 100f, "Holding any form for a long time never drains SP.");
+                    Check(!form.IsFormSpExhausted, "Combat and selection cannot cause exhaustion.");
+                }
+            Check(notifications == 0, "Long unchanged ticks do not notify.");
+
+            LegacyExhaustion(form);
+            form.UpdateFormSp(0f, true, true);
+            form.UpdateFormSp(float.NaN, true, true);
+            Near(form.CurrentFormSp, 0f, "Invalid ticks do not modify a legacy state.");
+            Check(form.IsFormSpExhausted && notifications == 0, "Invalid ticks neither clear state nor notify.");
+            form.UpdateFormSp(1f / 60f, true, true);
+            Near(form.CurrentFormSp, 100f, "A valid tick immediately restores legacy depleted SP.");
+            Check(!form.IsFormSpExhausted, "A valid tick immediately clears legacy exhaustion.");
+            Check(notifications == 1, "A legacy state correction emits one notification.");
+            form.UpdateFormSp(1000f, true, true);
+            Check(notifications == 1, "A restored form does not repeatedly notify.");
 
             var frameForm = new ProbeForm(data);
-            for (int i = 0; i < 1800; i++) frameForm.UpdateFormSp(1f / 60f, true, true);
-            Near(frameForm.CurrentFormSp, 0f, "Frame-sized depletion reaches zero.", .001f);
-            Check(frameForm.IsFormSpExhausted, "Frame-sized depletion triggers exhaustion.");
+            for (int i = 0; i < 3600; i++) frameForm.UpdateFormSp(1f / 60f, true, true);
+            Near(frameForm.CurrentFormSp, 100f, "A minute of combat frame ticks preserves full SP.");
+            Check(!frameForm.IsFormSpExhausted, "Frame-sized combat ticks cannot exhaust a form.");
             for (int i = 0; i < 240; i++) frameForm.UpdateFormSp(1f / 60f, false, false);
-            Near(frameForm.CurrentFormSp, 20f, "Frame-sized recovery reaches twenty percent.", .001f);
-            Check(!frameForm.IsFormSpExhausted, "Frame-sized recovery releases at the threshold.");
-            var longFrame = new ProbeForm(data);
-            longFrame.UpdateFormSp(1000f, true, true);
-            Near(longFrame.CurrentFormSp, 0f, "Long combat frames clamp to zero.");
-            longFrame.UpdateFormSp(20f, false, false);
-            Near(longFrame.CurrentFormSp, 100f, "Twenty inactive seconds fully recharge.");
-            Check(!longFrame.IsFormSpExhausted, "Full recovery clears exhaustion.");
+            Near(frameForm.CurrentFormSp, 100f, "Inactive frame ticks also preserve full SP.");
+            Check(!frameForm.IsFormSpExhausted, "Inactive ticks do not introduce exhaustion.");
 
             var customData = Data();
             customData.CommonBalance.FormSp.MaxSp = 200f;
@@ -114,14 +108,13 @@ public static class FormSpRegression
             customData.CommonBalance.FormSp.ExhaustionRecoveryRatio = .5f;
             var custom = new ProbeForm(customData);
             Near(custom.CurrentFormSp, 200f, "Per-form maximum is used on construction.");
-            custom.UpdateFormSp(10f, true, true);
-            Near(custom.CurrentFormSp, 0f, "Per-form depletion duration is respected.");
-            custom.UpdateFormSp(3f, false, false);
-            Near(custom.CurrentFormSp, 75f, "Per-form recovery duration is respected.");
-            Check(custom.IsFormSpExhausted, "Custom release ratio remains latched below its threshold.");
-            custom.UpdateFormSp(1f, false, false);
-            Near(custom.CurrentFormSp, 100f, "Custom release threshold is relative to maximum.");
-            Check(!custom.IsFormSpExhausted, "Custom release ratio clears at its threshold.");
+            custom.UpdateFormSp(1000f, true, true);
+            Near(custom.CurrentFormSp, 200f, "Authored depletion settings cannot drain SP.");
+            Check(!custom.IsFormSpExhausted, "Authored exhaustion settings cannot exhaust a form.");
+            LegacyExhaustion(custom);
+            custom.UpdateFormSp(1f / 60f, false, false);
+            Near(custom.CurrentFormSp, 200f, "Legacy SP restores to the authored maximum immediately.");
+            Check(!custom.IsFormSpExhausted, "Legacy exhaustion clears independently of authored recovery settings.");
             Near(form.CurrentFormSp, 100f, "Another form's custom state cannot change the first form.");
 
             host = new GameObject("__FormSpRegressionPlayer");
@@ -148,42 +141,51 @@ public static class FormSpRegression
             Near(form.EffectiveSpeed, 1.5f, "Form speed includes existing buffs.");
             form.SnapshotNormal();
             var healthyHit = form.Hit();
-            form.UpdateFormSp(30f, true, true);
-            Near(form.EffectiveAttack, 12f, "Exhaustion independently multiplies buffed attack by 0.8.");
-            Near(form.EffectiveSpeed, 1.2f, "Exhaustion independently multiplies buffed speed by 0.8.");
-            Near(stats.GetStat(StatType.ST_ATK), 15f, "Exhaustion does not mutate shared attack stats.");
-            Near(stats.GetStat(StatType.ST_ATK_SPD), 1.5f, "Exhaustion does not mutate shared speed stats.");
-            Near(form.Hit().BaseDamage, 15f, "An ongoing normal attack keeps its pre-exhaustion snapshot.");
+            form.UpdateFormSp(1000f, true, true);
+            Near(form.EffectiveAttack, 15f, "Prolonged combat preserves buffed attack.");
+            Near(form.EffectiveSpeed, 1.5f, "Prolonged combat preserves buffed attack speed.");
+            Near(stats.GetStat(StatType.ST_ATK), 15f, "Form ticks do not mutate shared attack stats.");
+            Near(stats.GetStat(StatType.ST_ATK_SPD), 1.5f, "Form ticks do not mutate shared speed stats.");
+            Near(form.Hit().BaseDamage, 15f, "An ongoing normal attack retains its damage snapshot.");
+            stats.AddModifier(StatType.ST_ATK, 0f, .25f);
+            float changedAttack = stats.GetStat(StatType.ST_ATK);
+            Check(changedAttack > 15f, "The snapshot fixture changes the live attack stat.");
+            Near(form.Hit().BaseDamage, 15f, "An ongoing normal attack retains its snapshot after a stat change.");
             form.SnapshotNormal();
-            Near(form.Hit().BaseDamage, 12f, "A new normal attack snapshots exhausted attack.");
+            Near(form.Hit().BaseDamage, changedAttack, "A new normal attack snapshots the updated attack.");
+            stats.RemoveModifier(StatType.ST_ATK, 0f, .25f);
             form.UseSkill();
-            Near(form.Hit().BaseDamage, 12f, "Live actions read the current exhausted attack.");
+            Near(form.Hit().BaseDamage, 15f, "Live actions read the current attack.");
             var delayedHit = form.Hit(2f, 7f, true);
-            Near(delayedHit.BaseDamage, 31f, "Secondary damage scales its attack portion and preserves fixed extra damage.");
+            Near(delayedHit.BaseDamage, 37f, "Secondary damage scales its attack portion and preserves fixed extra damage.");
             Check(delayedHit.HasSourceDamageSnapshot, "Generated effects retain their damage snapshot.");
 
             var other = new ProbeForm(data, ElementType.ELEMENT_FIRE);
             manager.AddTransition(form, () => false);
             manager.AddTransition(other, () => false);
             manager.ChangeForm(other);
-            Near(form.Hit().BaseDamage, 12f, "An inactive form reads its own exhaustion, not the selected form.");
+            Near(form.Hit().BaseDamage, 15f, "An inactive form retains normal attack scaling.");
             form.UpdateFormSp(4f, false, false);
-            Near(form.EffectiveAttack, 15f, "Recovery removes the attack penalty without removing buffs.");
-            Near(form.EffectiveSpeed, 1.5f, "Recovery removes the speed penalty without removing buffs.");
-            Near(delayedHit.BaseDamage, 31f, "Recovery cannot rewrite damage already created.");
+            Near(form.EffectiveAttack, 15f, "Inactive ticks preserve attack buffs.");
+            Near(form.EffectiveSpeed, 1.5f, "Inactive ticks preserve speed buffs.");
+            Near(delayedHit.BaseDamage, 37f, "Later ticks cannot rewrite damage already created.");
             Near(healthyHit.BaseDamage, 15f, "Later resource changes cannot rewrite an earlier hit.");
             form.SnapshotNormal();
-            Near(form.Hit().BaseDamage, 15f, "A new recovered attack has no exhaustion penalty.");
+            Near(form.Hit().BaseDamage, 15f, "A new attack keeps its full buffed damage.");
             form.UpdateFormSp(30f, true, true);
             form.UpdateFormSp(4f, false, false);
-            Near(stats.GetStat(StatType.ST_ATK), 15f, "Repeated exhaustion and recovery never accumulate stat changes.");
+            Near(stats.GetStat(StatType.ST_ATK), 15f, "Repeated active and inactive ticks never accumulate stat changes.");
 
             custom.Equip(player);
-            customData.CommonBalance.FormSp.ExhaustedAttackMultiplier = .5f;
-            customData.CommonBalance.FormSp.ExhaustedAttackSpeedMultiplier = .6f;
-            custom.UpdateFormSp(10f, true, true);
-            Near(custom.EffectiveAttack, 7.5f, "Per-form attack penalty is configurable.");
-            Near(custom.EffectiveSpeed, .9f, "Per-form speed penalty is configurable.");
+            customData.CommonBalance.FormSp.ExhaustedAttackMultiplier = 0f;
+            customData.CommonBalance.FormSp.ExhaustedAttackSpeedMultiplier = 0f;
+            LegacyExhaustion(custom);
+            Near(custom.EffectiveAttack, 15f, "Legacy exhaustion and authored attack penalties are ignored immediately.");
+            Near(custom.EffectiveSpeed, 1.5f, "Legacy exhaustion and authored speed penalties are ignored immediately.");
+            custom.UpdateFormSp(1000f, true, true);
+            Near(custom.EffectiveAttack, 15f, "Authored attack penalties remain ignored after prolonged combat.");
+            Near(custom.EffectiveSpeed, 1.5f, "Authored speed penalties remain ignored after prolonged combat.");
+            Check(!custom.IsFormSpExhausted, "Prolonged combat clears the legacy exhaustion state.");
             stats.AddModifier(StatType.ST_ATK_SPD, 0f, -2f);
             Near(form.EffectiveSpeed, .1f, "Attack speed preserves its existing lower bound.");
 
@@ -197,7 +199,7 @@ public static class FormSpRegression
             Near(stats.CurrentSp, sharedSp - 20f, "Form SP ticking does not spend shared SP.");
 
             // Custom actions use their authored clocks: Earth/Water ignore normal speed buffs,
-            // while Wood follows the normal attack clock. All three must follow exhaustion.
+            // while Wood follows the normal attack clock. Holding a form must not slow either clock.
             stats.RemoveModifier(StatType.ST_ATK_SPD, 0f, -2f);
             host.transform.position = new Vector3(100000f, 10000f, 100000f);
             host.SetActive(true);
@@ -208,24 +210,24 @@ public static class FormSpRegression
             earthData.SkillSteps = new List<WeaponActionData> { new WeaponActionData { Duration = 1f } };
             foreach (string action in new[] { "Skill", "SwitchAttack" })
             {
-                foreach (bool exhausted in new[] { false, true })
+                foreach (bool prolongedUse in new[] { false, true })
                 {
                     var earth = new EarthForm(earthData);
                     Field(typeof(BaseForm), earth, "_playerController", player);
                     Action(earth, action);
-                    if (exhausted) earth.UpdateFormSp(30f, true, true);
+                    if (prolongedUse) earth.UpdateFormSp(1000f, true, true);
                     Invoke(typeof(EarthForm), earth, "PrepareSkillAttack");
                     Vector3 start = host.transform.position;
                     Check(!Advance(typeof(EarthForm), earth, "AdvanceSkill", .5f),
                         $"Earth {action} cannot finish halfway through its dash.");
-                    Near(Read<float>(typeof(BaseForm), earth, "_timer"), exhausted ? .4f : .5f,
-                        $"Earth {action} clock uses only its exhaustion multiplier.");
-                    Near(player.Animator.speed, exhausted ? .8f : 1f,
+                    Near(Read<float>(typeof(BaseForm), earth, "_timer"), .5f,
+                        $"Earth {action} clock preserves its authored speed after holding the form.");
+                    Near(player.Animator.speed, 1f,
                         $"Earth {action} animation agrees with its fixed action clock.");
-                    Near(Vector3.Distance(host.transform.position, start), exhausted ? 2.4f : 3f,
-                        $"Earth {action} movement follows slowed progress.", .02f);
-                    Check(Advance(typeof(EarthForm), earth, "AdvanceSkill", exhausted ? .75f : .5f),
-                        $"Earth {action} completes at its normal or exhausted duration.");
+                    Near(Vector3.Distance(host.transform.position, start), 3f,
+                        $"Earth {action} movement follows its authored progress.", .02f);
+                    Check(Advance(typeof(EarthForm), earth, "AdvanceSkill", .5f),
+                        $"Earth {action} completes at its authored duration.");
                     Near(Vector3.Distance(host.transform.position, start), 6f,
                         $"Earth {action} preserves its total authored dash distance.", .02f);
                 }
@@ -244,23 +246,23 @@ public static class FormSpRegression
             Advance(typeof(WoodForm), wood, "AdvanceSkill", .5f);
             Near(Read<float>(typeof(BaseForm), wood, "_timer"), .75f, "Wood skill follows normal attack speed buffs.");
             Near(player.Animator.speed, 1.5f, "Wood skill refreshes its normal animation speed.");
-            wood.UpdateFormSp(30f, true, true);
+            wood.UpdateFormSp(1000f, true, true);
             Advance(typeof(WoodForm), wood, "AdvanceSkill", .5f);
-            Near(Read<float>(typeof(BaseForm), wood, "_timer"), 1.35f, "Wood skill clock applies exhaustion after a mid-action depletion.");
-            Near(player.Animator.speed, 1.2f, "Wood skill animation refreshes after mid-action depletion.");
+            Near(Read<float>(typeof(BaseForm), wood, "_timer"), 1.5f, "Wood skill clock retains its buffed speed after prolonged use.");
+            Near(player.Animator.speed, 1.5f, "Wood skill animation retains its buffed speed after prolonged use.");
 
             var waterData = ScriptableObject.CreateInstance<WaterFormActionDataSO>();
             assets.Add(waterData);
             waterData.UltimateSteps = new List<WeaponActionData> { new WeaponActionData { Duration = 2f } };
-            foreach (bool exhausted in new[] { false, true })
+            foreach (bool prolongedUse in new[] { false, true })
             {
                 var water = new WaterForm(waterData);
                 Field(typeof(BaseForm), water, "_playerController", player);
                 Field(typeof(WaterForm), water, "_ultimateCenter", host.transform.position);
                 Action(water, "Ultimate");
-                if (exhausted) water.UpdateFormSp(30f, true, true);
+                if (prolongedUse) water.UpdateFormSp(1000f, true, true);
                 string WaterState(bool complete)
-                    => $"exhaustedCase={exhausted}, exhaustedState={water.IsFormSpExhausted}, "
+                    => $"prolongedUse={prolongedUse}, exhaustedState={water.IsFormSpExhausted}, "
                     + $"SP={water.CurrentFormSp:R}, elapsed={Read<float>(typeof(WaterForm), water, "_ultimateElapsed"):R}, "
                     + $"hits={Read<int>(typeof(WaterForm), water, "_ultimateHits")}, complete={complete}, "
                     + $"ActionDeltaTime={player.ActionDeltaTime:R}, animatorSpeed={player.Animator.speed:R}";
@@ -281,30 +283,21 @@ public static class FormSpRegression
                     return done;
                 }
                 Check(!AdvanceWater(1f), "Water ultimate cannot finish after one second.");
-                Near(Read<float>(typeof(WaterForm), water, "_ultimateElapsed"), exhausted ? .8f : 1f,
-                    "Water ultimate clock ignores normal speed buffs and applies exhaustion.");
-                Near(player.Animator.speed, exhausted ? .8f : 1f, "Water ultimate animation agrees with its fixed clock.");
+                Near(Read<float>(typeof(WaterForm), water, "_ultimateElapsed"), 1f,
+                    "Water ultimate retains its fixed clock after prolonged use.");
+                Near(player.Animator.speed, 1f, "Water ultimate animation agrees with its fixed clock.");
                 bool complete = AdvanceWater(1f);
                 // The existing float scheduler can leave the tenth threshold just above 2f
                 // on some Unity runtimes. Allow ten microseconds only when completion is due.
-                if (!exhausted && !complete) complete = AdvanceWater(.00001f);
-                Near(Read<float>(typeof(WaterForm), water, "_ultimateElapsed"), exhausted ? 1.6f : 2f,
+                if (!complete) complete = AdvanceWater(.00001f);
+                Near(Read<float>(typeof(WaterForm), water, "_ultimateElapsed"), 2f,
                     "Water ultimate reaches its expected clock boundary within floating-point tolerance.");
-                Check(complete == !exhausted,
-                    "Water ultimate completes after two normal seconds, but exhausted recovery is slower. " + WaterState(complete));
-                if (exhausted)
-                {
-                    complete = AdvanceWater(.5f);
-                    if (!complete) complete = AdvanceWater(.00001f);
-                    Near(Read<float>(typeof(WaterForm), water, "_ultimateElapsed"), 2f,
-                        "Exhausted Water ultimate reaches the two-second action boundary after 2.5 wall seconds.");
-                    Check(complete, "Exhausted Water ultimate completes after 2.5 seconds. " + WaterState(complete));
-                }
+                Check(complete, "Water ultimate completes after two seconds even after prolonged use. " + WaterState(complete));
                 Check(Read<int>(typeof(WaterForm), water, "_ultimateHits") == 10,
                     "Water ultimate preserves its fixed ten hits. " + WaterState(complete));
             }
 
-            // The real manager must visit each registered form only once, even with repeated registrations.
+            // The real manager clears legacy state on every registered form, including inactive forms.
             var forms = new List<ProbeForm>();
             var managerData = Data();
             var tickingManager = new FormManager(player);
@@ -312,7 +305,7 @@ public static class FormSpRegression
             for (int i = 0; i < 5; i++)
             {
                 var entry = new ProbeForm(managerData);
-                entry.UpdateFormSp(30f, true, true);
+                LegacyExhaustion(entry);
                 forms.Add(entry);
                 tickingManager.AddTransition(entry, () => false);
                 tickingManager.AddTransition(entry, () => false);
@@ -322,31 +315,31 @@ public static class FormSpRegression
             Check(player.isActiveAndEnabled, "Manager fixture is active.");
             Check(!player.IsInRoomCombat, "A player without an encounter source is outside combat.");
             tickingManager.UpdateFormSp(4f);
-            Near(forms[0].CurrentFormSp, 0f, "The manager holds an active form outside combat.");
-            for (int i = 1; i < forms.Count; i++)
+            for (int i = 0; i < forms.Count; i++)
             {
-                Near(forms[i].CurrentFormSp, 20f, "All inactive forms recover once per manager tick.");
-                Check(!forms[i].IsFormSpExhausted, "Each inactive form independently clears exhaustion.");
+                Near(forms[i].CurrentFormSp, 100f, "The manager immediately restores both active and inactive forms.");
+                Check(!forms[i].IsFormSpExhausted, "Each registered form independently clears legacy exhaustion.");
             }
+            LegacyExhaustion(forms[1]);
             player.enabled = false;
             tickingManager.UpdateFormSp(1f);
-            Near(forms[1].CurrentFormSp, 20f, "Disabled players freeze form resources.");
+            Near(forms[1].CurrentFormSp, 0f, "Disabled players freeze form resources.");
             player.enabled = true;
             Property(player, "IsShopPaused", true);
             tickingManager.UpdateFormSp(1f);
-            Near(forms[1].CurrentFormSp, 20f, "Shop pause freezes form resources.");
+            Near(forms[1].CurrentFormSp, 0f, "Shop pause freezes form resources.");
             Property(player, "IsShopPaused", false);
             Property(player, "IsStageTransitioning", true);
             tickingManager.UpdateFormSp(1f);
-            Near(forms[1].CurrentFormSp, 20f, "Stage transitions freeze form resources.");
+            Near(forms[1].CurrentFormSp, 0f, "Stage transitions freeze form resources.");
             Property(player, "IsStageTransitioning", false);
             typeof(PlayerStatManager).GetField("_currentHp", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(stats, 0f);
             tickingManager.UpdateFormSp(1f);
-            Near(forms[1].CurrentFormSp, 20f, "Dead players freeze form resources.");
+            Near(forms[1].CurrentFormSp, 0f, "Dead players freeze form resources.");
             var fresh = new ProbeForm(managerData);
             Near(fresh.CurrentFormSp, 100f, "A fresh player form does not inherit another form's exhaustion.");
             Check(!fresh.IsFormSpExhausted, "Fresh forms reset the exhaustion latch.");
-            return $"PASS: form SP ({checks} checks: combat-only depletion, inactive recovery/release, independent states, frame boundaries, authoring, notifications, attack snapshots, fixed extra damage, custom action clocks/motion, buff/SP isolation, and manager pause/death guards).";
+            return $"PASS: form SP ({checks} checks: no holding penalty, full resources, legacy state cleanup, ignored exhaustion settings, frame ticks, notifications, attack snapshots, fixed extra damage, custom action clocks/motion, buff/SP isolation, and manager pause/death guards).";
         }
         finally
         {
@@ -358,6 +351,12 @@ public static class FormSpRegression
 
     private static void Property(object target, string name, object value)
         => target.GetType().GetProperty(name).SetValue(target, value);
+
+    private static void LegacyExhaustion(BaseForm form)
+    {
+        Field(typeof(BaseForm), form, "_currentFormSp", 0d);
+        typeof(BaseForm).GetProperty(nameof(BaseForm.IsFormSpExhausted)).SetValue(form, true);
+    }
 
     private const BindingFlags Hidden = BindingFlags.Instance | BindingFlags.NonPublic;
     private static void Field(Type owner, object target, string name, object value)

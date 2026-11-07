@@ -32,7 +32,7 @@ public partial class PlayerController
 
     internal bool TryOpenFinisherSelection(PlayerAttackState attack)
     {
-        if (IsFinisherSelecting || !isActiveAndEnabled || IsStageTransitioning || IsShopPaused
+        if (IsFinisherSelecting || !isActiveAndEnabled || IsStageTransitioning || IsGameplayModalPaused
             || StatManager == null || StatManager.CurrentHp <= 0f || PendingHitReaction != PlayerHitReaction.None
             || !IsGround() || attack == null || StateMachine?.CurrentState != attack || !attack.CanSelectFinisher
             || Input == null || !Input.IsFinisherInputAvailable || !(FormManager.CurrentForm is BaseForm source)) return false;
@@ -77,7 +77,7 @@ public partial class PlayerController
     }
 
     private bool FinisherSessionIsValid()
-        => isActiveAndEnabled && !IsStageTransitioning && !IsShopPaused
+        => isActiveAndEnabled && !IsStageTransitioning && !IsGameplayModalPaused
             && StatManager != null && StatManager.CurrentHp > 0f
             && PendingHitReaction == PlayerHitReaction.None && IsGround()
             && _finisherAttack != null && StateMachine?.CurrentState == _finisherAttack
@@ -130,7 +130,7 @@ public partial class PlayerController
         _finisherTimeLease = null;
         if (hadSession) Input?.SetFinisherInputBlocked(false);
         foreach (var axis in _finisherCameraInputs)
-            if (axis != null && !IsStageTransitioning) axis.enabled = true;
+            if (axis != null && !IsStageTransitioning && !IsGameplayModalPaused) axis.enabled = true;
         _finisherCameraInputs.Clear();
         if (_finisherOwnsCursor)
         {

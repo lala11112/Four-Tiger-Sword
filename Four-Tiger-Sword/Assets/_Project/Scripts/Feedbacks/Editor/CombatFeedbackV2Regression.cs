@@ -8,6 +8,17 @@ public static class CombatFeedbackV2Regression
     {
         var defaults = new CombatCameraV2Settings();
         Require(!defaults.HasOverrides, "New camera data must inherit the authored route.");
+        var hitDefaults = new CombatCameraHitSettings();
+        Require(!hitDefaults.HasOverrides, "A compact hit camera must inherit until a hit channel is authored.");
+        hitDefaults.PreserveFeelFlash = false;
+        Require(hitDefaults.HasOverrides, "A hit-only flash policy must activate without attack motion settings.");
+        hitDefaults.PreserveFeelFlash = true;
+        hitDefaults.Shake.Mode = CombatFeedbackChannelMode.Off;
+        Require(hitDefaults.HasOverrides, "A compact hit camera can explicitly suppress an inherited shake.");
+        CombatCameraHitSettings hitView = defaults;
+        defaults.Mode = CombatFeedbackChannelMode.Override;
+        Require(hitView.HasOverrides, "Full attack camera settings retain their override gate through the hit-camera interface.");
+        defaults.Mode = CombatFeedbackChannelMode.Inherit;
         var profile = ScriptableObject.CreateInstance<AttackCameraProfile>();
         try
         {
@@ -16,6 +27,8 @@ public static class CombatFeedbackV2Regression
             profile.V2.Mode = CombatFeedbackChannelMode.Override;
             profile.V2.TriggerPolicy = CombatFeedbackTriggerPolicy.FirstPerStep;
             profile.V2.Motion.FovOffset = AnimationCurve.Linear(0, -3, 1, 0);
+            Require(ReferenceEquals(CombatCameraV2Settings.Resolve(profile, null), profile.V2),
+                "An absent inline camera directly inherits the existing shared profile.");
             var inline = new CombatCameraV2Settings { Authored = true,
                 TriggerPolicy = CombatFeedbackTriggerPolicy.FirstPerHitEvent, PreserveFeelFlash = false };
             var effective = CombatCameraV2Settings.Resolve(profile, inline);

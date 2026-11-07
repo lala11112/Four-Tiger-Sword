@@ -1,0 +1,31 @@
+V3 방별 구성 목록 — 원본 프리팹 GUID 기준
+
+저작 데이터의 의도와 대표 모델 목록이다. 실제 수락/거부 및 보정은 네이티브 manifest를 기준으로 한다.
+방 | 기능 | 내부 조립군 / 벽측 구역 | 대표 모델 | 원본 GUID
+--- | --- | --- | --- | ---
+1번 후보 - 재교전_관제실 | 전술 재투입 지휘실 | 2 / 3 | LAB_CommandWallArray, LAB_CommandDesk | d2543bdad568acf489e0b9f6dfb2f450
+2번 후보 - 분석실_회수_교전 | 격리 표본 분석실 | 2 / 3 | LAB_AnalysisBedGantry, LAB_CryoPipeRack | 5110cb5008d6ed842a42c13e063349d2
+보스_통제실 | 중앙 지능 통제실 | 2 / 3 | LAB_HolographicMapProjector, LAB_TurbineServiceUnit | 6172017bbd3fb664c90b7cdc8a1591df
+3번 후보 - 전환_관측_전투실 | 광학 전환 관측소 | 2 / 6 | LAB_CommunicationDishConsole, LAB_CommandWallArray | 0ebb86389dad1444eb844fd306845c40
+MCP_자동생성_검증 1 | 저온 시료 이송실 | 1 / 4 | LAB_DualCryogenicManifold | c9b39e1706d1e40448db0889617bf47b
+MCP_자동생성_검증 2 | 검역 물품 반입실 | 1 / 4 | LAB_SealedQuarantineCabinet | 5731e44f117b60d449d788b8f5f82c5e
+MCP_자동생성_검증 | 로봇 정비 실증실 | 1 / 4 | LAB_RoboticMaintenanceArm | 140443c0c47b1d347a0ee5f5bc58a243
+offset_command_arena | 비대칭 에너지 분배실 | 2 / 6 | LAB_StackedBatteryBank, LAB_TurbineServiceUnit | 8b761a682efe3aa40b6441eed11cf3ae
+Raised_Arena_Cutaway 1 | 고가 열교환 시험장 | 2 / 6 | LAB_CoolantRadiatorFans, LAB_TurbineServiceUnit | d569c1de78d7653478dc2eccecdec458
+raised_arena_cutaway | 고가 생체 재활성실 | 2 / 6 | LAB_HorizontalStasisPod, LAB_AnalysisBedGantry | d5ab2857428623f4a963284be92fc58d
+raised_command_arena | 고가 통신 통제실 | 1 / 4 | LAB_CommunicationDishConsole | 8bec81ae5a5e3db4d816ce6c36fe620a
+고통의_심연_관제실 | 심연 반응로 감시실 | 2 / 6 | LAB_ReactorCoilColumn, LAB_TurbineServiceUnit | 2b4f658411cd21d41a70d671ea052190
+고통의_쌍단상 1 | 쌍단상 중력장 실험실 | 2 / 6 | LAB_ReactorCoilColumn, LAB_AnalysisBedGantry | 63588edb21d2d4743b15fb3997acc93e
+고통의_쌍단상 | 쌍단상 동력 동기화실 | 2 / 6 | LAB_StackedBatteryBank, LAB_SealedQuarantineCabinet | 4ba502e51da8ec54d97d4fc25fec0824
+과밀_표본실 1 | 병원체 봉쇄 표본실 | 2 / 6 | LAB_SealedQuarantineCabinet, LAB_AnalysisBedGantry | 603ee97ff02a8cd48a59b6a95f8cdb06
+과밀_표본실 | 고밀도 표본 분류실 | 2 / 6 | LAB_SpecimenCarousel, LAB_CryoPipeRack | 813bad9ba6a9e5e47b57f264d38ca9eb
+관제_전투실 | 승인된 관제 전투실 유지 | 0 / 0 | 기존 승인 관제실 장비 14개 보존 | 2387d8dee7ad96a49b8c6a34f100bf62
+관측_교전실 | 교전 기록 관측실 | 2 / 6 | LAB_ArchiveDrawerTower, LAB_CommandWallArray | b2bf1068570e5e644bce41617bec59c3
+관측고지_전투실 | 고지 스펙트럼 계측실 | 1 / 5 | LAB_AnalysisBedGantry | d0d8e288708d9104ba309dd61849d41c
+굴곡진_삼단_전장 1 | 삼층 물류 자동화실 | 2 / 5 | LAB_RoboticMaintenanceArm, LAB_CargoLoadingStation | dcafcb5db2c04d249a41d1f95270d4bc
+굴곡진_삼단_전장 | 삼층 냉각 순환실 | 2 / 6 | LAB_DualCryogenicManifold, LAB_CryoPipeRack | 8f4dfd574e548ea469814777d35325cf
+굴곡형_다층_전투실 | 다층 극저온 보존실 | 2 / 6 | LAB_HorizontalStasisPod, LAB_SpecimenCarousel | 56b23c90db2e3364382d0ca6d7cd8ebe
+
+내부 조립군의 수는 1~2개를 기본으로 하고 벽측 기능 구역의 수와 구성을 방마다 다르게 지정한다.
+승인된 관제실은 새 조립군을 자동 생성하지 않고 기존 14개 장비와 외관을 보존하는 별도 경로를 사용한다.
+같은 대표 모델을 공유해도 지지 구조·보조 부품·앵커·방향·기능 구역을 별도로 저작한다.

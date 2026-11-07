@@ -5,6 +5,10 @@ using UnityEngine;
 public class EnemyStat : MonoBehaviour
 {
     [SerializeField] private EnemyData baseData;
+    private float _phaseAttackMultiplier = 1f;
+    private float _phaseDefenseMultiplier = 1f;
+    private float _phaseMaxHp;
+    public EnemyData Data => baseData;
 
     // 스탯 저장소
     private Dictionary<EnemyStatType, float> baseValues = new(); // 기본값 (SO에서 읽어온 원본)
@@ -37,6 +41,9 @@ public class EnemyStat : MonoBehaviour
     // === 초기화: SO 데이터로 스탯 세팅 ===
     private void InitializeFromData()
     {
+        // A boss and its EnemyStat always consume one shared combat asset.
+        var bossData = GetComponent<Boss>()?.Data;
+        if (bossData != null) baseData = bossData;
         if (baseData == null) return;
 
         baseValues[EnemyStatType.HP]                  = baseData.maxHp;
@@ -81,12 +88,12 @@ public class EnemyStat : MonoBehaviour
     // === 스탯 재계산: 버프 적용 후 해당 스탯만 재계산 ===
     private void RecalculateStat(EnemyStatType stat)
     {
-        float baseVal = baseValues.GetValueOrDefault(stat, 0f);
+        float baseVal = PhaseBaseValue(stat);
         float addVal  = addValues.GetValueOrDefault(stat, 0f);
         float multVal = multValues.GetValueOrDefault(stat, 0f);
 
         // 계산식: (기본값 + 가산값) * (1 + 승산값)
-        float result = (baseVal + addVal) * (1f + multVal);
+        float result = (baseVal + addVal) * (1f + multVal) * PhaseMultiplier(stat);
         result = ApplyClamp(stat, result);
 
         finalValues[stat] = result;
@@ -98,11 +105,11 @@ public class EnemyStat : MonoBehaviour
     {
         foreach (EnemyStatType stat in Enum.GetValues(typeof(EnemyStatType)))
         {
-            float baseVal = baseValues.GetValueOrDefault(stat, 0f);
+            float baseVal = PhaseBaseValue(stat);
             float addVal  = addValues.GetValueOrDefault(stat, 0f);
             float multVal = multValues.GetValueOrDefault(stat, 0f);
 
-            float result = (baseVal + addVal) * (1f + multVal);
+            float result = (baseVal + addVal) * (1f + multVal) * PhaseMultiplier(stat);
             finalValues[stat] = ApplyClamp(stat, result);
         }
 
@@ -131,6 +138,37 @@ public class EnemyStat : MonoBehaviour
     {
         return baseValues.GetValueOrDefault(stat, 0f);
     }
+
+    /// <summary>Base for percentage armor shred, including the current phase only.</summary>
+    public float GetPhaseBaseStat(EnemyStatType stat) => GetBaseStat(stat) * PhaseMultiplier(stat);
+
+    public void SetPhaseMultipliers(float attack, float defense)
+    {
+        if (!FiniteNonnegative(attack) || !FiniteNonnegative(defense)) return;
+        _phaseAttackMultiplier = attack;
+        _phaseDefenseMultiplier = defense;
+        RecalculateStat(EnemyStatType.ATK);
+        RecalculateStat(EnemyStatType.DEF);
+    }
+
+    /// <summary>Changes this actor's current health bar without mutating shared BossData.</summary>
+    public void SetPhaseMaxHp(float maxHp)
+    {
+        if (!FiniteNonnegative(maxHp) || maxHp <= 0f)
+            throw new ArgumentOutOfRangeException(nameof(maxHp), "Phase HP must be finite and positive.");
+        _phaseMaxHp = maxHp;
+        RecalculateStat(EnemyStatType.HP);
+    }
+
+    private float PhaseBaseValue(EnemyStatType stat)
+        => stat == EnemyStatType.HP && _phaseMaxHp > 0f ? _phaseMaxHp : baseValues.GetValueOrDefault(stat, 0f);
+
+    private float PhaseMultiplier(EnemyStatType stat)
+        => stat == EnemyStatType.ATK ? _phaseAttackMultiplier
+            : stat == EnemyStatType.DEF ? _phaseDefenseMultiplier : 1f;
+
+    private static bool FiniteNonnegative(float value)
+        => value >= 0f && !float.IsNaN(value) && !float.IsInfinity(value);
 
     // ── TakeDamage ───────────────────────────────────────────────────────────────
 

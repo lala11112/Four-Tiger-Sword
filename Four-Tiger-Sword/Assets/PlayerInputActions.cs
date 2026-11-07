@@ -226,6 +226,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ChainSkill"",
+                    ""type"": ""Button"",
+                    ""id"": ""702b0f82-a732-4d17-b6b3-508e29f52178"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -437,6 +446,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""FinisherSelect"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5d4aa6aa-6b93-4a37-a351-8e5b550ba776"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ChainSkill"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -460,6 +480,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_FastFormChange = m_Player.FindAction("FastFormChange", throwIfNotFound: true);
         m_Player_Parring = m_Player.FindAction("Parring", throwIfNotFound: true);
         m_Player_FinisherSelect = m_Player.FindAction("FinisherSelect", throwIfNotFound: true);
+        m_Player_ChainSkill = m_Player.FindAction("ChainSkill", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -555,6 +576,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_FastFormChange;
     private readonly InputAction m_Player_Parring;
     private readonly InputAction m_Player_FinisherSelect;
+    private readonly InputAction m_Player_ChainSkill;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -627,6 +649,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @FinisherSelect => m_Wrapper.m_Player_FinisherSelect;
         /// <summary>
+        /// Provides access to the underlying input action "Player/ChainSkill".
+        /// </summary>
+        public InputAction @ChainSkill => m_Wrapper.m_Player_ChainSkill;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Player; }
@@ -697,6 +723,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @FinisherSelect.started += instance.OnFinisherSelect;
             @FinisherSelect.performed += instance.OnFinisherSelect;
             @FinisherSelect.canceled += instance.OnFinisherSelect;
+            @ChainSkill.started += instance.OnChainSkill;
+            @ChainSkill.performed += instance.OnChainSkill;
+            @ChainSkill.canceled += instance.OnChainSkill;
         }
 
         /// <summary>
@@ -753,6 +782,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @FinisherSelect.started -= instance.OnFinisherSelect;
             @FinisherSelect.performed -= instance.OnFinisherSelect;
             @FinisherSelect.canceled -= instance.OnFinisherSelect;
+            @ChainSkill.started -= instance.OnChainSkill;
+            @ChainSkill.performed -= instance.OnChainSkill;
+            @ChainSkill.canceled -= instance.OnChainSkill;
         }
 
         /// <summary>
@@ -898,5 +930,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnFinisherSelect(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ChainSkill" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnChainSkill(InputAction.CallbackContext context);
     }
 }

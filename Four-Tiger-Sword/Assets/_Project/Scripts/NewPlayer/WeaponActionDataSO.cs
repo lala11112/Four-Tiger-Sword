@@ -5,8 +5,6 @@ using UnityEngine;
 // One form asset owns its actions; nested groups separate tuning responsibilities.
 public abstract class WeaponActionDataSO : ScriptableObject
 {
-    public string WeaponName;
-
     [InspectorName("공격 목록 (Actions)")]
     public FormActionSet Actions = new FormActionSet();
 
@@ -18,6 +16,26 @@ public abstract class WeaponActionDataSO : ScriptableObject
 
     [InspectorName("공통 타격 피드백 (Feedback)")]
     public FormFeedbackSettings CommonFeedback = new FormFeedbackSettings();
+
+    [InspectorName("연계 스킬 (Chain Skill)")]
+    public FormChainSettings ChainSettings;
+    [SerializeField, HideInInspector] private int _chainSettingsVersion;
+
+    protected virtual FormChainSettings CreateDefaultChainSettings() => new FormChainSettings();
+
+    protected virtual void OnEnable()
+    {
+        // Missing data in existing form assets receives the form's defaults without copying E.
+        if (_chainSettingsVersion < 1)
+        {
+            // Unity materializes a missing inline class as a zero-valued instance in old assets.
+            ChainSettings = CreateDefaultChainSettings();
+            _chainSettingsVersion = 1;
+        }
+        else ChainSettings ??= CreateDefaultChainSettings();
+        Actions ??= new FormActionSet();
+        Actions.SwitchAttackSteps ??= new List<WeaponActionData>();
+    }
 
     // Compatibility accessors used by the form runtime and CombatLab adapter.
     public List<WeaponActionData> ComboSteps { get => Actions.ComboSteps; set => Actions.ComboSteps = value; }
@@ -33,6 +51,7 @@ public abstract class WeaponActionDataSO : ScriptableObject
     public WeaponActionData AirAttackStep { get => Actions.AirAttackStep; set => Actions.AirAttackStep = value; }
     public WeaponActionData CounterStep { get => Actions.CounterStep; set => Actions.CounterStep = value; }
     public List<WeaponActionData> SkillSteps { get => Actions.SkillSteps; set => Actions.SkillSteps = value; }
+    public List<WeaponActionData> SwitchAttackSteps { get => Actions.SwitchAttackSteps; set => Actions.SwitchAttackSteps = value; }
     public List<WeaponActionData> UltimateSteps { get => Actions.UltimateSteps; set => Actions.UltimateSteps = value; }
     public GameObject HitVFX { get => CommonFeedback.HitVFX; set => CommonFeedback.HitVFX = value; }
     public AudioClip HitSound { get => CommonFeedback.HitSound; set => CommonFeedback.HitSound = value; }
@@ -57,8 +76,27 @@ public class FormActionSet
     [Tooltip("스킬 공격 데이터 (여러 단계 가능)")]
     public List<WeaponActionData> SkillSteps;
 
+    [InspectorName("교체 스킬 (Switch Attack)"), Tooltip("조건을 달성한 뒤 사용하는 독립 교체 스킬입니다. 비어 있으면 사용할 수 없으며 일반 스킬을 대신 사용하지 않습니다.")]
+    public List<WeaponActionData> SwitchAttackSteps = new List<WeaponActionData>();
+
     [Tooltip("궁극기 공격 데이터 (여러 단계 가능). 수 폼의 고정 10연타는 첫 단계의 Hit Events를 순서대로 참조하여 히트스탑과 사운드를 적용합니다. 해당 히트 설정이 없으면 첫 단계의 기본 설정을 사용합니다.")]
     public List<WeaponActionData> UltimateSteps;
+}
+
+public enum FormChainTrigger { Disabled, OtherFormFinalHit, SuccessfulDodge }
+
+[Serializable]
+public class FormChainSettings
+{
+    public bool Enabled;
+    public FormChainTrigger Trigger = FormChainTrigger.Disabled;
+    [Min(0f), Tooltip("조건 달성 후 교체 스킬을 사용할 수 있는 시간(초)")]
+    public float ReadyDuration = 5f;
+    [Min(0f)] public float BuffDuration = 20f;
+    [Min(0f)] public float AttackBonusPercent;
+    [Min(0f)] public float AttackSpeedBonusPercent;
+    [Min(0f), Tooltip("교체 스킬이 실제로 적중한 대상의 받는 피해 증가율(%)")]
+    public float VulnerabilityBonusPercent;
 }
 
 [Serializable]
@@ -66,7 +104,8 @@ public class FormBalanceSettings
 {
     [Min(0f)] public float UltimateCooldown = 30f;
 
-    [InspectorName("폼 유지 SP"), Tooltip("공용 영력/행동 비용과 독립된 폼별 자원입니다.")]
+    // Legacy serialized data only. Form upkeep depletion and exhaustion penalties are retired.
+    [HideInInspector]
     public FormSpSettings FormSp = new FormSpSettings();
 }
 
@@ -109,10 +148,14 @@ public class FormFeedbackSettings
     [Tooltip("적을 타격했을 때 적 위치에 스폰할 이펙트 프리팹")]
     public GameObject HitVFX;
 
-    [Tooltip("적을 타격했을 때 재생할 사운드")]
-    public AudioClip HitSound;
+    // Compatibility alias: HitAudio.Clip is the only serialized common hit clip.
+    public AudioClip HitSound
+    {
+        get => HitAudio?.Clip;
+        set { HitAudio ??= new CombatSoundSettings(); HitAudio.Clip = value; }
+    }
 
-    [Tooltip("이 폼의 공통 적중 사운드. 비워두면 기존 Hit Sound를 사용합니다.")]
+    [Tooltip("이 폼의 공통 적중 사운드.")]
     public CombatSoundSettings HitAudio = new CombatSoundSettings();
 
     [Tooltip("화염 스택 폭발 등 추가 피해의 사운드. 비워두면 공통 적중 사운드를 사용합니다.")]

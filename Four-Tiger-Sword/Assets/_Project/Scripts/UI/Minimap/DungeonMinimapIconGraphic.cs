@@ -1,14 +1,37 @@
 using UnityEngine;
 
-/// <summary>Small texture-free symbols that remain legible at minimap scale.</summary>
+/// <summary>Replaceable map icons with simple built-in symbols when no sprite is assigned.</summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(CanvasRenderer))]
 public sealed class DungeonMinimapIconGraphic : UnityEngine.UI.MaskableGraphic
 {
-    public enum Symbol { Player, Shop, Exit }
+    public enum Symbol { Player, Shop, Exit, Enemy }
 
     [SerializeField] private Symbol symbol;
+    [SerializeField] private Sprite iconSprite;
+    [SerializeField] private bool preserveAspect = true;
     public Symbol Kind => symbol;
+    public Sprite IconSprite
+    {
+        get => iconSprite;
+        set
+        {
+            if (iconSprite == value) return;
+            iconSprite = value;
+            SetAllDirty();
+        }
+    }
+    public bool PreserveAspect
+    {
+        get => preserveAspect;
+        set
+        {
+            if (preserveAspect == value) return;
+            preserveAspect = value;
+            SetVerticesDirty();
+        }
+    }
+    public override Texture mainTexture => iconSprite != null ? iconSprite.texture : Texture2D.whiteTexture;
 
     public void SetSymbol(Symbol value)
     {
@@ -28,8 +51,16 @@ public sealed class DungeonMinimapIconGraphic : UnityEngine.UI.MaskableGraphic
     {
         vertices.Clear();
         Rect bounds = GetPixelAdjustedRect();
+        if (iconSprite != null)
+        {
+            SpriteQuad(vertices, bounds);
+            return;
+        }
         switch (symbol)
         {
+            case Symbol.Enemy:
+                Dot(vertices, bounds);
+                break;
             case Symbol.Shop:
                 Triangle(vertices, bounds, new Vector2(-.5f, .12f), new Vector2(0f, .47f), new Vector2(.5f, .12f));
                 Quad(vertices, bounds, -.36f, -.4f, -.25f, .08f);
@@ -50,6 +81,37 @@ public sealed class DungeonMinimapIconGraphic : UnityEngine.UI.MaskableGraphic
                 Triangle(vertices, bounds, new Vector2(0f, .5f), new Vector2(0f, -.23f), new Vector2(.43f, -.42f));
                 break;
         }
+    }
+
+    private void Dot(UnityEngine.UI.VertexHelper vertices, Rect bounds)
+    {
+        const int segments = 16;
+        Vertex(vertices, bounds, Vector2.zero);
+        for (int i = 0; i < segments; i++)
+        {
+            float angle = i * (Mathf.PI * 2f / segments);
+            Vertex(vertices, bounds, new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * .5f);
+        }
+        for (int i = 0; i < segments; i++) vertices.AddTriangle(0, i + 1, (i + 1) % segments + 1);
+    }
+
+    private void SpriteQuad(UnityEngine.UI.VertexHelper vertices, Rect bounds)
+    {
+        if (preserveAspect && bounds.width > 0f && bounds.height > 0f)
+        {
+            float aspect = iconSprite.rect.width / Mathf.Max(.0001f, iconSprite.rect.height);
+            Vector2 center = bounds.center;
+            if (bounds.width / bounds.height > aspect) bounds.width = bounds.height * aspect;
+            else bounds.height = bounds.width / aspect;
+            bounds.center = center;
+        }
+        Vector4 uv = UnityEngine.Sprites.DataUtility.GetOuterUV(iconSprite);
+        vertices.AddVert(new Vector3(bounds.xMin, bounds.yMin, 0f), color, new Vector2(uv.x, uv.y));
+        vertices.AddVert(new Vector3(bounds.xMin, bounds.yMax, 0f), color, new Vector2(uv.x, uv.w));
+        vertices.AddVert(new Vector3(bounds.xMax, bounds.yMax, 0f), color, new Vector2(uv.z, uv.w));
+        vertices.AddVert(new Vector3(bounds.xMax, bounds.yMin, 0f), color, new Vector2(uv.z, uv.y));
+        vertices.AddTriangle(0, 1, 2);
+        vertices.AddTriangle(0, 2, 3);
     }
 
     private void Quad(UnityEngine.UI.VertexHelper vertices, Rect bounds, float left, float bottom, float right, float top)

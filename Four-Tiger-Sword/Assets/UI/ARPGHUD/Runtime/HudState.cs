@@ -24,11 +24,21 @@ namespace ArpgHud
     }
 
     [Serializable]
+    public struct ChainSkillState
+    {
+        public float Remaining;
+        public bool Selected;
+        public ChainSkillState(float remaining, bool selected)
+        { Remaining = remaining; Selected = selected; }
+    }
+
+    [Serializable]
     public struct HudState
     {
         public MeterState Hp, Auxiliary, UltimateCharge;
         public int ActiveFormIndex;
         public SkillState E, R;
+        public ChainSkillState FireChain, WaterChain;
     }
 
     /// <summary>The game owns all state and cooldown timing. Publish after accepted changes.</summary>
@@ -51,5 +61,8 @@ namespace ArpgHud
 
         public static float Progress(SkillState value) =>
             IsFinite(value.Duration) && value.Duration > 0 ? 1 - Remaining(value) / value.Duration : 1;
+
+        public static float ChainRemaining(ChainSkillState value) =>
+            IsFinite(value.Remaining) ? Mathf.Max(0f, value.Remaining) : 0f;
     }
 }

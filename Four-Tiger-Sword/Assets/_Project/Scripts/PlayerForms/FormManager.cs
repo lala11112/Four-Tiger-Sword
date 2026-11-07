@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-public class FormManager
+public partial class FormManager
 {
     public enum SwitchReason { Direct, Parry }
     private PlayerController _playerController;
@@ -52,6 +52,7 @@ public class FormManager
 
     public void CleanupTransientEffects()
     {
+        ClearChainReadiness();
         _playerController.CancelPendingSwitchAttack();
         _playerController.StopAttackTrails(true);
         _playerController.CombatCamera?.Cancel(_playerController, true);
@@ -62,6 +63,8 @@ public class FormManager
 
     public void CleanupStageEffects()
     {
+        ClearChainReadiness();
+        _playerController.CancelPendingSwitchAttack();
         foreach (var form in _registeredForms)
             (form as BaseForm)?.CleanupStageEffects();
     }
@@ -124,6 +127,7 @@ public class FormManager
         CurrentForm?.Unequip(_playerController);
         CurrentForm = form;
         CurrentForm?.Equip(_playerController);
+        _playerController.WeaponManager?.SetForm(CurrentForm?.Element ?? ElementType.ELEMENT_NONE);
         if (publish)
         {
             _playerController.ItemRuntime?.RecalculateForCurrentForm();
@@ -133,7 +137,7 @@ public class FormManager
 
     /// <summary>Eligibility only. Initial/editor assignments use ChangeForm and never spend SP or proc items.</summary>
     public bool CanSwitchForm(IForm target)
-        => target is BaseForm attackForm && attackForm.CanSwitchAttack
+        => target is BaseForm
             && CurrentForm != null && target != CurrentForm && _registeredForms.Contains(target)
             && _playerController.isActiveAndEnabled && _playerController.StatManager != null
             && _playerController.StatManager.CurrentHp > 0f && _playerController.CanChangeForm
@@ -141,13 +145,12 @@ public class FormManager
 
     public bool TrySwitchForm(IForm target, SwitchReason reason = SwitchReason.Direct)
     {
-        if (reason != SwitchReason.Direct && reason != SwitchReason.Parry) return false;
+        // Numeric/Q selection is a plain form swap. Conditional attacks use F.
+        if (reason != SwitchReason.Direct) return false;
         if (!CanSwitchForm(target)) return false;
         var state = _playerController.StateMachine?.CurrentState;
-        bool permitted = reason == SwitchReason.Parry
-            ? state is PlayerParryState
-            : (state is PlayerIdleState || state is PlayerRunState)
-                && (CanTransition == null || CanTransition());
+        bool permitted = (state is PlayerIdleState || state is PlayerRunState)
+            && (CanTransition == null || CanTransition());
         if (!permitted || !_playerController.StatManager.TryConsumeSp(_playerController.SwitchSpCost)) return false;
 
         IForm previous = CurrentForm;
@@ -158,8 +161,6 @@ public class FormManager
         _playerController.ItemRuntime?.NotifyFormSwitchSucceeded();
         OnFormChanged?.Invoke(CurrentForm);
         OnFormSwitchSucceeded?.Invoke(previous, target);
-        _playerController.QueueSwitchAttack((BaseForm)target);
-        if (reason == SwitchReason.Direct) _playerController.StartPendingSwitchAttack();
         return true;
     }
 

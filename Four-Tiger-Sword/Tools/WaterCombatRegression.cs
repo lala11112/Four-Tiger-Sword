@@ -30,10 +30,9 @@ public static class WaterCombatRegression
         input.AttackBuffer.Set(0.5f);
     }
 
-    public static string Run() => RunChecks(true);
-    // Fire drain is being edited independently; retain its strict regression in Run().
-    public static string RunWoodUpdate() => RunChecks(false);
-    private static string RunChecks(bool verifyFireDrain)
+    public static string Run() => RunChecks();
+    public static string RunWoodUpdate() => RunChecks();
+    private static string RunChecks()
     {
         Check(!Application.isPlaying, "Run regression in Edit Mode.");
         var passed = new List<string>();
@@ -331,24 +330,12 @@ public static class WaterCombatRegression
             player.ConsumeHitReaction();
 
             var fireTick = typeof(FireForm).GetMethod("OnTick", Hidden);
-            int drainDamageEvents = 0, drainHpEvents = 0;
-            System.Action<float, ElementType, bool> damageListener = (a, b, c) => drainDamageEvents++;
-            System.Action<float, float> hpListener = (a, b) => drainHpEvents++;
-            stats.OnDamageTaken += damageListener; stats.OnHpChanged += hpListener;
             stats.GrantShield(100f, 10f);
             hpBefore = stats.CurrentHp;
-            fireData.FireUltimateHealthDrainPercentPerSecond = 2f;
             fireTick.Invoke(fire, new object[] { 0.25f });
             fireTick.Invoke(fire, new object[] { 0.75f });
-            Check(!verifyFireDrain || (Mathf.Abs(hpBefore - stats.CurrentHp - stats.MaxHp * 0.02f) < 0.01f
-                && stats.Shield == 100f && drainDamageEvents == 0 && drainHpEvents == 2),
-                $"Fire drain: before={hpBefore}, after={stats.CurrentHp}, max={stats.MaxHp}, shield={stats.Shield}, damageEvents={drainDamageEvents}, hpEvents={drainHpEvents}.");
-            stats.OnDamageTaken -= damageListener; stats.OnHpChanged -= hpListener;
-            fireData.FireUltimateHealthDrainPercentPerSecond = 0f;
-            hpBefore = stats.CurrentHp;
-            fireTick.Invoke(fire, new object[] { 1f });
-            Check(stats.CurrentHp == hpBefore, "Zero drain setting ignored.");
-            fireData.FireUltimateHealthDrainPercentPerSecond = 2f;
+            Check(stats.CurrentHp == hpBefore && stats.Shield == 100f && fire.IsUltimateActive,
+                "Fire stance ticks must preserve HP and shields.");
 
             enemyObstacle.transform.position = go.transform.position;
             Physics.SyncTransforms();
@@ -378,16 +365,15 @@ public static class WaterCombatRegression
             Check(!fire.IsSkillBuffActive && Mathf.Approximately(stats.GetStat(StatType.ST_ATK), 100f), "Fire skill buff did not expire.");
             hpBefore = stats.CurrentHp;
             fireTick.Invoke(fire, new object[] { 1f });
-            Check(stats.CurrentHp == hpBefore, "Drain continued after form switch.");
+            Check(stats.CurrentHp == hpBefore, "Inactive fire ticks changed HP after a form switch.");
             forms.ChangeForm(fire); fire.BeginUltimate();
             typeof(PlayerStatManager).GetField("_currentHp", Hidden).SetValue(stats, 2f);
             fireTick.Invoke(fire, new object[] { 100f });
-            Check(stats.CurrentHp == 1f && !fire.IsUltimateActive
-                && fire.IncomingDamageMultiplier == 1f && fire.OutgoingDamageMultiplier == 1f
-                && Mathf.Approximately(stats.GetStat(StatType.ST_ATK_SPD), 1f), "Low HP must end stance without killing player.");
-            fireTick.Invoke(fire, new object[] { 1f });
-            Check(stats.CurrentHp == 1f, "Drain continued after automatic deactivation.");
-            passed.Add("FIRE drain: frame-independent max HP cost / shield bypass / HP event / no hit event / zero setting / switch stop / low HP automatic off");
+            Check(stats.CurrentHp == 2f && fire.IsUltimateActive,
+                "Low HP must not create an automatic stance cost or end a manually controlled stance.");
+            fire.DeactivateUltimate();
+            Check(!fire.IsUltimateActive && fire.IncomingDamageMultiplier == 1f && fire.OutgoingDamageMultiplier == 1f
+                && Mathf.Approximately(stats.GetStat(StatType.ST_ATK_SPD), 1f), "Manual low-HP stance deactivation restores modifiers.");
             passed.Add("FIRE: AoE radii / skill buff refresh-expiry / toggle cost / dealt-taken damage / speed / normal-skill lifesteal / manual off / switch cleanup");
             earthData = UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<EarthFormActionDataSO>(
                 "Assets/_Project/Scripts/FormActions/EarthFormAction.asset"));

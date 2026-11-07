@@ -5,7 +5,7 @@
 생성기의 `Completed` 이벤트를 받아 방별 NavMesh 준비, 몬스터 배치와 출입문 전투를 연결합니다.
 플레이어 자동 배치와 스테이지 전체 승리 처리는 별도입니다.
 
-## 미니맵
+## 미니맵과 전체지도
 
 `Game Scene`에는 `Assets/_Project/Prefabs/UI/DungeonMinimap.prefab`이 연결되어 있습니다.
 속성 HUD 아래에 300×300 미니맵을 표시하고, 골드는 미니맵 아래에 배치합니다.
@@ -16,10 +16,65 @@
 밝은 청록색은 현재 영역, 어두운 청록색은 방문한 영역입니다. 상점과 출구 아이콘은 해당 방을 방문한 뒤
 실제 앵커 위치에 표시합니다. 전투 클리어 여부와 무관하며 높낮이·구덩이·장애물 윤곽은 표현하지 않습니다.
 방문 기록은 같은 스테이지의 UI 재활성화 동안 유지하고, 새 생성 결과가 적용되면 초기화합니다.
+미니맵에는 현재 방에 속한 살아 있는 적만 빨간 점으로 표시합니다. 적의 이동을 실시간으로 반영하고,
+사망·비활성화·방 이동 시 갱신하며 통로·코너에서는 숨깁니다. 적 표시는 탐험 기록을 변경하지 않습니다.
+`DungeonMinimapView > Enemy markers`의 Sprite·Color·Icon Size로 적 표시 아트를 교체할 수 있습니다.
+
+게임 중 **Tab**으로 전체지도를 열고 다시 Tab 또는 **Esc**로 닫습니다.
+전체지도는 `Assets/_Project/Prefabs/UI/DungeonFullMap.prefab`의 별도 캔버스로 표시하며,
+현재 던전 전체가 Viewport 안에 들어오도록 축척을 맞춥니다. 공개 범위와 현재 위치·방향,
+상점·출구 표시는 미니맵과 같은 방문 기록을 사용하므로 전체지도를 열어도 미방문 방이 공개되지는 않습니다.
+지도를 열면 작은 미니맵은 숨겨지고 게임이 일시정지되며 마우스 커서가 표시됩니다.
+플레이어·카메라 조작, 상점 열기와 필살기 선택은 지도 사용 중 차단됩니다.
+스테이지 전환·오류·런 종료·포커스 상실·지도 UI 비활성화 시 지도를 닫고 소유한 일시정지를 해제합니다.
+
+현재 비전투 상태에서 **방문했고 전투가 완료된 방을 왼쪽 클릭**하면 지정된 안전 지점으로 이동하고 지도를 닫습니다.
+현재 방·미방문 방·미완료 방·통로·코너는 이동할 수 없습니다. 상점·출구 아이콘도 해당 방 선택으로 처리합니다.
+비용·쿨다운·확인창은 없으며, 이동이 불가능하면 지도 하단에 이유를 표시합니다.
+순간이동은 중간 경로를 방문 처리하거나 다른 방의 전투를 시작하지 않습니다.
 
 설치를 다시 연결하려면 `Tools > Studio Baekho > Dungeon > Install Minimap`을 사용합니다.
-기존 미니맵을 재사용하며 씬 저장은 별도로 수행합니다. 같은 메뉴의 `Run Minimap Model Regression`과
-`Run Minimap Integration Regression`은 임시 씬에서 좌표·방문·UI 수명·해상도 배치를 검사합니다.
+기존 미니맵과 전체지도 인스턴스·프리팹을 재사용하며 씬 저장은 별도로 수행합니다.
+전체지도는 미니맵의 자식이 아닌 독립된 루트 캔버스입니다. 정렬 순서는 미니맵 100, 상점 150,
+전체지도 160, 결과 200입니다. 전체지도만 포인터 입력을 받고 배경 클릭을 차단하며 미니맵은 입력을 통과시킵니다.
+같은 메뉴의 `Run Minimap Model Regression`, `Run Minimap Integration Regression`,
+`Run Full Map Regression`은 임시 씬에서 좌표·방문·UI 수명·해상도 배치와 두 지도 간 공유를 검사합니다.
+`Run Minimap Enemy Regression`은 현재 방 필터링·적 이동과 사망·마커 재사용·탐험 기록 분리를 검사합니다.
+
+### 지도 UI 아트와 레이아웃 교체
+
+`DungeonMinimap.prefab`과 `DungeonFullMap.prefab`을 Prefab Mode에서 수정합니다.
+`Panel`의 앵커·크기·여백, `Background`와 전체지도의 `Backdrop` 이미지, 제목과 닫기 힌트는
+자유롭게 교체할 수 있습니다. `Viewport`는 `RectMask2D`를 유지하고, 그 안의 `MapContent`,
+`MarkerLayer`, `PlayerArrow` 역할과 `DungeonMinimapView`의 직렬화된 참조를 유지합니다.
+전체지도는 `Mode=EntireDungeon`, 미니맵은 `Mode=FollowPlayer`를 사용합니다.
+새 UI에서도 CanvasScaler는 `Scale With Screen Size`, 기준 1920×1080, Match 0.5를 권장합니다.
+
+방·현재 영역·입구의 색, 아이콘 색과 크기, 플레이어·상점·출구 스프라이트는
+`DungeonMinimapView`의 Inspector 설정으로 교체합니다. 스프라이트를 비워 두면 기본 도형 아이콘을 사용합니다.
+`DungeonMinimapModel`의 좌표·방문 로직과 `DungeonMinimapPresenter`의 스테이지·입력 연결은 유지하므로
+아트 교체를 위해 다시 구현할 필요가 없습니다. 전체지도 프리팹에는 View만 두고 Presenter는
+기존 미니맵 쪽의 하나를 공유합니다.
+
+완전히 새 프리팹으로 바꾸면 씬의 Presenter에서 `Run`, `View`(미니맵), `Full Map View`(전체지도)를
+새 인스턴스에 다시 연결합니다. 각 View의 Visibility·Viewport·Map Content·Marker Layer·Player Arrow도
+새 계층에 연결하고, 전체지도 캔버스를 미니맵 CanvasGroup 아래에 넣지 않습니다.
+전체지도는 GraphicRaycaster, Viewport의 DungeonMapPointerHandler와 포인터 수신 Image,
+Backdrop의 입력 차단, 상태 안내 TMP 참조도 유지합니다. 방 도형과 아이콘 자체는 raycastTarget을 끕니다.
+설치 메뉴는 기존 프리팹의 아트와 배치를 덮어쓰지 않으며, 별도 경로의 새 프리팹은 이 명시적 씬 참조로 사용합니다.
+
+### 순간이동 도착 지점
+
+각 main-room 프리팹의 `StageMapAnchors.teleportPoint`는 바닥이 아닌 **플레이어 루트의 위치와 방향**입니다.
+바닥 위에 실제 CharacterController 캡슐 전체가 놓이도록 설정하고 문짝·상점 카운터·출구 자동 진행 범위를 피합니다.
+시작방·일반 방·상점·출구·보스방은 모두 지원하며, 코너에는 설정하지 않습니다.
+제작 도구는 현재 Run Definition에서 사용하는 main-room 프리팹을 중복 없이 검사하고 기존 도착 지점을 보존합니다.
+`Tools > Studio Baekho > Dungeon > Install Teleport Anchors`는 누락된 지점만 설치하고,
+`Validate Teleport Anchors`는 에셋을 변경하지 않고 기존 지점을 검사합니다.
+`Run Fast Travel Landing Regression`, `Run Fast Travel Service Regression`, `Run Map Modal Regression`은
+도착 공간·클릭 시점의 재검증·자원 보존·일시정지와 입력 소유권을 검사합니다.
+NavMesh가 없는 빈 방도 실제 바닥과 캡슐 여유 공간으로 검증합니다. 클릭 직전에도 동적 장애물을 재검사합니다.
+지점이 없거나 안전하지 않은 기존 콘텐츠는 정상 플레이를 유지하며 해당 방으로의 순간이동만 차단됩니다.
 
 ## 방별 몬스터와 전투
 
@@ -35,9 +90,13 @@
   같은 던전 시드와 설정은 같은 조합과 배치를 재현합니다. 마커가 없는 방은 빈 방입니다.
 - 기존 베이크 데이터는 재사용하고 없는 방만 런타임에 베이크합니다. 현재 카탈로그는 NavMesh Agent Type 0을
   사용합니다. 스폰이나 이동 데이터가 잘못되면 해당 방은 Failed 상태가 되고 문을 잠그지 않습니다.
-- 몬스터는 맵 생성 후 미리 보이는 상태로 배치됩니다. 방문 전에는 AI, 이동, 피격 콜라이더가 꺼집니다.
-  플레이어가 문짝의 안쪽 안전 경계를 완전히 지나면 방의 모든 연결된 문을 잠그고 몬스터를 활성화합니다.
-- `Enemy.OnDied`로 마지막 처치를 확인하면 모든 문을 엽니다. 시체 삭제를 기다리지 않습니다.
+- 일반 방은 총예산으로 뽑은 적을 웨이브로 나눕니다. `DungeonEncounterDirector`의 웨이브당 목표 코스트(기본 20)와
+  최대 마릿수(기본 6)가 기준입니다. 방 생성 로그에서 웨이브별 명단과 코스트를 확인할 수 있습니다.
+- 첫 웨이브는 문 밖에서도 보이며 스폰 지점 3m 안에서 걷다가 1~3초씩 쉽니다. 방에 들어오기 전에는
+  플레이어를 감지하거나 피해를 받지 않습니다. 문 안쪽 안전 경계를 지나면 문이 잠기고 현재 위치에서 교전을 시작합니다.
+- 일반 적은 공격 쿨타임 동안 스킬의 선호 거리(미설정 시 실행 거리)를 유지합니다. 해당 거리 근처에서는 플레이어를 바라보고 멈춥니다.
+- 일반 방의 후속 웨이브는 앞 웨이브 전멸 1.5초 뒤 안전한 적 마커 주변에 등장합니다. 증원 대기 중에도 전투와 문 잠금이 유지됩니다.
+  마지막 웨이브까지 끝나면 문을 열며, 방 처치 보상은 실제 처치한 경우에 지급합니다. 보스방은 보스 고유 페이즈를 사용합니다.
   클리어한 방은 재입장해도 재스폰하거나 잠그지 않습니다. 별도 수동 배치 적은 집계하지 않습니다.
 - `BaekhoMapConnection > Runtime Door`에 기존 LabDoor 오브젝트를 연결하면 위치를 유지해 재사용합니다.
   비어 있으면 생성기 프리팹의 Door Prefab으로 설치합니다. Closed Wall 측정값이 있으면 벽 두께의 중심에

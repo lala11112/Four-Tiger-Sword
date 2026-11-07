@@ -37,7 +37,7 @@ public static class DungeonStageEncounterRegression
             ConfirmedDeathAndDownstreamGate();
             UnexpectedBossRemoval(false);
             UnexpectedBossRemoval(true);
-            UnconfirmedZeroHpFails();
+            UnconfirmedZeroHpDoesNotDefeat();
             SuspensionDoesNotClear();
             EmptyEndRoomTracksArrival();
             return $"Stage encounters: {_checks} checks passed (preparation errors, missing anchors, downstream lock, " +
@@ -127,13 +127,14 @@ public static class DungeonStageEncounterRegression
         Check(!string.IsNullOrEmpty(f.director.Error), "Director did not expose a runtime boss failure.");
     }
 
-    private static void UnconfirmedZeroHpFails()
+    private static void UnconfirmedZeroHpDoesNotDefeat()
     {
         var f = FightingBoss("HP changed without death callback");
         f.member.GetComponent<EnemyStat>().CurrentHp = 0f;
         Tick(f.room);
-        Check(!f.member.HasDied && !f.room.BossDefeated && f.room.State == DungeonEncounterState.Failed,
-            "Zero HP without Enemy.OnDied was accepted as boss defeat.");
+        Check(!f.member.HasDied && !f.member.IsDead && !f.room.BossDefeated
+            && f.room.State == DungeonEncounterState.Fighting && f.room.AliveCount == 1,
+            "Provisional zero HP removed the actor before Enemy confirmed final death.");
     }
 
     private static void SuspensionDoesNotClear()

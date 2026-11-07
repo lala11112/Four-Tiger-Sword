@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "attackId": "a3a3ce55a4e264cb9b2b31dc53f788381",
+  "typeId": "Baekho.Generated.a3a3ce55a4e264cb9b2b31dc53f788381.MonsterSequentialOrbitSpheresSO",
+  "name": "등 뒤 회전 구체 8연속 유도 발사",
+  "description": "기본값은 적의 등 뒤에서 구체 8개가 세로 원형으로 2초간 회전한 뒤, 0.2초 간격으로 하나씩 발사됩니다. 아직 발사되지 않은 구체는 계속 회전합니다. 각 구체는 발사 시점부터 3초간 플레이어를 추적하고, 이후 마지막 진행 방향으로 3초간 직진합니다. 비행 속도는 6m/s이며, 플레이어나 벽에 닿으면 소멸합니다. 회전 중에는 피해가 없고, 비행 중 구체마다 ATK×0.3의 피해를 한 번 시도하며 기존 속성·치명타·경직·패링·사운드 규칙을 적용합니다. 구체 프리팹에서 외형을 선택할 수 있고, 비워두면 기본 구체를 사용합니다. 프리팹은 외형 전용으로 사용하며 내부 스크립트와 물리 충돌은 비활성화합니다. 프리팹 크기와 별도로 충돌 반경을 설정할 수 있습니다. 준비 시간·발사 간격·회전에는 attackSpeed가 적용되고, 비행 시간과 이동은 Enemy.ActionDeltaTime 기준입니다. 적은 모든 구체가 사라질 때까지 이동을 멈추며, 패링이나 공격 중단 시 남은 구체를 모두 제거하고 이동 설정을 복구합니다.",
+  "defaults": {
+    "animName": "Attack",
+    "engageRange": 10,
+    "executeRange": 8,
+    "weight": 100,
+    "minimumRange": 0,
+    "preferredRange": 6,
+    "cooldown": 0,
+    "repeatWeightMultiplier": 0.5,
+    "attackSpeed": 1,
+    "staggerLevel": 1,
+    "isParryable": true,
+    "telegraphDuration": 2,
+    "SwingAudio": {
+      "Clip": null,
+      "Accent": null,
+      "Volume": 0.65,
+      "AccentVolume": 0.3,
+      "PitchRange": [
+        0.97,
+        1.03
+      ]
+    },
+    "HitAudio": {
+      "Clip": null,
+      "Accent": null,
+      "Volume": 0.65,
+      "AccentVolume": 0.3,
+      "PitchRange": [
+        0.97,
+        1.03
+      ]
+    },
+    "LandingAudio": {
+      "Clip": null,
+      "Accent": null,
+      "Volume": 0.65,
+      "AccentVolume": 0.3,
+      "PitchRange": [
+        0.97,
+        1.03
+      ]
+    },
+    "sphereCount": 8,
+    "orbitDuration": 2,
+    "shotInterval": 0.2,
+    "homingDuration": 3,
+    "straightDuration": 3,
+    "orbitCenterOffset": [
+      0,
+      1.5,
+      -1
+    ],
+    "orbitRadius": 0.8,
+    "orbitAngularSpeed": 180,
+    "projectileSpeed": 6,
+    "projectileRadius": 0.18,
+    "homingTurnSpeed": 180,
+    "targetHeight": 1.5,
+    "damage": 0.3,
+    "knockbackForce": 0,
+    "obstacleMask": -5,
+    "projectilePrefab": null,
+    "projectilePrefabScale": 1
+  },
+  "preview": {
+    "shapes": []
+  },
+  "previewSupported": false
+}

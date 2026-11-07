@@ -3,11 +3,17 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "DefaultAttack", menuName = "Monster/DefaultAttack")]
 public class MonsterDefaultAttackSO : MonsterSkillData
 {
+    public override bool SupportsBossExecutionPolicy => true;
+
     [Header("데미지")]
     public float damage = 10;
     public float knockbackForce = 5f;
 
     [Header("타이밍")]
+    [Tooltip("Optional preparation state before animName. Empty preserves the existing animation playback.")]
+    public string startupAnimName;
+    [Min(0f), Tooltip("Attack timeline delay before animName starts, when a preparation state is assigned.")]
+    public float animationStartDelay;
     // telegraphDuration은 부모 MonsterSkillData에서 관리합니다.
     // 단일 타격: 타격 직전까지 예고를 유지하려면 hitStartTime과 같거나 짧게 설정하세요.
     [Tooltip("히트 판정 시작 시간 (action.Enter 기준)")]

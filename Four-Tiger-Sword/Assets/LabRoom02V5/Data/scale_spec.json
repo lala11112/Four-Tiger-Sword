@@ -1,0 +1,524 @@
+{
+  "units": "meters",
+  "reference_grid_m": 2,
+  "existing_global_1_5_already_applied": true,
+  "additional_global_scale": 1,
+  "dimensions_order": "width_X,depth_Y,height_Z",
+  "assets": [
+    {
+      "id": 1,
+      "slug": "triple_energy_tank",
+      "label_ko": "3연 에너지 탱크 연결 장치",
+      "dimensions_m": [
+        3.8,
+        2.2,
+        4.6
+      ],
+      "mount": "floor",
+      "basis_ko": "기존 단일 탱크 높이4.03m 대비 3연 연결장치"
+    },
+    {
+      "id": 2,
+      "slug": "multi_monitor_workstation",
+      "label_ko": "다중 모니터 연구 책상",
+      "dimensions_m": [
+        5.4,
+        1.5,
+        2.35
+      ],
+      "mount": "floor",
+      "basis_ko": "기존 책상 모니터 포함높이2.336m; 상판높이1.05m"
+    },
+    {
+      "id": 3,
+      "slug": "compact_workstation",
+      "label_ko": "소형 모니터 작업대",
+      "dimensions_m": [
+        3.2,
+        1.25,
+        1.75
+      ],
+      "mount": "floor",
+      "basis_ko": "서랍장과 낮은 모니터 조립체,상판1.05m"
+    },
+    {
+      "id": 4,
+      "slug": "red_control_console",
+      "label_ko": "붉은 화면 조작 콘솔",
+      "dimensions_m": [
+        1.65,
+        1.05,
+        1.75
+      ],
+      "mount": "floor",
+      "basis_ko": "기존 콘솔 체급,독립경사패널"
+    },
+    {
+      "id": 6,
+      "slug": "lab_swivel_chair",
+      "label_ko": "연구용 회전의자",
+      "dimensions_m": [
+        1.26,
+        1.24,
+        1.77
+      ],
+      "mount": "floor",
+      "basis_ko": "기존 의자외곽1.2622x1.2401x1.7719m;좌판0.72m"
+    },
+    {
+      "id": 7,
+      "slug": "tall_equipment_cabinet",
+      "label_ko": "대형 장비 캐비닛",
+      "dimensions_m": [
+        1.8,
+        1.1,
+        2.45
+      ],
+      "mount": "floor",
+      "basis_ko": "기존 전력캐비닛1.78x1.14x2.16m보다 높은 외함"
+    },
+    {
+      "id": 8,
+      "slug": "medium_vertical_crate",
+      "label_ko": "중형 세로 장비함",
+      "dimensions_m": [
+        1.3,
+        0.9,
+        1.6
+      ],
+      "mount": "floor",
+      "basis_ko": "중형세로함"
+    },
+    {
+      "id": 9,
+      "slug": "low_wide_crate",
+      "label_ko": "낮은 가로 수납함",
+      "dimensions_m": [
+        1.8,
+        0.95,
+        0.9
+      ],
+      "mount": "floor",
+      "basis_ko": "최종 이미지약2:1가로형"
+    },
+    {
+      "id": 13,
+      "slug": "long_safety_barrier",
+      "label_ko": "긴 직선 안전 배리어",
+      "dimensions_m": [
+        4,
+        0.45,
+        0.8
+      ],
+      "mount": "floor",
+      "basis_ko": "원본낮은안전벽,2m타일2칸"
+    },
+    {
+      "id": 14,
+      "slug": "corner_safety_barrier",
+      "label_ko": "모서리 안전 배리어",
+      "dimensions_m": [
+        2,
+        2,
+        0.8
+      ],
+      "mount": "floor",
+      "basis_ko": "2m코너모듈"
+    },
+    {
+      "id": 28,
+      "slug": "reward_claim_terminal",
+      "label_ko": "보상 지급 단말",
+      "dimensions_m": [
+        1.45,
+        1.05,
+        2.45
+      ],
+      "mount": "floor",
+      "basis_ko": "넓은 독립형 보상 화면과 지급 트레이"
+    },
+    {
+      "id": 29,
+      "slug": "emergency_power_generator",
+      "label_ko": "비상 발전기",
+      "dimensions_m": [
+        2.8,
+        1.6,
+        2.2
+      ],
+      "mount": "floor",
+      "basis_ko": "낮고 넓은 독립 발전기, 기존 콘솔 체급"
+    },
+    {
+      "id": 30,
+      "slug": "equipment_service_workbench",
+      "label_ko": "장비 정비 작업대",
+      "dimensions_m": [
+        3.4,
+        1.55,
+        2.35
+      ],
+      "mount": "floor",
+      "basis_ko": "기존 책상 높이와 맞춘 작업대 및 정비 암"
+    },
+    {
+      "id": 31,
+      "slug": "sample_analysis_machine",
+      "label_ko": "시료 분석기",
+      "dimensions_m": [
+        2.4,
+        1.5,
+        2.6
+      ],
+      "mount": "floor",
+      "basis_ko": "독립형 유리 분석 챔버와 제어 장치"
+    },
+    {
+      "id": 32,
+      "slug": "circular_warp_point",
+      "label_ko": "원형 바닥 워프 포인트",
+      "dimensions_m": [
+        2.8,
+        2.8,
+        0.18
+      ],
+      "mount": "surface",
+      "basis_ko": "2m 바닥 타일보다 넓은 낮은 원형 도착 지점"
+    },
+    {
+      "id": 33,
+      "slug": "stage_exit_elevator",
+      "label_ko": "다음 스테이지 이동 엘리베이터",
+      "dimensions_m": [
+        4.8,
+        4.6,
+        10
+      ],
+      "mount": "floor",
+      "basis_ko": "가로4.8m 깊이4.6m 높이10m 유지, 승강실 및 상부 승강로를 불투명 외벽으로 밀폐",
+      "group": "elevator",
+      "purpose_ko": "앞쪽 승하차 입구를 제외한 승강실과 상부 승강로가 외벽으로 둘러싸인 다음 스테이지 승강기"
+    },
+    {
+      "id": 35,
+      "slug": "medical_supply_station",
+      "label_ko": "의료 보급 스테이션",
+      "dimensions_m": [
+        2.6,
+        1.4,
+        3
+      ],
+      "mount": "floor",
+      "group": "technology",
+      "basis_ko": "V4 목적성 선별 및 기존 대형 연구실 설비 대비 크기 조정"
+    },
+    {
+      "id": 37,
+      "slug": "equipment_storage_rack",
+      "label_ko": "장비 보관 랙",
+      "dimensions_m": [
+        3.4,
+        1.2,
+        2.9
+      ],
+      "mount": "floor",
+      "group": "technology",
+      "basis_ko": "V4 목적성 선별 및 기존 대형 연구실 설비 대비 크기 조정"
+    },
+    {
+      "id": 42,
+      "slug": "air_purification_tower",
+      "label_ko": "공기 정화 타워",
+      "dimensions_m": [
+        2,
+        2,
+        3.6
+      ],
+      "mount": "floor",
+      "group": "utilities",
+      "basis_ko": "V4 목적성 선별 및 기존 대형 연구실 설비 대비 크기 조정"
+    },
+    {
+      "id": 43,
+      "slug": "coolant_pump_station",
+      "label_ko": "냉각수 펌프 장치",
+      "dimensions_m": [
+        3.4,
+        2,
+        2.7
+      ],
+      "mount": "floor",
+      "group": "utilities",
+      "basis_ko": "V4 목적성 선별 및 기존 대형 연구실 설비 대비 크기 조정"
+    },
+    {
+      "id": 47,
+      "slug": "diagnostic_scan_bed",
+      "label_ko": "진단 스캔 침대",
+      "dimensions_m": [
+        2.8,
+        4.2,
+        2.6
+      ],
+      "mount": "floor",
+      "group": "research",
+      "purpose_ko": "환자용 침대와 진단 스캔 아치",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 48,
+      "slug": "fume_hood_workbench",
+      "label_ko": "밀폐 환기 실험대",
+      "dimensions_m": [
+        3.6,
+        1.8,
+        3.4
+      ],
+      "mount": "floor",
+      "group": "research",
+      "purpose_ko": "환기 후드와 보호창을 갖춘 실험 작업 공간",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 49,
+      "slug": "specimen_centrifuge",
+      "label_ko": "시료 원심분리기",
+      "dimensions_m": [
+        2.8,
+        2.6,
+        2.3
+      ],
+      "mount": "floor",
+      "group": "research",
+      "purpose_ko": "원형 회전실과 시료 로터가 보이는 분석 장비",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 50,
+      "slug": "cryogenic_storage_freezer",
+      "label_ko": "극저온 시료 냉동고",
+      "dimensions_m": [
+        3.0,
+        1.8,
+        3.4
+      ],
+      "mount": "floor",
+      "group": "research",
+      "purpose_ko": "단열 저장실과 시료 보관 서랍",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 51,
+      "slug": "chemical_drum_rack",
+      "label_ko": "화학물질 드럼 보관대",
+      "dimensions_m": [
+        3.6,
+        1.8,
+        2.8
+      ],
+      "mount": "floor",
+      "group": "research",
+      "purpose_ko": "대형 밀폐 드럼과 유출 방지 받침",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 52,
+      "slug": "sterilization_autoclave",
+      "label_ko": "고압 멸균기",
+      "dimensions_m": [
+        3.4,
+        2.4,
+        3.2
+      ],
+      "mount": "floor",
+      "group": "infrastructure",
+      "purpose_ko": "압력 잠금 원형 해치를 갖춘 멸균 설비",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 53,
+      "slug": "server_bank",
+      "label_ko": "대형 서버 뱅크",
+      "dimensions_m": [
+        3.6,
+        1.5,
+        3.6
+      ],
+      "mount": "floor",
+      "group": "infrastructure",
+      "purpose_ko": "두 개의 노출 서버 슬롯과 냉각 통풍 구조",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 54,
+      "slug": "power_distribution_switchboard",
+      "label_ko": "전력 분배반",
+      "dimensions_m": [
+        3.4,
+        1.3,
+        3.3
+      ],
+      "mount": "floor",
+      "group": "infrastructure",
+      "purpose_ko": "큰 차단기와 전력 계측 패널",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 55,
+      "slug": "twin_ventilation_fan_wall",
+      "label_ko": "대형 이중 환기팬",
+      "dimensions_m": [
+        4.4,
+        1.0,
+        3.4
+      ],
+      "mount": "floor",
+      "group": "infrastructure",
+      "purpose_ko": "두 개의 대형 팬으로 읽히는 독립 환기 벽체",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 56,
+      "slug": "overhead_pipe_bridge",
+      "label_ko": "상부 배관 연결대",
+      "dimensions_m": [
+        4.4,
+        1.5,
+        4.0
+      ],
+      "mount": "floor",
+      "group": "infrastructure",
+      "purpose_ko": "설비 사이 배관을 지지하는 높이 있는 연결 프레임",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 57,
+      "slug": "safety_glass_partition",
+      "label_ko": "안전 관찰 유리벽",
+      "dimensions_m": [
+        4.2,
+        0.9,
+        3.2
+      ],
+      "mount": "floor",
+      "group": "safety",
+      "purpose_ko": "실험 구역과 이동 구역을 구분하는 보호벽",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 58,
+      "slug": "surveillance_camera_pillar",
+      "label_ko": "보안 감시 카메라 타워",
+      "dimensions_m": [
+        2.2,
+        1.8,
+        3.6
+      ],
+      "mount": "floor",
+      "group": "safety",
+      "purpose_ko": "방향이 다른 두 카메라와 모니터가 있는 감시 기둥",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 59,
+      "slug": "decontamination_booth",
+      "label_ko": "제독 부스",
+      "dimensions_m": [
+        3.2,
+        2.6,
+        3.8
+      ],
+      "mount": "floor",
+      "group": "safety",
+      "purpose_ko": "바닥 배수판과 측면 분사구를 갖춘 제독 공간",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 60,
+      "slug": "emergency_wash_station",
+      "label_ko": "비상 세척 설비",
+      "dimensions_m": [
+        2.8,
+        1.8,
+        3.4
+      ],
+      "mount": "floor",
+      "group": "safety",
+      "purpose_ko": "상부 샤워와 세안용 세척대",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    },
+    {
+      "id": 61,
+      "slug": "secure_storage_vault",
+      "label_ko": "보안 보관 금고",
+      "dimensions_m": [
+        3.0,
+        2.2,
+        3.4
+      ],
+      "mount": "floor",
+      "group": "safety",
+      "purpose_ko": "큰 잠금 장치와 인증 패널을 갖춘 장비 금고",
+      "basis_ko": "V4 확정 장비 체급과 2m 바닥 격자에 맞춘 대형 독립 장비"
+    }
+  ],
+  "revision": 3,
+  "asset_count": 29,
+  "retained_ids": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    7,
+    8,
+    9,
+    13,
+    14,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34
+  ],
+  "new_ids": [
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "new_asset_ids": [
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61
+  ],
+  "retained_asset_count": 21,
+  "removed_asset_ids": [
+    34
+  ],
+  "revised_asset_ids": [
+    33
+  ]
+}

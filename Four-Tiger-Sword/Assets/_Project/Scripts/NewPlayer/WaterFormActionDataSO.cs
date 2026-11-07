@@ -3,12 +3,18 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "WaterFormAction", menuName = "Combat/Forms/Water")]
 public class WaterFormActionDataSO : WeaponActionDataSO
 {
+    protected override FormChainSettings CreateDefaultChainSettings() => new FormChainSettings
+    {
+        Enabled = true,
+        Trigger = FormChainTrigger.SuccessfulDodge,
+        AttackSpeedBonusPercent = 25f,
+        VulnerabilityBonusPercent = 15f
+    };
+
     [InspectorName("폼 밸런스 (Balance)")]
     public WaterFormBalanceSettings FormBalance = new WaterFormBalanceSettings();
     [InspectorName("폼 동작·판정 (Execution)")]
     public WaterFormExecutionSettings FormExecution = new WaterFormExecutionSettings();
-    [InspectorName("폼 타격 연출 (Feedback)")]
-    public WaterFormFeedbackSettings FormFeedback = new WaterFormFeedbackSettings();
 
     [Header("Heavy Attack (optional)")]
     public WeaponActionData HeavyAttackStep;
@@ -23,7 +29,6 @@ public class WaterFormActionDataSO : WeaponActionDataSO
     public float WaterSkillBuffDuration { get => FormBalance.WaterSkillBuffDuration; set => FormBalance.WaterSkillBuffDuration = value; }
     public float WaterSkillAttackBonusPercent { get => FormBalance.WaterSkillAttackBonusPercent; set => FormBalance.WaterSkillAttackBonusPercent = value; }
     public float WaterSkillHeavyDamageBonusPercent { get => FormBalance.WaterSkillHeavyDamageBonusPercent; set => FormBalance.WaterSkillHeavyDamageBonusPercent = value; }
-    public GameObject DelayedHitVFX { get => FormFeedback.DelayedHitVFX; set => FormFeedback.DelayedHitVFX = value; }
     public float AreaRadius { get => FormExecution.AreaRadius; set => FormExecution.AreaRadius = value; }
 }
 
@@ -59,12 +64,4 @@ public class WaterFormBalanceSettings
     public float WaterSkillAttackBonusPercent = 20f;
     [Min(0f), Tooltip("버프 중 수 폼 강공격 피해 증가율(%). 30 = 최종 공격 계수에 1.3배.")]
     public float WaterSkillHeavyDamageBonusPercent = 30f;
-}
-
-[System.Serializable]
-public class WaterFormFeedbackSettings
-{
-    [Header("Delayed Hit Effect")]
-    [Tooltip("지연 데미지가 터질 때 적 위치에 스폰할 이펙트 프리팹")]
-    public GameObject DelayedHitVFX;
 }

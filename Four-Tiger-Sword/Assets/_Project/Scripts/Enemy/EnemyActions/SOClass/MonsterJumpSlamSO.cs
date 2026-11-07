@@ -3,6 +3,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "JumpSlam", menuName = "Monster/JumpSlam")]
 public class MonsterJumpSlamSO : MonsterSkillData
 {
+    public override bool SupportsBossExecutionPolicy => true;
+
     [Header("데미지")]
     public float damage = 30;
     public float knockbackForce = 18f;

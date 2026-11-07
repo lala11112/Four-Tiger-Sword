@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 public static class ShopSetup
 {
     public const string Folder = "Assets/_Game/Shop";
-    private static TMP_FontAsset Font => AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/_Project/Font/NotoSansKR SDF.asset");
+    private static TMP_FontAsset Font => BoundaryZeroTypography.GetFont();
     private static readonly Color Ink = new(.055f, .075f, .10f, 1f);
     private static readonly Color Card = new(.10f, .13f, .17f, 1f);
     private static readonly Color Accent = new(.76f, .58f, .29f, 1f);
@@ -105,7 +105,11 @@ public static class ShopSetup
     {
         string path = Folder + "/UI/TemporaryShop.prefab";
         var saved = AssetDatabase.LoadAssetAtPath<ShopView>(path);
-        if (saved != null) return saved;
+        if (saved != null)
+        {
+            if (!saved.HasCurrentTabsLayout) ShopTabsSetup.Upgrade();
+            return AssetDatabase.LoadAssetAtPath<ShopView>(path);
+        }
         var row = GetOfferView();
         var root = CanvasRoot("TemporaryShop", 150);
         try
@@ -150,6 +154,7 @@ public static class ShopSetup
             var view = root.AddComponent<ShopView>();
             view.Configure(overlay.gameObject, prompt.gameObject, balance, health, feedback, content, row, close);
             overlay.gameObject.SetActive(false); prompt.gameObject.SetActive(false);
+            ShopTabsSetup.ConfigureHierarchy(root);
             PrefabUtility.SaveAsPrefabAsset(root, path);
         }
         finally { UnityEngine.Object.DestroyImmediate(root); }

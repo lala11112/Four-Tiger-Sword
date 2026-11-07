@@ -1,8 +1,13 @@
 public class PlayerUltimateState : IPlayerState
 {
     private readonly PlayerController _playerController;
+    private IForm _form;
 
     public bool IsComplete { get; private set; }
+    public bool CanCancelToMove => IsComplete
+        || _form is BaseForm form && form.CanCancelCurrentActionToMove;
+    public bool CanCancelToAction => IsComplete
+        || _form is BaseForm form && form.CanCancelCurrentActionToAction;
 
     public PlayerUltimateState(PlayerController playerController)
     {
@@ -11,20 +16,21 @@ public class PlayerUltimateState : IPlayerState
 
     public void Enter()
     {
+        _form = _playerController.FormManager.CurrentForm;
         IsComplete = false;
         _playerController.Input.UltimateBuffer.Consume();
-        _playerController.FormManager.CurrentForm.BeginUltimate();
+        _form.BeginUltimate();
     }
 
     public void Update()
     {
-        _playerController.FormManager.CurrentForm.UpdateUltimate(out bool isComplete);
+        _form.UpdateUltimate(out bool isComplete);
         IsComplete = isComplete;
     }
 
     public void Exit()
     {
-        _playerController.FormManager.CurrentForm.EndUltimate();
+        _form.EndUltimate();
         // 쿨타임은 BaseForm.EndUltimate() 내부에서 처리됩니다.
     }
 }

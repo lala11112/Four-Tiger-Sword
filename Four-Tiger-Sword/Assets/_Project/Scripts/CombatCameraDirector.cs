@@ -112,7 +112,7 @@ public sealed class CombatCameraDirector : CinemachineExtension
 
     // Returns true when this profile owns hit feedback, including suppressed duplicate hits.
     public bool NotifyHit(PlayerController owner, Transform target, Vector3 direction,
-        CombatCameraV2Settings hitSettings = null, int hitEventIndex = -1)
+        CombatCameraHitSettings hitSettings = null, int hitEventIndex = -1)
     {
         if (owner != _owner || !IsPlaying) return false;
         bool v2 = _v2?.HasOverrides == true || hitSettings?.HasOverrides == true;

@@ -1,17 +1,14 @@
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections.Generic;
 
 public class EnemyCombatIdleState : IPlayerState
 {
     private readonly Enemy _enemy;
     private NavMeshAgent _nav;
-    private readonly List<MonsterSkillData> _candidates = new();
-    private readonly List<float> _candidateWeights = new();
-
-    private float _roamTimer;
-    private const float RoamInterval = 5f;
-    private const float RoamRadius   = 4f;
+    private EnemyNavigation _navigation;
+    private float _repathTimer;
+    private bool _oldUpdateRotation;
+    private float _oldStoppingDistance;
 
     public EnemyCombatIdleState(Enemy enemy)
     {
@@ -21,108 +18,78 @@ public class EnemyCombatIdleState : IPlayerState
     public void Enter()
     {
         _nav = _enemy.GetComponent<NavMeshAgent>();
-        _enemy.Animator.CrossFade("Move", 0.1f);
+        _navigation = new EnemyNavigation(_enemy);
+        _oldUpdateRotation = _nav.updateRotation;
+        _oldStoppingDistance = _nav.stoppingDistance;
+        _enemy.SetNavigationRotation(false);
+        _nav.stoppingDistance = .1f;
+        _navigation.Stop();
         _enemy.HasSelectedAttack = false;
         _enemy.CurrentAction = null;
-        _roamTimer = RoamInterval; // 진입 즉시 배회 시작
+        _repathTimer = 0f;
     }
 
     public void Update()
     {
         if (_enemy.CanAttack)
             TrySelectAttack();
-        else
-            Roam();
+        if (!_enemy.HasSelectedAttack) MaintainDistance();
     }
 
-    public void Exit() { }
+    public void Exit()
+    {
+        _navigation.Stop();
+        _enemy.SetNavigationRotation(_oldUpdateRotation);
+        _nav.stoppingDistance = _oldStoppingDistance;
+    }
 
     // ── 공격 선택 (가중치 랜덤) ─────────────────────────────────────────────
 
     private void TrySelectAttack()
     {
-        if (_enemy.DetectedTarget == null || _enemy.EnemyStat.MonsterSkillData?.skillData == null) return;
-
-        float dist = Vector3.Distance(_enemy.transform.position, _enemy.DetectedTarget.position);
-
-        // 현재 거리에서 선택 가능한 공격 목록 (engageRange 이내)
-        var candidates = _candidates;
-        candidates.Clear();
-        _candidateWeights.Clear();
-        float totalWeight = 0f;
-        foreach (var skill in _enemy.EnemyStat.MonsterSkillData.skillData)
-        {
-            float weight = _enemy.GetAttackSelectionWeight(skill, dist);
-            if (weight <= 0f) continue;
-            candidates.Add(skill);
-            _candidateWeights.Add(weight);
-            totalWeight += weight;
-        }
-
-        if (candidates.Count == 0)
-        {
-            // 사거리 밖일 때만 접근하고, 쿨타임/최소 거리 때문에 선택할 수 없으면 배회합니다.
-            bool outsideAllRanges = true;
-            foreach (var skill in _enemy.EnemyStat.MonsterSkillData.skillData)
-                if (skill != null && skill.weight > 0f && dist <= skill.engageRange)
-                    outsideAllRanges = false;
-            if (outsideAllRanges && _nav != null && _nav.enabled && _nav.isOnNavMesh)
-                _nav.SetDestination(_enemy.DetectedTarget.position);
-            else
-                Roam();
-            return;
-        }
-
-        // 가중치 합산 후 랜덤 롤
-        float roll = Random.Range(0f, totalWeight);
-        float cumulative = 0f;
-
-        for (int i = 0; i < candidates.Count; i++)
-        {
-            var skill = candidates[i];
-            cumulative += _candidateWeights[i];
-            if (roll <= cumulative)
-            {
-                _enemy.CurrentAction = skill.CreateAction(_enemy);
-                _enemy.HasSelectedAttack = _enemy.CurrentAction != null;
-                return;
-            }
-        }
-
-        // 부동소수점 오차 폴백
-        var fallback = candidates[candidates.Count - 1];
-        _enemy.CurrentAction = fallback.CreateAction(_enemy);
+        var skill = _enemy.SelectAttackSkill();
+        if (skill == null) return;
+        _enemy.CurrentAction = skill.CreateAction(_enemy);
         _enemy.HasSelectedAttack = _enemy.CurrentAction != null;
     }
 
-    // ── 배회 (쿨타임 중 플레이어 주변 랜덤 이동) ────────────────────────────
-
-    private void Roam()
+    // 공격을 고를 수 없을 때는 현재 거리와 가장 가까운 유효 스킬의 선호 거리를 유지합니다.
+    private void MaintainDistance()
     {
         if (_enemy.DetectedTarget == null) return;
-
         FaceTarget();
-
-        _roamTimer += _enemy.ActionDeltaTime;
-        if (_roamTimer < RoamInterval) return;
-
-        _roamTimer = 0f;
-        /*
-        Vector2 rand2D = Random.insideUnitCircle.normalized * RoamRadius;
-        Vector3 targetPos = _enemy.DetectedTarget.position + new Vector3(rand2D.x, 0f, rand2D.y);
-        _nav.SetDestination(targetPos);
-        */
-
-         //배회 할때 플레이어를 가로지르지 못하도록 막는 코드, 그런데 조금 작동을 잘 안하는거 같음
-        Vector3 toEnemy = _enemy.transform.position - _enemy.DetectedTarget.position;
-        toEnemy.y = 0f;
-        Vector3 baseDir = toEnemy.sqrMagnitude > 0.001f ? toEnemy.normalized : _enemy.transform.forward;
-
-        float randomAngle = Random.Range(-90f, 90f);
-        Vector3 roamDir = Quaternion.Euler(0f, randomAngle, 0f) * baseDir;
-        Vector3 targetPos = _enemy.DetectedTarget.position + roamDir * RoamRadius;
-        if (_nav.enabled && _nav.isOnNavMesh) _nav.SetDestination(targetPos);
-        
+        Vector3 away = _enemy.transform.position - _enemy.DetectedTarget.position;
+        away.y = 0f;
+        float distance = away.magnitude;
+        float preferred = 0f;
+        float closest = float.PositiveInfinity;
+        var skills = _enemy.ActiveSkillSet?.skillData;
+        if (skills != null)
+            foreach (var skill in skills)
+            {
+                if (skill == null || skill is MonsterSelfDestructSO || skill.weight <= 0f
+                    || skill.minimumRange > skill.executeRange || skill.executeRange < 0f
+                    || skill.engageRange < skill.minimumRange) continue;
+                float range = skill.preferredRange > 0f ? skill.preferredRange : skill.executeRange;
+                float difference = Mathf.Abs(distance - range);
+                if (difference >= closest) continue;
+                closest = difference;
+                preferred = range;
+            }
+        if (float.IsPositiveInfinity(closest) || Mathf.Abs(distance - preferred) <= .5f)
+        {
+            _navigation.Stop();
+            _repathTimer = 0f;
+            return;
+        }
+        _repathTimer -= _enemy.ActionDeltaTime;
+        if (_repathTimer > 0f) return;
+        _repathTimer = .3f;
+        if (away.sqrMagnitude < .001f) away = -_enemy.transform.forward;
+        Vector3 destination = _enemy.DetectedTarget.position + away.normalized * preferred;
+        destination.y = _enemy.transform.position.y;
+        if (_navigation.TryMove(destination, false, _enemy.DetectedTarget)) _navigation.Animate(true);
+        else _navigation.Stop();
     }
 
     private void FaceTarget()

@@ -1,0 +1,983 @@
+{
+  "pipeline": "Universal Render Pipeline",
+  "materials": [
+    {
+      "name": "LAB02_bubble_cyan",
+      "base_color": [
+        0.05999999865889549,
+        0.6499999761581421,
+        0.8500000238418579,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.10999999940395355,
+      "alpha": 0.800000011920929,
+      "emission_color": [
+        0.05999999865889549,
+        0.6499999761581421,
+        0.8500000238418579,
+        1.0
+      ],
+      "emission_strength": 1.0,
+      "transmission": 0.0,
+      "textures": {
+        "base_color": [],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB02_liquid_cyan",
+      "base_color": [
+        0.004999999888241291,
+        0.23999999463558197,
+        0.3799999952316284,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.10999999940395355,
+      "alpha": 0.23999999463558197,
+      "emission_color": [
+        0.004999999888241291,
+        0.23999999463558197,
+        0.3799999952316284,
+        1.0
+      ],
+      "emission_strength": 0.6499999761581421,
+      "transmission": 0.05000000074505806,
+      "textures": {
+        "base_color": [],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB02_white_light",
+      "base_color": [
+        0.699999988079071,
+        0.8799999952316284,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.25,
+      "alpha": 1.0,
+      "emission_color": [
+        0.699999988079071,
+        0.8799999952316284,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 2.799999952316284,
+      "transmission": 0.0,
+      "textures": {
+        "base_color": [],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB_black",
+      "base_color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929,
+        1.0
+      ],
+      "metallic": 0.10000000149011612,
+      "roughness": 0.4699999988079071,
+      "alpha": 1.0,
+      "emission_color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "transmission": 0.0,
+      "textures": {
+        "base_color": [
+          {
+            "image": "TX_black",
+            "path": "C:\\Users\\김민준\\Desktop\\3D model\\output\\lab-room-02-models-v7\\textures\\TX_black.png",
+            "colorspace": "sRGB",
+            "output": "Color"
+          }
+        ],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB_blue",
+      "base_color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929,
+        1.0
+      ],
+      "metallic": 0.47999998927116394,
+      "roughness": 0.4699999988079071,
+      "alpha": 1.0,
+      "emission_color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "transmission": 0.0,
+      "textures": {
+        "base_color": [
+          {
+            "image": "TX_blue",
+            "path": "C:\\Users\\김민준\\Desktop\\3D model\\output\\lab-room-02-models-v7\\textures\\TX_blue.png",
+            "colorspace": "sRGB",
+            "output": "Color"
+          }
+        ],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB_cyan",
+      "base_color": [
+        0.029999999329447746,
+        0.6499999761581421,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.25,
+      "alpha": 1.0,
+      "emission_color": [
+        0.029999999329447746,
+        0.6499999761581421,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 2.799999952316284,
+      "transmission": 0.0,
+      "textures": {
+        "base_color": [],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB_dark",
+      "base_color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929,
+        1.0
+      ],
+      "metallic": 0.10000000149011612,
+      "roughness": 0.4699999988079071,
+      "alpha": 1.0,
+      "emission_color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "transmission": 0.0,
+      "textures": {
+        "base_color": [
+          {
+            "image": "TX_dark",
+            "path": "C:\\Users\\김민준\\Desktop\\3D model\\output\\lab-room-02-models-v7\\textures\\TX_dark.png",
+            "colorspace": "sRGB",
+            "output": "Color"
+          }
+        ],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB_edge",
+      "base_color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929,
+        1.0
+      ],
+      "metallic": 0.47999998927116394,
+      "roughness": 0.4699999988079071,
+      "alpha": 1.0,
+      "emission_color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "transmission": 0.0,
+      "textures": {
+        "base_color": [
+          {
+            "image": "TX_edge",
+            "path": "C:\\Users\\김민준\\Desktop\\3D model\\output\\lab-room-02-models-v7\\textures\\TX_edge.png",
+            "colorspace": "sRGB",
+            "output": "Color"
+          }
+        ],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB_glass",
+      "base_color": [
+        0.3499999940395355,
+        0.699999988079071,
+        0.800000011920929,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.10999999940395355,
+      "alpha": 0.09000000357627869,
+      "emission_color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "transmission": 0.10000000149011612,
+      "textures": {
+        "base_color": [],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB_metal",
+      "base_color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929,
+        1.0
+      ],
+      "metallic": 0.47999998927116394,
+      "roughness": 0.4699999988079071,
+      "alpha": 1.0,
+      "emission_color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "transmission": 0.0,
+      "textures": {
+        "base_color": [
+          {
+            "image": "TX_metal",
+            "path": "C:\\Users\\김민준\\Desktop\\3D model\\output\\lab-room-02-models-v7\\textures\\TX_metal.png",
+            "colorspace": "sRGB",
+            "output": "Color"
+          }
+        ],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB_red",
+      "base_color": [
+        1.0,
+        0.02500000037252903,
+        0.009999999776482582,
+        1.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.25,
+      "alpha": 1.0,
+      "emission_color": [
+        1.0,
+        0.02500000037252903,
+        0.009999999776482582,
+        1.0
+      ],
+      "emission_strength": 2.799999952316284,
+      "transmission": 0.0,
+      "textures": {
+        "base_color": [],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB_screen_blue",
+      "base_color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929,
+        1.0
+      ],
+      "metallic": 0.10000000149011612,
+      "roughness": 0.3799999952316284,
+      "alpha": 1.0,
+      "emission_color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 1.5,
+      "transmission": 0.0,
+      "textures": {
+        "base_color": [
+          {
+            "image": "TX_screen_blue.001",
+            "path": "C:\\Users\\김민준\\Desktop\\3D model\\output\\lab-room-02-models-v7\\textures\\TX_screen_blue.png",
+            "colorspace": "sRGB",
+            "output": "Color"
+          }
+        ],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [
+          {
+            "image": "TX_screen_blue.001",
+            "path": "C:\\Users\\김민준\\Desktop\\3D model\\output\\lab-room-02-models-v7\\textures\\TX_screen_blue.png",
+            "colorspace": "sRGB",
+            "output": "Color"
+          }
+        ],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB_screen_red",
+      "base_color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929,
+        1.0
+      ],
+      "metallic": 0.10000000149011612,
+      "roughness": 0.3799999952316284,
+      "alpha": 1.0,
+      "emission_color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 1.5,
+      "transmission": 0.0,
+      "textures": {
+        "base_color": [
+          {
+            "image": "screen_red.png",
+            "path": "C:\\Users\\김민준\\Desktop\\3D model\\output\\lab-room-02-models-v7\\textures\\screen_red.png",
+            "colorspace": "sRGB",
+            "output": "Color"
+          }
+        ],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [
+          {
+            "image": "screen_red.png",
+            "path": "C:\\Users\\김민준\\Desktop\\3D model\\output\\lab-room-02-models-v7\\textures\\screen_red.png",
+            "colorspace": "sRGB",
+            "output": "Color"
+          }
+        ],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    },
+    {
+      "name": "LAB_silver",
+      "base_color": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929,
+        1.0
+      ],
+      "metallic": 0.47999998927116394,
+      "roughness": 0.4699999988079071,
+      "alpha": 1.0,
+      "emission_color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emission_strength": 0.0,
+      "transmission": 0.0,
+      "textures": {
+        "base_color": [
+          {
+            "image": "TX_silver",
+            "path": "C:\\Users\\김민준\\Desktop\\3D model\\output\\lab-room-02-models-v7\\textures\\TX_silver.png",
+            "colorspace": "sRGB",
+            "output": "Color"
+          }
+        ],
+        "metallic": [],
+        "roughness": [],
+        "alpha": [],
+        "emission_color": [],
+        "emission_strength": [],
+        "transmission": []
+      },
+      "surface_render_method": "DITHERED",
+      "double_sided": true
+    }
+  ],
+  "assets": [
+    {
+      "id": 1,
+      "object": "R2_01_triple_energy_tank",
+      "materials": [
+        "LAB_red",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_silver",
+        "LAB_black",
+        "LAB_dark",
+        "LAB_cyan",
+        "LAB_glass",
+        "LAB02_liquid_cyan",
+        "LAB02_white_light",
+        "LAB02_bubble_cyan"
+      ]
+    },
+    {
+      "id": 2,
+      "object": "R2_02_multi_monitor_workstation",
+      "materials": [
+        "LAB_edge",
+        "LAB_dark",
+        "LAB_silver",
+        "LAB_black",
+        "LAB_metal",
+        "LAB_screen_blue",
+        "LAB_red"
+      ]
+    },
+    {
+      "id": 3,
+      "object": "R2_03_compact_workstation",
+      "materials": [
+        "LAB_dark",
+        "LAB_edge",
+        "LAB_silver",
+        "LAB_black",
+        "LAB_red",
+        "LAB_metal",
+        "LAB_screen_blue"
+      ]
+    },
+    {
+      "id": 4,
+      "object": "R2_04_red_control_console",
+      "materials": [
+        "LAB_metal",
+        "LAB_dark",
+        "LAB_edge",
+        "LAB_silver",
+        "LAB_black",
+        "LAB_red",
+        "LAB_screen_red"
+      ]
+    },
+    {
+      "id": 6,
+      "object": "R2_06_lab_swivel_chair",
+      "materials": [
+        "LAB_metal",
+        "LAB_dark",
+        "LAB_silver",
+        "LAB_black",
+        "LAB_blue"
+      ]
+    },
+    {
+      "id": 7,
+      "object": "R2_07_tall_equipment_cabinet",
+      "materials": [
+        "LAB_edge",
+        "LAB_metal",
+        "LAB_black",
+        "LAB_dark",
+        "LAB_red",
+        "LAB_silver"
+      ]
+    },
+    {
+      "id": 8,
+      "object": "R2_08_medium_vertical_crate",
+      "materials": [
+        "LAB_metal",
+        "LAB_black",
+        "LAB_edge",
+        "LAB_dark",
+        "LAB_silver",
+        "LAB_red"
+      ]
+    },
+    {
+      "id": 9,
+      "object": "R2_09_low_wide_crate",
+      "materials": [
+        "LAB_metal",
+        "LAB_black",
+        "LAB_edge",
+        "LAB_dark",
+        "LAB_silver",
+        "LAB_red"
+      ]
+    },
+    {
+      "id": 13,
+      "object": "R2_13_long_safety_barrier",
+      "materials": [
+        "LAB_edge",
+        "LAB_metal",
+        "LAB_dark",
+        "LAB_black",
+        "LAB_red",
+        "LAB_silver"
+      ]
+    },
+    {
+      "id": 14,
+      "object": "R2_14_corner_safety_barrier",
+      "materials": [
+        "LAB_edge",
+        "LAB_metal",
+        "LAB_dark",
+        "LAB_black",
+        "LAB_red",
+        "LAB_silver"
+      ]
+    },
+    {
+      "id": 28,
+      "object": "R2_28_reward_claim_terminal",
+      "materials": [
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_screen_blue",
+        "LAB_black",
+        "LAB_red",
+        "LAB_cyan",
+        "LAB_silver"
+      ]
+    },
+    {
+      "id": 29,
+      "object": "R2_29_emergency_power_generator",
+      "materials": [
+        "LAB_black",
+        "LAB_dark",
+        "LAB_edge",
+        "LAB_metal",
+        "LAB_blue",
+        "LAB_silver",
+        "LAB_screen_blue",
+        "LAB_red"
+      ]
+    },
+    {
+      "id": 30,
+      "object": "R2_30_equipment_service_workbench",
+      "materials": [
+        "LAB_black",
+        "LAB_edge",
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_silver",
+        "LAB_screen_blue",
+        "LAB_red"
+      ]
+    },
+    {
+      "id": 31,
+      "object": "R2_31_sample_analysis_machine",
+      "materials": [
+        "LAB_red",
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_black",
+        "LAB_silver",
+        "LAB_glass",
+        "LAB02_white_light",
+        "LAB02_liquid_cyan",
+        "LAB_cyan",
+        "LAB_screen_blue"
+      ]
+    },
+    {
+      "id": 32,
+      "object": "R2_32_circular_warp_point",
+      "materials": [
+        "LAB_cyan",
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_black",
+        "LAB_edge",
+        "LAB_silver",
+        "LAB_red"
+      ]
+    },
+    {
+      "id": 33,
+      "object": "R2_33_stage_exit_elevator",
+      "materials": [
+        "LAB_black",
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_red",
+        "LAB_edge",
+        "LAB_silver",
+        "LAB_cyan",
+        "LAB02_white_light",
+        "LAB_screen_blue"
+      ]
+    },
+    {
+      "id": 35,
+      "object": "R2_35_medical_supply_station",
+      "materials": [
+        "LAB_cyan",
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_black",
+        "LAB_silver",
+        "LAB_blue",
+        "LAB02_white_light",
+        "LAB_screen_blue"
+      ]
+    },
+    {
+      "id": 37,
+      "object": "R2_37_equipment_storage_rack",
+      "materials": [
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_black",
+        "LAB_cyan",
+        "LAB_silver",
+        "LAB_blue",
+        "LAB_red"
+      ]
+    },
+    {
+      "id": 42,
+      "object": "R2_42_air_purification_tower",
+      "materials": [
+        "LAB_screen_blue",
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_black",
+        "LAB_edge",
+        "LAB_silver",
+        "LAB_red",
+        "LAB_blue"
+      ]
+    },
+    {
+      "id": 43,
+      "object": "R2_43_coolant_pump_station",
+      "materials": [
+        "LAB_dark",
+        "LAB_edge",
+        "LAB_metal",
+        "LAB02_liquid_cyan",
+        "LAB_glass",
+        "LAB_blue",
+        "LAB_silver",
+        "LAB_black",
+        "LAB_screen_blue",
+        "LAB_red"
+      ]
+    },
+    {
+      "id": 47,
+      "object": "R2_47_diagnostic_scan_bed",
+      "materials": [
+        "LAB_cyan",
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_silver",
+        "LAB_red",
+        "LAB_screen_blue"
+      ]
+    },
+    {
+      "id": 48,
+      "object": "R2_48_fume_hood_workbench",
+      "materials": [
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_blue",
+        "LAB_silver",
+        "LAB_edge",
+        "LAB_black",
+        "LAB_glass",
+        "LAB02_white_light",
+        "LAB_screen_blue"
+      ]
+    },
+    {
+      "id": 49,
+      "object": "R2_49_specimen_centrifuge",
+      "materials": [
+        "LAB_screen_blue",
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_silver",
+        "LAB_blue",
+        "LAB02_liquid_cyan",
+        "LAB_glass",
+        "LAB_red"
+      ]
+    },
+    {
+      "id": 50,
+      "object": "R2_50_cryogenic_storage_freezer",
+      "materials": [
+        "LAB_blue",
+        "LAB_metal",
+        "LAB_dark",
+        "LAB_silver",
+        "LAB_edge",
+        "LAB_cyan",
+        "LAB_screen_blue",
+        "LAB_black"
+      ]
+    },
+    {
+      "id": 51,
+      "object": "R2_51_chemical_drum_rack",
+      "materials": [
+        "LAB_blue",
+        "LAB_dark",
+        "LAB_edge",
+        "LAB_metal",
+        "LAB_silver",
+        "LAB_red"
+      ]
+    },
+    {
+      "id": 52,
+      "object": "R2_52_sterilization_autoclave",
+      "materials": [
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_black",
+        "LAB_silver",
+        "LAB_blue",
+        "LAB_red",
+        "LAB_screen_blue",
+        "LAB_cyan"
+      ]
+    },
+    {
+      "id": 53,
+      "object": "R2_53_server_bank",
+      "materials": [
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_black",
+        "LAB_blue",
+        "LAB_cyan",
+        "LAB_silver",
+        "LAB_red"
+      ]
+    },
+    {
+      "id": 54,
+      "object": "R2_54_power_distribution_switchboard",
+      "materials": [
+        "LAB_silver",
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_black",
+        "LAB_edge",
+        "LAB_blue",
+        "LAB_red",
+        "LAB_cyan"
+      ]
+    },
+    {
+      "id": 55,
+      "object": "R2_55_twin_ventilation_fan_wall",
+      "materials": [
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_silver",
+        "LAB_blue"
+      ]
+    },
+    {
+      "id": 56,
+      "object": "R2_56_overhead_pipe_bridge",
+      "materials": [
+        "LAB_metal",
+        "LAB_dark",
+        "LAB_edge",
+        "LAB_blue",
+        "LAB_silver"
+      ]
+    },
+    {
+      "id": 57,
+      "object": "R2_57_safety_glass_partition",
+      "materials": [
+        "LAB_black",
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_silver",
+        "LAB_glass",
+        "LAB_edge"
+      ]
+    },
+    {
+      "id": 58,
+      "object": "R2_58_surveillance_camera_pillar",
+      "materials": [
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_screen_blue",
+        "LAB_black",
+        "LAB_red",
+        "LAB_silver",
+        "LAB_blue"
+      ]
+    },
+    {
+      "id": 59,
+      "object": "R2_59_decontamination_booth",
+      "materials": [
+        "LAB_metal",
+        "LAB_dark",
+        "LAB_silver",
+        "LAB_glass",
+        "LAB_edge",
+        "LAB_black",
+        "LAB_screen_blue",
+        "LAB_red"
+      ]
+    },
+    {
+      "id": 60,
+      "object": "R2_60_emergency_wash_station",
+      "materials": [
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_silver",
+        "LAB_black",
+        "LAB_blue"
+      ]
+    },
+    {
+      "id": 61,
+      "object": "R2_61_secure_storage_vault",
+      "materials": [
+        "LAB_dark",
+        "LAB_metal",
+        "LAB_edge",
+        "LAB_black",
+        "LAB_blue",
+        "LAB_silver",
+        "LAB_screen_blue",
+        "LAB_red"
+      ]
+    }
+  ]
+}

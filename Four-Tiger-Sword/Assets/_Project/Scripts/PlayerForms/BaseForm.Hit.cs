@@ -77,7 +77,7 @@ public abstract partial class BaseForm
             var result = DamageManager.Apply(
                 new HitInfo(baseDamage * DamageAttackStat, Element, critChance, critMultiplier, trueDamage: DealsTrueDamage, source: _playerController, power: knockback, poiseDamage: poiseDamage, staggerResistLevel: step.StaggerResistLevel, impactSound: ResolveHitSound(step, hitEvent),
                     category: CurrentAttackCategory, itemDamageMultiplier: DamageItemMultiplier,
-                    sourceDamageMultiplier: DamageSourceMultiplier, hasSourceDamageSnapshot: true),
+                    sourceDamageMultiplier: DamageSourceMultiplier, hasSourceDamageSnapshot: true, isDirectPlayerHit: true),
                 damageable, target);
 
             if (!result.Applied) continue;

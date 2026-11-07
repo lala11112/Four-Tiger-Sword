@@ -13,11 +13,11 @@ public sealed class WoodTargetEffects : MonoBehaviour
     private void OnEnable()
     {
         _enemy = GetComponent<Enemy>();
-        if (_enemy != null) _enemy.OnDied += ResetEffects;
+        if (_enemy != null) _enemy.OnDied += ResetForNewPhase;
     }
     public void AddStacks(WoodFormActionDataSO data, bool maximum = false)
     {
-        if (!isActiveAndEnabled || GetComponent<EnemyStat>()?.IsDead == true) return;
+        if (data == null || !CanApplyEffects()) return;
         int limit = Mathf.Max(1, data.MaximumStacks);
         Stacks = maximum ? limit : Mathf.Min(limit, Stacks + Mathf.Max(1, data.StacksPerHit));
         StackRemaining = Mathf.Max(0.1f, data.StackLifetime);
@@ -28,7 +28,7 @@ public sealed class WoodTargetEffects : MonoBehaviour
     }
     public void Pull(Vector3 center, float duration, float speed, float stopDistance)
     {
-        if (duration <= 0f || speed <= 0f) return;
+        if (!CanApplyEffects() || duration <= 0f || speed <= 0f) return;
         _pullCenter = center;
         _pullRemaining = duration;
         _pullSpeed = speed;
@@ -39,7 +39,7 @@ public sealed class WoodTargetEffects : MonoBehaviour
     private void Tick(float dt)
     {
         dt = Mathf.Max(0f, dt);
-        if (GetComponent<EnemyStat>()?.IsDead == true) { ResetEffects(); return; }
+        if (!CanApplyEffects()) { ResetForNewPhase(); return; }
         StackRemaining = Mathf.Max(0f, StackRemaining - dt);
         if (StackRemaining <= 0f) Stacks = 0;
         if (_pullRemaining <= 0f) return;
@@ -76,14 +76,19 @@ public sealed class WoodTargetEffects : MonoBehaviour
         if (_movementLocked && _enemy != null) _enemy.UnlockMovement();
         _movementLocked = false;
     }
-    private void ResetEffects()
+    private bool CanApplyEffects() => isActiveAndEnabled
+        && GetComponent<EnemyStat>()?.IsDead != true && GetComponent<Boss>()?.IsInvulnerable != true;
+
+    public void ResetForNewPhase()
     {
         Stacks = 0; StackRemaining = _pullRemaining = 0f;
+        _pullSpeed = _stopDistance = 0f;
+        _pullCenter = default;
         ReleaseMovement();
     }
     private void OnDisable()
     {
-        if (_enemy != null) _enemy.OnDied -= ResetEffects;
-        ResetEffects();
+        if (_enemy != null) _enemy.OnDied -= ResetForNewPhase;
+        ResetForNewPhase();
     }
 }

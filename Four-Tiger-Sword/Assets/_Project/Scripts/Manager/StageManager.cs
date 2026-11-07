@@ -34,7 +34,8 @@ public class StageManager : MonoBehaviour
         if (generator == null) generator = FindFirstObjectByType<BaekhoDungeonGenerator>();
         if (encounters == null && generator != null) encounters = generator.GetComponent<DungeonEncounterDirector>();
         if (generator != null) generator.generateOnStart = false;
-        Application.targetFrameRate = 144;
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = -1;
     }
 
     public void Configure(BaekhoDungeonGenerator source, DungeonEncounterDirector director)
@@ -93,11 +94,22 @@ public class StageManager : MonoBehaviour
             catch (Exception exception) { SetError("Shop preparation failed: " + exception.Message); }
             if (Error != null) yield break;
         }
-        var exitObject = new GameObject("StageExit");
-        exitObject.transform.SetParent(result.endRoom.transform, false);
-        exitObject.transform.SetPositionAndRotation(end.exitPoint.position, end.exitPoint.rotation);
-        Exit = exitObject.AddComponent<StageExit>();
-        Exit.Initialize(this, player, end.exitSize, generation);
+        GameObject exitObject = null;
+        try
+        {
+            exitObject = new GameObject("StageExit");
+            exitObject.transform.SetParent(result.endRoom.transform, false);
+            exitObject.transform.SetPositionAndRotation(end.exitPoint.position, end.exitPoint.rotation);
+            Exit = exitObject.AddComponent<StageExit>();
+            Exit.Initialize(this, player, end.exitSize, generation);
+        }
+        catch (Exception exception)
+        {
+            if (exitObject != null) Destroy(exitObject);
+            Exit = null;
+            SetError("Stage exit preparation failed: " + exception.Message);
+        }
+        if (Error != null) yield break;
         IsReady = true;
     }
 
@@ -135,7 +147,7 @@ public class StageManager : MonoBehaviour
 
     public bool TryUseExit(PlayerController player, int generation)
     {
-        if (!IsReady || _exitRequested || generation != _generation || player != _player || player.IsStageTransitioning || player.IsShopPaused
+        if (!IsReady || _exitRequested || generation != _generation || player != _player || player.IsStageTransitioning || player.IsGameplayModalPaused
             || Exit == null || !Exit.ContainsPlayer(player)
             || player.StatManager.CurrentHp <= 0 || _endEncounter == null || _endEncounter.State != DungeonEncounterState.Cleared
             || (_isBossStage && (_bossEncounter == null || !_bossEncounter.BossDefeated || _bossEncounter.State != DungeonEncounterState.Cleared))) return false;

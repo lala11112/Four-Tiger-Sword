@@ -27,6 +27,12 @@ public static class DamageManager
         }
         var vulnerability = targetGO.GetComponent<StatusEffectHandler>()?.Get<VulnerabilityEffect>();
         if (vulnerability != null && !vulnerability.IsExpired) damage *= vulnerability.DamageMultiplier;
+        var waterChainVulnerability = targetGO.GetComponent<StatusEffectHandler>()?.Get<WaterChainVulnerabilityEffect>();
+        if (waterChainVulnerability != null && !waterChainVulnerability.IsExpired)
+            damage *= waterChainVulnerability.DamageMultiplier;
+        var boss = targetGO.GetComponent<Boss>();
+        if (boss != null && boss.IsGroggy && boss.Data != null)
+            damage *= boss.Data.groggyDamageMult;
         bool critical = false;
         if (!info.TrueDamage)
         {
@@ -36,6 +42,8 @@ public static class DamageManager
             ElementType defenseElement = enemy != null ? enemy.ElementType
                 : player != null ? player.Element : ElementType.ELEMENT_NONE;
             if (!elementTable.TryGetElementEffective(info.Element, defenseElement, out float multiplier)) return default;
+            if (boss != null && boss.Data != null)
+                multiplier = boss.Data.ResolveElementMultiplier(info.Element, multiplier);
             damage *= multiplier;
             critical = Random.value < Mathf.Clamp01(info.CriticalChance);
             if (critical) damage *= Mathf.Max(0f, info.CriticalMultiplier);
@@ -53,6 +61,10 @@ public static class DamageManager
         DamageResult result = target.TakeDamage(damage, info.Element, critical, info.Power,
             Mathf.Max(0f, info.PoiseDamage * info.PoiseDamageMultiplier),
             info.StaggerResistLevel, info.IsParryable, info.Source);
+        if (result.Applied && result.CausedOrdinaryStagger && info.IsDirectPlayerHit
+            && info.Category != PlayerAttackCategory.Secondary
+            && info.Source is PlayerController && target is Enemy staggeredEnemy)
+            staggeredEnemy.RecordDirectPlayerStagger();
         if (result.Applied && result.HealthDamage + result.ShieldDamage > 0f)
             CombatSfx.Play(info.ImpactSound, impactPosition, info.Source, impact: true);
         return result;

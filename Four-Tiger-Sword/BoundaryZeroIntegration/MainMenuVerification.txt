@@ -1,0 +1,33 @@
+BoundaryZERO 메인 화면 검증 · 2026-10-29
+
+씬: Assets/_Project/Scenes/TitleScene.unity
+첫 번째 활성 빌드 씬으로 등록. 두 번째 활성 씬은 기존 Game Scene.
+기존 Game Scene은 수정하지 않음. 아이템 이미지도 변경하지 않음.
+
+화면 구성
+- Main 폴더의 PNG 5개 추가. Sprite Single, Bilinear, 무압축, MipMap 없음, 원본 크기 유지.
+- A 배치의 칼 로고/경계/ZERO 크롭 부모와 내부 위치를 그대로 적용.
+- 메뉴 위치 (1600,470), 크기 700×103, 행간 130.
+- 안내에 배경 PNG가 없어 남색 그라데이션과 사선 장식을 uGUI 메시로 구성.
+- Canvas 기준 2560×1440, 전체 콘텐츠 비율을 유지하며 화면 안에 맞춤.
+- 기존 NotoSansKR TMP 서체 사용.
+- 새 게임/종료는 연결. 저장/설정 시스템이 없는 이어하기/설정은 비활성.
+- 기존 결과/로딩 프리팹을 씬에 배치하여 게임 시작 시 로딩 표시.
+
+검증 결과
+- 새 게임 버튼의 EventSystem 포인터 클릭으로 로딩 표시, 버튼 잠금, 중복 요청 방지 확인.
+- 실제 Game Scene 전환 후 RunState.Playing, chapter=0, stage=0 확인.
+- RunManager.ReturnToTitle()을 통한 복귀 후 TitleScene, 플레이어 0개, EventSystem 1개, 시간 배율1, 커서 잠금 해제 확인.
+- 종료 버튼의 포인터 클릭으로 Editor Play Mode 종료 확인. 플레이어 빌드의 Application.Quit는 별도 빌드에서 실행하지 않음.
+- 메뉴 탐색: 새 게임 → 종료 → 새 게임. 비활성 행은 건너뜀.
+- 비활성 이어하기/설정 클릭은 아무 동작을 실행하지 않음.
+- Raycast 결과는 장식이 아닌 실제 새 게임 버튼을 가리킴.
+- 메뉴 기본 상태/이벤트/커서/빌드 등록/탐색 검사 12개 통과.
+- 2560×1440,1920×1080,1280×720,3440×1440에서 촬영 및 육안 확인.
+- 최종 컴파일 completed, failed=false, errors=[]. 최종 플레이 콘솔 게임 오류 0개.
+- 화면 검증용 Editor 도구의 임시 해상도 삭제 인덱스 오류를 발견하여 수정. 게임 코드와 무관한 오류이며 수정 후 임시 항목 제거를 다시 확인.
+- TitleScene의 누락 스크립트 0개. 정상적으로 저장된 편집 모드 씬을 열어 둠.
+- 임시 Game View 해상도 제거 및 원래 해상도/runInBackground 설정 복원.
+
+촬영 파일: MainReview/Main_2560.png, Main_1920.png, Main_1280.png, Main_3440.png
+검증 범위: Unity 6000.3.10f1 Windows Editor Play Mode. 별도 플레이어 빌드 미실행.

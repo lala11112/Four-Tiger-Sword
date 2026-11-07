@@ -12,5 +12,7 @@ public sealed class StageMapAnchors : MonoBehaviour
     public Transform bossSpawn;
     [Tooltip("Floor position for the shop counter inside a dedicated shop room.")]
     public Transform shopPoint;
+    [Tooltip("Exact player root position and facing for full-map fast travel. Keep the entire CharacterController clear of geometry, doors and the stage exit. Optional on legacy rooms.")]
+    public Transform teleportPoint;
     public Vector3 exitSize = new(2f, 3f, 2f);
 }

@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9047343e9f5d4281b2e0e9c555e972be, type: 3}
+  m_Name: Phase1_Combat
+  m_EditorClassIdentifier: Assembly-CSharp::BossCombatProfileSO
+  decisionInterval: 0.2
+  preferredMinDistance: 2.4
+  preferredMaxDistance: 3.3
+  turnSpeed: 180
+  movementTimeout: 4
+  stuckTimeout: 1
+  repathInterval: 0.2
+  strafeDuration: 0.8
+  repositionDuration: 0.7
+  failureRecovery: 0.25
+  parryRecovery: 1
+  patterns:
+  - pattern: {fileID: 11400000, guid: b4efd2b6615622b469e60e540e9bd85f, type: 2}
+    condition:
+      minimumDistance: 0
+      maximumDistance: 3.7
+      minimumAngle: 0
+      maximumAngle: 95
+      minimumHpPercent: 0
+      maximumHpPercent: 1
+      visibility: 1
+      readySkill: {fileID: 0}
+    weight: 4
+    cooldown: 0.5
+    recovery: 0.25
+    repeatMultiplier: 0.2
+    preferredDistance: 3
+  - pattern: {fileID: 11400000, guid: 0f6e9f29382b6c24fa19bb8be4a4d0d4, type: 2}
+    condition:
+      minimumDistance: 0
+      maximumDistance: 3.8
+      minimumAngle: 0
+      maximumAngle: 90
+      minimumHpPercent: 0
+      maximumHpPercent: 1
+      visibility: 1
+      readySkill: {fileID: 0}
+    weight: 2.4
+    cooldown: 3
+    recovery: 0.4
+    repeatMultiplier: 0.2
+    preferredDistance: 3
+  - pattern: {fileID: 11400000, guid: d0dc2e3fb14de2b41833979e0bf98ae5, type: 2}
+    condition:
+      minimumDistance: 0
+      maximumDistance: 4.1
+      minimumAngle: 0
+      maximumAngle: 120
+      minimumHpPercent: 0
+      maximumHpPercent: 1
+      visibility: 1
+      readySkill: {fileID: 0}
+    weight: 1.6
+    cooldown: 6
+    recovery: 0.5
+    repeatMultiplier: 0.2
+    preferredDistance: 3

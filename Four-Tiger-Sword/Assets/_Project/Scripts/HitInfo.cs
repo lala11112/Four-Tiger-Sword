@@ -22,6 +22,8 @@ public readonly struct HitInfo
     public readonly float ItemDamageMultiplier;
     public readonly float SourceDamageMultiplier;
     public readonly bool HasSourceDamageSnapshot;
+    /// <summary>Explicit player attack contact. Persistent and secondary damage leave this false.</summary>
+    public readonly bool IsDirectPlayerHit;
 
     public readonly Vector3 Power;
 
@@ -40,7 +42,8 @@ public readonly struct HitInfo
                    bool isParryable = true, object source = null, bool trueDamage = false,
                    CombatSoundCue impactSound = default,
                    PlayerAttackCategory category = PlayerAttackCategory.Other, float itemDamageMultiplier = 1f,
-                   float sourceDamageMultiplier = 1f, bool hasSourceDamageSnapshot = false)
+                   float sourceDamageMultiplier = 1f, bool hasSourceDamageSnapshot = false,
+                   bool isDirectPlayerHit = false)
     {
         BaseDamage            = damage;
         Element               = element;
@@ -59,5 +62,14 @@ public readonly struct HitInfo
         ItemDamageMultiplier = itemDamageMultiplier;
         SourceDamageMultiplier = sourceDamageMultiplier;
         HasSourceDamageSnapshot = hasSourceDamageSnapshot;
+        IsDirectPlayerHit = isDirectPlayerHit;
     }
+
+    public HitInfo WithDirectPlayerHit(bool isDirectPlayerHit = true)
+        => new HitInfo(BaseDamage, Element, CriticalChance, CriticalMultiplier, PoiseDamageMultiplier,
+            ArmorPierce, Power, PoiseDamage, StaggerResistLevel, IsParryable, Source, TrueDamage,
+            ImpactSound, Category, ItemDamageMultiplier, SourceDamageMultiplier, HasSourceDamageSnapshot,
+            isDirectPlayerHit && Category != PlayerAttackCategory.Secondary);
+
+    public HitInfo WithoutDirectPlayerHit() => WithDirectPlayerHit(false);
 }

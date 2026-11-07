@@ -170,7 +170,8 @@ public static class FinisherWheelPrefabRegression
 
     private static TMP_Text FindText(FinisherWheelView view, string objectName)
     {
-        foreach (var text in view.GetComponentsInChildren<TMP_Text>(true))
+        var content = Field<RectTransform>(view, "content");
+        foreach (var text in content.GetComponentsInChildren<TMP_Text>(true))
             if (text.name == objectName) return text;
         return null;
     }

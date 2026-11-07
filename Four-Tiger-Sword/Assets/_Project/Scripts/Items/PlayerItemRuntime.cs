@@ -14,6 +14,7 @@ public sealed class PlayerItemRuntime : MonoBehaviour
     private Func<ElementType> _formProvider;
     private bool _initialized;
     private bool _suspended;
+    private bool _mutationInProgress;
     private readonly Dictionary<string, OwnedItem> _owned = new(StringComparer.Ordinal);
     private readonly List<ItemDefinition> _ownedItems = new();
     private IReadOnlyList<ItemDefinition> _ownedView;
@@ -33,22 +34,31 @@ public sealed class PlayerItemRuntime : MonoBehaviour
     }
 
     public event Action OnOwnedItemsChanged;
+    public event Action<ItemDefinition> ItemAcquired;
 
     public ItemCatalog Catalog
     {
         get => catalog;
         set
         {
+            if (_mutationInProgress) return;
             if (catalog == value) { RecalculateForCurrentForm(); return; }
-            bool hadItems = _owned.Count > 0;
-            catalog = value;
-            _owned.Clear();
-            _ownedItems.Clear();
-            RecalculateForCurrentForm();
-            if (_initialized && hadItems) OnOwnedItemsChanged?.Invoke();
+            _mutationInProgress = true;
+            try
+            {
+                bool hadItems = _owned.Count > 0;
+                catalog = value;
+                _owned.Clear();
+                _ownedItems.Clear();
+                RecalculateCommittedChange();
+                if (_initialized && hadItems) NotifyOwnedItemsChanged();
+            }
+            finally { _mutationInProgress = false; }
         }
     }
 
+    internal bool IsInitialized => _initialized;
+    internal bool IsMutationInProgress => _mutationInProgress;
     public IReadOnlyList<ItemDefinition> OwnedItems => _ownedView ??= _ownedItems.AsReadOnly();
     public float DodgeSpCost => EffectiveCost(ItemStat.DodgeSpCost, BaseDodgeSpCost,
         ValidMinimum(catalog != null ? catalog.policy?.minDodgeCost : null, 8f));
@@ -81,13 +91,81 @@ public sealed class PlayerItemRuntime : MonoBehaviour
 
     public bool TryAddItem(string itemId)
     {
-        if (!_initialized || catalog == null || string.IsNullOrWhiteSpace(itemId) || Contains(itemId)) return false;
+        if (!_initialized || _mutationInProgress || catalog == null || string.IsNullOrWhiteSpace(itemId)
+            || Contains(itemId)) return false;
         var definition = catalog.Find(itemId);
-        if (definition == null || !string.Equals(definition.projectId, catalog.projectId, StringComparison.Ordinal)
-            || string.IsNullOrWhiteSpace(definition.candidateKey) || definition.effects == null) return false;
         // candidateKey is the content identity, even when a malformed catalog uses two item IDs for it.
+        if (definition == null) return false;
         foreach (var owned in _owned.Values)
             if (string.Equals(owned.Definition.candidateKey, definition.candidateKey, StringComparison.Ordinal)) return false;
+        if (!TryCreateOwnedItem(definition, out var added)) return false;
+        _mutationInProgress = true;
+        try
+        {
+            _owned.Add(itemId, added);
+            _ownedItems.Add(definition);
+            RecalculateCommittedChange();
+            NotifyOwnedItemsChanged();
+            NotifyItemAcquired(definition);
+            return true;
+        }
+        finally { _mutationInProgress = false; }
+    }
+
+    public bool TryRemoveItem(string itemId)
+    {
+        if (!_initialized || _mutationInProgress || itemId == null || !_owned.TryGetValue(itemId, out var owned)) return false;
+        _mutationInProgress = true;
+        try
+        {
+            _owned.Remove(itemId);
+            _ownedItems.Remove(owned.Definition);
+            RecalculateCommittedChange();
+            NotifyOwnedItemsChanged();
+            return true;
+        }
+        finally { _mutationInProgress = false; }
+    }
+
+    /// <summary>Consumes two distinct owned items and grants one fresh item as a single stat replacement.</summary>
+    public bool TryExchangeItems(string firstId, string secondId, string resultId)
+    {
+        if (!_initialized || _mutationInProgress || catalog == null
+            || string.IsNullOrWhiteSpace(firstId) || string.IsNullOrWhiteSpace(secondId)
+            || string.Equals(firstId, secondId, StringComparison.Ordinal)
+            || !_owned.TryGetValue(firstId, out var first) || !_owned.TryGetValue(secondId, out var second)
+            || string.IsNullOrWhiteSpace(resultId)) return false;
+        var definition = catalog.Find(resultId);
+        if (!TryCreateOwnedItem(definition, out var replacement)) return false;
+        foreach (var pair in _owned)
+        {
+            if (pair.Key == firstId || pair.Key == secondId) continue;
+            if (pair.Key == resultId || string.Equals(pair.Value.Definition.candidateKey,
+                definition.candidateKey, StringComparison.Ordinal)) return false;
+        }
+        _mutationInProgress = true;
+        try
+        {
+            _owned.Remove(firstId);
+            _owned.Remove(secondId);
+            _ownedItems.Remove(first.Definition);
+            _ownedItems.Remove(second.Definition);
+            _owned.Add(resultId, replacement);
+            _ownedItems.Add(definition);
+            RecalculateCommittedChange();
+            NotifyOwnedItemsChanged();
+            NotifyItemAcquired(definition);
+            return true;
+        }
+        finally { _mutationInProgress = false; }
+    }
+
+    private bool TryCreateOwnedItem(ItemDefinition definition, out OwnedItem owned)
+    {
+        owned = null;
+        if (definition == null || catalog == null
+            || !string.Equals(definition.projectId, catalog.projectId, StringComparison.Ordinal)
+            || string.IsNullOrWhiteSpace(definition.candidateKey) || definition.effects == null) return false;
         var active = new ActiveEffect[definition.effects.Length];
         for (int i = 0; i < active.Length; i++)
         {
@@ -95,21 +173,34 @@ public sealed class PlayerItemRuntime : MonoBehaviour
             if (effect == null || !effect.IsValid()) return false;
             active[i] = new ActiveEffect { Definition = effect.Copy() };
         }
-        _owned.Add(itemId, new OwnedItem { Definition = definition, Effects = active });
-        _ownedItems.Add(definition);
-        RecalculateForCurrentForm();
-        OnOwnedItemsChanged?.Invoke();
+        owned = new OwnedItem { Definition = definition, Effects = active };
         return true;
     }
 
-    public bool TryRemoveItem(string itemId)
+    private void RecalculateCommittedChange()
     {
-        if (!_initialized || itemId == null || !_owned.TryGetValue(itemId, out var owned)) return false;
-        _owned.Remove(itemId);
-        _ownedItems.Remove(owned.Definition);
-        RecalculateForCurrentForm();
-        OnOwnedItemsChanged?.Invoke();
-        return true;
+        try { RecalculateForCurrentForm(); }
+        catch (Exception error) { Debug.LogWarning("[Items] Committed stat update observer failed: " + error, this); }
+    }
+
+    private void NotifyItemAcquired(ItemDefinition definition)
+    {
+        if (ItemAcquired == null) return;
+        foreach (Action<ItemDefinition> callback in ItemAcquired.GetInvocationList())
+        {
+            try { callback(definition); }
+            catch (Exception error) { Debug.LogWarning("[Items] Acquisition observer failed: " + error, this); }
+        }
+    }
+
+    private void NotifyOwnedItemsChanged()
+    {
+        if (OnOwnedItemsChanged == null) return;
+        foreach (Action callback in OnOwnedItemsChanged.GetInvocationList())
+        {
+            try { callback(); }
+            catch (Exception error) { Debug.LogWarning("[Items] Ownership observer failed: " + error, this); }
+        }
     }
 
     public void NotifyFormSwitchSucceeded()

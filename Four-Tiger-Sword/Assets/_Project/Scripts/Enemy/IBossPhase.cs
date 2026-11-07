@@ -5,16 +5,18 @@
 public interface IBossPhase
 {
     /// <summary>
-    /// 이 페이즈로 전환되는 HP 비율 (0.0 ~ 1.0).
-    /// HP가 이 값 이하로 내려가면 전환이 발동됩니다.
+    /// 이 페이즈의 최대 체력. 목록 순서대로 체력을 모두 소진하면 다음 페이즈로 부활합니다.
     /// </summary>
-    float HpThreshold { get; }
+    float MaxHp { get; }
 
     /// <summary>
     /// 이 페이즈에서 사용할 스킬셋.
     /// null을 반환하면 Boss가 이전 스킬셋을 그대로 유지합니다.
     /// </summary>
     MonsterSkillDataSO SkillSet { get; }
+
+    /// <summary>Optional pattern asset. Null selects weighted attacks from the active skill set.</summary>
+    BossPatternSO Pattern { get; }
 
     /// <summary>페이즈 진입 직후 한 번 호출됩니다.</summary>
     void OnEnter(Boss boss);
@@ -32,5 +34,5 @@ public interface IBossPhase
     /// 들어오는 데미지를 수정하여 반환합니다.
     /// 페이즈별 데미지 감소율, 보호막과 별개인 수치 보정 등에 사용합니다.
     /// </summary>
-    int ModifyIncomingDamage(int rawDamage, Boss boss);
+    float ModifyIncomingDamage(float rawDamage, Boss boss);
 }

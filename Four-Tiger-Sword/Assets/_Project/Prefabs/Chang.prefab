@@ -202,12 +202,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52537b332a0aa094e9b77be005bc49d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDeathFade
-  _delay: 0.35
+  _delay: 2
   _duration: 2
   _targets:
   - Renderer: {fileID: 1595951805110702795}
     Materials:
-    - {fileID: 2100000, guid: 8fbe642d19fa81245950ec1f1d7937d4, type: 2}
+    - {fileID: 2100000, guid: 5dae89b2d958ad54e9b7e6b66229cee6, type: 2}
 --- !u!1001 &14420121646640273
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -337,7 +337,7 @@ PrefabInstance:
     - target: {fileID: 3511498378696096446, guid: 8f1a82d51d2659947a4c189df102a7e7, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 4ecd56aa0c2673741a5b1690e2f32d7e, type: 2}
+      objectReference: {fileID: 2100000, guid: 78bcfc459b9a8834a8a5e0ce1bbceabf, type: 2}
     - target: {fileID: 5866666021909216657, guid: 8f1a82d51d2659947a4c189df102a7e7, type: 3}
       propertyPath: m_Controller
       value: 

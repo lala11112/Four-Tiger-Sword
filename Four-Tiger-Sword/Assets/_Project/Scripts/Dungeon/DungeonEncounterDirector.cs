@@ -10,6 +10,10 @@ public sealed class DungeonEncounterDirector : MonoBehaviour
     public DungeonEnemyCatalog catalog;
     public GameObject doorPrefab;
     [Min(0.1f)] public float spawnRadius = 3f;
+    [Min(1), Tooltip("Desired cost per wave. Individual enemy prices can exceed this target.")]
+    public int targetCostPerWave = 20;
+    [Min(1), Tooltip("Maximum enemies allocated to one wave.")]
+    public int maxEnemiesPerWave = 6;
     [SerializeField] private CharacterController player;
     public CharacterController Player => player;
     public bool IsReady { get; private set; }
@@ -58,6 +62,12 @@ public sealed class DungeonEncounterDirector : MonoBehaviour
 
     /// <summary>Set before generating a stage; null selects ordinary encounters only.</summary>
     public void ConfigureStage(GameObject bossPrefab) => _bossPrefab = bossPrefab;
+
+    /// <summary>A warp must not be interpreted as a swept crossing of unrelated room entrances.</summary>
+    public void ResetPlayerMotionHistory()
+    {
+        foreach (var room in _rooms) if (room != null) room.ResetPlayerMotionHistory();
+    }
 
     public void SuspendEncounters()
     {

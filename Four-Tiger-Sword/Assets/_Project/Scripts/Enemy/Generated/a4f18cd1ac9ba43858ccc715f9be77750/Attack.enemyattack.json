@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "attackId": "a4f18cd1ac9ba43858ccc715f9be77750",
+  "typeId": "Baekho.Generated.a4f18cd1ac9ba43858ccc715f9be77750.MonsterOrbitHomingSpheresSO",
+  "name": "등 뒤 회전 구체 5개 유도 공격",
+  "description": "기본 설정에서는 적의 등 뒤에 구체 5개가 세로 원형으로 2초간 회전한 뒤 동시에 발사됩니다. 발사 후 3초 동안 플레이어를 향해 방향을 보정하고, 이후에는 마지막 진행 방향을 유지하며 3초 더 직진한 뒤 소멸합니다. 회전 중에는 피해가 없으며, 비행 중 플레이어에게 닿으면 구체당 ATK×0.3의 피해를 시도하고 사라집니다. 벽에 닿은 구체도 소멸합니다. 준비 시간과 회전에는 attackSpeed가 적용되며, 비행 시간과 이동은 Enemy.ActionDeltaTime 기준입니다. 대상이 없어지면 현재 방향으로 진행합니다. 적은 모든 구체가 소멸할 때까지 이동하지 않으며, 패링이나 공격 중단 시 남은 구체를 모두 제거하고 이동·루트 모션 설정을 복구합니다. 기존 속성·치명타·경직·패링·사운드 규칙을 유지합니다.",
+  "defaults": {
+    "animName": "Attack",
+    "engageRange": 10,
+    "executeRange": 8,
+    "weight": 100,
+    "minimumRange": 0,
+    "preferredRange": 6,
+    "cooldown": 0,
+    "repeatWeightMultiplier": 0.5,
+    "attackSpeed": 1,
+    "staggerLevel": 1,
+    "isParryable": true,
+    "telegraphDuration": 2,
+    "SwingAudio": {
+      "Clip": null,
+      "Accent": null,
+      "Volume": 0.65,
+      "AccentVolume": 0.3,
+      "PitchRange": [
+        0.97,
+        1.03
+      ]
+    },
+    "HitAudio": {
+      "Clip": null,
+      "Accent": null,
+      "Volume": 0.65,
+      "AccentVolume": 0.3,
+      "PitchRange": [
+        0.97,
+        1.03
+      ]
+    },
+    "LandingAudio": {
+      "Clip": null,
+      "Accent": null,
+      "Volume": 0.65,
+      "AccentVolume": 0.3,
+      "PitchRange": [
+        0.97,
+        1.03
+      ]
+    },
+    "sphereCount": 5,
+    "orbitDuration": 2,
+    "homingDuration": 3,
+    "straightDuration": 3,
+    "orbitCenterOffset": [
+      0,
+      1.5,
+      -1
+    ],
+    "orbitRadius": 0.8,
+    "orbitAngularSpeed": 180,
+    "projectileSpeed": 6,
+    "projectileRadius": 0.18,
+    "homingTurnSpeed": 180,
+    "targetHeight": 1.5,
+    "damage": 0.3,
+    "knockbackForce": 0,
+    "obstacleMask": -5,
+    "projectileMaterial": null
+  },
+  "preview": {
+    "shapes": []
+  },
+  "previewSupported": false
+}

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.AI;
 using Object = UnityEngine.Object;
@@ -22,30 +21,38 @@ namespace StudioBaekho.EnemyForge
             if (string.IsNullOrWhiteSpace(name) || !Regex.IsMatch(name, @"\A[\p{L}\p{N}_ -]{1,64}\z") || name.Trim() != name ||
                 Regex.IsMatch(name, @"\A(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])\z", RegexOptions.IgnoreCase))
                 throw new InvalidDataException("적 이름은 1~64자의 문자·숫자·공백·밑줄·하이픈을 사용하세요.");
-            return OutputRoot + "/" + name;
+            return (BaekhoEnemyForgeBoss.IsBoss(blueprint) ? BaekhoEnemyForgeBoss.OutputRoot : OutputRoot) + "/" + name;
         }
 
         private static void Issue(JArray issues, string severity, string path, string message)
             => issues.Add(new JObject { ["severity"] = severity, ["path"] = path, ["message"] = message });
 
-        public static JObject Validate(JObject blueprint, bool requireFreshFolder = true)
+        public static JObject ValidateConfiguration(JObject blueprint) => Validate(blueprint, false, true);
+
+        public static JObject Validate(JObject blueprint, bool requireFreshFolder = true, bool configurationOnly = false)
         {
             var issues = new JArray();
             if (blueprint == null) return new JObject { ["valid"] = false, ["issues"] = new JArray(new JObject { ["severity"] = "error", ["path"] = "blueprint", ["message"] = "적 설정이 없습니다." }) };
             try
             {
-                if ((int?)blueprint["version"] != 1) throw new InvalidDataException("Unsupported enemy blueprint version.");
+                blueprint = BaekhoEnemyForgeBoss.Normalize(blueprint);
+                int version = (int?)blueprint["version"] ?? 0; string kind = (string)blueprint["kind"] ?? "normal";
+                if ((version != 1 && version != 2 && version != 3) || (kind != "normal" && kind != "boss") || version >= 2 && blueprint["kind"] == null || version == 1 && kind != "normal") throw new InvalidDataException("Unsupported enemy blueprint version/kind.");
+                if (kind == "normal" && blueprint["boss"] != null && blueprint["boss"].Type != JTokenType.Null) throw new InvalidDataException("Normal enemies cannot contain boss settings.");
                 string output = OutputFolder(blueprint);
                 BaekhoEnemyForgeBridge.CheckPath(Path.GetFullPath(output));
                 if (requireFreshFolder && (AssetDatabase.IsValidFolder(output) || Directory.Exists(output))) Issue(issues, "error", "name", "같은 이름의 출력 폴더가 있습니다. 새 이름을 입력하세요.");
                 var template = ResolveTemplate(blueprint);
-                foreach (Type required in new[] { typeof(Enemy), typeof(EnemyStat), typeof(PoiseHandler), typeof(NavMeshAgent), typeof(FanVisionSensor), typeof(SphereCollider) })
+                if (template == null) throw new InvalidDataException("Template prefab was not found.");
+                if (template.GetComponents<Enemy>().Length != 1 || kind == "normal" && template.GetComponent<Boss>() != null) Issue(issues, "error", "template", "설계 종류와 템플릿 전투 컴포넌트가 맞지 않습니다.");
+                foreach (Type required in new[] { typeof(Enemy), typeof(EnemyStat), typeof(PoiseHandler), typeof(NavMeshAgent), typeof(FanVisionSensor) })
                     if (template.GetComponent(required) == null) Issue(issues, "error", "template", "템플릿 루트에 " + required.Name + " 컴포넌트가 필요합니다.");
+                if (template.GetComponent<SphereCollider>() == null && template.GetComponent<CapsuleCollider>() == null) Issue(issues, "error", "template", "템플릿 루트에 SphereCollider 또는 CapsuleCollider가 필요합니다.");
                 if (LayerMask.NameToLayer("Enemy") < 0 || LayerMask.NameToLayer("Player") < 0) Issue(issues, "error", "project", "프로젝트에 Enemy와 Player 레이어가 필요합니다.");
-                var model = BaekhoEnemyForgeCatalog.Resolve(blueprint["model"], typeof(GameObject)) as GameObject;
+                var model = configurationOnly ? null : BaekhoEnemyForgeCatalog.Resolve(blueprint["model"], typeof(GameObject)) as GameObject;
                 var modelAnimator = model?.GetComponentInChildren<Animator>(true);
-                if (model == null || modelAnimator == null) Issue(issues, "error", "model", "Animator를 포함한 모델/모델 프리팹을 선택하세요.");
-                else if (model.GetComponentsInChildren<Animator>(true).Length != 1) Issue(issues, "error", "model", "모델에는 Animator가 하나만 있어야 합니다.");
+                if (!configurationOnly && (model == null || modelAnimator == null)) Issue(issues, "error", "model", "Animator를 포함한 모델/모델 프리팹을 선택하세요.");
+                else if (model != null && model.GetComponentsInChildren<Animator>(true).Length != 1) Issue(issues, "error", "model", "모델에는 Animator가 하나만 있어야 합니다.");
                 var transform = blueprint["modelTransform"] as JObject ?? throw new InvalidDataException("modelTransform is required.");
                 BaekhoEnemyForgeCatalog.Numbers(transform["position"], 3); BaekhoEnemyForgeCatalog.Numbers(transform["rotation"], 3);
                 if (BaekhoEnemyForgeCatalog.Numbers(transform["scale"], 3).Any(s => s <= 0f)) Issue(issues, "error", "modelTransform.scale", "모델 스케일은 0보다 커야 합니다.");
@@ -82,12 +89,15 @@ namespace StudioBaekho.EnemyForge
                     }
                 }
                 var attacks = blueprint["attacks"] as JArray ?? throw new InvalidDataException("attacks must be an array.");
+                if (blueprint["components"]?["CapsuleCollider"] is JObject capsule && (double?)capsule["m_Height"] < (double?)capsule["m_Radius"] * 2) Issue(issues, "error", "components.CapsuleCollider", "몸체 캡슐 높이는 반지름의 두 배 이상이어야 합니다.");
                 if (attacks.Count < 1 || attacks.Count > 32) Issue(issues, "error", "attacks", "일반 공격을 1~32개 설정하세요.");
                 var ids = new HashSet<string>(); var requiredStates = new HashSet<string>(new[] { "Idle", "Move", "Groggy" });
+                if (kind == "boss" && ((JArray)blueprint["boss"]["phases"]).Count > 1) { requiredStates.Add("PhaseDown"); requiredStates.Add("PhaseRevive"); }
                 for (int i = 0; i < attacks.Count; i++) ValidateAttack(attacks[i] as JObject, false, "attacks." + i, issues, ids, requiredStates);
                 if (blueprint["selfDestruct"] is JObject selfDestruct) ValidateAttack(selfDestruct, true, "selfDestruct", issues, ids, requiredStates);
-                ValidateAnimation(blueprint["animation"] as JObject, modelAnimator, requiredStates, issues);
-                Issue(issues, "warning", "placement", "생성 후 유효한 NavMesh 위에 배치하세요. 프리팹 생성은 열린 씬을 변경하지 않습니다.");
+                BaekhoEnemyForgeBoss.Validate(blueprint, issues);
+                if (!configurationOnly) BaekhoEnemyForgeAnimation.Validate(blueprint["animation"] as JObject, modelAnimator, requiredStates, issues);
+                if (!configurationOnly) Issue(issues, "warning", "placement", "생성 후 유효한 NavMesh 위에 배치하세요. 프리팹 생성은 열린 씬을 변경하지 않습니다.");
                 if (model != null && !SameModel(template, model))
                 {
                     Issue(issues, "warning", "model", "모델 교체 시 원본 사망용 재질 연결은 제거됩니다. 사망 후 제거는 유지되며 전용 페이드 재질은 별도로 설정할 수 있습니다.");
@@ -188,45 +198,9 @@ namespace StudioBaekho.EnemyForge
             finally { Object.DestroyImmediate(skill); }
         }
 
-        private static void ValidateAnimation(JObject animation, Animator animator, HashSet<string> required, JArray issues)
-        {
-            if (animation == null) throw new InvalidDataException("animation is required.");
-            string mode = (string)animation["mode"];
-            if (mode != "clips" && mode != "controller") throw new InvalidDataException("Animation mode must be clips or controller.");
-            var mappings = animation["states"] as JObject ?? throw new InvalidDataException("Animation states are required.");
-            var existing = new HashSet<string>(); var clips = new HashSet<AnimationClip>();
-            if (mode == "controller")
-            {
-                var controller = BaekhoEnemyForgeCatalog.Resolve(animation["controller"], typeof(AnimatorController)) as AnimatorController;
-                if (controller == null) Issue(issues, "error", "animation.controller", "Animator Controller를 선택하세요.");
-                else
-                {
-                    foreach (var state in controller.layers[0].stateMachine.states) existing.Add(state.state.name);
-                    foreach (var clip in controller.animationClips) clips.Add(clip);
-                }
-            }
-            foreach (var mapping in mappings)
-            {
-                if (mapping.Value.Type == JTokenType.Null || (mode == "controller" && existing.Contains(mapping.Key))) continue;
-                var clip = BaekhoEnemyForgeCatalog.Resolve(mapping.Value, typeof(AnimationClip)) as AnimationClip;
-                if (clip != null) { existing.Add(mapping.Key); clips.Add(clip); }
-            }
-            foreach (string state in required)
-                if (!existing.Contains(state)) Issue(issues, "error", "animation.states." + state, "필수 상태 " + state + "에 애니메이션을 지정하세요.");
-            if (animator == null) return;
-            foreach (var clip in clips)
-            {
-                if (clip.humanMotion && (animator.avatar == null || !animator.avatar.isHuman)) { Issue(issues, "error", "animation", clip.name + ": Humanoid 클립을 Generic 모델에 사용할 수 없습니다."); continue; }
-                if (clip.humanMotion) continue;
-                var paths = AnimationUtility.GetCurveBindings(clip).Concat(AnimationUtility.GetObjectReferenceCurveBindings(clip)).Select(b => b.path).Where(p => !string.IsNullOrEmpty(p)).Distinct().ToArray();
-                string missing = paths.FirstOrDefault(p => animator.transform.Find(p) == null);
-                if (missing != null) Issue(issues, "error", "animation", clip.name + ": 모델에 애니메이션 경로가 없습니다: " + missing);
-            }
-        }
-
         public static GameObject ResolveTemplate(JObject blueprint)
             => blueprint["template"] == null || blueprint["template"].Type == JTokenType.Null
-                ? AssetDatabase.LoadAssetAtPath<GameObject>(BaekhoEnemyForgeCatalog.TemplatePath)
+                ? AssetDatabase.LoadAssetAtPath<GameObject>(BaekhoEnemyForgeBoss.IsBoss(blueprint) ? BaekhoEnemyForgeBoss.TemplatePath : BaekhoEnemyForgeCatalog.TemplatePath)
                 : (GameObject)BaekhoEnemyForgeCatalog.Resolve(blueprint["template"], typeof(GameObject));
 
         private static Transform ModelChild(GameObject root)
@@ -242,6 +216,7 @@ namespace StudioBaekho.EnemyForge
 
         public static JObject Build(JObject blueprint)
         {
+            blueprint = BaekhoEnemyForgeBoss.Normalize(blueprint);
             var validation = Validate(blueprint);
             if (!(bool)validation["valid"]) throw new InvalidDataException(string.Join("\n", ((JArray)validation["issues"]).Where(i => (string)i["severity"] == "error").Select(i => (string)i["message"])));
             string folder = OutputFolder(blueprint);
@@ -251,6 +226,7 @@ namespace StudioBaekho.EnemyForge
                 EnsureFolder(folder, createdFolders);
                 var template = ResolveTemplate(blueprint);
                 root = PrefabUtility.LoadPrefabContents(AssetDatabase.GetAssetPath(template));
+                if (BaekhoEnemyForgeBoss.IsBoss(blueprint)) BaekhoEnemyForgeBoss.ConvertRoot(root);
                 root.name = (string)blueprint["name"];
                 root.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity); root.transform.localScale = Vector3.one;
                 var model = (GameObject)BaekhoEnemyForgeCatalog.Resolve(blueprint["model"], typeof(GameObject));
@@ -271,9 +247,10 @@ namespace StudioBaekho.EnemyForge
                 foreach (var transform in modelRoot.GetComponentsInChildren<Transform>(true)) transform.gameObject.layer = enemyLayer;
                 var animator = modelRoot.GetComponentInChildren<Animator>(true);
                 string controllerPath = folder + "/" + root.name + ".controller";
-                var controller = CreateController((JObject)blueprint["animation"], controllerPath);
+                var controller = BaekhoEnemyForgeAnimation.CreateController((JObject)blueprint["animation"], controllerPath);
                 assets.Add(controllerPath); animator.runtimeAnimatorController = controller; animator.applyRootMotion = false;
-                var data = ScriptableObject.CreateInstance<EnemyData>(); data.name = root.name + "_Stats";
+                BaekhoEnemyForgeAnimation.ConfigureDriver(root, animator, (JObject)blueprint["animation"]);
+                var data = BaekhoEnemyForgeBoss.IsBoss(blueprint) ? (EnemyData)ScriptableObject.CreateInstance<BossData>() : ScriptableObject.CreateInstance<EnemyData>(); data.name = root.name + "_Stats";
                 BaekhoEnemyForgeCatalog.ApplyValues(data, (JObject)blueprint["stats"], Stats);
                 var skills = ScriptableObject.CreateInstance<MonsterSkillDataSO>(); skills.name = root.name + "_Skills"; skills.monsterName = root.name; skills.skillData = new List<MonsterSkillData>();
                 int index = 0;
@@ -299,6 +276,7 @@ namespace StudioBaekho.EnemyForge
                 if (point == null) { point = new GameObject("VFXPoint").transform; point.SetParent(root.transform, false); }
                 point.gameObject.layer = enemyLayer; point.localPosition = Vector(blueprint["vfxPosition"]);
                 var anchor = root.GetComponent<HitVfxAnchor>() ?? root.AddComponent<HitVfxAnchor>(); var anchorSerialized = new SerializedObject(anchor); anchorSerialized.FindProperty("spawnPoint").objectReferenceValue = point; anchorSerialized.ApplyModifiedPropertiesWithoutUndo();
+                if (data is BossData bossData) BaekhoEnemyForgeBoss.Build(root, blueprint, bossData, skills, folder, assets);
                 string prefabPath = folder + "/" + root.name + ".prefab";
                 if (PrefabUtility.SaveAsPrefabAsset(root, prefabPath) == null) throw new IOException("Prefab save did not return an asset.");
                 assets.Add(prefabPath);
@@ -334,36 +312,6 @@ namespace StudioBaekho.EnemyForge
                 BaekhoEnemyForgeCatalog.ApplyValues(skill, (JObject)config["values"]); return skill;
             }
             catch { Object.DestroyImmediate(skill); throw; }
-        }
-
-        private static AnimatorController CreateController(JObject animation, string path)
-        {
-            AnimatorController controller;
-            bool clone = (string)animation["mode"] == "controller";
-            if (clone)
-            {
-                var original = BaekhoEnemyForgeCatalog.Resolve(animation["controller"], typeof(AnimatorController));
-                if (!AssetDatabase.CopyAsset(AssetDatabase.GetAssetPath(original), path)) throw new IOException("Animator Controller copy failed.");
-                controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(path);
-            }
-            else controller = AnimatorController.CreateAnimatorControllerAtPath(path);
-            foreach (string parameter in new[] { "DirX", "DirY" })
-                if (!controller.parameters.Any(p => p.name == parameter && p.type == AnimatorControllerParameterType.Float))
-                {
-                    if (controller.parameters.Any(p => p.name == parameter)) throw new InvalidDataException(parameter + " Animator parameter must be float.");
-                    controller.AddParameter(parameter, AnimatorControllerParameterType.Float);
-                }
-            var machine = controller.layers[0].stateMachine;
-            foreach (var mapping in (JObject)animation["states"])
-            {
-                if (mapping.Value.Type == JTokenType.Null) continue;
-                var existing = machine.states.FirstOrDefault(s => s.state.name == mapping.Key).state;
-                if (clone && existing != null) continue;
-                var state = existing ?? machine.AddState(mapping.Key);
-                state.motion = (AnimationClip)BaekhoEnemyForgeCatalog.Resolve(mapping.Value, typeof(AnimationClip));
-                if (mapping.Key == "Idle") machine.defaultState = state;
-            }
-            EditorUtility.SetDirty(controller); return controller;
         }
 
         private static Vector3 Vector(JToken token)

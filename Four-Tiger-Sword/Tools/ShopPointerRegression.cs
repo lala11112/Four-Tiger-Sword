@@ -63,7 +63,7 @@ public static class ShopPointerRegression
             }
             _running = false;
             string result = failure == null
-                ? $"PASS: shop pointer ({_checks} checks): virtual F, real mouse raycast/purchase, wheel/healing, Esc and service prompt lifecycle."
+                ? $"PASS: shop pointer ({_checks} checks): virtual F, inspect-before-purchase, real mouse explicit purchase, wheel/healing, Tab and Esc folding, service prompt lifecycle."
                 : $"FAIL after {_checks} checks: {failure}";
             SessionState.SetString(ResultKey, result);
             if (failure == null) Debug.Log(result); else Debug.LogError(result);
@@ -121,6 +121,8 @@ public static class ShopPointerRegression
             Check(shop.IsInRange, "The player did not reach the authored shop interaction radius.");
             var view = shop.GetComponentInChildren<ShopView>(true);
             Check(view != null, "The temporary ShopView was not instantiated.");
+            Check(view.HasBoundaryLayout, "The BoundaryZERO shop layout is not installed.");
+            var boundary = Field<ShopView.BoundaryControls>(view, "boundary");
             var prompt = Field<GameObject>(view, "interactionPrompt");
             var panel = Field<GameObject>(view, "panel");
             Check(prompt.activeInHierarchy && !panel.activeInHierarchy, "The in-range closed-shop prompt is missing.");
@@ -135,13 +137,13 @@ public static class ShopPointerRegression
                 "Keyboard opening did not pause gameplay and release the pointer.");
             Check(!prompt.activeInHierarchy, "The interaction prompt remained visible over the open shop.");
             Canvas.ForceUpdateCanvases();
-            var scroll = view.GetComponentInChildren<ScrollRect>(false);
+            var scroll = boundary.StockScroll;
             Check(scroll != null && scroll.vertical && scroll.viewport != null && scroll.content != null,
                 "The visible shop has no vertical offer scroll view.");
 
             ShopOffer selected = null;
             Button itemButton = null;
-            foreach (var row in view.GetComponentsInChildren<ShopOfferView>(false))
+            foreach (var row in scroll.content.GetComponentsInChildren<ShopOfferView>(false))
             {
                 string id = Field<string>(row, "_id");
                 var offer = available.FirstOrDefault(candidate => candidate.Id == id);
@@ -155,14 +157,31 @@ public static class ShopPointerRegression
             int goldBefore = shop.Wallet.Gold;
             uint attackPress = player.Input.AttackPressId;
             yield return Click(mouse, itemButton, events);
+            Check(!selected.SoldOut && !player.ItemRuntime.Contains(selected.Item.itemId) && shop.Wallet.Gold == goldBefore,
+                "Inspecting a stock card performed a purchase.");
+            Check(boundary.DetailAction.interactable && boundary.DetailIcon.sprite == selected.Item.icon,
+                "Inspecting did not enable the explicit purchase with the original item sprite.");
+            yield return Click(mouse, boundary.DetailAction, events);
             Check(selected.SoldOut && player.ItemRuntime.Contains(selected.Item.itemId),
-                "A real pointer press/release on the item button did not purchase its offer.");
-            Check(shop.Wallet.Gold == goldBefore - selected.Price && !itemButton.interactable,
-                "Pointer item purchase charged incorrectly or left its button enabled.");
+                "A real pointer press/release on the explicit detail action did not purchase its offer.");
+            Check(shop.Wallet.Gold == goldBefore - selected.Price && !boundary.DetailAction.interactable && itemButton.interactable,
+                "Pointer purchase charged incorrectly, remained purchasable, or disabled card inspection.");
+            int goldAfterPurchase = shop.Wallet.Gold;
+            yield return Click(mouse, itemButton, events);
+            Check(shop.Wallet.Gold == goldAfterPurchase && !boundary.DetailAction.interactable,
+                "Inspecting the sold stock card charged a second time.");
             Check(player.Input.AttackPressId == attackPress && !player.Input.AttackBuffer.IsActive,
                 "Clicking the shop also entered a gameplay attack.");
             Check(run.IsShopOpen && Mathf.Approximately(Time.timeScale, 0f), "Purchasing released the modal unexpectedly.");
 
+            // The view remembers its folded/filter state across real opens. With three stock
+            // cards the collapsed three-column layout legitimately has no scroll range.
+            if (!view.BuyInventoryExpanded) yield return KeyPress(keyboard, Key.Tab);
+            yield return Click(mouse, boundary.StockFilters[0], events);
+            yield return Frames(2);
+            Canvas.ForceUpdateCanvases();
+            Check(view.BuyInventoryExpanded && boundary.StockGrid.constraintCount == 2,
+                "The wheel fixture did not restore the expanded two-column stock layout.");
             Check(scroll.content.rect.height > scroll.viewport.rect.height + 1f,
                 "The fixture needs overflowing offers to verify actual wheel scrolling.");
             Vector2 viewportCenter = ScreenCenter(scroll.viewport);
@@ -175,11 +194,9 @@ public static class ShopPointerRegression
             yield return Wheel(mouse, viewportCenter, -1200f);
             Check(Mathf.Abs(scroll.content.anchoredPosition.y - yBeforeScroll) > 0.5f,
                 "Real wheel events did not move the offer content while gameplay was paused.");
-            var healRow = view.GetComponentsInChildren<ShopOfferView>(false).Single(row => Field<string>(row, "_id") == heal.Id);
-            var healButton = Field<Button>(healRow, "purchaseButton");
-            Vector2 healingCenter = ScreenCenter(healButton.transform as RectTransform);
-            Check(RectTransformUtility.RectangleContainsScreenPoint(scroll.viewport, healingCenter, null),
-                "Scrolling did not bring the healing button inside the visible viewport.");
+            var healButton = boundary.HealingButton;
+            Check(healButton != null && healButton.gameObject.activeInHierarchy,
+                "The separate healing service is not visible below stock.");
             float maxHp = player.StatManager.MaxHp;
             player.StatManager.Heal(maxHp);
             player.StatManager.ConsumeHealth(maxHp * 0.4f);
@@ -192,12 +209,23 @@ public static class ShopPointerRegression
             Check(Mathf.Abs(player.StatManager.CurrentHp - Mathf.Min(maxHp, hpBefore + maxHp * shop.settings.healingFraction)) < 0.01f,
                 "The pointer healing purchase restored the wrong HP amount.");
 
+            Check(view.BuyInventoryExpanded, "The buy inventory should initially be expanded.");
+            yield return KeyPress(keyboard, Key.Tab);
+            Check(!view.BuyInventoryExpanded && run.IsShopOpen && !run.IsMapOpen && Mathf.Approximately(Time.timeScale, 0f),
+                "Tab did not fold only the buy inventory while keeping the shop paused.");
+            yield return KeyPress(keyboard, Key.Tab);
+            Check(view.BuyInventoryExpanded && run.IsShopOpen && boundary.OwnedPanel.gameObject.activeInHierarchy,
+                "Tab did not restore the buy inventory.");
+            yield return KeyPress(keyboard, Key.Escape);
+            Check(run.IsShopOpen && player.IsShopPaused && !view.BuyInventoryExpanded && panel.activeInHierarchy,
+                "The first Escape did not fold expanded buy inventory before closing.");
             yield return KeyPress(keyboard, Key.Escape);
             Check(!run.IsShopOpen && !player.IsShopPaused && !panel.activeInHierarchy,
                 "A real virtual Escape press did not close the shop.");
             Check(Mathf.Approximately(Time.timeScale, 1f) && Cursor.lockState == CursorLockMode.Locked && !Cursor.visible,
                 "Escape did not restore world time and the gameplay cursor.");
             Check(prompt.activeInHierarchy && shop.IsInRange, "Closing did not restore the in-range interaction prompt.");
+            Check(boundary.Backdrop == null || !boundary.Backdrop.IsShown, "Closing left the captured modal backdrop active.");
 
             // Keep the player still and the cached in-range value unchanged across component lifecycle.
             shop.enabled = false;

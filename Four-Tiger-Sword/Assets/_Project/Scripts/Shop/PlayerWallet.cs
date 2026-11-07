@@ -7,6 +7,7 @@ public sealed class PlayerWallet : MonoBehaviour
 {
     public int Gold { get; private set; }
     public event Action<int> GoldChanged;
+    public event Action<int> GoldGained;
     internal bool IsInitialized { get; private set; }
     private bool _transactionInProgress;
 
@@ -27,6 +28,7 @@ public sealed class PlayerWallet : MonoBehaviour
         if (amount == 0) return true;
         Gold += amount;
         NotifyGoldChanged();
+        NotifyGoldGained(amount);
         return true;
     }
 
@@ -55,6 +57,33 @@ public sealed class PlayerWallet : MonoBehaviour
             return true;
         }
         finally { _transactionInProgress = false; }
+    }
+
+    /// <summary>Preflights credit capacity before consuming the sold item; callbacks cannot reenter the wallet.</summary>
+    internal bool TrySale(int amount, Func<bool> fulfill)
+    {
+        if (!IsInitialized || _transactionInProgress || amount < 0 || amount > int.MaxValue - Gold
+            || fulfill == null) return false;
+        _transactionInProgress = true;
+        try
+        {
+            if (!fulfill()) return false;
+            Gold += amount;
+            if (amount != 0) NotifyGoldChanged();
+            if (amount != 0) NotifyGoldGained(amount);
+            return true;
+        }
+        finally { _transactionInProgress = false; }
+    }
+
+    private void NotifyGoldGained(int amount)
+    {
+        if (GoldGained == null) return;
+        foreach (Action<int> callback in GoldGained.GetInvocationList())
+        {
+            try { callback(amount); }
+            catch (Exception error) { Debug.LogWarning("[Shop] GoldGained observer failed: " + error, this); }
+        }
     }
 
     private void NotifyGoldChanged()

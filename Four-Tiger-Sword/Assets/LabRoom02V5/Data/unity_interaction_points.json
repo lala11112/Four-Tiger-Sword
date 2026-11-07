@@ -1,0 +1,31 @@
+{
+  "coordinates": "Unity meters X right Y up Z forward",
+  "assets": [
+    {
+      "id": 32,
+      "slug": "circular_warp_point",
+      "interaction_role": "map selectable warp destination",
+      "unity_local_destination_m": [
+        0.0,
+        0.18000000715255737,
+        0.0
+      ],
+      "prefab_front": "+Z",
+      "collider_default": "trigger",
+      "note": "Metadata only; no child markers required."
+    },
+    {
+      "id": 33,
+      "slug": "stage_exit_elevator",
+      "interaction_role": "next_stage_exit",
+      "unity_local_destination_m": [
+        0.0,
+        0.5,
+        -0.15
+      ],
+      "prefab_front": "+Z",
+      "collider_default": "trigger",
+      "note": "Metadata only; no child markers required."
+    }
+  ]
+}

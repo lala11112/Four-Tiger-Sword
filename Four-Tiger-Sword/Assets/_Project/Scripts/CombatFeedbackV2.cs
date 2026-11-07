@@ -22,21 +22,27 @@ public sealed class CombatFeedbackHitGate
 }
 
 [Serializable]
-public sealed class CombatCameraV2Settings
+public class CombatCameraHitSettings
 {
     // Distinguishes an explicit default-valued policy/flag from an untouched block.
     public bool Authored;
-    public CombatFeedbackChannelMode Mode;
-    public CombatCameraMotionV2 Motion = new CombatCameraMotionV2();
     public CombatCameraImpactV2 Impact = new CombatCameraImpactV2();
     public CombatCameraShakeV2 Shake = new CombatCameraShakeV2();
     public CombatFeedbackTriggerPolicy TriggerPolicy = CombatFeedbackTriggerPolicy.FirstPerHitEvent;
     public bool PreserveFeelFlash = true;
 
-    public bool HasOverrides => Authored || Mode != CombatFeedbackChannelMode.Inherit
-        || (Impact != null && Impact.Mode != CombatFeedbackChannelMode.Inherit)
+    public virtual bool HasOverrides => Authored || (Impact != null && Impact.Mode != CombatFeedbackChannelMode.Inherit)
         || (Shake != null && Shake.Mode != CombatFeedbackChannelMode.Inherit)
         || !PreserveFeelFlash || TriggerPolicy != CombatFeedbackTriggerPolicy.FirstPerHitEvent;
+}
+
+[Serializable]
+public sealed class CombatCameraV2Settings : CombatCameraHitSettings
+{
+    public CombatFeedbackChannelMode Mode;
+    public CombatCameraMotionV2 Motion = new CombatCameraMotionV2();
+
+    public override bool HasOverrides => base.HasOverrides || Mode != CombatFeedbackChannelMode.Inherit;
 
     public static CombatCameraV2Settings Resolve(AttackCameraProfile profile, CombatCameraV2Settings inline)
     {

@@ -2,6 +2,23 @@
 
 Source: 플레이어 무기 폼(Form) 스킬 상세 명세 및 모션, 5 pages.
 
+## 조건부 교체 스킬 (F)
+
+숫자키/Q는 기존 SP 비용과 공유 2초 쿨타임을 사용하는 폼 교체만 수행합니다. 자동 공격과 숫자키 패링 전환은 제거했으며 토 폼의 방어/반격은 유지합니다.
+
+- 화: 다른 폼의 일반 콤보 마지막 단계 또는 피니셔가 실제 적중하면 5초 동안 준비됩니다. F 사용 시 공격력 +30%를 20초 부여합니다.
+- 수: 대시 무적 구간에 실제 적 공격을 피하면 5초 동안 준비됩니다. F 사용 시 공격속도 +25%를 20초 부여하고, 교체 공격에 맞은 적에게 받는 피해 +15%를 적중 시점부터 20초 부여합니다. 목 취약과 독립적으로 곱하며 보스 취약 면역을 따릅니다.
+- F는 준비된 비현재 폼 중 가장 최근의 사용 가능한 대상을 선택합니다. 준비는 폼별 1회이며 재충족 시 5초로 갱신됩니다. SP와 E 자원/쿨타임, 일반 교체 쿨타임을 사용하지 않습니다.
+- 플레이어 버프는 다른 폼에서도 유지되고 동일 효과는 중첩 대신 시간을 갱신합니다. 게임 시간 기준이며 지도/상점 일시정지 중에는 멈춥니다. 사망/비활성화는 정리하고, 스테이지 이동은 준비만 초기화합니다.
+- F 입력은 0.15초 버퍼를 사용합니다. 대기/이동, 완료된 회피, 일반 공격의 행동 취소 가능 후딜과 완료된 피니셔에서 실행합니다. 이전 상태를 종료한 뒤 폼을 교체하고 새 공격을 시작합니다.
+- 상점 상호작용도 F를 사용하므로 상점 열기를 전투 입력 처리보다 먼저 실행합니다. 상점이 열리면 같은 입력으로 교체 스킬이 발동하지 않고 준비 기회는 보존됩니다.
+
+각 폼 SO의 **연계 스킬 (Chain Skill)**에서 조건, 준비 유지 시간, 버프 시간을 조정합니다. **공격 목록 (Actions) > 교체 스킬 (Switch Attack)**에 전용 `WeaponActionData` 목록을 지정합니다. 화/수 슬롯은 의도적으로 비어 있고 E 데이터를 대신 사용하지 않습니다. 비어 있는 상태에서도 준비 HUD는 표시하지만 F 대상에는 포함되지 않습니다. 목/금/토는 공통 설정만 제공하며 기본 비활성입니다.
+
+HUD는 기존 오행 표시 아래에서 준비된 화/수의 남은 시간을 표시하고 실행 가능한 F 대상을 강조합니다. `FormManager.GetChainReadyRemaining(element)`와 `ReadyChainSkill`이 상태의 원본입니다. HUD 재연결은 `BoundaryZeroHudSetup.ApplyChainSkills()`로 수행합니다.
+
+회귀 진입점: Edit Mode의 `FormChainRegression.Run()`, `FormChainEffectsRegression.Run()`, `ChainSkillHudRegression.Run()`, `BaekhoItemCombatRegression.Run()`; Play Mode의 `BaekhoItemFlowRegression.RunPlayMode()`, `BaekhoItemCombatRegression.RunPlayMode()`. 검사에서는 임시 전용 공격을 사용하며 실제 화/수 슬롯에 모션을 생성하거나 복사하지 않습니다.
+
 ## Scope
 
 This update fills missing mechanics and empty attack data. Existing Fire/Wood basic attack timings, damage and thrust curves, Fire skill's authored three-hit sequence, and Water's existing first combo step and dash initial damage are retained. They are not a full rebalance to the PDF's numerical tables.

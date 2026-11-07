@@ -89,7 +89,428 @@ MonoBehaviour:
   ReturnDuration: 0.3
   CancelDuration: 0.12
   HitImpulse: 0.33600003
-  FeelFeedbackPrefab: {fileID: 6815743324412404434, guid: 06935012018fa294c98618ab8ae2f5f3, type: 3}
+  FeelFeedbackPrefab: {fileID: 0}
+  EnableV2: 0
+  V2:
+    Authored: 0
+    Impact:
+      Mode: 0
+      Delay: 0
+      Duration: 0.15
+      Clock: 2
+      Space: 0
+      Stacking: 1
+      FovOffset:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      PositionX:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      PositionY:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      PositionZ:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      RotationX:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      RotationY:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      RotationZ:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+    Shake:
+      Mode: 0
+      Translation: {x: 0, y: 0, z: 0}
+      Rotation: {x: 0, y: 0, z: 0}
+      Frequency: 25
+      Delay: 0
+      Duration: 0.15
+      Envelope:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: -1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: -1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      Clock: 2
+      Space: 0
+      Stacking: 1
+      Seed: 17
+    TriggerPolicy: 1
+    PreserveFeelFlash: 1
+    Mode: 0
+    Motion:
+      FovOffset:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      PositionX:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      PositionY:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      PositionZ:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      RotationX:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      RotationY:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      RotationZ:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      FramingWeight:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      TargetWeight: 0.35
+      MaxTargetDistance: 12
+      MaxFramingOffset: 2.5
+      DirectionLookAhead: 0
+      ResponseTime: 0.08
+      ReturnDuration: 0.3
+      CancelDuration: 0.12
+      Space: 0
+      Clock: 1
+      ReturnClock: 2
+      PreserveChainViewDirection: 1
+      UseFeelZoom: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -102,10 +523,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5f3de366a60d6048a74f5a12932b470, type: 3}
   m_Name: WaterFormActionSO_V2
   m_EditorClassIdentifier: Assembly-CSharp::WeaponActionDataSO
-  WeaponName: 
   Actions:
     ComboSteps:
     - Balance:
+        EnableV2: 0
         Damage: 0
         PoiseDamage: 0
         KnockbackForce: 6.6000004
@@ -114,6 +535,8 @@ MonoBehaviour:
         AnimationName: Water1
         Duration: 1.433
         ComboTransitionTime: 1
+        RecoveryCancelTime: -1
+        ActionCancelTime: -1
         HitStartTime: 0
         HitDuration: 0
         Hitbox:
@@ -201,7 +624,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
           Accent: {fileID: 0}
@@ -215,9 +637,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 1
           HitStopDuration: 0.05
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 1
@@ -235,21 +660,25 @@ MonoBehaviour:
           FollowPlayer: 1
           AlternateDirection: 1
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.001
           OverrideCameraShakeDirection: 1
           CameraShakeDirection: {x: -1, y: 0, z: 0}
       HitEvents:
       - Balance:
+          EnableV2: 0
           Damage: 1
           PoiseDamage: 20
-          StaggerResistLevel: 3
           OverrideKnockbackForce: 1
           KnockbackForce: 13.75
         Execution:
           StartTime: 0.43
           Duration: 0.05
         Feedback:
+          CameraV2:
+            rid: -2
           OverrideSlashVFX: 1
           Slash:
             SlashVFX: {fileID: 1872147318604286, guid: 5bea49531fc500c408823a2e2863106f, type: 3}
@@ -280,19 +709,24 @@ MonoBehaviour:
             Scale: {x: 1, y: 1, z: 1}
             Rotation: {x: 0, y: 90, z: 0}
           HitStop:
+            EnableV2: 0
             OverrideHitStop: 0
             HitStopDuration: 0.08
             HitStopTimeScale: 0.05
+            Scope: 0
+            Stacking: 0
       - Balance:
+          EnableV2: 0
           Damage: 1
           PoiseDamage: 20
-          StaggerResistLevel: 3
           OverrideKnockbackForce: 1
           KnockbackForce: 16.5
         Execution:
           StartTime: 0.63
           Duration: 0.05
         Feedback:
+          CameraV2:
+            rid: -2
           OverrideSlashVFX: 1
           Slash:
             SlashVFX: {fileID: 1872147318604286, guid: 5bea49531fc500c408823a2e2863106f, type: 3}
@@ -323,10 +757,14 @@ MonoBehaviour:
             Scale: {x: 1, y: 1, z: 1}
             Rotation: {x: 0, y: 90, z: 0}
           HitStop:
+            EnableV2: 0
             OverrideHitStop: 0
             HitStopDuration: 0.08
             HitStopTimeScale: 0.05
+            Scope: 0
+            Stacking: 0
     - Balance:
+        EnableV2: 0
         Damage: 0.6
         PoiseDamage: 0
         KnockbackForce: 5.3999996
@@ -335,6 +773,8 @@ MonoBehaviour:
         AnimationName: Water2
         Duration: 1.4
         ComboTransitionTime: 1
+        RecoveryCancelTime: -1
+        ActionCancelTime: -1
         HitStartTime: 0
         HitDuration: 0
         Hitbox:
@@ -422,7 +862,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
           Accent: {fileID: 0}
@@ -436,9 +875,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 1
           HitStopDuration: 0.065
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 1
@@ -456,21 +898,25 @@ MonoBehaviour:
           FollowPlayer: 1
           AlternateDirection: 1
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.0021000002
           OverrideCameraShakeDirection: 1
           CameraShakeDirection: {x: 1, y: 0, z: 0}
       HitEvents:
       - Balance:
+          EnableV2: 0
           Damage: 0.6
           PoiseDamage: 10
-          StaggerResistLevel: 2
           OverrideKnockbackForce: 1
           KnockbackForce: 9
         Execution:
           StartTime: 0.33
           Duration: 0.04
         Feedback:
+          CameraV2:
+            rid: -2
           OverrideSlashVFX: 1
           Slash:
             SlashVFX: {fileID: 1872147318604286, guid: 5bea49531fc500c408823a2e2863106f, type: 3}
@@ -501,19 +947,24 @@ MonoBehaviour:
             Scale: {x: 1, y: 1, z: 1}
             Rotation: {x: 0, y: 0, z: 0}
           HitStop:
+            EnableV2: 0
             OverrideHitStop: 0
             HitStopDuration: 0.08
             HitStopTimeScale: 0.05
+            Scope: 0
+            Stacking: 0
       - Balance:
+          EnableV2: 0
           Damage: 0.6
           PoiseDamage: 10
-          StaggerResistLevel: 2
           OverrideKnockbackForce: 1
           KnockbackForce: 13.5
         Execution:
           StartTime: 0.56
           Duration: 0.04
         Feedback:
+          CameraV2:
+            rid: -2
           OverrideSlashVFX: 1
           Slash:
             SlashVFX: {fileID: 1872147318604286, guid: 5bea49531fc500c408823a2e2863106f, type: 3}
@@ -544,10 +995,14 @@ MonoBehaviour:
             Scale: {x: 1, y: 1, z: 1}
             Rotation: {x: 0, y: 0, z: 0}
           HitStop:
+            EnableV2: 0
             OverrideHitStop: 0
             HitStopDuration: 0.08
             HitStopTimeScale: 0.05
+            Scope: 0
+            Stacking: 0
     - Balance:
+        EnableV2: 0
         Damage: 0.6
         PoiseDamage: 0
         KnockbackForce: 15.599999
@@ -556,6 +1011,8 @@ MonoBehaviour:
         AnimationName: Water3
         Duration: 1.55
         ComboTransitionTime: 0
+        RecoveryCancelTime: -1
+        ActionCancelTime: -1
         HitStartTime: 0
         HitDuration: 0
         Hitbox:
@@ -670,7 +1127,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
           Accent: {fileID: 0}
@@ -684,9 +1140,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 1
           HitStopDuration: 0.085
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 1
@@ -704,21 +1163,25 @@ MonoBehaviour:
           FollowPlayer: 1
           AlternateDirection: 0
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.031499997
           OverrideCameraShakeDirection: 1
           CameraShakeDirection: {x: 0, y: 1, z: 0}
       HitEvents:
       - Balance:
+          EnableV2: 0
           Damage: 0.6
           PoiseDamage: 10
-          StaggerResistLevel: 2
           OverrideKnockbackForce: 1
           KnockbackForce: 32.5
         Execution:
           StartTime: 0.43
           Duration: 0.04
         Feedback:
+          CameraV2:
+            rid: -2
           OverrideSlashVFX: 1
           Slash:
             SlashVFX: {fileID: 1610259402245616, guid: 09a2baab97fbf474f9499bf610686e4d, type: 3}
@@ -749,19 +1212,24 @@ MonoBehaviour:
             Scale: {x: 1, y: 1, z: 1}
             Rotation: {x: 0, y: 0, z: 0}
           HitStop:
+            EnableV2: 0
             OverrideHitStop: 0
             HitStopDuration: 0.08
             HitStopTimeScale: 0.05
+            Scope: 0
+            Stacking: 0
       - Balance:
+          EnableV2: 0
           Damage: 0.6
           PoiseDamage: 10
-          StaggerResistLevel: 3
           OverrideKnockbackForce: 1
           KnockbackForce: 45.5
         Execution:
           StartTime: 1
           Duration: 0.04
         Feedback:
+          CameraV2:
+            rid: -2
           OverrideSlashVFX: 1
           Slash:
             SlashVFX: {fileID: 1610259402245616, guid: 09a2baab97fbf474f9499bf610686e4d, type: 3}
@@ -792,11 +1260,17 @@ MonoBehaviour:
             Scale: {x: 1, y: 1, z: 1}
             Rotation: {x: 0, y: 0, z: 0}
           HitStop:
+            EnableV2: 0
             OverrideHitStop: 0
             HitStopDuration: 0.08
             HitStopTimeScale: 0.05
+            Scope: 0
+            Stacking: 0
+    FinisherStep:
+      rid: -2
     AirAttackStep:
       Balance:
+        EnableV2: 0
         Damage: 10
         PoiseDamage: 10
         KnockbackForce: 1
@@ -805,6 +1279,8 @@ MonoBehaviour:
         AnimationName: WaterAirEnd
         Duration: 0.5
         ComboTransitionTime: 0.3
+        RecoveryCancelTime: -1
+        ActionCancelTime: -1
         HitStartTime: 0.1
         HitDuration: 0.1
         Hitbox:
@@ -883,7 +1359,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
           Accent: {fileID: 8300000, guid: 99695530f8af0494381257ec2c979227, type: 3}
@@ -897,9 +1372,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 0
           HitStopDuration: 0.08
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 0
@@ -917,6 +1395,8 @@ MonoBehaviour:
           FollowPlayer: 1
           AlternateDirection: 1
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 1
           OverrideCameraShakeDirection: 0
@@ -924,6 +1404,7 @@ MonoBehaviour:
       HitEvents: []
     CounterStep:
       Balance:
+        EnableV2: 0
         Damage: 10
         PoiseDamage: 10
         KnockbackForce: 8
@@ -932,6 +1413,8 @@ MonoBehaviour:
         AnimationName: WaterSkill
         Duration: 1.2
         ComboTransitionTime: 0
+        RecoveryCancelTime: -1
+        ActionCancelTime: -1
         HitStartTime: 0.5
         HitDuration: 0.1
         Hitbox:
@@ -1019,7 +1502,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
           Accent: {fileID: 0}
@@ -1033,9 +1515,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 0
           HitStopDuration: 0.08
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 0
@@ -1053,6 +1538,8 @@ MonoBehaviour:
           FollowPlayer: 1
           AlternateDirection: 0
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.05
           OverrideCameraShakeDirection: 0
@@ -1060,6 +1547,7 @@ MonoBehaviour:
       HitEvents: []
     SkillSteps:
     - Balance:
+        EnableV2: 0
         Damage: 2
         PoiseDamage: 10
         KnockbackForce: 3
@@ -1068,6 +1556,8 @@ MonoBehaviour:
         AnimationName: WaterSkill
         Duration: 0.9
         ComboTransitionTime: 0
+        RecoveryCancelTime: -1
+        ActionCancelTime: -1
         HitStartTime: 0.15
         HitDuration: 1.7
         Hitbox:
@@ -1155,7 +1645,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
           Accent: {fileID: 8300000, guid: 99695530f8af0494381257ec2c979227, type: 3}
@@ -1169,9 +1658,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 0
           HitStopDuration: 0.08
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 0
@@ -1189,13 +1681,17 @@ MonoBehaviour:
           FollowPlayer: 1
           AlternateDirection: 0
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.05
           OverrideCameraShakeDirection: 0
           CameraShakeDirection: {x: 0, y: -1, z: 0}
       HitEvents: []
+    SwitchAttackSteps: []
     UltimateSteps:
     - Balance:
+        EnableV2: 0
         Damage: 1.2
         PoiseDamage: 20
         KnockbackForce: 3
@@ -1204,6 +1700,8 @@ MonoBehaviour:
         AnimationName: 
         Duration: 2.1
         ComboTransitionTime: 2
+        RecoveryCancelTime: -1
+        ActionCancelTime: -1
         HitStartTime: 0.2
         HitDuration: 1.8
         Hitbox:
@@ -1282,7 +1780,6 @@ MonoBehaviour:
           Prefab: {fileID: 0}
           Scale: {x: 1, y: 1, z: 1}
           Rotation: {x: 0, y: 0, z: 0}
-        SwingSound: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
         SwingAudio:
           Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
           Accent: {fileID: 0}
@@ -1296,9 +1793,12 @@ MonoBehaviour:
           AccentVolume: 0.28
           PitchRange: {x: 0.97, y: 1.03}
         HitStop:
+          EnableV2: 0
           OverrideHitStop: 0
           HitStopDuration: 0.08
           HitStopTimeScale: 0.05
+          Scope: 0
+          Stacking: 0
         Trail:
           DisableTrail: 0
           UseCustomTrailTiming: 0
@@ -1316,6 +1816,8 @@ MonoBehaviour:
           FollowPlayer: 0
           AlternateDirection: 1
         Camera:
+          V2:
+            rid: -2
           CameraProfile: {fileID: 0}
           CameraShakeStrength: 0.05
           OverrideCameraShakeDirection: 0
@@ -1323,6 +1825,13 @@ MonoBehaviour:
       HitEvents: []
   CommonBalance:
     UltimateCooldown: 25
+    FormSp:
+      MaxSp: 100
+      DepletionSeconds: 30
+      RecoverySeconds: 20
+      ExhaustionRecoveryRatio: 0.2
+      ExhaustedAttackMultiplier: 0.8
+      ExhaustedAttackSpeedMultiplier: 0.8
   CommonExecution:
     ParryAnimationName: WaterParry
     AirAttackStartAnimationName: WaterAirStart
@@ -1330,7 +1839,6 @@ MonoBehaviour:
     AirAttackLoopAnimationName: WaterAtrIdle
   CommonFeedback:
     HitVFX: {fileID: 1367524815892938, guid: 40f5e004d2504a04db181f5453658776, type: 3}
-    HitSound: {fileID: 8300000, guid: f30bda0bed69a24409ddf7764db26d51, type: 3}
     HitAudio:
       Clip: {fileID: 8300000, guid: f30bda0bed69a24409ddf7764db26d51, type: 3}
       Accent: {fileID: 0}
@@ -1343,6 +1851,15 @@ MonoBehaviour:
       Volume: 0.48
       AccentVolume: 0.28
       PitchRange: {x: 0.97, y: 1.03}
+  ChainSettings:
+    Enabled: 1
+    Trigger: 2
+    ReadyDuration: 5
+    BuffDuration: 20
+    AttackBonusPercent: 0
+    AttackSpeedBonusPercent: 25
+    VulnerabilityBonusPercent: 15
+  _chainSettingsVersion: 1
   FormBalance:
     WaterGaugePerSegment: 100
     WaterNormalHitGain: 12
@@ -1356,10 +1873,9 @@ MonoBehaviour:
     WaterHeavyDashDuration: 0.35
     WaterHeavyTargetOvershoot: 1
     AreaRadius: 4
-  FormFeedback:
-    DelayedHitVFX: {fileID: 0}
   HeavyAttackStep:
     Balance:
+      EnableV2: 0
       Damage: 2.4
       PoiseDamage: 40
       KnockbackForce: 0
@@ -1368,6 +1884,8 @@ MonoBehaviour:
       AnimationName: WaterSkill
       Duration: 0.8
       ComboTransitionTime: 0
+      RecoveryCancelTime: -1
+      ActionCancelTime: -1
       HitStartTime: 0
       HitDuration: 0.35
       Hitbox:
@@ -1446,7 +1964,6 @@ MonoBehaviour:
         Prefab: {fileID: 0}
         Scale: {x: 1, y: 1, z: 1}
         Rotation: {x: 0, y: 0, z: 0}
-      SwingSound: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
       SwingAudio:
         Clip: {fileID: 8300000, guid: 6e2caf29e37d6b9438ac314ec40a622b, type: 3}
         Accent: {fileID: 0}
@@ -1460,9 +1977,12 @@ MonoBehaviour:
         AccentVolume: 0.28
         PitchRange: {x: 0.97, y: 1.03}
       HitStop:
+        EnableV2: 0
         OverrideHitStop: 1
         HitStopDuration: 0.09
         HitStopTimeScale: 0.05
+        Scope: 0
+        Stacking: 0
       Trail:
         DisableTrail: 0
         UseCustomTrailTiming: 0
@@ -1480,8 +2000,15 @@ MonoBehaviour:
         FollowPlayer: 1
         AlternateDirection: 0
       Camera:
+        V2:
+          rid: -2
         CameraProfile: {fileID: -4481314836165393723}
         CameraShakeStrength: 0.28
         OverrideCameraShakeDirection: 0
         CameraShakeDirection: {x: 0, y: -1, z: 0}
     HitEvents: []
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }

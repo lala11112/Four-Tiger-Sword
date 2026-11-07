@@ -1,0 +1,554 @@
+{
+  "id": "HealingStation",
+  "heightMeters": 1.95,
+  "modelFile": "HealingStation.fbx",
+  "front": "Blender -Y; Unity infer exported Basis markers",
+  "parts": [
+    {
+      "name": "Body",
+      "pivotBlender": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "role": "static",
+      "triangles": 30840
+    },
+    {
+      "name": "Healing_Emitter_Carriage",
+      "pivotBlender": [
+        0.0,
+        -0.2750000059604645,
+        1.3799999952316284
+      ],
+      "role": "moving",
+      "triangles": 1324
+    },
+    {
+      "name": "Healing_Active_Beam",
+      "pivotBlender": [
+        0.0,
+        -0.30000001192092896,
+        1.0750000476837158
+      ],
+      "role": "moving",
+      "triangles": 156
+    }
+  ],
+  "clips": [
+    {
+      "name": "Use",
+      "duration": 4,
+      "loop": false,
+      "rewardTime": 2,
+      "tracks": [
+        {
+          "part": "Healing_Emitter_Carriage",
+          "kind": "move",
+          "axis": "Z",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.0
+            },
+            {
+              "time": 0.7,
+              "value": 0.0
+            },
+            {
+              "time": 1.15,
+              "value": -0.03999999902187252
+            },
+            {
+              "time": 3.0,
+              "value": -0.03999999902187252
+            },
+            {
+              "time": 3.65,
+              "value": 0.0
+            },
+            {
+              "time": 4.0,
+              "value": 0.0
+            }
+          ]
+        },
+        {
+          "part": "Healing_Active_Beam",
+          "kind": "scale",
+          "axis": "X",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.001
+            },
+            {
+              "time": 0.7,
+              "value": 0.001
+            },
+            {
+              "time": 1.15,
+              "value": 1.0
+            },
+            {
+              "time": 3.0,
+              "value": 1.0
+            },
+            {
+              "time": 3.45,
+              "value": 0.001
+            },
+            {
+              "time": 4.0,
+              "value": 0.001
+            }
+          ]
+        },
+        {
+          "part": "Healing_Active_Beam",
+          "kind": "scale",
+          "axis": "Y",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.001
+            },
+            {
+              "time": 0.7,
+              "value": 0.001
+            },
+            {
+              "time": 1.15,
+              "value": 1.0
+            },
+            {
+              "time": 3.0,
+              "value": 1.0
+            },
+            {
+              "time": 3.45,
+              "value": 0.001
+            },
+            {
+              "time": 4.0,
+              "value": 0.001
+            }
+          ]
+        },
+        {
+          "part": "Healing_Active_Beam",
+          "kind": "scale",
+          "axis": "Z",
+          "keyframes": [
+            {
+              "time": 0.0,
+              "value": 0.001
+            },
+            {
+              "time": 0.7,
+              "value": 0.001
+            },
+            {
+              "time": 1.15,
+              "value": 1.0
+            },
+            {
+              "time": 3.0,
+              "value": 1.0
+            },
+            {
+              "time": 3.45,
+              "value": 0.001
+            },
+            {
+              "time": 4.0,
+              "value": 0.001
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "EP_dark",
+      "baseColor": [
+        0.02199999988079071,
+        0.03799999877810478,
+        0.06199999898672104,
+        1.0
+      ],
+      "metallic": 0.3499999940395355,
+      "roughness": 0.47999998927116394,
+      "emission": [
+        0.02199999988079071,
+        0.03799999877810478,
+        0.06199999898672104
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_dark_BaseColor.png",
+      "normalTexture": "Textures/EP_dark_Normal.png",
+      "roughnessTexture": "Textures/EP_dark_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_dark_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_steel",
+      "baseColor": [
+        0.08500000089406967,
+        0.13500000536441803,
+        0.20499999821186066,
+        1.0
+      ],
+      "metallic": 0.5799999833106995,
+      "roughness": 0.38999998569488525,
+      "emission": [
+        0.08500000089406967,
+        0.13500000536441803,
+        0.20499999821186066
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_steel_BaseColor.png",
+      "normalTexture": "Textures/EP_steel_Normal.png",
+      "roughnessTexture": "Textures/EP_steel_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_steel_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_rubber",
+      "baseColor": [
+        0.012000000104308128,
+        0.01899999938905239,
+        0.02800000086426735,
+        1.0
+      ],
+      "metallic": 0.05000000074505806,
+      "roughness": 0.699999988079071,
+      "emission": [
+        0.012000000104308128,
+        0.01899999938905239,
+        0.02800000086426735
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_edge",
+      "baseColor": [
+        0.2800000011920929,
+        0.3700000047683716,
+        0.46000000834465027,
+        1.0
+      ],
+      "metallic": 0.7200000286102295,
+      "roughness": 0.3100000023841858,
+      "emission": [
+        0.2800000011920929,
+        0.3700000047683716,
+        0.46000000834465027
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_edge_BaseColor.png",
+      "normalTexture": "Textures/EP_edge_Normal.png",
+      "roughnessTexture": "Textures/EP_edge_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_edge_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_panel",
+      "baseColor": [
+        0.15000000596046448,
+        0.23000000417232513,
+        0.3199999928474426,
+        1.0
+      ],
+      "metallic": 0.5199999809265137,
+      "roughness": 0.36000001430511475,
+      "emission": [
+        0.15000000596046448,
+        0.23000000417232513,
+        0.3199999928474426
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_panel_BaseColor.png",
+      "normalTexture": "Textures/EP_panel_Normal.png",
+      "roughnessTexture": "Textures/EP_panel_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_panel_MetallicSmoothness.png"
+    },
+    {
+      "name": "EP_silver",
+      "baseColor": [
+        0.49000000953674316,
+        0.5899999737739563,
+        0.6600000262260437,
+        1.0
+      ],
+      "metallic": 0.8199999928474426,
+      "roughness": 0.25999999046325684,
+      "emission": [
+        0.49000000953674316,
+        0.5899999737739563,
+        0.6600000262260437
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": "Textures/EP_silver_BaseColor.png",
+      "normalTexture": "Textures/EP_silver_Normal.png",
+      "roughnessTexture": "Textures/EP_silver_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_silver_MetallicSmoothness.png"
+    },
+    {
+      "name": "HealingStation_clear_vessel_shell",
+      "baseColor": [
+        0.2199999988079071,
+        0.4300000071525574,
+        0.550000011920929,
+        0.054999999701976776
+      ],
+      "metallic": 0.0,
+      "roughness": 0.05999999865889549,
+      "emission": [
+        0.2199999988079071,
+        0.4300000071525574,
+        0.550000011920929
+      ],
+      "emissionStrength": 0.0,
+      "transparent": true,
+      "texture": ""
+    },
+    {
+      "name": "EP_green",
+      "baseColor": [
+        0.03999999910593033,
+        0.5799999833106995,
+        0.27000001072883606,
+        1.0
+      ],
+      "metallic": 0.05000000074505806,
+      "roughness": 0.23000000417232513,
+      "emission": [
+        0.03999999910593033,
+        0.5799999833106995,
+        0.27000001072883606
+      ],
+      "emissionStrength": 0.800000011920929,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "HealingStation_greenlight",
+      "baseColor": [
+        0.05000000074505806,
+        1.0,
+        0.3499999940395355,
+        1.0
+      ],
+      "metallic": 0.05000000074505806,
+      "roughness": 0.23000000417232513,
+      "emission": [
+        0.05000000074505806,
+        1.0,
+        0.3499999940395355
+      ],
+      "emissionStrength": 2.5,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_screen",
+      "baseColor": [
+        0.00800000037997961,
+        0.054999999701976776,
+        0.11500000208616257,
+        1.0
+      ],
+      "metallic": 0.20000000298023224,
+      "roughness": 0.30000001192092896,
+      "emission": [
+        0.00800000037997961,
+        0.054999999701976776,
+        0.11500000208616257
+      ],
+      "emissionStrength": 0.15000000596046448,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_cyan",
+      "baseColor": [
+        0.014999999664723873,
+        0.6399999856948853,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.10000000149011612,
+      "roughness": 0.23999999463558197,
+      "emission": [
+        0.014999999664723873,
+        0.6399999856948853,
+        1.0
+      ],
+      "emissionStrength": 2.200000047683716,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_ink",
+      "baseColor": [
+        0.012000000104308128,
+        0.02800000086426735,
+        0.04600000008940697,
+        1.0
+      ],
+      "metallic": 0.3499999940395355,
+      "roughness": 0.41999998688697815,
+      "emission": [
+        0.012000000104308128,
+        0.02800000086426735,
+        0.04600000008940697
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_rim",
+      "baseColor": [
+        0.47999998927116394,
+        0.6399999856948853,
+        0.7200000286102295,
+        1.0
+      ],
+      "metallic": 0.7799999713897705,
+      "roughness": 0.25,
+      "emission": [
+        0.47999998927116394,
+        0.6399999856948853,
+        0.7200000286102295
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_green",
+      "baseColor": [
+        0.02500000037252903,
+        0.41999998688697815,
+        0.23000000417232513,
+        1.0
+      ],
+      "metallic": 0.3499999940395355,
+      "roughness": 0.25999999046325684,
+      "emission": [
+        0.02500000037252903,
+        0.41999998688697815,
+        0.23000000417232513
+      ],
+      "emissionStrength": 0.12999999523162842,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_greenlight",
+      "baseColor": [
+        0.20000000298023224,
+        0.8700000047683716,
+        0.5400000214576721,
+        1.0
+      ],
+      "metallic": 0.30000001192092896,
+      "roughness": 0.2199999988079071,
+      "emission": [
+        0.20000000298023224,
+        0.8700000047683716,
+        0.5400000214576721
+      ],
+      "emissionStrength": 0.2800000011920929,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_Icon_white",
+      "baseColor": [
+        0.699999988079071,
+        0.9399999976158142,
+        1.0,
+        1.0
+      ],
+      "metallic": 0.30000001192092896,
+      "roughness": 0.20000000298023224,
+      "emission": [
+        0.699999988079071,
+        0.9399999976158142,
+        1.0
+      ],
+      "emissionStrength": 0.30000001192092896,
+      "transparent": false,
+      "texture": ""
+    },
+    {
+      "name": "EP_amber",
+      "baseColor": [
+        0.7799999713897705,
+        0.4399999976158142,
+        0.11999999731779099,
+        1.0
+      ],
+      "metallic": 0.6200000047683716,
+      "roughness": 0.2800000011920929,
+      "emission": [
+        0.7799999713897705,
+        0.4399999976158142,
+        0.11999999731779099
+      ],
+      "emissionStrength": 0.05999999865889549,
+      "transparent": false,
+      "texture": "Textures/EP_amber_BaseColor.png",
+      "normalTexture": "Textures/EP_amber_Normal.png",
+      "roughnessTexture": "Textures/EP_amber_Roughness.png",
+      "metallicSmoothnessTexture": "Textures/EP_amber_MetallicSmoothness.png"
+    },
+    {
+      "name": "Healing transparent beam.001",
+      "baseColor": [
+        0.03999999910593033,
+        1.0,
+        0.18000000715255737,
+        0.12999999523162842
+      ],
+      "metallic": 0.05000000074505806,
+      "roughness": 0.23000000417232513,
+      "emission": [
+        0.03999999910593033,
+        1.0,
+        0.18000000715255737
+      ],
+      "emissionStrength": 0.5,
+      "transparent": true,
+      "texture": ""
+    }
+  ],
+  "boundsBlender": [
+    [
+      -0.550000011920929,
+      -0.4659999907016754,
+      0.0
+    ],
+    [
+      0.5499999523162842,
+      0.40049996972084045,
+      1.9500000476837158
+    ]
+  ],
+  "triangles": 32320,
+  "metadata": {
+    "interactionHeightMeters": 1.05,
+    "defaultState": "Idle",
+    "construction": "Solid chamfered rigid meshes, real fluid vessels, geometric status icons",
+    "animationDescription": "Emitter lowers; healing beam appears above palm console; returns to idle"
+  },
+  "normalizationScale": 0.999999975546813
+}

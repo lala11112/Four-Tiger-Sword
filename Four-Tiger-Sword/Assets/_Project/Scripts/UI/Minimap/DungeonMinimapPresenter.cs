@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using StudioBaekho;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>Connects the run-owned stage to a presentation-only exploration map.</summary>
 [DisallowMultipleComponent]
@@ -7,35 +9,117 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
 {
     [SerializeField] private RunManager run;
     [SerializeField] private DungeonMinimapView view;
+    [SerializeField] private DungeonMinimapView fullMapView;
 
     private readonly DungeonMinimapModel _model = new DungeonMinimapModel();
+    private readonly List<Vector2> _enemyPositions = new List<Vector2>(16);
+    private DungeonRoomEncounter _enemyRoom;
+    private int _enemyRoomId = -1;
     private RunManager _subscribedRun;
     private StageManager _subscribedStage;
+    private DungeonMinimapView _subscribedFullMapView;
+    private DungeonFastTravelService _travel;
     private BaekhoDungeonResult _result;
     private bool _tracking;
+    private bool _mapReady;
+    private bool _isFullMapOpen;
+    private bool _closingFullMap;
+    private int _closeRevision;
+    private int _labelChapter = -1, _labelStage = -1;
+    private string _stageLabel;
 
     public DungeonMinimapModel Model => _model;
     public DungeonMinimapView View => view;
+    public DungeonMinimapView FullMapView => fullMapView;
+    public bool IsFullMapOpen => _isFullMapOpen;
     public RunManager Run => run;
 
-    public void Configure(RunManager targetRun, DungeonMinimapView targetView)
+    public void Configure(RunManager targetRun, DungeonMinimapView targetView, DungeonMinimapView targetFullMapView = null)
     {
+        CloseFullMap();
         Unsubscribe();
         if (view != null) { view.SetVisible(false); view.Clear(); }
+        if (fullMapView != null) { fullMapView.SetVisible(false); fullMapView.Clear(); }
         run = targetRun;
         view = targetView;
+        fullMapView = targetFullMapView != targetView ? targetFullMapView : null;
         _result = null;
         _model.Reset(null);
+        _travel = run != null ? new DungeonFastTravelService(run, _model) : null;
         _tracking = false;
-        if (view != null) view.SetVisible(false);
+        HideMaps();
         if (isActiveAndEnabled) Subscribe();
+    }
+
+    public void ToggleFullMap()
+    {
+        if (_closingFullMap) return;
+        if (_isFullMapOpen) { RequestCloseFullMap(); return; }
+        if (!CanShowFullMap() || !run.TryOpenMap(this)) return;
+        _isFullMapOpen = true;
+        fullMapView.ShowTravelMessage(null);
+        RefreshVisibility();
+    }
+
+    public void CloseFullMap()
+    {
+        ++_closeRevision;
+        _closingFullMap = false;
+        _isFullMapOpen = false;
+        if (run != null && run.IsMapOpen) run.CloseMap();
+        RefreshVisibility();
+    }
+
+    /// <summary>Normal user dismissal keeps gameplay paused through the visual exit.</summary>
+    public void RequestCloseFullMap()
+    {
+        if (!_isFullMapOpen || _closingFullMap) return;
+        if (!CanShowFullMap() || run == null || !run.IsMapSessionCurrent)
+        { CloseFullMap(); return; }
+        _closingFullMap = true;
+        int revision = ++_closeRevision;
+        fullMapView.PlayClose(() =>
+        {
+            if (revision == _closeRevision && _closingFullMap) CloseFullMap();
+        });
+    }
+
+    private bool CanShowFullMap()
+        => isActiveAndEnabled && _mapReady && fullMapView != null && fullMapView.isActiveAndEnabled
+            && run != null && run.isActiveAndEnabled && run.State == RunState.Playing && !run.IsShopOpen
+            && run.player != null && !run.player.IsStageTransitioning && !run.player.IsFinisherSelecting
+            && run.stageManager != null && ReferenceEquals(_result, run.stageManager.Result);
+
+    private void RefreshVisibility()
+    {
+        if (_isFullMapOpen && (!CanShowFullMap() || !run.IsMapOpen))
+        {
+            CloseFullMap();
+            return;
+        }
+        if (view != null) view.SetVisible(_mapReady && !_isFullMapOpen);
+        if (fullMapView != null) fullMapView.SetVisible(_mapReady && _isFullMapOpen);
+    }
+
+    private void HideMaps()
+    {
+        _stageLabel = null;
+        if (view != null) view.SetStageLabel(string.Empty);
+        _enemyRoom = null;
+        _enemyRoomId = -1;
+        _enemyPositions.Clear();
+        if (view != null) view.SetEnemyPositions(null);
+        _mapReady = false;
+        CloseFullMap();
+        if (view != null) view.SetVisible(false);
+        if (fullMapView != null) fullMapView.SetVisible(false);
     }
 
     private void OnEnable()
     {
         _tracking = false;
         _model.ResetMotionHistory();
-        if (view != null) view.SetVisible(false);
+        HideMaps();
         Subscribe();
     }
 
@@ -44,26 +128,59 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
         Unsubscribe();
         _tracking = false;
         _model.ResetMotionHistory();
-        if (view != null) view.SetVisible(false);
+        HideMaps();
     }
 
     private void Subscribe()
     {
         var stage = run != null ? run.stageManager : null;
-        if (_subscribedRun == run && _subscribedStage == stage) return;
+        if (_subscribedRun == run && _subscribedStage == stage && _subscribedFullMapView == fullMapView) return;
+        if (_subscribedRun != null && _subscribedRun.IsMapOpen) _subscribedRun.CloseMap();
+        bool changedRun = _subscribedRun != run;
         Unsubscribe();
         _subscribedRun = run;
         _subscribedStage = stage;
-        if (_subscribedRun != null) _subscribedRun.StateChanged += OnRunStateChanged;
+        _subscribedFullMapView = fullMapView;
+        if (_travel == null || changedRun)
+        {
+            _travel = run != null ? new DungeonFastTravelService(run, _model) : null;
+            _travel?.Bind(_result);
+        }
+        if (_subscribedRun != null)
+        {
+            _subscribedRun.StateChanged += OnRunStateChanged;
+            _subscribedRun.ShopOpenChanged += OnShopOpenChanged;
+            _subscribedRun.MapOpenChanged += OnMapOpenChanged;
+        }
         if (_subscribedStage != null) _subscribedStage.OnStageStart += OnStageStarted;
+        if (_subscribedFullMapView != null)
+        {
+            _subscribedFullMapView.RoomClicked += OnRoomClicked;
+            _subscribedFullMapView.Disabled += OnFullMapDisabled;
+            _subscribedFullMapView.CloseRequested += RequestCloseFullMap;
+            _subscribedFullMapView.SetTravelAvailability(GetTravelBlockReason);
+        }
     }
 
     private void Unsubscribe()
     {
-        if (_subscribedRun != null) _subscribedRun.StateChanged -= OnRunStateChanged;
+        if (_subscribedRun != null)
+        {
+            _subscribedRun.StateChanged -= OnRunStateChanged;
+            _subscribedRun.ShopOpenChanged -= OnShopOpenChanged;
+            _subscribedRun.MapOpenChanged -= OnMapOpenChanged;
+        }
         if (_subscribedStage != null) _subscribedStage.OnStageStart -= OnStageStarted;
+        if (_subscribedFullMapView != null)
+        {
+            _subscribedFullMapView.RoomClicked -= OnRoomClicked;
+            _subscribedFullMapView.Disabled -= OnFullMapDisabled;
+            _subscribedFullMapView.CloseRequested -= RequestCloseFullMap;
+            _subscribedFullMapView.SetTravelAvailability(null);
+        }
         _subscribedRun = null;
         _subscribedStage = null;
+        _subscribedFullMapView = null;
     }
 
     private void OnRunStateChanged(RunState state)
@@ -71,7 +188,48 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
         if (state == RunState.Playing) return;
         _tracking = false;
         _model.ResetMotionHistory();
-        if (view != null) view.SetVisible(false);
+        HideMaps();
+    }
+
+    private void OnShopOpenChanged(bool open)
+    {
+        if (open) CloseFullMap();
+    }
+
+    private void OnMapOpenChanged(bool open)
+    {
+        if (!open)
+        {
+            ++_closeRevision;
+            _closingFullMap = false;
+        }
+        _isFullMapOpen = open;
+        RefreshVisibility();
+    }
+
+    private void OnFullMapDisabled() => CloseFullMap();
+
+    private string GetTravelBlockReason(int roomId)
+    {
+        if (_travel == null) return "지도를 준비 중입니다.";
+        return _travel.CanTravel(roomId, out string reason) ? null : reason;
+    }
+
+    private void OnRoomClicked(int roomId)
+    {
+        if (!_isFullMapOpen || _closingFullMap || fullMapView == null || fullMapView.IsAnimating
+            || _travel == null || !CanShowFullMap()) return;
+        if (!_travel.TryTravel(roomId, _result, out string reason))
+        {
+            fullMapView.ShowTravelMessage(reason);
+            return;
+        }
+        // The service sampled the destination without revealing the intervening path.
+        _tracking = false;
+        view.RefreshExploration(_model);
+        fullMapView.RefreshExploration(_model);
+        UpdateMap();
+        RequestCloseFullMap();
     }
 
     private void OnStageStarted()
@@ -86,6 +244,11 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
     {
         Subscribe();
         UpdateMap();
+        // Input remains available while the run owns a paused map session.
+        var keyboard = Keyboard.current;
+        if (keyboard == null) return;
+        if (keyboard.escapeKey.wasPressedThisFrame) RequestCloseFullMap();
+        else if (keyboard.tabKey.wasPressedThisFrame) ToggleFullMap();
     }
 
     private void UpdateMap()
@@ -93,13 +256,12 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
         var stage = run != null ? run.stageManager : null;
         var player = run != null ? run.player : null;
         var result = stage != null ? stage.Result : null;
-        if (view == null) return;
-        if (run == null || run.State != RunState.Playing || stage == null || !stage.IsReady
+        if (view == null || run == null || !run.isActiveAndEnabled || run.State != RunState.Playing || stage == null || !stage.IsReady
             || player == null || !player.isActiveAndEnabled || player.IsStageTransitioning
             || result == null || !result.success || result.root == null || result.plan == null
             || stage.Generator == null || stage.Generator.CurrentRoot != result.root)
         {
-            view.SetVisible(false);
+            HideMaps();
             _tracking = false;
             _model.ResetMotionHistory();
             return;
@@ -107,9 +269,16 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
 
         if (!ReferenceEquals(_result, result))
         {
+            CloseFullMap();
             _result = result;
+            _enemyRoom = null;
+            _enemyRoomId = -1;
             _model.Reset(result.plan);
+            _travel ??= new DungeonFastTravelService(run, _model);
+            _travel.Bind(result);
             view.Build(_model);
+            _stageLabel = null;
+            if (fullMapView != null) fullMapView.Build(_model);
             AddMarker(result.shopRoom, result.plan.shopMapId, DungeonMinimapIconGraphic.Symbol.Shop);
             AddMarker(result.endRoom, result.plan.endMapId, DungeonMinimapIconGraphic.Symbol.Exit);
             _tracking = false;
@@ -119,10 +288,79 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
         Vector3 position = root.InverseTransformPoint(player.transform.position);
         Vector3 forward = root.InverseTransformDirection(player.transform.forward);
         var point = new Vector2(position.x, position.z);
-        if (_model.UpdatePosition(point, _tracking)) view.RefreshExploration(_model);
-        view.SetPose(point, new Vector2(forward.x, forward.z));
-        view.SetVisible(true);
+        if (_model.UpdatePosition(point, _tracking))
+        {
+            view.RefreshExploration(_model);
+            if (fullMapView != null) fullMapView.RefreshExploration(_model);
+        }
+        var direction = new Vector2(forward.x, forward.z);
+        view.SetPose(point, direction);
+        if (fullMapView != null) fullMapView.SetPose(point, direction);
+        _mapReady = true;
+        UpdateStageLabel();
+        RefreshVisibility();
+        UpdateEnemies(stage, root);
         _tracking = true;
+    }
+
+    private void UpdateStageLabel()
+    {
+        if (_stageLabel == null || _labelChapter != run.CurrentChapterIndex || _labelStage != run.CurrentStageIndex)
+        {
+            _labelChapter = run.CurrentChapterIndex;
+            _labelStage = run.CurrentStageIndex;
+            _stageLabel = run.ProgressLabel;
+        }
+        view.SetStageLabel(_stageLabel);
+    }
+
+    private void UpdateEnemies(StageManager stage, Transform root)
+    {
+        _enemyPositions.Clear();
+        int index = _model.CurrentAreaIndex;
+        var director = stage.Encounters;
+        if (!view.IsVisible || index < 0 || index >= _model.Areas.Count
+            || _model.Areas[index].Kind != DungeonMinimapAreaKind.Room
+            || director == null || !director.isActiveAndEnabled || !director.IsReady)
+        {
+            _enemyRoom = null;
+            _enemyRoomId = -1;
+            view.SetEnemyPositions(null);
+            return;
+        }
+
+        int roomId = _model.Areas[index].RoomId;
+        if (_enemyRoom == null || _enemyRoomId != roomId || !_enemyRoom.transform.IsChildOf(root))
+        {
+            _enemyRoom = null;
+            _enemyRoomId = roomId;
+            // Resolve only when the room changes; never search every Enemy in the scene.
+            foreach (var room in director.Rooms)
+            {
+                if (room == null || !room.transform.IsChildOf(root)) continue;
+                var identity = room.GetComponent<BaekhoGeneratedRoom>();
+                if (identity == null || identity.instanceId != roomId) continue;
+                _enemyRoom = room;
+                break;
+            }
+        }
+
+        if (_enemyRoom != null && _enemyRoom.isActiveAndEnabled
+            && (_enemyRoom.State == DungeonEncounterState.Waiting || _enemyRoom.State == DungeonEncounterState.Fighting))
+        {
+            var members = _enemyRoom.Members;
+            for (int i = 0; i < members.Count; i++)
+            {
+                var member = members[i];
+                if (member == null || !member.isActiveAndEnabled || member.HasDied || member.IsDead
+                    || member.Enemy == null || !member.Enemy.gameObject.activeInHierarchy) continue;
+                // Dormant AI is still a living enemy in this room. Its world height is irrelevant to the map.
+                Vector3 local = root.InverseTransformPoint(member.Enemy.transform.position);
+                if (float.IsNaN(local.x) || float.IsInfinity(local.x) || float.IsNaN(local.z) || float.IsInfinity(local.z)) continue;
+                _enemyPositions.Add(new Vector2(local.x, local.z));
+            }
+        }
+        view.SetEnemyPositions(_enemyPositions);
     }
 
     private void AddMarker(BaekhoMapModule room, int roomId, DungeonMinimapIconGraphic.Symbol symbol)
@@ -135,5 +373,6 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
         if (anchor == null) return;
         Vector3 local = _result.root.transform.InverseTransformPoint(anchor.position);
         view.AddMarker(area, new Vector2(local.x, local.z), symbol);
+        if (fullMapView != null) fullMapView.AddMarker(area, new Vector2(local.x, local.z), symbol);
     }
 }

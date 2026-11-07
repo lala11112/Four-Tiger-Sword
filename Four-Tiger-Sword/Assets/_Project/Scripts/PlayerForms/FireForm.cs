@@ -20,6 +20,14 @@ public class FireForm : BaseForm, IToggleUltimateForm
     private float _normalLifeSteal, _skillLifeSteal;
 
     public FireForm(FireFormActionDataSO data) : base(data) { _fireData = data; }
+
+    protected override float ResolveNormalAttackFollowEndTime(WeaponActionData step, float lastHitStart)
+    {
+        // End both pursuit and tracking rotation at the authored movement cutoff.
+        float movementEnd = step.UseDistanceMovement ? step.MovementEndTime : step.ApproachEndTime;
+        return Mathf.Min(lastHitStart, Mathf.Max(0f, movementEnd));
+    }
+
     public override void Equip(PlayerController player)
     {
         base.Equip(player);
@@ -56,7 +64,7 @@ public class FireForm : BaseForm, IToggleUltimateForm
             _playerController.StatManager.AddModifier(StatType.ST_ATK, 0f, _skillAttackBonus);
     }
     protected override int QueryOverlap(WeaponActionData step, Vector3 center)
-        => _currentAction == ActionType.Skill || _currentAction == ActionType.SwitchAttack
+        => _currentAction == ActionType.Skill
             ? Physics.OverlapSphereNonAlloc(center, CurrentSkillRadius, _overlapBuffer, _enemyLayer)
             : base.QueryOverlap(step, center);
 
@@ -121,5 +129,6 @@ public class FireForm : BaseForm, IToggleUltimateForm
     {
         DeactivateUltimate();
         RemoveSkillBuff();
+        base.CleanupTransientEffects();
     }
 }

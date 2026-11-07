@@ -30,6 +30,9 @@ public static class DungeonMinimapIntegrationRegression
         int targetFrameRate = Application.targetFrameRate;
         bool cursorVisible = Cursor.visible;
         CursorLockMode cursorLock = Cursor.lockState;
+        var definition = ScriptableObject.CreateInstance<RunDefinitionSO>();
+        definition.chapters = new[] { new ChapterDefinition { displayName = "Chapter fixture",
+            stages = new[] { new StageDefinition(), new StageDefinition() } } };
         try
         {
             SceneManager.SetActiveScene(isolated);
@@ -40,15 +43,16 @@ public static class DungeonMinimapIntegrationRegression
             foreach (var graphic in instance.GetComponentsInChildren<UnityEngine.UI.Graphic>(true))
                 Check(graphic.GetComponent<CanvasRenderer>() != null, "Instantiated graphic has no CanvasRenderer: " + graphic.name);
             Canvas.ForceUpdateCanvases();
-            Lifecycle(view, presenter);
+            Lifecycle(view, presenter, definition);
             Layout(instance);
             return $"Minimap integration: {_checks} checks passed (discovery, markers, transformed roots, " +
-                "height, state changes, UI reactivation, replacement stages, input pass-through and three aspect ratios).";
+                "height, stage labels, state changes, UI reactivation, replacement stages, input pass-through and multiple aspect ratios).";
         }
         finally
         {
             SceneManager.SetActiveScene(previous);
             EditorSceneManager.CloseScene(isolated, true);
+            Object.DestroyImmediate(definition);
             Application.targetFrameRate = targetFrameRate;
             Cursor.visible = cursorVisible;
             Cursor.lockState = cursorLock;
@@ -74,7 +78,7 @@ public static class DungeonMinimapIntegrationRegression
         return "Installed minimap: one presenter, explicit run/view bindings, CanvasRenderers and input pass-through verified.";
     }
 
-    private static void Lifecycle(DungeonMinimapView view, DungeonMinimapPresenter presenter)
+    private static void Lifecycle(DungeonMinimapView view, DungeonMinimapPresenter presenter, RunDefinitionSO definition)
     {
         var runObject = new GameObject("MinimapRunFixture");
         var run = runObject.AddComponent<RunManager>();
@@ -84,6 +88,9 @@ public static class DungeonMinimapIntegrationRegression
         var player = new GameObject("PlayerFixture").AddComponent<PlayerController>();
         run.stageManager = stage;
         run.player = player;
+        run.definition = definition;
+        Auto(run, "CurrentChapterIndex", 0);
+        Auto(run, "CurrentStageIndex", 0);
         var result = Result();
         Auto(stage, "Result", result);
         Auto(stage, "IsReady", true);
@@ -98,6 +105,8 @@ public static class DungeonMinimapIntegrationRegression
         var viewport = Field<RectTransform>(view, "viewport");
         var arrow = Field<DungeonMinimapIconGraphic>(view, "playerArrow");
         Check(view.IsVisible && view.BuiltAreaCount == 3, "Ready stage did not build its room geometry.");
+        Check(view.StageLabel != null && view.StageLabel.gameObject.activeSelf && view.StageLabel.text == run.ProgressLabel,
+            "Ready stage did not display the current chapter/stage in the minimap.");
         Check(presenter.Model.Areas[presenter.Model.GetRoomAreaIndex(1)].Visited, "Start room was not discovered.");
         Check(markers.childCount == 2 && !markers.Find("ShopMarker").gameObject.activeSelf
             && !markers.Find("ExitMarker").gameObject.activeSelf, "Undiscovered markers leaked.");
@@ -121,10 +130,14 @@ public static class DungeonMinimapIntegrationRegression
 
         Invoke(presenter, "OnDisable");
         Check(!view.IsVisible, "Disabled presenter left the minimap visible.");
+        Check(!view.StageLabel.gameObject.activeSelf && string.IsNullOrEmpty(view.StageLabel.text),
+            "Disabled presenter retained its stage label.");
         Invoke(presenter, "OnEnable");
         Invoke(presenter, "UpdateMap");
         Check(view.IsVisible && presenter.Model.Areas[presenter.Model.GetRoomAreaIndex(2)].Visited
             && content.childCount == 3 && markers.childCount == 2, "Reactivation lost exploration or duplicated UI.");
+        Check(view.StageLabel.gameObject.activeSelf && view.StageLabel.text == run.ProgressLabel,
+            "Reactivation failed to restore the current stage label.");
 
         foreach (RunState state in new[] { RunState.Preparing, RunState.Error, RunState.Won, RunState.Lost })
         {
@@ -132,6 +145,8 @@ public static class DungeonMinimapIntegrationRegression
             Invoke(presenter, "OnRunStateChanged", state);
             Invoke(presenter, "UpdateMap");
             Check(!view.IsVisible, "Minimap remained visible during " + state + ".");
+            Check(!view.StageLabel.gameObject.activeSelf && string.IsNullOrEmpty(view.StageLabel.text),
+                "Minimap retained stale progress during " + state + ".");
         }
         Auto(run, "State", RunState.Playing);
         player.transform.position = result.root.transform.TransformPoint(new Vector3(200f, 0f, 0f));
@@ -144,6 +159,8 @@ public static class DungeonMinimapIntegrationRegression
         }
 
         var next = Result();
+        string previousLabel = view.StageLabel.text;
+        Auto(run, "CurrentStageIndex", 1);
         Auto(stage, "Result", next);
         Auto(generator, "CurrentRoot", next.root);
         player.transform.SetPositionAndRotation(next.root.transform.TransformPoint(Vector3.zero), next.root.transform.rotation);
@@ -151,9 +168,13 @@ public static class DungeonMinimapIntegrationRegression
         Check(view.IsVisible && !presenter.Model.Areas[presenter.Model.GetRoomAreaIndex(2)].Visited,
             "Replacement stage reused discovery from matching old room IDs.");
         Check(content.childCount == 3 && markers.childCount == 2, "Replacement stage duplicated old geometry or icons.");
+        Check(view.StageLabel.text == run.ProgressLabel && view.StageLabel.text != previousLabel,
+            "Replacement stage retained its previous chapter/stage label.");
         view.Clear();
         Check(view.BuiltAreaCount == 0 && content.childCount == 0 && markers.childCount == 0 && !view.IsVisible,
             "Clearing the view left geometry, markers or visibility behind.");
+        Check(!view.StageLabel.gameObject.activeSelf && string.IsNullOrEmpty(view.StageLabel.text),
+            "Clearing the view retained its stage label.");
     }
 
     private static BaekhoDungeonResult Result()
@@ -191,29 +212,95 @@ public static class DungeonMinimapIntegrationRegression
         var formsPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/UI/PlayerHUD.prefab");
         var goldPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Shop/UI/GoldHUD.prefab");
         Check(formsPrefab != null && goldPrefab != null, "Existing HUD assets are missing.");
-        RectTransform forms = NamedRect(formsPrefab, "FormsGroup"), skills = NamedRect(formsPrefab, "SkillsGroup");
+        RectTransform forms = NamedRect(formsPrefab, "Forms"), skills = NamedRect(formsPrefab, "Skills");
+        RectTransform vitals = NamedRect(formsPrefab, "Vitals"), chainSkills = NamedRect(formsPrefab, "ChainSkills");
         RectTransform gold = NamedRect(goldPrefab, "Gold");
         Check(panel.anchorMin == Vector2.one && panel.anchorMax == Vector2.one && panel.pivot == Vector2.one,
-            "Minimap panel is not anchored to the upper-right corner.");
-        Check(Vector2.Distance(panel.anchoredPosition, new Vector2(-48f, -198f)) < .01f
-            && Vector2.Distance(panel.sizeDelta, new Vector2(300f, 300f)) < .01f, "Minimap panel dimensions differ from the approved layout.");
-        Check(Vector2.Distance(forms.anchoredPosition, new Vector2(-48f, -24f)) < .01f, "Form HUD moved.");
+            "BoundaryZERO minimap must remain fixed to the upper-right corner.");
+        Check(Vector2.Distance(panel.anchoredPosition, new Vector2(-60.75f, -54f)) < .01f
+            && Vector2.Distance(panel.sizeDelta, new Vector2(245f, 255f)) < .01f
+            && Vector3.Distance(panel.localScale, new Vector3(1.65f, 1.65f, 1f)) < .01f,
+            "Minimap does not match the QHD guide frame.");
+        Check(forms.anchorMin == Vector2.zero && forms.anchorMax == Vector2.zero && forms.pivot == Vector2.zero,
+            "The five-element HUD must remain anchored to the lower-left corner.");
+        Check(skills.anchorMin == new Vector2(1f, 0f) && skills.anchorMax == new Vector2(1f, 0f)
+            && skills.pivot == new Vector2(1f, 0f), "E/R skills must remain anchored to the lower-right corner.");
+        Check(vitals.anchorMin == new Vector2(0f, 1f) && vitals.anchorMax == new Vector2(0f, 1f)
+            && vitals.pivot == new Vector2(0f, 1f), "Vitals must remain anchored to the upper-left corner.");
         Check(Field<RectTransform>(view, "viewport").GetComponent<UnityEngine.UI.RectMask2D>() != null,
             "Minimap viewport has no clipping mask.");
+        var label = view.StageLabel.rectTransform;
+        var viewport = Field<RectTransform>(view, "viewport");
+        Check(label.parent == panel && !label.IsChildOf(viewport)
+            && label.anchorMin == Vector2.zero && label.anchorMax == Vector2.zero && label.pivot == Vector2.zero,
+            "The stage label must be fixed to the panel's lower-left corner, outside the scrolling viewport hierarchy.");
+        Check(!view.StageLabel.raycastTarget, "The stage label blocks input.");
+        var mapHint = panel.Find("MapHint") as RectTransform;
+        Check(mapHint != null && forms.Find("MapHint") == null,
+            "The map hint must follow the minimap after the forms move to the lower-left corner.");
         var mapScaler = instance.GetComponent<UnityEngine.UI.CanvasScaler>();
         var formScaler = formsPrefab.GetComponent<UnityEngine.UI.CanvasScaler>();
         var goldScaler = goldPrefab.GetComponent<UnityEngine.UI.CanvasScaler>();
-        foreach (Vector2 screen in new[] { new Vector2(1280f, 720f), new Vector2(1920f, 1080f), new Vector2(1920f, 1200f) })
+        foreach (Vector2 screen in new[] { new Vector2(1280f, 720f), new Vector2(1920f, 1080f), new Vector2(2560f, 1440f), new Vector2(3440f, 1440f) })
         {
             Rect mapRect = ScreenRect(panel, mapScaler, screen), formRect = ScreenRect(forms, formScaler, screen);
             Rect goldRect = ScreenRect(gold, goldScaler, screen), skillRect = ScreenRect(skills, formScaler, screen);
-            Check(!mapRect.Overlaps(formRect) && !mapRect.Overlaps(goldRect) && !mapRect.Overlaps(skillRect)
-                && !goldRect.Overlaps(skillRect), "HUD regions overlap at " + screen + ".");
-            Check(mapRect.xMin >= 0f && mapRect.yMin >= 0f && mapRect.xMax <= screen.x && mapRect.yMax <= screen.y,
-                "Minimap leaves the screen at " + screen + ".");
             float mapScale = Scale(mapScaler, screen);
-            Check(Mathf.Abs((mapRect.yMin - goldRect.yMax) / mapScale - 24f) < .05f
-                && Mathf.Abs(mapRect.xMax - goldRect.xMax) < .05f, "Gold is not aligned 24 units below the minimap at " + screen + ".");
+            float formScale = Scale(formScaler, screen);
+            CheckRect(mapRect, new Rect(screen.x - 465f * mapScale, screen.y - 474.75f * mapScale,
+                404.25f * mapScale, 420.75f * mapScale), "minimap frame", screen);
+            CheckRect(ScreenRect(viewport, mapScaler, screen),
+                new Rect(screen.x - 458.4f * mapScale, screen.y - 451.65f * mapScale,
+                    366.3f * mapScale, 366.3f * mapScale), "minimap content", screen);
+            CheckRect(formRect, new Rect(55f * formScale, 46f * formScale, 630f * formScale, 174f * formScale),
+                "five-element group", screen);
+            CheckRect(skillRect, new Rect(screen.x - 360.3f * formScale, 35.45f * formScale,
+                297f * formScale, 206.55f * formScale), "E/R group", screen);
+            var housing = formsPrefab.transform.Find("BoundaryZeroHUD/Vitals/Housing") as RectTransform;
+            Rect housingRect = ScreenRect(housing, formScaler, screen);
+            CheckRect(housingRect, new Rect(52f * formScale, screen.y - 248f * formScale,
+                625f * formScale, 202f * formScale), "health housing", screen);
+            for (int i = 0; i < 5; i++)
+            {
+                Rect mount = ScreenRect((RectTransform)forms.Find("Mount" + i), formScaler, screen);
+                Rect icon = ScreenRect((RectTransform)forms.Find("Element" + i), formScaler, screen);
+                Rect key = ScreenRect((RectTransform)forms.Find("Key" + i), formScaler, screen);
+                CheckRect(mount, new Rect((64f + 126f * i) * formScale, 94f * formScale,
+                    108f * formScale, 114f * formScale), "element mount " + i, screen);
+                CheckRect(icon, new Rect((85f + 126f * i) * formScale, 121f * formScale,
+                    66f * formScale, 66f * formScale), "element icon " + i, screen);
+                CheckRect(key, new Rect((100f + 126f * i) * formScale, 56.5f * formScale,
+                    36f * formScale, 34.5f * formScale), "element key " + i, screen);
+            }
+            for (int i = 0; i < 2; i++)
+            {
+                string skill = i == 0 ? "SkillE" : "SkillR";
+                Rect mount = ScreenRect((RectTransform)skills.Find(skill + "/Mount"), formScaler, screen);
+                Rect icon = ScreenRect((RectTransform)skills.Find(skill + "/IconColorReveal"), formScaler, screen);
+                Rect key = ScreenRect((RectTransform)skills.Find(skill + "/Key"), formScaler, screen);
+                CheckRect(mount, new Rect(screen.x - (360.3f - 164.7f * i) * formScale, 80f * formScale,
+                    132.3f * formScale, 162f * formScale), skill + " mount", screen);
+                CheckRect(icon, new Rect(screen.x - (341.4f - 164.7f * i) * formScale, 128.6f * formScale,
+                    94.5f * formScale, 94.5f * formScale), skill + " icon", screen);
+                CheckRect(key, new Rect(screen.x - (326.55f - 164.7f * i) * formScale, 35.45f * formScale,
+                    64.8f * formScale, 37.8f * formScale), skill + " key", screen);
+            }
+            Rect stageRect = ScreenRect(label, mapScaler, screen), viewportRect = ScreenRect(viewport, mapScaler, screen);
+            Check(viewportRect.Contains(stageRect.min) && viewportRect.Contains(stageRect.max)
+                && mapRect.Contains(stageRect.min) && mapRect.Contains(stageRect.max),
+                "Stage label leaves the scaled minimap interior at " + screen + ".");
+            Rect hintRect = ScreenRect(mapHint, mapScaler, screen);
+            Check(hintRect.xMin >= mapRect.xMin && hintRect.xMax <= mapRect.xMax
+                && hintRect.yMax <= mapRect.yMin, "Map hint does not sit below its frame at " + screen + ".");
+            Rect chainRect = ScreenRect(chainSkills, formScaler, screen);
+            Check(chainRect.yMin >= formRect.yMax && !chainRect.Overlaps(skillRect)
+                && !chainRect.Overlaps(mapRect), "Conditional chain skills overlap the corner HUD at " + screen + ".");
+            Check(!mapRect.Overlaps(formRect) && !mapRect.Overlaps(goldRect) && !mapRect.Overlaps(skillRect)
+                && !goldRect.Overlaps(skillRect) && !formRect.Overlaps(skillRect)
+                && !housingRect.Overlaps(mapRect), "HUD regions overlap at " + screen + ".");
+            foreach (Rect region in new[] { mapRect, formRect, goldRect, skillRect, housingRect, chainRect, hintRect })
+                Check(region.xMin >= 0f && region.yMin >= 0f && region.xMax <= screen.x && region.yMax <= screen.y,
+                    "A HUD region leaves the screen at " + screen + ": " + region + ".");
         }
     }
 
@@ -221,6 +308,8 @@ public static class DungeonMinimapIntegrationRegression
     {
         CheckAsset(scaler != null && scaler.uiScaleMode == UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize,
             "HUD requires Scale With Screen Size.");
+        CheckAsset(scaler.referenceResolution == new Vector2(2560f, 1440f)
+            && Mathf.Abs(scaler.matchWidthOrHeight - .5f) < .001f, "HUD requires the shared QHD canvas scale.");
         Vector2 reference = scaler.referenceResolution;
         return Mathf.Pow(2f, Mathf.Lerp(Mathf.Log(screen.x / reference.x, 2f),
             Mathf.Log(screen.y / reference.y, 2f), scaler.matchWidthOrHeight));
@@ -228,10 +317,34 @@ public static class DungeonMinimapIntegrationRegression
 
     private static Rect ScreenRect(RectTransform rect, UnityEngine.UI.CanvasScaler scaler, Vector2 screen)
     {
-        float scale = Scale(scaler, screen);
-        Vector2 anchor = Vector2.Scale(rect.anchorMin, screen);
-        Vector2 size = rect.sizeDelta * scale;
-        return new Rect(anchor + rect.anchoredPosition * scale - Vector2.Scale(size, rect.pivot), size);
+        return ScreenRect(rect, scaler, screen, out _);
+    }
+
+    private static Rect ScreenRect(RectTransform rect, UnityEngine.UI.CanvasScaler scaler, Vector2 screen,
+        out Vector2 scale)
+    {
+        CheckAsset(rect != null, "A HUD layout rect is missing.");
+        if (rect == scaler.transform)
+        {
+            scale = Vector2.one * Scale(scaler, screen);
+            return new Rect(Vector2.zero, screen);
+        }
+        CheckAsset(rect.parent is RectTransform && rect.localRotation == Quaternion.identity,
+            "The HUD layout measurement requires an unrotated rect beneath its canvas.");
+        Rect parent = ScreenRect((RectTransform)rect.parent, scaler, screen, out var parentScale);
+        scale = Vector2.Scale(parentScale, new Vector2(rect.localScale.x, rect.localScale.y));
+        Vector2 anchorSpan = rect.anchorMax - rect.anchorMin;
+        Vector2 anchor = parent.min + Vector2.Scale(parent.size, rect.anchorMin + Vector2.Scale(anchorSpan, rect.pivot));
+        Vector2 size = Vector2.Scale(Vector2.Scale(parent.size, anchorSpan)
+            + Vector2.Scale(rect.sizeDelta, parentScale), new Vector2(rect.localScale.x, rect.localScale.y));
+        return new Rect(anchor + Vector2.Scale(rect.anchoredPosition, parentScale) - Vector2.Scale(size, rect.pivot), size);
+    }
+
+    private static void CheckRect(Rect actual, Rect expected, string name, Vector2 screen)
+    {
+        Check(Vector2.Distance(actual.position, expected.position) < .05f
+            && Vector2.Distance(actual.size, expected.size) < .05f,
+            name + " differs from the QHD guide at " + screen + ": " + actual + ".");
     }
 
     private static RectTransform NamedRect(GameObject root, string name)

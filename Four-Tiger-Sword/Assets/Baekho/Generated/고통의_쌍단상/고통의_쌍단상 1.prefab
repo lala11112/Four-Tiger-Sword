@@ -357,6 +357,37 @@ MonoBehaviour:
   label: enemy 2
   kind: enemy
   contentKey: 
+--- !u!1 &3724069950466312758
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9015066689789503716}
+  m_Layer: 0
+  m_Name: TeleportPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9015066689789503716
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3724069950466312758}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.4520157, z: -0, w: 0.89201}
+  m_LocalPosition: {x: -0.49586046, y: 1.055, z: -0.50564486}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7680969651568690076}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4078987162622100496
 GameObject:
   m_ObjectHideFlags: 0
@@ -742,6 +773,7 @@ GameObject:
   - component: {fileID: 7680969651568690076}
   - component: {fileID: 162763428814526199}
   - component: {fileID: 5517765551556620965}
+  - component: {fileID: 611427166298894653}
   m_Layer: 0
   m_Name: "\uACE0\uD1B5\uC758_\uC30D\uB2E8\uC0C1 1"
   m_TagString: Untagged
@@ -2205,6 +2237,7 @@ Transform:
   - {fileID: 6700679684375564279}
   - {fileID: 3789733859417554573}
   - {fileID: 4579687520801474717}
+  - {fileID: 9015066689789503716}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &162763428814526199
@@ -2692,6 +2725,24 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 668e9afd7dbdd724b884f17cd3dae427, type: 2}
   m_BuildHeightMesh: 0
+--- !u!114 &611427166298894653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7027861334424090702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 520f4474fe544a1086a0902a9b9e81c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StageMapAnchors
+  playerSpawn: {fileID: 0}
+  exitPoint: {fileID: 0}
+  bossSpawn: {fileID: 0}
+  shopPoint: {fileID: 0}
+  teleportPoint: {fileID: 9015066689789503716}
+  exitSize: {x: 2, y: 3, z: 2}
 --- !u!1 &7404502967567861142
 GameObject:
   m_ObjectHideFlags: 0

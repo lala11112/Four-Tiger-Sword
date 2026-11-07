@@ -5,19 +5,28 @@ public abstract partial class BaseForm
 {
     private void PlayActionAnimation(string stateName, float transition)
     {
+        ResetActionTiming();
         // TODO: 금/토 기본기, 신규 스킬/궁극기 모션 제작 후 AnimationName을 연결합니다.
         // _playerController.Animator.CrossFade("NewFormMotion", transition);
-        if (string.IsNullOrWhiteSpace(stateName)) return;
-        if (_playerController.Animator.HasState(0, Animator.StringToHash(stateName)))
+        var animator = _playerController?.Animator;
+        if (string.IsNullOrWhiteSpace(stateName) || animator == null || animator.runtimeAnimatorController == null) return;
+        if (animator.HasState(0, Animator.StringToHash(stateName)))
         {
+            _actionAnimationName = stateName;
+            _actionAnimationHash = Animator.StringToHash(stateName);
+            _actionAnimationStartFrame = Time.frameCount;
+            var previous = animator.GetCurrentAnimatorStateInfo(0);
+            _actionAnimationRestartPending = MatchesActionAnimation(previous);
+            _previousAnimationTime = previous.normalizedTime;
             //_playerController.Animator.applyRootMotion = true;
             // Every action clock starts at zero, including repeated attacks using the same state.
-            _playerController.Animator.CrossFade(stateName, transition, 0, 0f);
+            animator.CrossFade(stateName, transition, 0, 0f);
         }
     }
 
     protected void PlayCombo()
     {
+        _finalComboHitNotified = false;
         SnapshotAttackDamage();
         _timer = 0;
         _playerController.Input.AttackBuffer.Consume();
@@ -40,10 +49,11 @@ public abstract partial class BaseForm
     {
         _timer = 0;
         ClearHitTargets();
-        WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
+        WeaponActionData step = (_currentAction == ActionType.SwitchAttack
+            ? _weaponActionData.SwitchAttackSteps : _weaponActionData.SkillSteps)[_skillStep];
         ResetMotion(step);
         BeginAttackCamera(step, _skillStep > 0);
-        PlayActionAnimation(step.AnimationName, 0.01f);
+        PlayActionAnimation(step.AnimationName, 0.05f);
         _playerController.UpdateAttackTrails(step, 0f);
         Debug.Log($"스킬 단계 : {step.AnimationName} ({_skillStep})");
     }

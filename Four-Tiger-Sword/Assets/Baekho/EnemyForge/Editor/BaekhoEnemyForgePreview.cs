@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -100,6 +101,9 @@ namespace StudioBaekho.EnemyForge
             PlayableGraph graph;
             AnimationClipPlayable playable;
             AnimationClip currentClip;
+            AnimatorController moveController;
+            AnimatorControllerPlayable movePlayable;
+            string currentMove;
             string clipWarning;
             long lastSequence = -1;
             double lastDescriptorScan;
@@ -206,9 +210,12 @@ namespace StudioBaekho.EnemyForge
                 root.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
                 var time = Number(payload["time"], 0, 0, 36000);
                 var clip = BaekhoEnemyForgeCatalog.Resolve(payload["clip"], typeof(AnimationClip)) as AnimationClip;
-                var warning = Join(Sample(clip, time), materialWarning);
+                var move = (string)payload["state"] == "Move" && BaekhoEnemyForgeAnimation.IsActive(blueprint["animation"] as JObject)
+                    ? blueprint["animation"]?["move"] as JObject : null;
+                var parameters = payload["moveParameters"] == null ? new Vector2(0, 1) : ReadMoveParameters(payload["moveParameters"]);
+                var warning = Join(move != null ? SampleMove(move, parameters, time) : Sample(clip, time), materialWarning);
                 SetModelTransform(blueprint);
-                StableCameraBounds(blueprint, clip, time);
+                StableCameraBounds(blueprint, clip, time, move, parameters);
                 var attack = FindAttack(blueprint, (string)payload["attackId"]);
                 if (attack != null && !descriptors.ContainsKey((string)attack["typeId"] ?? "") && EditorApplication.timeSinceStartup - lastDescriptorScan > 1)
                     LoadDescriptors();
@@ -218,6 +225,10 @@ namespace StudioBaekho.EnemyForge
                 var draw = new WireGeometry();
                 draw.Grid(Mathf.Max(2, modelBounds.size.magnitude), -geometry.ActorPosition);
                 if ((bool?)payload["showHitboxes"] == true) draw.Attack(geometry);
+                var hpPosition = Vector(blueprint["hpBarPosition"], new Vector3(0, 3, 0));
+                var vfxPosition = Vector(blueprint["vfxPosition"], Vector3.up);
+                var anchorWidth = Mathf.Clamp(modelBounds.size.x * .55f, .4f, 2);
+                draw.Anchors(hpPosition, vfxPosition, anchorWidth);
                 lines.Clear();
                 lines.SetVertices(draw.Vertices);
                 lines.SetColors(draw.Colors);
@@ -226,6 +237,9 @@ namespace StudioBaekho.EnemyForge
 
                 var framing = cameraBounds;
                 framing.Encapsulate(cameraBounds.center + geometry.TravelEnd);
+                framing.Encapsulate(hpPosition + Vector3.right * anchorWidth * .5f);
+                framing.Encapsulate(hpPosition - Vector3.right * anchorWidth * .5f);
+                framing.Encapsulate(vfxPosition);
                 // Keep the camera on the authored character, rather than allowing a giant range ring to hide it.
                 var radius = Mathf.Max(.3f, framing.extents.magnitude);
                 var yaw = Number(payload["yaw"], 35, -360000, 360000);
@@ -246,10 +260,9 @@ namespace StudioBaekho.EnemyForge
 
             string Sample(AnimationClip clip, float time)
             {
-                if (clip != currentClip)
+                if (clip != currentClip || currentMove != null)
                 {
-                    if (graph.IsValid()) graph.Destroy();
-                    foreach (var pair in bindPose) pair.Value.Restore(pair.Key);
+                    ResetSampling();
                     currentClip = clip;
                     clipWarning = null;
                     if (clip)
@@ -285,6 +298,65 @@ namespace StudioBaekho.EnemyForge
                 return clip ? clipWarning : "클립을 선택하면 애니메이션을 재생할 수 있습니다.";
             }
 
+            string SampleMove(JObject move, Vector2 parameters, float time)
+            {
+                var identity = move.ToString(Newtonsoft.Json.Formatting.None);
+                if (identity != currentMove)
+                {
+                    ResetSampling();
+                    currentMove = identity;
+                    try
+                    {
+                        moveController = BaekhoEnemyForgeAnimation.CreatePreviewController(move);
+                        foreach (var clip in moveController.animationClips)
+                        {
+                            if (clip.legacy) throw new InvalidOperationException("Blend Tree에 Legacy 클립을 사용할 수 없습니다.");
+                            if (clip.humanMotion && (!animator.avatar || !animator.avatar.isValid || !animator.avatar.isHuman))
+                                throw new InvalidOperationException("Blend Tree의 Humanoid 클립과 모델 Avatar가 맞지 않습니다.");
+                            if (!clip.humanMotion)
+                            {
+                                var bindings = AnimationUtility.GetCurveBindings(clip).Where(b => b.type == typeof(Transform) || b.type == typeof(SkinnedMeshRenderer)).ToArray();
+                                var missing = bindings.Count(b => !string.IsNullOrEmpty(b.path) && !animator.transform.Find(b.path));
+                                if (bindings.Length > 0 && missing == bindings.Length)
+                                    throw new InvalidOperationException("Blend Tree 클립 " + clip.name + "의 본 경로가 모델과 맞지 않습니다.");
+                                if (missing > 0) clipWarning = "Blend Tree 클립의 일부 본 경로가 모델에 없습니다. 연결되는 부분만 재생합니다.";
+                            }
+                        }
+                        graph = PlayableGraph.Create("Enemy Forge Move preview " + Id);
+                        graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
+                        movePlayable = AnimatorControllerPlayable.Create(graph, moveController);
+                        var output = AnimationPlayableOutput.Create(graph, "Move Blend Tree", animator);
+                        output.SetSourcePlayable(movePlayable);
+                        graph.Play();
+                    }
+                    catch (Exception exception)
+                    {
+                        clipWarning = "Move 미리보기: " + exception.GetBaseException().Message;
+                        if (graph.IsValid()) graph.Destroy();
+                        if (moveController) BaekhoEnemyForgeAnimation.DestroyPreviewController(moveController);
+                        moveController = null;
+                    }
+                }
+                if (!graph.IsValid()) return clipWarning;
+                movePlayable.SetFloat((string)move["parameterX"], parameters.x);
+                movePlayable.SetFloat((string)move["parameterY"], parameters.y);
+                graph.Evaluate(0);
+                movePlayable.PlayInFixedTime("Move", 0, time);
+                graph.Evaluate(0);
+                return clipWarning;
+            }
+
+            void ResetSampling()
+            {
+                if (graph.IsValid()) graph.Destroy();
+                if (moveController) BaekhoEnemyForgeAnimation.DestroyPreviewController(moveController);
+                moveController = null;
+                currentMove = null;
+                currentClip = null;
+                clipWarning = null;
+                foreach (var pair in bindPose) pair.Value.Restore(pair.Key);
+            }
+
             void SetModelTransform(JObject blueprint)
             {
                 var transform = blueprint["modelTransform"] as JObject;
@@ -295,22 +367,25 @@ namespace StudioBaekho.EnemyForge
                 modelBounds = Measure(model);
             }
 
-            void StableCameraBounds(JObject blueprint, AnimationClip clip, float requestedTime)
+            void StableCameraBounds(JObject blueprint, AnimationClip clip, float requestedTime, JObject move, Vector2 parameters)
             {
-                var identity = (clip ? clip.GetInstanceID().ToString() : "none") + ":" + blueprint["modelTransform"]?.ToString(Newtonsoft.Json.Formatting.None);
+                var identity = (move != null ? currentMove + ":" + parameters.x.ToString("R", System.Globalization.CultureInfo.InvariantCulture) + ":" + parameters.y.ToString("R", System.Globalization.CultureInfo.InvariantCulture)
+                    : clip ? clip.GetInstanceID().ToString() : "none") + ":" + blueprint["modelTransform"]?.ToString(Newtonsoft.Json.Formatting.None);
                 if (identity == boundsIdentity) return;
                 cameraBounds = modelBounds;
-                if (clip && graph.IsValid())
+                if ((move != null || clip) && graph.IsValid())
                 {
+                    var duration = move != null ? moveController.animationClips.Select(c => c.length).DefaultIfEmpty(1f).Max() : clip.length;
                     // Frame the whole motion once, keeping the camera still during playback and scrubbing.
                     for (var i = 0; i <= 4; i++)
                     {
-                        playable.SetTime(clip.length * i / 4d);
-                        graph.Evaluate(0);
+                        if (move != null) SampleMove(move, parameters, duration * i / 4f);
+                        else { playable.SetTime(duration * i / 4d); graph.Evaluate(0); }
                         SetModelTransform(blueprint);
                         cameraBounds.Encapsulate(modelBounds);
                     }
-                    Sample(clip, requestedTime);
+                    if (move != null) SampleMove(move, parameters, requestedTime);
+                    else Sample(clip, requestedTime);
                     SetModelTransform(blueprint);
                 }
                 boundsIdentity = identity;
@@ -346,6 +421,7 @@ namespace StudioBaekho.EnemyForge
                 if (disposed) return;
                 disposed = true;
                 if (graph.IsValid()) graph.Destroy();
+                if (moveController) BaekhoEnemyForgeAnimation.DestroyPreviewController(moveController);
                 if (preview != null) preview.Cleanup();
                 // Cleanup owns objects added to the preview; construction failures may happen before AddSingleGO.
                 if (root) Object.DestroyImmediate(root);
@@ -456,6 +532,11 @@ namespace StudioBaekho.EnemyForge
             var value = (float)token;
             if (float.IsNaN(value) || float.IsInfinity(value)) throw new ArgumentException("미리보기 수치는 유한한 값이어야 합니다.");
             return Mathf.Clamp(value, min, max);
+        }
+        static Vector2 ReadMoveParameters(JToken token)
+        {
+            var values = BaekhoEnemyForgeCatalog.Numbers(token, 2);
+            return new Vector2(values[0], values[1]);
         }
         static Vector3 Vector(JToken token, Vector3 fallback)
         {
@@ -629,6 +710,17 @@ namespace StudioBaekho.EnemyForge
                 var spacing = Mathf.Max(.5f, Mathf.Pow(10, Mathf.Floor(Mathf.Log10(extent))) * .5f);
                 var color = new Color(.3f, .4f, .5f, .18f);
                 for (var i = -10; i <= 10; i++) { Line(offset + new Vector3(i * spacing, 0, -10 * spacing), offset + new Vector3(i * spacing, 0, 10 * spacing), color); Line(offset + new Vector3(-10 * spacing, 0, i * spacing), offset + new Vector3(10 * spacing, 0, i * spacing), color); }
+            }
+            public void Anchors(Vector3 hp, Vector3 vfx, float width)
+            {
+                var green = new Color(.25f, 1, .4f, 1);
+                Box(hp, new Vector3(width, Mathf.Max(.04f, width * .07f), .025f), green);
+                Line(hp - Vector3.right * width * .5f, hp + Vector3.right * width * .5f, green);
+                var cyan = new Color(.25f, .8f, 1, 1);
+                var radius = Mathf.Max(.06f, width * .09f);
+                Line(vfx - Vector3.right * radius, vfx + Vector3.right * radius, cyan);
+                Line(vfx - Vector3.up * radius, vfx + Vector3.up * radius, cyan);
+                Line(vfx - Vector3.forward * radius, vfx + Vector3.forward * radius, cyan);
             }
             public void Attack(AttackGeometry geometry)
             {

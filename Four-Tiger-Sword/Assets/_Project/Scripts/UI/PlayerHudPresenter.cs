@@ -43,12 +43,17 @@ public sealed class PlayerHudPresenter : MonoBehaviour
         }
 
         bool ultimateActive = form is IToggleUltimateForm toggle && toggle.IsUltimateActive;
+        var chainTarget = player.FormManager.ReadyChainSkill;
         var state = new HudState
         {
             Hp = new MeterState(stats.CurrentHp, stats.MaxHp),
             Auxiliary = new MeterState(stats.CurrentSp, stats.MaxSp),
             UltimateCharge = new MeterState(stats.CurrentUltimateGauge, stats.MaxUltimateGauge),
             ActiveFormIndex = formIndex,
+            FireChain = new ChainSkillState(player.FormManager.GetChainReadyRemaining(ElementType.ELEMENT_FIRE),
+                chainTarget != null && chainTarget.Element == ElementType.ELEMENT_FIRE),
+            WaterChain = new ChainSkillState(player.FormManager.GetChainReadyRemaining(ElementType.ELEMENT_WATER),
+                chainTarget != null && chainTarget.Element == ElementType.ELEMENT_WATER),
             E = new SkillState
             {
                 Remaining = form.SkillCooldownRemaining,

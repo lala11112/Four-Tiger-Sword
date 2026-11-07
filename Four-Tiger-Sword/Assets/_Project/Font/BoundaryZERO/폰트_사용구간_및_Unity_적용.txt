@@ -1,0 +1,73 @@
+﻿경계ZERO Unity 원본 폰트와 사용 구간
+
+실제 UI 제작 프로젝트에서 사용하는 원본 폰트 3종입니다.
+Fonts 폴더의 OTF/TTF 원본과 각 라이선스, 이 사용 안내를 포함합니다.
+폰트 파일은 변환하거나 수정하지 않고 그대로 복사했습니다.
+
+1. 폰트별 사용 구간
+
+[Pretendard Regular — Fonts/Pretendard-Regular.otf]
+일반 UI의 기본 글꼴입니다.
+- 전투 HUD: 체력 문구/수치, 오행 슬롯 숫자 1~5, 스킬 키 E/R, 상호작용 문구.
+- 상점/소지품: 구매·판매·합성 탭, 아이템 이름·등급·설명·가격, 버튼.
+- 설정/일시정지/확인/강화/보상/이벤트: 일반 창 제목, 본문, 버튼, 수치.
+- 결과 화면: 처치한 적·격파한 보스·획득 영구 재화 등의 항목명, 거점 귀환 버튼.
+- 로딩 화면: 상태 문구와 '불러오는 중'.
+- 별도 골드 HUD의 잔액 및 획득 로그도 이 글꼴을 사용합니다.
+기존 프로젝트에서는 BoundaryFont에 연결됩니다.
+일부 큰 글자는 같은 Regular 원본에 TMP Bold 스타일을 적용합니다.
+
+[Black Han Sans Regular — Fonts/BlackHanSans-Regular.ttf]
+강하게 강조하는 한글 제목/메뉴용입니다.
+- 메인 화면: '경계', '새 게임', '이어하기', '설정', '종료'.
+- 결과 화면의 큰 제목: '경계 돌파', '탐사 종료'.
+기존 프로젝트에서는 TitleKorean에 연결됩니다.
+파일명은 Regular지만 글꼴 자체가 굵습니다. 기존 위 영역은 TMP Normal 스타일입니다.
+설정 팝업 안의 일반 문구는 Pretendard이며, 메인 메뉴의 '설정'만 이 글꼴입니다.
+
+[Chakra Petch Bold — Fonts/ChakraPetch-Bold.ttf]
+일부 강조 숫자용입니다.
+- 결과 화면: 우측에 표시하는 처치 수·보스 수·획득 재화·보너스의 실제 값.
+- 로딩 화면: 진행률 숫자와 %.
+기존 프로젝트에서는 TitleLatin에 연결됩니다.
+한글 본문용으로 사용하지 않습니다. 전투 HUD의 1~5와 E/R은 Pretendard입니다.
+Bold 원본이므로 기존 위 영역은 TMP Normal 스타일로 사용합니다.
+
+2. 전달한 이미지 ZIP과의 관계
+
+기준 자료:
+- 경계ZERO_UI 이미지와 배치 설명.zip
+- 경계ZERO_전투 HUD 배치 수정본.zip
+
+두 ZIP의 font.woff2는 동일한 Pretendard Variable v1.309 웹폰트입니다.
+이번 Pretendard-Regular.otf는 같은 버전의 글꼴이며 실제 Unity 제작 프로젝트에서
+사용한 고정 굵기 Regular 원본입니다. WOFF2를 변환한 파일은 아닙니다.
+
+전투 HUD 배치 수정본의 QHD(2560×1440) 기준:
+- 오행 숫자 1~5: Pretendard Regular, 글자 크기 22.5, 중앙 정렬.
+- 스킬 키 E/R: Pretendard Regular, 글자 크기 24.3, 중앙 정렬.
+배치 수정본에 없는 체력 수치·쿨타임·전투 숫자의 신규 디자인은 별도 결정합니다.
+
+PNG/Main/korean_wordmark.png는 Black Han Sans의 '경계'를 이미지에 넣은 파일입니다.
+그 PNG를 그대로 쓰면 같은 글자를 TMP로 다시 겹쳐 넣을 필요가 없습니다.
+PNG/Main/zero_wordmark.png의 ZERO는 직접 그린 도형 로고입니다.
+Chakra Petch로 타이핑해서 대체하지 말고 전달한 로고 PNG를 사용합니다.
+
+3. Unity에서 적용
+
+1) Fonts 폴더의 OTF/TTF를 프로젝트의 Assets 아래에 넣습니다.
+   Licenses 폴더도 함께 보관합니다.
+2) 원본 폰트를 선택하고 Create > TextMeshPro > Font Asset으로
+   각 폰트의 TMP Font Asset을 만듭니다. Unity/TMP 버전에 따라 메뉴가 다를 수 있습니다.
+3) TextMeshProUGUI의 Font Asset에 사용 구간에 맞는 에셋을 연결합니다.
+   새로 만드는 한글 폰트 에셋은 Atlas Population Mode를 Dynamic으로 두면
+   사용하는 문자를 추가할 수 있습니다. Dynamic일 때 원본 OTF/TTF를 삭제하지 않습니다.
+
+이 묶음에는 원본 폰트만 전달하기 위해 기존 TMP .asset, .meta, 프리팹을 넣지 않았습니다.
+기존 프리팹의 폰트 연결을 자동 복구하는 패키지가 아니므로, 받는 프로젝트에서
+생성한 TMP Font Asset을 텍스트 컴포넌트에 연결해야 합니다.
+
+Unity 공식 참고:
+https://docs.unity.cn/Packages/com.unity.ugui@2.5/manual/TextMeshPro/FontAssetsDynamicFonts.html
+
+사용 구간 확인 기준: 2026-11-05 경계ZERO Unity 제작 소스와 위 이미지 ZIP 2종.

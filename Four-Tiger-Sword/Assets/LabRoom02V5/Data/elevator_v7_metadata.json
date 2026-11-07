@@ -1,0 +1,66 @@
+{
+  "id": 33,
+  "slug": "stage_exit_elevator",
+  "unity_dimensions_m": [
+    4.8,
+    10,
+    4.6
+  ],
+  "visual_lift_travel_m": 5.5,
+  "car_sides_back_ceiling": "opaque geometry",
+  "upper_shaft_front_sides_back_top": "opaque geometry",
+  "only_ground_boarding_entrance_open": true,
+  "static_visual_only": true,
+  "animation_implemented": false,
+  "collider": "nonblocking trigger",
+  "source_metadata": {
+    "id": 33,
+    "slug": "stage_exit_elevator",
+    "label_ko": "다음 스테이지 이동 엘리베이터",
+    "dimensions_m": [
+      4.800000190734863,
+      4.599999904632568,
+      10.0
+    ],
+    "mount": "floor",
+    "basis_ko": "가로4.8m 깊이4.6m 높이10m 유지, 승강실 및 상부 승강로를 불투명 외벽으로 밀폐",
+    "group": "elevator",
+    "purpose_ko": "앞쪽 승하차 입구를 제외한 승강실과 상부 승강로가 외벽으로 둘러싸인 다음 스테이지 승강기",
+    "parts": 1,
+    "source_part_count": 137,
+    "triangles": 13828,
+    "material_slots": 9,
+    "nonmanifold_edges": 0,
+    "degenerate_faces": 0,
+    "uv_channels": [
+      "UVMap",
+      "EmissionMaskUV"
+    ],
+    "fbx": "models_fbx/R2_33_stage_exit_elevator.fbx",
+    "glb": "models_glb/R2_33_stage_exit_elevator.glb",
+    "front_preview": "previews/front/R2_33_stage_exit_elevator_front.png",
+    "emission_mask": "emission_masks/33_stage_exit_elevator_emission.png",
+    "emission_mask_uv_channel": 1,
+    "front": "-Y",
+    "root_pivot": "bottom footprint center",
+    "unity_mesh_object_count": 1,
+    "export_groups": [
+      "Combined"
+    ],
+    "stage_exit_trigger_local_m": [
+      0.0,
+      0.15,
+      0.5
+    ],
+    "clear_cabin_dimensions_m": [
+      3.2,
+      2.8,
+      3.1
+    ],
+    "visual_lift_travel_m": 5.5,
+    "interaction_role": "next_stage_exit",
+    "car_roof_top_m": 3.85,
+    "raised_car_roof_top_m": 9.35,
+    "guide_rail_top_m": 9.45
+  }
+}

@@ -1,0 +1,2128 @@
+{
+  "version": 1,
+  "layouts": [
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap9/Terraced_Flank_Arena.prefab",
+      "role": "normal",
+      "purpose": "Terraced observation and field analysis; preserve the central approach and raised reward deck",
+      "minimumParts": 8,
+      "bays": [
+        {
+          "id": "LowerWestCommand",
+          "kind": "command",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 0
+        },
+        {
+          "id": "NorthWestArchive",
+          "kind": "compact",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": 7
+          },
+          "yaw": 90
+        },
+        {
+          "id": "LowerEastCryo",
+          "kind": "cryo",
+          "position": {
+            "x": 5,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 0
+        },
+        {
+          "id": "WestWallServices",
+          "kind": "cooling",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": -1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "EastObservation",
+          "kind": "compact",
+          "position": {
+            "x": 3,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap10/Flanking_Terrace.prefab",
+      "role": "normal",
+      "purpose": "Asymmetric logistics court with upper cryogenic service terraces",
+      "minimumParts": 34,
+      "bays": [
+        {
+          "id": "WestCargoArrival",
+          "kind": "cargo",
+          "position": {
+            "x": -21,
+            "y": 0,
+            "z": -21
+          },
+          "yaw": 0,
+          "scale": 1.35
+        },
+        {
+          "id": "WestPowerBay",
+          "kind": "power",
+          "position": {
+            "x": -21,
+            "y": 0,
+            "z": -11
+          },
+          "yaw": 90
+        },
+        {
+          "id": "WestServiceCommand",
+          "kind": "command",
+          "position": {
+            "x": -15,
+            "y": 0,
+            "z": 3.5
+          },
+          "yaw": 180
+        },
+        {
+          "id": "EastTurbine",
+          "kind": "turbine",
+          "position": {
+            "x": 21,
+            "y": 0,
+            "z": -21
+          },
+          "yaw": 0,
+          "scale": 1.35
+        },
+        {
+          "id": "EastArchive",
+          "kind": "archive",
+          "position": {
+            "x": 21,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 90,
+          "scale": 1.2
+        },
+        {
+          "id": "EastAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": 17,
+            "y": 0,
+            "z": 3
+          },
+          "yaw": 0
+        },
+        {
+          "id": "UpperWestCryo",
+          "kind": "cryo",
+          "position": {
+            "x": -19,
+            "y": 2,
+            "z": 15
+          },
+          "yaw": 0,
+          "scale": 1.25
+        },
+        {
+          "id": "UpperEastCooling",
+          "kind": "cooling",
+          "position": {
+            "x": 17,
+            "y": 2,
+            "z": 15
+          },
+          "yaw": 0,
+          "scale": 1.2
+        },
+        {
+          "id": "SouthReservePower",
+          "kind": "power",
+          "position": {
+            "x": -11,
+            "y": 0,
+            "z": -21
+          },
+          "yaw": 0
+        },
+        {
+          "id": "WestMidArchive",
+          "kind": "archive",
+          "position": {
+            "x": -21,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90,
+          "scale": 1.1
+        },
+        {
+          "id": "SouthMidLoading",
+          "kind": "cargo",
+          "position": {
+            "x": 1,
+            "y": 0,
+            "z": -21
+          },
+          "yaw": 0,
+          "scale": 1.25
+        },
+        {
+          "id": "SouthEastArchive",
+          "kind": "archive",
+          "position": {
+            "x": 13,
+            "y": 0,
+            "z": -21
+          },
+          "yaw": 0,
+          "scale": 1.15
+        },
+        {
+          "id": "InnerWestAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 90,
+          "scale": 1.15
+        },
+        {
+          "id": "UpperWestStorage",
+          "kind": "archive",
+          "position": {
+            "x": -11,
+            "y": 2,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.1
+        },
+        {
+          "id": "UpperEastControl",
+          "kind": "command",
+          "position": {
+            "x": 11,
+            "y": 2,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.1
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap11/TwinRise_Arena.prefab",
+      "role": "normal",
+      "purpose": "Twin-rise turbine control with an open central fighting floor",
+      "minimumParts": 29,
+      "bays": [
+        {
+          "id": "SouthWestTurbine",
+          "kind": "turbine",
+          "position": {
+            "x": -21,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.3
+        },
+        {
+          "id": "NorthWestCooling",
+          "kind": "cooling",
+          "position": {
+            "x": -21,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0
+        },
+        {
+          "id": "WestMaintenance",
+          "kind": "cargo",
+          "position": {
+            "x": -21,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 90,
+          "scale": 1.2
+        },
+        {
+          "id": "SouthEastBattery",
+          "kind": "power",
+          "position": {
+            "x": 21,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.2
+        },
+        {
+          "id": "NorthEastAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": 21,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.25
+        },
+        {
+          "id": "EastArchive",
+          "kind": "archive",
+          "position": {
+            "x": 21,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 90
+        },
+        {
+          "id": "WestRaisedCommand",
+          "kind": "command",
+          "position": {
+            "x": -13,
+            "y": 2,
+            "z": 7
+          },
+          "yaw": 90
+        },
+        {
+          "id": "EastRaisedSpecimen",
+          "kind": "specimen",
+          "position": {
+            "x": 13,
+            "y": 2,
+            "z": 5
+          },
+          "yaw": 90
+        },
+        {
+          "id": "SouthDispatch",
+          "kind": "compact",
+          "position": {
+            "x": -11,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0
+        },
+        {
+          "id": "NorthWestSecondaryArchive",
+          "kind": "archive",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.1
+        },
+        {
+          "id": "NorthEastLoading",
+          "kind": "cargo",
+          "position": {
+            "x": 13,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.1
+        },
+        {
+          "id": "SouthMidCryo",
+          "kind": "cryo",
+          "position": {
+            "x": 1,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.2
+        },
+        {
+          "id": "WestInnerAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 90,
+          "scale": 1.1
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap12/TwinPitArena.prefab",
+      "role": "normal",
+      "purpose": "Twin-pit specimen processing around intact pit rims and bridges",
+      "minimumParts": 27,
+      "bays": [
+        {
+          "id": "WestLowerStorage",
+          "kind": "archive",
+          "position": {
+            "x": -17,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 90,
+          "scale": 1.25
+        },
+        {
+          "id": "WestNorthCryo",
+          "kind": "cryo",
+          "position": {
+            "x": -17,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.25
+        },
+        {
+          "id": "EastSouthPower",
+          "kind": "power",
+          "position": {
+            "x": 17,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.15
+        },
+        {
+          "id": "EastNorthCargo",
+          "kind": "cargo",
+          "position": {
+            "x": 17,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.25
+        },
+        {
+          "id": "WestPitAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": -11,
+            "y": 2,
+            "z": -9
+          },
+          "yaw": 90
+        },
+        {
+          "id": "NorthRaisedSpecimens",
+          "kind": "specimen",
+          "position": {
+            "x": -5,
+            "y": 2,
+            "z": 13
+          },
+          "yaw": 0
+        },
+        {
+          "id": "EastPitCommand",
+          "kind": "command",
+          "position": {
+            "x": 11,
+            "y": 2,
+            "z": -1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "SouthTelemetry",
+          "kind": "compact",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": -19
+          },
+          "yaw": 0
+        },
+        {
+          "id": "WestRimCooling",
+          "kind": "cooling",
+          "position": {
+            "x": -17,
+            "y": 0,
+            "z": -7.5
+          },
+          "yaw": 90,
+          "scale": 1.1
+        },
+        {
+          "id": "EastRimArchive",
+          "kind": "archive",
+          "position": {
+            "x": 17,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90,
+          "scale": 1.1
+        },
+        {
+          "id": "SouthSupportPower",
+          "kind": "power",
+          "position": {
+            "x": 6,
+            "y": 0,
+            "z": -19
+          },
+          "yaw": 0,
+          "scale": 1.2
+        },
+        {
+          "id": "NorthRaisedCryo",
+          "kind": "cryo",
+          "position": {
+            "x": -11,
+            "y": 2,
+            "z": 13
+          },
+          "yaw": 0,
+          "scale": 1
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap13/TwinPitArena.prefab",
+      "role": "normal",
+      "purpose": "Twin-pit cryogenic transfer variant with distinct power and storage bays",
+      "minimumParts": 27,
+      "bays": [
+        {
+          "id": "WestCryoIntake",
+          "kind": "cryo",
+          "position": {
+            "x": -17,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.25
+        },
+        {
+          "id": "WestNorthTurbine",
+          "kind": "turbine",
+          "position": {
+            "x": -17,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.3
+        },
+        {
+          "id": "EastSouthCargo",
+          "kind": "cargo",
+          "position": {
+            "x": 17,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.25
+        },
+        {
+          "id": "EastNorthCooling",
+          "kind": "cooling",
+          "position": {
+            "x": 17,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.2
+        },
+        {
+          "id": "WestRaisedPower",
+          "kind": "power",
+          "position": {
+            "x": -11,
+            "y": 2,
+            "z": -9
+          },
+          "yaw": 90
+        },
+        {
+          "id": "NorthRaisedArchive",
+          "kind": "archive",
+          "position": {
+            "x": -5,
+            "y": 2,
+            "z": 13
+          },
+          "yaw": 0
+        },
+        {
+          "id": "EastRaisedCommand",
+          "kind": "command",
+          "position": {
+            "x": 11,
+            "y": 2,
+            "z": -1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "WestLowerMaintenance",
+          "kind": "compact",
+          "position": {
+            "x": -17,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "WestRimCooling",
+          "kind": "cooling",
+          "position": {
+            "x": -17,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 90,
+          "scale": 1.1
+        },
+        {
+          "id": "EastRimPower",
+          "kind": "power",
+          "position": {
+            "x": 17,
+            "y": 0,
+            "z": -4
+          },
+          "yaw": 90,
+          "scale": 1.1
+        },
+        {
+          "id": "SouthTransferArchive",
+          "kind": "archive",
+          "position": {
+            "x": -5,
+            "y": 0,
+            "z": -19
+          },
+          "yaw": 0,
+          "scale": 1.15
+        },
+        {
+          "id": "NorthRaisedAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": 1,
+            "y": 2,
+            "z": 13
+          },
+          "yaw": 0,
+          "scale": 0.85
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap14/Pit_Ring_Arena.prefab",
+      "role": "normal",
+      "purpose": "Ring-side service stations with an unobstructed pit circuit",
+      "minimumParts": 8,
+      "bays": [
+        {
+          "id": "SouthWestArchive",
+          "kind": "archive",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": -11
+          },
+          "yaw": 0,
+          "scale": 0.85
+        },
+        {
+          "id": "NorthWestCryo",
+          "kind": "cryo",
+          "position": {
+            "x": -5,
+            "y": 0,
+            "z": 11
+          },
+          "yaw": 0,
+          "scale": 0.85
+        },
+        {
+          "id": "SouthEastServices",
+          "kind": "compact",
+          "position": {
+            "x": 9,
+            "y": 0,
+            "z": -11
+          },
+          "yaw": 90
+        },
+        {
+          "id": "NorthEastObservation",
+          "kind": "compact",
+          "position": {
+            "x": 9,
+            "y": 0,
+            "z": 11
+          },
+          "yaw": 90
+        },
+        {
+          "id": "WestRingPower",
+          "kind": "power",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": 3
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "InnerSouthMonitor",
+          "kind": "compact",
+          "position": {
+            "x": -3,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 0
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap16/냉각주조장.prefab",
+      "role": "normal",
+      "purpose": "Cooling foundry with perimeter turbines, pipe services and raised specimen control",
+      "minimumParts": 27,
+      "bays": [
+        {
+          "id": "WestSouthTurbine",
+          "kind": "turbine",
+          "position": {
+            "x": -15,
+            "y": 0,
+            "z": -13
+          },
+          "yaw": 0,
+          "scale": 1.3
+        },
+        {
+          "id": "WestNorthCooling",
+          "kind": "cooling",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": 15
+          },
+          "yaw": 0,
+          "scale": 1.2
+        },
+        {
+          "id": "WestServiceRack",
+          "kind": "archive",
+          "position": {
+            "x": -17,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "EastSouthTurbine",
+          "kind": "turbine",
+          "position": {
+            "x": 13,
+            "y": 0,
+            "z": -15
+          },
+          "yaw": 0,
+          "scale": 1.3
+        },
+        {
+          "id": "EastPowerServices",
+          "kind": "power",
+          "position": {
+            "x": 17,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "NorthCargoTransfer",
+          "kind": "cargo",
+          "position": {
+            "x": 3,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.2
+        },
+        {
+          "id": "NorthWestCryo",
+          "kind": "cryo",
+          "position": {
+            "x": -9,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0
+        },
+        {
+          "id": "RaisedAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": 11,
+            "y": 2,
+            "z": 7
+          },
+          "yaw": 0,
+          "scale": 0.85
+        },
+        {
+          "id": "RaisedControl",
+          "kind": "compact",
+          "position": {
+            "x": 9,
+            "y": 2,
+            "z": 13
+          },
+          "yaw": 0
+        },
+        {
+          "id": "WestMidLoading",
+          "kind": "cargo",
+          "position": {
+            "x": -17,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 90,
+          "scale": 1.1
+        },
+        {
+          "id": "SouthMidStorage",
+          "kind": "archive",
+          "position": {
+            "x": -3,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.2
+        },
+        {
+          "id": "WestInnerAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": -11,
+            "y": 0,
+            "z": 5
+          },
+          "yaw": 90,
+          "scale": 1.15
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap17/측면압박_전투실.prefab",
+      "role": "normal",
+      "purpose": "Flank-pressure research storage around an open entry and combat lane",
+      "minimumParts": 13,
+      "bays": [
+        {
+          "id": "WestSouthCargo",
+          "kind": "cargo",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": -13
+          },
+          "yaw": 0
+        },
+        {
+          "id": "WestNorthAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": 13
+          },
+          "yaw": 0
+        },
+        {
+          "id": "WestPowerService",
+          "kind": "power",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "EastSouthCryo",
+          "kind": "cryo",
+          "position": {
+            "x": 13,
+            "y": 0,
+            "z": -13
+          },
+          "yaw": 0
+        },
+        {
+          "id": "EastStorage",
+          "kind": "archive",
+          "position": {
+            "x": 9,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 90
+        },
+        {
+          "id": "RaisedNorthCommand",
+          "kind": "command",
+          "position": {
+            "x": 11,
+            "y": 2,
+            "z": 7
+          },
+          "yaw": 0
+        },
+        {
+          "id": "RaisedEastCooling",
+          "kind": "cooling",
+          "position": {
+            "x": 11,
+            "y": 2,
+            "z": 3
+          },
+          "yaw": 90,
+          "scale": 0.8
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap18/삼단_측면전투실.prefab",
+      "role": "normal",
+      "purpose": "Three-level maintenance court; preserve stairs and the upper combat shelves",
+      "minimumParts": 29,
+      "bays": [
+        {
+          "id": "SouthWestLogistics",
+          "kind": "cargo",
+          "position": {
+            "x": -17,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.3
+        },
+        {
+          "id": "NorthWestAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": -19,
+            "y": 0,
+            "z": 15
+          },
+          "yaw": 0,
+          "scale": 1.25
+        },
+        {
+          "id": "WestTurbineService",
+          "kind": "turbine",
+          "position": {
+            "x": -19,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "SouthEastPower",
+          "kind": "power",
+          "position": {
+            "x": 19,
+            "y": 0,
+            "z": -15
+          },
+          "yaw": 0
+        },
+        {
+          "id": "EastCoolingService",
+          "kind": "cooling",
+          "position": {
+            "x": 19,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90,
+          "scale": 1.2
+        },
+        {
+          "id": "NorthCryoTransfer",
+          "kind": "cryo",
+          "position": {
+            "x": 3,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0
+        },
+        {
+          "id": "SouthArchive",
+          "kind": "archive",
+          "position": {
+            "x": -9,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.2
+        },
+        {
+          "id": "UpperObservation",
+          "kind": "command",
+          "position": {
+            "x": 11,
+            "y": 2,
+            "z": 15
+          },
+          "yaw": 0,
+          "scale": 0.8
+        },
+        {
+          "id": "UpperSpecimenBay",
+          "kind": "compact",
+          "position": {
+            "x": 17,
+            "y": 2,
+            "z": 9
+          },
+          "yaw": 90
+        },
+        {
+          "id": "WestSouthArchive",
+          "kind": "archive",
+          "position": {
+            "x": -19,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 90,
+          "scale": 1.1
+        },
+        {
+          "id": "SouthEastLoading",
+          "kind": "cargo",
+          "position": {
+            "x": 9,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.2
+        },
+        {
+          "id": "WestInnerAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": -5
+          },
+          "yaw": 90,
+          "scale": 1.1
+        },
+        {
+          "id": "NorthWestStorage",
+          "kind": "archive",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.1
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap19/고가교_전투실.prefab",
+      "role": "normal",
+      "purpose": "Compact bridge monitoring posts placed beside the existing bridge and enemy spawns",
+      "minimumParts": 6,
+      "bays": [
+        {
+          "id": "WestBridgeMonitor",
+          "kind": "compact",
+          "position": {
+            "x": -5,
+            "y": 0,
+            "z": -1
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "SouthServicePost",
+          "kind": "compact",
+          "position": {
+            "x": -3,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "LowerBridgeConsole",
+          "kind": "compact",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": -3
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "UpperBridgeArchive",
+          "kind": "compact",
+          "position": {
+            "x": 1,
+            "y": 2,
+            "z": 7
+          },
+          "yaw": 0,
+          "scale": 0.8
+        },
+        {
+          "id": "LowerEastService",
+          "kind": "compact",
+          "position": {
+            "x": 5,
+            "y": 0,
+            "z": -5
+          },
+          "yaw": 90,
+          "scale": 0.7
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap21/1번 후보 - 서측_고저차_전투실.prefab",
+      "role": "normal",
+      "purpose": "West-rise tactical stores with a distinct raised eastern observation bay",
+      "minimumParts": 12,
+      "bays": [
+        {
+          "id": "SouthWestCargo",
+          "kind": "cargo",
+          "position": {
+            "x": -15,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 0
+        },
+        {
+          "id": "NorthWestCooling",
+          "kind": "cooling",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": 9
+          },
+          "yaw": 0
+        },
+        {
+          "id": "WestArchive",
+          "kind": "archive",
+          "position": {
+            "x": -15,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "SouthFieldPower",
+          "kind": "power",
+          "position": {
+            "x": -3,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 0
+        },
+        {
+          "id": "NorthSpecimenStation",
+          "kind": "specimen",
+          "position": {
+            "x": -3,
+            "y": 0,
+            "z": 9
+          },
+          "yaw": 0,
+          "scale": 0.8
+        },
+        {
+          "id": "RaisedEastCommand",
+          "kind": "command",
+          "position": {
+            "x": 8.5,
+            "y": 2,
+            "z": -7
+          },
+          "yaw": 0
+        },
+        {
+          "id": "RaisedNorthAnalysis",
+          "kind": "compact",
+          "position": {
+            "x": 7,
+            "y": 2,
+            "z": 9
+          },
+          "yaw": 0
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap22/2번 후보 - West_Ring_Arena.prefab",
+      "role": "normal",
+      "purpose": "West-ring quarantine and archive bays around preserved loop paths",
+      "minimumParts": 12,
+      "bays": [
+        {
+          "id": "WestSouthCryo",
+          "kind": "cryo",
+          "position": {
+            "x": -15,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 0
+        },
+        {
+          "id": "WestArchive",
+          "kind": "archive",
+          "position": {
+            "x": -15,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "InnerWestCooling",
+          "kind": "cooling",
+          "position": {
+            "x": -9,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 0,
+          "scale": 0.8
+        },
+        {
+          "id": "SouthPowerBay",
+          "kind": "power",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 0
+        },
+        {
+          "id": "NorthRingCommand",
+          "kind": "command",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": 7
+          },
+          "yaw": 0,
+          "scale": 0.8
+        },
+        {
+          "id": "RaisedEastSpecimen",
+          "kind": "specimen",
+          "position": {
+            "x": 9,
+            "y": 2,
+            "z": -7
+          },
+          "yaw": 0,
+          "scale": 0.8
+        },
+        {
+          "id": "RaisedEastTelemetry",
+          "kind": "compact",
+          "position": {
+            "x": 15,
+            "y": 2,
+            "z": -7
+          },
+          "yaw": 90
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap23/북동_단층_전투장.prefab",
+      "role": "normal",
+      "purpose": "North-east elevated research annex with large lower logistics and cooling zones",
+      "minimumParts": 31,
+      "bays": [
+        {
+          "id": "SouthWestCargo",
+          "kind": "cargo",
+          "position": {
+            "x": -21,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.3
+        },
+        {
+          "id": "NorthWestAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": -21,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.3
+        },
+        {
+          "id": "WestTurbineServices",
+          "kind": "turbine",
+          "position": {
+            "x": -21,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "SouthEastPower",
+          "kind": "power",
+          "position": {
+            "x": 19,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.25
+        },
+        {
+          "id": "EastCoolingServices",
+          "kind": "cooling",
+          "position": {
+            "x": 21,
+            "y": 0,
+            "z": -3
+          },
+          "yaw": 90
+        },
+        {
+          "id": "SouthArchive",
+          "kind": "archive",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0
+        },
+        {
+          "id": "NorthCryoTransfer",
+          "kind": "cryo",
+          "position": {
+            "x": -11,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0,
+          "scale": 1.25
+        },
+        {
+          "id": "NorthDispatch",
+          "kind": "command",
+          "position": {
+            "x": 1,
+            "y": 0,
+            "z": 17
+          },
+          "yaw": 0
+        },
+        {
+          "id": "RaisedEastAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": 13,
+            "y": 2,
+            "z": 9
+          },
+          "yaw": 90,
+          "scale": 0.85
+        },
+        {
+          "id": "RaisedNorthPower",
+          "kind": "power",
+          "position": {
+            "x": 9,
+            "y": 2,
+            "z": 13
+          },
+          "yaw": 0,
+          "scale": 0.8
+        },
+        {
+          "id": "WestMidArchive",
+          "kind": "archive",
+          "position": {
+            "x": -21,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 90,
+          "scale": 1.1
+        },
+        {
+          "id": "WestInnerCryo",
+          "kind": "cryo",
+          "position": {
+            "x": -15,
+            "y": 0,
+            "z": -5
+          },
+          "yaw": 90,
+          "scale": 1.15
+        },
+        {
+          "id": "SouthMidBattery",
+          "kind": "power",
+          "position": {
+            "x": 1,
+            "y": 0,
+            "z": -17
+          },
+          "yaw": 0,
+          "scale": 1.2
+        },
+        {
+          "id": "UpperEastCooling",
+          "kind": "cooling",
+          "position": {
+            "x": 19,
+            "y": 2,
+            "z": 3
+          },
+          "yaw": 90,
+          "scale": 0.95
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap24/단차_전투실.prefab",
+      "role": "normal",
+      "purpose": "Stepped specimen room with small functional bays separated from stair landings",
+      "minimumParts": 10,
+      "bays": [
+        {
+          "id": "SouthWestArchive",
+          "kind": "archive",
+          "position": {
+            "x": -9,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 90,
+          "scale": 0.85
+        },
+        {
+          "id": "NorthWestCryo",
+          "kind": "cryo",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": 9
+          },
+          "yaw": 0,
+          "scale": 0.85
+        },
+        {
+          "id": "SouthEastPower",
+          "kind": "power",
+          "position": {
+            "x": 7,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 0,
+          "scale": 0.85
+        },
+        {
+          "id": "EastCooling",
+          "kind": "cooling",
+          "position": {
+            "x": 9,
+            "y": 0,
+            "z": 3
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "InnerFieldAnalysis",
+          "kind": "compact",
+          "position": {
+            "x": 3,
+            "y": 0,
+            "z": -3
+          },
+          "yaw": 90
+        },
+        {
+          "id": "RaisedNorthCommand",
+          "kind": "compact",
+          "position": {
+            "x": 4,
+            "y": 2,
+            "z": 11
+          },
+          "yaw": 0
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap25/고가교_전투실.prefab",
+      "role": "normal",
+      "purpose": "Bridge logistics depot with clear bridge access and separated maintenance stacks",
+      "minimumParts": 12,
+      "bays": [
+        {
+          "id": "SouthWestCargo",
+          "kind": "cargo",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 0
+        },
+        {
+          "id": "NorthWestCryo",
+          "kind": "cryo",
+          "position": {
+            "x": -11,
+            "y": 0,
+            "z": 11
+          },
+          "yaw": 0
+        },
+        {
+          "id": "WestCoolingServices",
+          "kind": "cooling",
+          "position": {
+            "x": -13,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "SouthEastPower",
+          "kind": "power",
+          "position": {
+            "x": 13,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 0
+        },
+        {
+          "id": "EastArchive",
+          "kind": "archive",
+          "position": {
+            "x": 11,
+            "y": 0,
+            "z": -1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "NorthBridgeCommand",
+          "kind": "command",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": 7
+          },
+          "yaw": 0
+        },
+        {
+          "id": "SouthFieldTelemetry",
+          "kind": "compact",
+          "position": {
+            "x": 5,
+            "y": 0,
+            "z": -6
+          },
+          "yaw": 0
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/ProceduralDungeon/Modules/BaekhoMap5_FlankingArena.prefab",
+      "role": "normal",
+      "purpose": "Flanking arena converted into a compact power-and-cryo service court",
+      "minimumParts": 12,
+      "bays": [
+        {
+          "id": "WestSouthPower",
+          "kind": "power",
+          "position": {
+            "x": -9,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 90
+        },
+        {
+          "id": "WestNorthCryo",
+          "kind": "cryo",
+          "position": {
+            "x": -9,
+            "y": 0,
+            "z": 9
+          },
+          "yaw": 0
+        },
+        {
+          "id": "WestMidArchive",
+          "kind": "archive",
+          "position": {
+            "x": -9,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90
+        },
+        {
+          "id": "EastSouthCooling",
+          "kind": "cooling",
+          "position": {
+            "x": 7,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 0
+        },
+        {
+          "id": "EastFieldStorage",
+          "kind": "compact",
+          "position": {
+            "x": 9,
+            "y": 0,
+            "z": -3
+          },
+          "yaw": 90
+        },
+        {
+          "id": "RaisedCommand",
+          "kind": "command",
+          "position": {
+            "x": 5,
+            "y": 2,
+            "z": 5
+          },
+          "yaw": 0,
+          "scale": 0.85
+        },
+        {
+          "id": "RaisedSpecimenMonitor",
+          "kind": "compact",
+          "position": {
+            "x": 5,
+            "y": 2,
+            "z": -1
+          },
+          "yaw": 90
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/ProceduralDungeon/Modules/BaekhoMap6_Flanking_Pit_Arena.prefab",
+      "role": "normal",
+      "purpose": "Flanking pit research complex with perimeter equipment and protected raised paths",
+      "minimumParts": 29,
+      "bays": [
+        {
+          "id": "SouthWestCargo",
+          "kind": "cargo",
+          "position": {
+            "x": -17,
+            "y": 0,
+            "z": -15
+          },
+          "yaw": 0,
+          "scale": 1.3
+        },
+        {
+          "id": "NorthWestCryo",
+          "kind": "cryo",
+          "position": {
+            "x": -17,
+            "y": 0,
+            "z": 15
+          },
+          "yaw": 0
+        },
+        {
+          "id": "WestTurbineServices",
+          "kind": "turbine",
+          "position": {
+            "x": -19,
+            "y": 0,
+            "z": 1
+          },
+          "yaw": 90,
+          "scale": 1.2
+        },
+        {
+          "id": "SouthEastPower",
+          "kind": "power",
+          "position": {
+            "x": 17,
+            "y": 0,
+            "z": -15
+          },
+          "yaw": 0
+        },
+        {
+          "id": "NorthEastAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": 17,
+            "y": 0,
+            "z": 15
+          },
+          "yaw": 0,
+          "scale": 1.25
+        },
+        {
+          "id": "EastCoolingServices",
+          "kind": "cooling",
+          "position": {
+            "x": 20.5,
+            "y": 0,
+            "z": -3
+          },
+          "yaw": 90,
+          "scale": 1.2
+        },
+        {
+          "id": "SouthArchive",
+          "kind": "archive",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": -15
+          },
+          "yaw": 0
+        },
+        {
+          "id": "NorthMaintenance",
+          "kind": "compact",
+          "position": {
+            "x": -7,
+            "y": 0,
+            "z": 15
+          },
+          "yaw": 0
+        },
+        {
+          "id": "RaisedCommand",
+          "kind": "command",
+          "position": {
+            "x": 3,
+            "y": 2,
+            "z": -3
+          },
+          "yaw": 0,
+          "scale": 0.85
+        },
+        {
+          "id": "RaisedSpecimenServices",
+          "kind": "compact",
+          "position": {
+            "x": 13,
+            "y": 2,
+            "z": 5
+          },
+          "yaw": 90
+        },
+        {
+          "id": "WestSouthAnalysis",
+          "kind": "analysis",
+          "position": {
+            "x": -15,
+            "y": 0,
+            "z": -9
+          },
+          "yaw": 0,
+          "scale": 1.1
+        },
+        {
+          "id": "NorthInnerArchive",
+          "kind": "archive",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": 15
+          },
+          "yaw": 0,
+          "scale": 1.1
+        },
+        {
+          "id": "SouthMidCooling",
+          "kind": "cooling",
+          "position": {
+            "x": 3,
+            "y": 0,
+            "z": -13
+          },
+          "yaw": 0,
+          "scale": 1.2
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/RunProgression/Rooms/RunStart.prefab",
+      "role": "start",
+      "purpose": "Arrival preparation room with clear player spawn, teleport and single exit",
+      "minimumParts": 8,
+      "bays": [
+        {
+          "id": "WestReadinessArchive",
+          "kind": "archive",
+          "position": {
+            "x": -5,
+            "y": 0,
+            "z": -5
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "NorthBriefingDesk",
+          "kind": "command",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": 7
+          },
+          "yaw": 0,
+          "scale": 0.85
+        },
+        {
+          "id": "EastPowerServices",
+          "kind": "power",
+          "position": {
+            "x": 5,
+            "y": 0,
+            "z": -3
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "NorthEastPreparation",
+          "kind": "compact",
+          "position": {
+            "x": 5,
+            "y": 0,
+            "z": 5
+          },
+          "yaw": 90
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/RunProgression/Rooms/RunExit.prefab",
+      "role": "end",
+      "purpose": "Extraction checkpoint with a clear central exit trigger and teleport landing",
+      "minimumParts": 8,
+      "bays": [
+        {
+          "id": "WestRecoveryArchive",
+          "kind": "archive",
+          "position": {
+            "x": -5,
+            "y": 0,
+            "z": -5
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "NorthExtractionCommand",
+          "kind": "command",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": 7
+          },
+          "yaw": 0,
+          "scale": 0.85
+        },
+        {
+          "id": "EastExtractionPower",
+          "kind": "power",
+          "position": {
+            "x": 5,
+            "y": 0,
+            "z": -3
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "NorthEastRecovery",
+          "kind": "compact",
+          "position": {
+            "x": 5,
+            "y": 0,
+            "z": 5
+          },
+          "yaw": 90
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/RunProgression/Rooms/RunShop.prefab",
+      "role": "shop",
+      "purpose": "Supply room with an open central interactive shop counter and clear customer approach",
+      "minimumParts": 8,
+      "bays": [
+        {
+          "id": "WestMerchantStores",
+          "kind": "archive",
+          "position": {
+            "x": -5,
+            "y": 0,
+            "z": -5
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "NorthReserveStocks",
+          "kind": "cargo",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": 7
+          },
+          "yaw": 0,
+          "scale": 0.7
+        },
+        {
+          "id": "EastSupplyPower",
+          "kind": "power",
+          "position": {
+            "x": 5,
+            "y": 0,
+            "z": -3
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "NorthEastCases",
+          "kind": "compact",
+          "position": {
+            "x": 5,
+            "y": 0,
+            "z": 5
+          },
+          "yaw": 90
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/RunProgression/Rooms/ChapterBossRoom.prefab",
+      "role": "boss",
+      "purpose": "Boss control hall with a broad clear center and equipment confined to perimeter service bays",
+      "minimumParts": 12,
+      "bays": [
+        {
+          "id": "WestSouthTurbine",
+          "kind": "turbine",
+          "position": {
+            "x": -9,
+            "y": 0,
+            "z": -11
+          },
+          "yaw": 0,
+          "scale": 0.85
+        },
+        {
+          "id": "WestServicePower",
+          "kind": "power",
+          "position": {
+            "x": -9,
+            "y": 0,
+            "z": 3
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "EastSouthCryo",
+          "kind": "cryo",
+          "position": {
+            "x": 7,
+            "y": 0,
+            "z": -13
+          },
+          "yaw": 0,
+          "scale": 0.85
+        },
+        {
+          "id": "EastNorthArchive",
+          "kind": "archive",
+          "position": {
+            "x": 9,
+            "y": 0,
+            "z": 9
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "EastMidCooling",
+          "kind": "cooling",
+          "position": {
+            "x": 9,
+            "y": 0,
+            "z": -7
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "RaisedNorthCommand",
+          "kind": "command",
+          "position": {
+            "x": -7,
+            "y": 2,
+            "z": 13
+          },
+          "yaw": 0,
+          "scale": 0.8
+        },
+        {
+          "id": "RaisedNorthTelemetry",
+          "kind": "compact",
+          "position": {
+            "x": -1,
+            "y": 2,
+            "z": 9
+          },
+          "yaw": 0,
+          "scale": 0.8
+        }
+      ]
+    },
+    {
+      "sourcePath": "Assets/_Game/Greybox/Blockout/StartMap/안전한_출발방.prefab",
+      "role": "demo-start",
+      "purpose": "Demonstration arrival room following the active start-room readiness language",
+      "minimumParts": 8,
+      "bays": [
+        {
+          "id": "WestReadinessArchive",
+          "kind": "archive",
+          "position": {
+            "x": -5,
+            "y": 0,
+            "z": -5
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "NorthBriefingDesk",
+          "kind": "command",
+          "position": {
+            "x": -1,
+            "y": 0,
+            "z": 7
+          },
+          "yaw": 0,
+          "scale": 0.85
+        },
+        {
+          "id": "EastPowerServices",
+          "kind": "power",
+          "position": {
+            "x": 5,
+            "y": 0,
+            "z": -3
+          },
+          "yaw": 90,
+          "scale": 0.8
+        },
+        {
+          "id": "NorthEastPreparation",
+          "kind": "compact",
+          "position": {
+            "x": 5,
+            "y": 0,
+            "z": 5
+          },
+          "yaw": 90
+        }
+      ]
+    }
+  ]
+}

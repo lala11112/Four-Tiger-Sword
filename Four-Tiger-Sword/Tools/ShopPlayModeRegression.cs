@@ -131,6 +131,8 @@ public static class ShopPlayModeRegression
             var view = shop.GetComponentInChildren<ShopView>(true);
             var hud = shop.GetComponentInChildren<GoldHudView>(true);
             Check(view != null && hud != null, "Temporary shop and gold UI adapters were not instantiated.");
+            Check(view.HasBoundaryLayout, "The BoundaryZERO shop layout is not installed.");
+            var boundary = Field<ShopView.BoundaryControls>(view, "boundary");
             Check(Field<GameObject>(view, "interactionPrompt").activeSelf, "The nearby interaction prompt is hidden.");
             var cameraInputs = TrackedCameraInputs(player).ToDictionary(input => input, input => input.enabled);
             Check(cameraInputs.Count > 0 && cameraInputs.Values.Any(enabled => enabled), "No active tracked camera input exists in this Game Scene.");
@@ -147,33 +149,39 @@ public static class ShopPlayModeRegression
                 "Opening retained gameplay input buffers.");
             Check(Field<GameObject>(view, "panel").activeSelf && !Field<GameObject>(view, "interactionPrompt").activeSelf,
                 "The shop panel/prompt visibility is incorrect.");
-            Check(view.GetComponentsInChildren<ShopOfferView>(false).Length == firstStock.Offers.Count,
-                "The visible item rows do not match this stock.");
+            Check(boundary.StockScroll.content.GetComponentsInChildren<ShopOfferView>(false).Length
+                == firstStock.Offers.Count(offer => !offer.IsHealing),
+                "Stock cards do not match item stock independently of the healing service.");
             Check(shop.TryBuy(heal.Id) == ShopPurchaseResult.FullHealth && !heal.SoldOut,
                 "Full-health healing was charged or consumed.");
-            Check(!ButtonFor(view, heal.Id).interactable, "Full-health healing is still an enabled UI purchase.");
+            Check(!boundary.HealingButton.interactable, "Full-health healing is still an enabled UI purchase.");
 
             Check(shop.Wallet.TrySpend(shop.Wallet.Gold), "Could not prepare the zero-gold purchase fixture.");
             Check(shop.TryBuy(item.Id) == ShopPurchaseResult.InsufficientGold && !item.SoldOut && shop.Wallet.Gold == 0,
                 "Insufficient-gold purchase changed stock or balance.");
-            Check(!ButtonFor(view, item.Id).interactable, "Unaffordable stock has an enabled purchase button.");
-            Check(shop.Wallet.AddGold(item.Price + heal.Price), "Could not fund the UI purchase fixture.");
-            Check(ButtonFor(view, item.Id).interactable, "Funding the wallet did not refresh the purchase button.");
+            Check(ButtonFor(view, item.Id).interactable, "Unaffordable stock is no longer inspectable.");
             ButtonFor(view, item.Id).onClick.Invoke();
-            Check(item.SoldOut && player.ItemRuntime.Contains(item.Item.itemId), "Clicking the real item row did not grant the item.");
-            Check(shop.Wallet.Gold == heal.Price && !ButtonFor(view, item.Id).interactable,
-                "The item row charged incorrectly or remained purchasable.");
+            Check(!item.SoldOut && !player.ItemRuntime.Contains(item.Item.itemId) && shop.Wallet.Gold == 0,
+                "Card inspection purchased an unaffordable item.");
+            Check(!boundary.DetailAction.interactable && boundary.DetailIcon.sprite == item.Item.icon,
+                "Unaffordable inspected stock has an enabled explicit purchase or substituted icon.");
+            Check(shop.Wallet.AddGold(item.Price + heal.Price), "Could not fund the UI purchase fixture.");
+            Check(boundary.DetailAction.interactable, "Funding the wallet did not refresh the explicit purchase button.");
+            boundary.DetailAction.onClick.Invoke();
+            Check(item.SoldOut && player.ItemRuntime.Contains(item.Item.itemId), "Clicking the explicit detail action did not grant the item.");
+            Check(shop.Wallet.Gold == heal.Price && !boundary.DetailAction.interactable && ButtonFor(view, item.Id).interactable,
+                "The purchase charged incorrectly, remained purchasable, or disabled sold-card inspection.");
             Check(shop.TryBuy(item.Id) == ShopPurchaseResult.SoldOut && shop.Wallet.Gold == heal.Price,
                 "A duplicate item purchase charged again.");
             float maxHp = player.StatManager.MaxHp;
             player.StatManager.Heal(maxHp);
             player.StatManager.ConsumeHealth(maxHp * 0.6f);
             float hpBeforeHeal = player.StatManager.CurrentHp;
-            Check(ButtonFor(view, heal.Id).interactable, "Damaging the player did not enable the healing UI.");
-            ButtonFor(view, heal.Id).onClick.Invoke();
+            Check(boundary.HealingButton.interactable, "Damaging the player did not enable the healing UI.");
+            boundary.HealingButton.onClick.Invoke();
             Near(player.StatManager.CurrentHp, Mathf.Min(maxHp, hpBeforeHeal + maxHp * shop.settings.healingFraction),
                 "The real healing UI restored the wrong amount.");
-            Check(heal.SoldOut && shop.Wallet.Gold == 0 && !ButtonFor(view, heal.Id).interactable,
+            Check(heal.SoldOut && shop.Wallet.Gold == 0 && !boundary.HealingButton.interactable,
                 "Healing was not sold once for its configured price.");
             Check(shop.TryBuy(heal.Id) == ShopPurchaseResult.SoldOut && shop.Wallet.Gold == 0,
                 "A duplicate healing purchase charged again.");
@@ -318,7 +326,9 @@ public static class ShopPlayModeRegression
 
     private static Button ButtonFor(ShopView view, string offerId)
     {
-        var row = view.GetComponentsInChildren<ShopOfferView>(false).FirstOrDefault(candidate => Field<string>(candidate, "_id") == offerId);
+        var controls = Field<ShopView.BoundaryControls>(view, "boundary");
+        var row = controls.StockScroll.content.GetComponentsInChildren<ShopOfferView>(false)
+            .FirstOrDefault(candidate => Field<string>(candidate, "_id") == offerId);
         if (row == null) throw new InvalidOperationException("No visible UI row for " + offerId);
         return Field<Button>(row, "purchaseButton");
     }

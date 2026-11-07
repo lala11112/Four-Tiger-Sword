@@ -129,13 +129,12 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             {
                 var step = steps[i];
                 string target = "step." + i;
-                Action enable = () => step.Feedback.EnableV2 = true;
                 Number(bindings, target + ".knockback", target, "전투", "넉백 세기", step.Balance.KnockbackForce,
-                    v => { step.Balance.EnableV2 = true; step.Balance.KnockbackForce = v; }, 0, float.MaxValue, 0, 12, "게임 값", enable);
+                    v => { step.Balance.EnableV2 = true; step.Balance.KnockbackForce = v; }, 0, float.MaxValue, 0, 12, "게임 값");
                 HitStopBindings(bindings, target, step.Feedback.HitStop,
-                    EffectiveFeedbackStop(source, actionId, step, null), enable);
+                    EffectiveFeedbackStop(source, actionId, step, null));
                 var camera = MaterializeCamera(step.Feedback.Camera);
-                CameraBindings(bindings, target, camera, () => { enable(); camera.Authored = true; step.Feedback.Camera.V2 = camera; }, true);
+                CameraBindings(bindings, target, camera, () => { camera.Authored = true; step.Feedback.Camera.V2 = camera; }, true);
                 bool waterUltimate = source is WaterFormActionDataSO && NormalizeActionId(actionId) == "ultimate";
                 foreach (int h in FeedbackHitIndices(source, actionId, step))
                 {
@@ -145,7 +144,6 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                     if (virtualHit) hit = new HitEvent();
                     if (hit?.Feedback == null) continue;
                     Action enableHit = () => {
-                        enable();
                         if (virtualHit) {
                             if (step.HitEvents == null) step.HitEvents = new List<HitEvent>();
                             while (step.HitEvents.Count <= hitIndex) step.HitEvents.Add(null);
@@ -242,12 +240,9 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             return settings;
         }
 
-        private static CombatCameraV2Settings MaterializeHitCamera(CombatCameraV2Settings authored, CombatCameraV2Settings step)
+        private static CombatCameraHitSettings MaterializeHitCamera(CombatCameraHitSettings authored, CombatCameraV2Settings step)
         {
-            var settings = CloneCamera(authored);
-            // Hit overrides never own attack-progress motion. Keep this channel
-            // inherited even when older data contains an unused hit motion value.
-            settings.Mode = CombatFeedbackChannelMode.Inherit;
+            var settings = CloneHitCamera(authored);
             if (settings.Impact.Mode == CombatFeedbackChannelMode.Inherit)
             {
                 var inherited = CloneCamera(step);
@@ -266,6 +261,17 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                 settings.PreserveFeelFlash = step.PreserveFeelFlash;
             }
             return settings;
+        }
+
+        private static CombatCameraHitSettings CloneHitCamera(CombatCameraHitSettings source)
+        {
+            if (source == null) return new CombatCameraHitSettings();
+            var copy = JsonUtility.FromJson<CombatCameraHitSettings>(JsonUtility.ToJson(source));
+            if (copy.Impact == null) copy.Impact = new CombatCameraImpactV2();
+            if (copy.Shake == null) copy.Shake = new CombatCameraShakeV2();
+            CopyCurveFields(source.Impact, copy.Impact);
+            CopyCurveFields(source.Shake, copy.Shake);
+            return copy;
         }
 
         private static CombatCameraV2Settings CloneCamera(CombatCameraV2Settings source)
@@ -307,13 +313,13 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             return new AnimationCurve(keys) { preWrapMode = original.preWrapMode, postWrapMode = original.postWrapMode };
         }
 
-        private static void HitStopBindings(List<Binding> list, string target, HitStopSettings settings, HitStopSettings effective, Action enable)
+        private static void HitStopBindings(List<Binding> list, string target, HitStopSettings settings, HitStopSettings effective, Action enable = null)
         {
             string prefix = target + ".hitstop";
             float duration = effective.HitStopDuration, timeScale = effective.HitStopTimeScale;
             bool initialized = settings.OverrideHitStop;
             Action activate = () => {
-                enable();
+                enable?.Invoke();
                 settings.EnableV2 = true;
                 if (!initialized) {
                     settings.HitStopDuration = duration; settings.HitStopTimeScale = timeScale;
@@ -330,13 +336,14 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             Number(list, prefix + ".stacking", target, "히트스톱", "중첩", (float)effective.Stacking, v => settings.Stacking = (HitStopStacking)(int)v, 0, 2, 0, 2, "", activate, new[] { "교체", "연장", "더 느리게·더 늦게 종료" });
         }
 
-        private static void CameraBindings(List<Binding> list, string target, CombatCameraV2Settings camera, Action enable, bool motion)
+        private static void CameraBindings(List<Binding> list, string target, CombatCameraHitSettings camera, Action enable, bool motion)
         {
             string prefix = target + ".camera";
             if (motion)
             {
-                Number(list, prefix + ".mode", target, "카메라 연출", "공격 진행 연출", (float)camera.Mode, v => camera.Mode = (CombatFeedbackChannelMode)(int)v, 0, 2, 0, 2, "", enable, new[] { "원본 유지", "끄기", "직접 설정" });
-                Fields(list, camera.Motion, prefix + ".motion", target, "카메라 연출", () => { enable(); camera.Mode = CombatFeedbackChannelMode.Override; });
+                var attackCamera = (CombatCameraV2Settings)camera;
+                Number(list, prefix + ".mode", target, "카메라 연출", "공격 진행 연출", (float)attackCamera.Mode, v => attackCamera.Mode = (CombatFeedbackChannelMode)(int)v, 0, 2, 0, 2, "", enable, new[] { "원본 유지", "끄기", "직접 설정" });
+                Fields(list, attackCamera.Motion, prefix + ".motion", target, "카메라 연출", () => { enable(); attackCamera.Mode = CombatFeedbackChannelMode.Override; });
             }
             Fields(list, camera.Impact, prefix + ".impact", target, "카메라 명중", () => { enable(); camera.Impact.Mode = CombatFeedbackChannelMode.Override; }, enable);
             Fields(list, camera.Shake, prefix + ".shake", target, "화면 흔들림", () => { enable(); camera.Shake.Mode = CombatFeedbackChannelMode.Override; }, enable);
@@ -447,7 +454,7 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             var activeValues = candidate.values.Where(v => !Kept(v.id)).ToList();
             var activeCurves = (candidate.curves ?? new List<CurveValue>()).Where(v => !Kept(v.id)).ToList();
             var restoreChannels = new List<Action>();
-            void PreserveCamera(string prefix, Func<CombatCameraV2Settings> read)
+            void PreserveCamera(string prefix, Func<CombatCameraHitSettings> read)
             {
                 var original = read();
                 bool motion = keepModes.Contains(prefix + ".mode");
@@ -460,8 +467,12 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                     // Editing another channel materializes a detached camera block.
                     // Restore the kept raw channel too, so profile inheritance and
                     // dormant curves are not silently made into inline overrides.
-                    if (motion) { current.Mode = original?.Mode ?? CombatFeedbackChannelMode.Inherit;
-                        current.Motion = original?.Motion ?? new CombatCameraMotionV2(); }
+                    if (motion && current is CombatCameraV2Settings attackCamera)
+                    {
+                        var originalAttack = original as CombatCameraV2Settings;
+                        attackCamera.Mode = originalAttack?.Mode ?? CombatFeedbackChannelMode.Inherit;
+                        attackCamera.Motion = originalAttack?.Motion ?? new CombatCameraMotionV2();
+                    }
                     if (impact) current.Impact = original?.Impact ?? new CombatCameraImpactV2();
                     if (shake) current.Shake = original?.Shake ?? new CombatCameraShakeV2();
                 });

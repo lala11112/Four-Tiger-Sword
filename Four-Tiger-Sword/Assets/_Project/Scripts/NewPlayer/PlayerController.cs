@@ -14,8 +14,8 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     public StateMachine StateMachine { get; private set; }
     public PlayerStatManager StatManager { get; private set; }
     public CombatActorClock ActorClock { get; private set; }
-    public float ActionDeltaTime => IsShopPaused ? 0f : ActorClock != null ? ActorClock.DeltaTime : Time.deltaTime;
-    public float ActionTimeScale => IsShopPaused ? 0f : ActorClock != null ? ActorClock.TimeScale : 1f;
+    public float ActionDeltaTime => IsGameplayModalPaused ? 0f : ActorClock != null ? ActorClock.DeltaTime : Time.deltaTime;
+    public float ActionTimeScale => IsGameplayModalPaused ? 0f : ActorClock != null ? ActorClock.TimeScale : 1f;
     public float ActionTime => ActorClock != null ? ActorClock.Time : Time.time;
     public void SetAnimationSpeed(float speed)
     {
@@ -60,8 +60,12 @@ public partial class PlayerController : MonoBehaviour, IDamageable
 
     [Header("Dash Settings")]
     public float DashCooldown = 1.0f;
+    [Tooltip("방향 입력이 있을 때 재생할 Animator 상태 이름. 클립은 해당 상태의 Motion에 연결합니다.")]
+    public string DashAnimationName = "Dash";
+    [Tooltip("방향 입력 없이 뒤로 회피할 때 재생할 Animator 상태 이름. 클립은 해당 상태의 Motion에 연결합니다.")]
+    public string BackstepAnimationName = "Backstep";
     private float _dashCooldownTimer;
-    public bool CanDash => !IsStageTransitioning && !IsShopPaused && _dashCooldownTimer <= 0f && StatManager != null
+    public bool CanDash => !IsStageTransitioning && !IsGameplayModalPaused && _dashCooldownTimer <= 0f && StatManager != null
         && StatManager.CurrentHp > 0f && StatManager.HasEnoughSp(DodgeSpCost);
     public bool IsDashing => StateMachine.CurrentState is PlayerDashState;
 
@@ -72,7 +76,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     [Tooltip("패링 성공 시 필살기 게이지 충전량 (막은 타격마다 적용)")]
     public float ParryUltimateGaugeReward = 30f;
     private float _formChangeCooldownTimer;
-    public bool CanChangeForm => !IsStageTransitioning && !IsShopPaused && _formChangeCooldownTimer <= 0f;
+    public bool CanChangeForm => !IsStageTransitioning && !IsGameplayModalPaused && _formChangeCooldownTimer <= 0f;
 
     /// <summary>패링 활성 윈도우 내에 있을 때 true. TakeDamage에서 패링 판정에 사용됩니다.</summary>
     public bool IsParryActive => StateMachine.CurrentState is PlayerParryState ps && ps.IsParryWindowActive;
@@ -91,16 +95,21 @@ public partial class PlayerController : MonoBehaviour, IDamageable
 
 
     // CanSkill / CanUltimate 는 현재 폼의 쿨타임과 SP를 함께 검사합니다.
-    public bool CanSkill => !IsStageTransitioning && !IsShopPaused && (FormManager?.CurrentForm?.CanSkill ?? false);
-    public bool CanUltimate => !IsStageTransitioning && !IsShopPaused && (FormManager?.CurrentForm?.CanUltimate ?? false);
+    public bool CanSkill => !IsStageTransitioning && !IsGameplayModalPaused && (FormManager?.CurrentForm?.CanSkill ?? false);
+    public bool CanUltimate => !IsStageTransitioning && !IsGameplayModalPaused && (FormManager?.CurrentForm?.CanUltimate ?? false);
 
     public bool IsKnockbacking => _knockbackCoroutine != null
         || PendingHitReaction == PlayerHitReaction.Knockback
         || StateMachine?.CurrentState is PlayerKnockbackState knockback && !knockback.IsComplete;
 
+    public bool IsKnockedDown => PendingHitReaction == PlayerHitReaction.Knockdown
+        || StateMachine?.CurrentState is PlayerKnockdownState knockdown && !knockdown.IsComplete;
+
     [Header("Hit Reaction Settings")]
-    [Min(0f)] public float HitDuration = 0.15f;
-    [Min(0f)] public float StaggerDuration = 0.4f;
+    [Min(0f)] public float HitDuration = 0.20f;
+    [HideInInspector, Min(0f)] public float StaggerDuration = 0.20f; // Legacy serialized data; normal reactions use HitDuration.
+    [Min(0f), Tooltip("피격 복귀 직전에 새 행동 입력을 보존하는 시간 (초)")]
+    public float HitRecoveryInputBufferWindow = 0.05f;
     [Tooltip("이 강인도 피해 이상이면 짧은 피격 대신 경직됩니다. 누적 게이지가 아닌 1회 타격 기준입니다.")]
     [Min(0f)] public float StaggerPoiseThreshold = 20f;
     [Tooltip("공격의 경직 강도가 이 저항보다 높을 때만 피격/경직/넉백됩니다. 같거나 낮으면 피해만 받습니다.")]
@@ -108,9 +117,13 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     public string HitAnimationName = "Hit";
     public string StaggerAnimationName = "Stagger";
     public string KnockbackAnimationName = "Knockback";
+    public string KnockdownAnimationName = "Knockdown";
+    public string GetUpAnimationName = "GetUp";
 
     public PlayerHitReaction PendingHitReaction { get; private set; }
     private Vector3 _pendingHitVelocity;
+    public float PendingKnockdownDownSeconds { get; private set; }
+    public float PendingKnockdownGetUpSeconds { get; private set; }
     public float KnockbackDuration => Mathf.Max(0f, _knockbackDuration);
 
     [Header("CombatData")]
@@ -123,7 +136,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     [Tooltip("넉백 저항값. 이 값보다 작은 힘은 밀리지 않음")]
     [SerializeField] private float _knockbackResistance = 3f;
     [Tooltip("넉백 지속 시간 (초)")]
-    [SerializeField] private float _knockbackDuration = 0.25f;
+    [SerializeField] private float _knockbackDuration = 0.12f;
     private Coroutine _knockbackCoroutine;
 
     [Header("Default Hit Stop Settings")]
@@ -145,6 +158,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     private void Awake()
     {
         StatManager = GetComponent<PlayerStatManager>();
+        GetComponent<PlayerUpgradeBinding>()?.BindForSpawn();
         ItemRuntime = GetComponent<PlayerItemRuntime>();
         Animator = gameObject.GetComponentInChildren<Animator>();
         ActorClock = CombatActorClock.GetOrCreate(this);
@@ -176,9 +190,9 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     private void Update()
     {
         if (IsStageTransitioning) return;
-        if (IsShopPaused)
+        if (IsGameplayModalPaused)
         {
-            // A scripted lethal hit must still terminate the run while the shop owns world time.
+            // A scripted lethal hit must still terminate the run while a gameplay modal owns world time.
             if (StatManager != null && StatManager.CurrentHp <= 0f)
                 StateMachine?.Update(false, false);
             return;
@@ -190,8 +204,10 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         ItemRuntime?.Tick(Time.deltaTime);
         StatManager.UpdateSpRegen(Time.deltaTime);
         FormManager.UpdateFormSp(Time.deltaTime);
+        FormManager.UpdateChainReadiness(Time.deltaTime);
         bool canAct = ActionDeltaTime > 0f;
         if (canAct) TryDeactivateUltimate();
+        if (StateMachine.CurrentState is PlayerAttackState attack) attack.PrepareSkillReservation();
         // Death and external hit reactions have priority even while actor time is stopped.
         StateMachine.Update(canAct, canAct);
         if (IsStageTransitioning) return;
@@ -266,7 +282,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         }
     }
 
-    public bool CanJump() => !IsStageTransitioning && !IsShopPaused && (IsGround() || _coyoteTimer > 0f);
+    public bool CanJump() => !IsStageTransitioning && !IsGameplayModalPaused && (IsGround() || _coyoteTimer > 0f);
     public void ConsumeCoyote() => _coyoteTimer = 0f;
     public void StartDashCooldown() => _dashCooldownTimer = DashCooldown;
 
@@ -285,8 +301,14 @@ public partial class PlayerController : MonoBehaviour, IDamageable
 
     public DamageResult TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE, bool isParryable = true, object source = null)
     {
-        if (!isActiveAndEnabled || IsStageTransitioning || StatManager.CurrentHp <= 0f || IsDashing
+        if (!isActiveAndEnabled || IsStageTransitioning || StatManager.CurrentHp <= 0f
             || damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return default;
+        if (StateMachine.CurrentState is PlayerDashState dash)
+        {
+            if (damage > 0f && source is EnemyAction && dash.TryConfirmSuccessfulDodge())
+                FormManager.NotifySuccessfulDodge();
+            return default;
+        }
         if ((FormManager.CurrentForm as BaseForm)?.BlocksIncomingDamage(damage, power, source) == true)
             return new DamageResult(DamageOutcome.Blocked);
 
@@ -307,9 +329,13 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         damage *= (FormManager.CurrentForm as BaseForm)?.IncomingDamageMultiplier ?? 1f;
         var result = StatManager.TakeDamage(damage, damageType, isCritical);
         if (result.Applied && result.HealthDamage + result.ShieldDamage > 0f)
+        {
             CancelPendingSwitchAttack();
-        if (result.Applied && !result.Killed && result.HealthDamage + result.ShieldDamage > 0f)
-            RequestHitReaction(power, poiseDamage, staggerResistLevel);
+            bool knockdown = ResolveIncomingKnockdown(source, out float downSeconds, out float getUpSeconds);
+            PlayIncomingHitCameraShake(source, knockdown);
+            if (!result.Killed)
+                RequestHitReaction(power, poiseDamage, staggerResistLevel, knockdown, downSeconds, getUpSeconds);
+        }
         return result;
     }
 
@@ -317,9 +343,21 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         => HitStaggerResistance != StaggerResistLevel.SUPER_ARMOR
             && attackLevel > HitStaggerResistance;
 
-    private void RequestHitReaction(Vector3 power, float poiseDamage, StaggerResistLevel attackLevel)
+    private static bool ResolveIncomingKnockdown(object source, out float downSeconds, out float getUpSeconds)
     {
-        if (!CanReactToHit(attackLevel))
+        downSeconds = getUpSeconds = 0f;
+        return source is EnemyAction enemyAttack
+            && enemyAttack.TryGetPlayerKnockdown(out downSeconds, out getUpSeconds)
+            && KnockbackMotion.IsFinite(downSeconds) && downSeconds >= 0f
+            && KnockbackMotion.IsFinite(getUpSeconds) && getUpSeconds >= 0f
+            && KnockbackMotion.IsFinite(downSeconds + getUpSeconds) && downSeconds + getUpSeconds > 0f;
+    }
+
+    private void RequestHitReaction(Vector3 power, float poiseDamage, StaggerResistLevel attackLevel,
+        bool knockdown, float downSeconds, float getUpSeconds)
+    {
+        // Damage and camera feedback still apply, but a committed down/get-up is never restarted.
+        if (IsKnockedDown || !CanReactToHit(attackLevel))
             return;
 
         Vector3 velocity = GetKnockbackVelocity(power);
@@ -328,6 +366,9 @@ public partial class PlayerController : MonoBehaviour, IDamageable
             : poiseDamage > 0f && poiseDamage >= StaggerPoiseThreshold
                 ? PlayerHitReaction.Stagger : PlayerHitReaction.Hit;
 
+        if (knockdown)
+            reaction = PlayerHitReaction.Knockdown;
+
         // 같은 프레임의 약한 타격이 강한 반응을 덮어쓰거나 진행 중인 넉백을 취소하지 않습니다.
         if (PendingHitReaction > reaction) return;
         if (StateMachine.CurrentState is PlayerHitState active && !active.IsComplete && active.Reaction > reaction)
@@ -335,6 +376,8 @@ public partial class PlayerController : MonoBehaviour, IDamageable
 
         PendingHitReaction = reaction;
         _pendingHitVelocity = velocity;
+        PendingKnockdownDownSeconds = reaction == PlayerHitReaction.Knockdown ? downSeconds : 0f;
+        PendingKnockdownGetUpSeconds = reaction == PlayerHitReaction.Knockdown ? getUpSeconds : 0f;
     }
 
     public Vector3 ConsumeHitReaction()
@@ -342,6 +385,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         Vector3 velocity = _pendingHitVelocity;
         PendingHitReaction = PlayerHitReaction.None;
         _pendingHitVelocity = Vector3.zero;
+        PendingKnockdownDownSeconds = PendingKnockdownGetUpSeconds = 0f;
         return velocity;
     }
 
@@ -406,6 +450,8 @@ public partial class PlayerController : MonoBehaviour, IDamageable
 
     private void OnDisable()
     {
+        if (StateMachine?.CurrentState is PlayerHitState activeReaction) activeReaction.Cancel();
+        if (StateMachine?.CurrentState is PlayerAttackState attack) attack.CancelSkillReservation();
         CancelFinisherSelection();
         CancelPendingSwitchAttack();
         if (StateMachine?.CurrentState is PlayerSwitchAttackState activeSwitch)

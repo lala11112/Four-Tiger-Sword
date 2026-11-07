@@ -4,6 +4,7 @@ public abstract partial class BaseForm
 {
     public virtual void BeginAttack()
     {
+        ResetActionTiming();
         ResetFinisherAttack();
         _normalAttackActive = true;
         _currentAction = ActionType.Attack;
@@ -26,19 +27,27 @@ public abstract partial class BaseForm
             return;
         }
 
+        _playerController.SetAnimationSpeed(AttackSpeed);
         _timer += _playerController.ActionDeltaTime * AttackSpeed;
         ApplyFinisherFacing();
 
-        _playerController.UpdateAttackTrails(currentStep, _timer);
-        MoveForward(currentStep);
-        ProcessHit(currentStep);
-
-        if (_timer >= currentStep.Duration)
-            isComplete = true;
+        if (!IsCurrentActionExecutionComplete)
+        {
+            _playerController.UpdateAttackTrails(currentStep, _timer);
+            MoveForward(currentStep);
+            ProcessHit(currentStep);
+        }
+        isComplete = CompleteActionExecution(_timer >= currentStep.Duration, !_finisherAttackActive);
     }
 
     public bool CanChainAttack => !_finisherAttackActive && HasSteps(_weaponActionData?.ComboSteps)
-        && CurrentNormalAttackStep != null && _timer >= CurrentNormalAttackStep.ComboTransitionTime;
+        && CurrentNormalAttackStep != null && _timer >= CurrentNormalAttackStep.ComboTransitionTime
+        && _timer >= LastExecutableHitEnd(CurrentNormalAttackStep);
+
+    public bool CanCancelAttackRecovery => _currentAction == ActionType.Attack && CanCancelCurrentActionToMove;
+
+    public bool CanRestartNormalCombo => _currentAction == ActionType.Attack && CanCancelCurrentActionToAction
+        && HasSteps(_weaponActionData?.ComboSteps) && _comboStep == _weaponActionData.ComboSteps.Count - 1;
 
     public bool TryContinueAttack()
     {
@@ -90,7 +99,7 @@ public abstract partial class BaseForm
         _timer += _playerController.ActionDeltaTime * AttackSpeed;
         isComplete = _weaponActionData == null
             || string.IsNullOrWhiteSpace(_weaponActionData.AirAttackStartAnimationName)
-            || _timer >= _weaponActionData.AirAttackStartDuration;
+            || CompleteActionExecution(_timer >= _weaponActionData.AirAttackStartDuration);
     }
 
     public virtual void BeginAirAttackLoop()
@@ -117,10 +126,13 @@ public abstract partial class BaseForm
 
         _playerController.SetAnimationSpeed(AttackSpeed);
         _timer += _playerController.ActionDeltaTime * AttackSpeed;
-        RotateTowardSoftTarget();
-        _playerController.UpdateAttackTrails(_weaponActionData.AirAttackStep, _timer);
-        ProcessHit(_weaponActionData.AirAttackStep);
-        isComplete = _timer >= _weaponActionData.AirAttackStep.Duration;
+        if (!IsCurrentActionExecutionComplete)
+        {
+            RotateTowardSoftTarget();
+            _playerController.UpdateAttackTrails(_weaponActionData.AirAttackStep, _timer);
+            ProcessHit(_weaponActionData.AirAttackStep);
+        }
+        isComplete = CompleteActionExecution(_timer >= _weaponActionData.AirAttackStep.Duration);
     }
 
     public virtual void EndAirAttack()
@@ -144,21 +156,29 @@ public abstract partial class BaseForm
     }
 
     public virtual void UpdateSkill(out bool isComplete)
+        => UpdateSkillSteps(_weaponActionData?.SkillSteps, out isComplete);
+
+    private void UpdateSkillSteps(System.Collections.Generic.List<WeaponActionData> steps, out bool isComplete)
     {
         isComplete = false;
-        if (_weaponActionData == null || _weaponActionData.SkillSteps == null || _weaponActionData.SkillSteps.Count == 0) { isComplete = true; return; }
+        if (!HasSteps(steps)) { isComplete = true; return; }
 
+        _playerController.SetAnimationSpeed(AttackSpeed);
         _timer += _playerController.ActionDeltaTime * AttackSpeed;
-        WeaponActionData step = _weaponActionData.SkillSteps[_skillStep];
-        _playerController.UpdateAttackTrails(step, _timer);
-        MoveForward(step);
-        ProcessHit(step);
+        WeaponActionData step = steps[_skillStep];
+        if (!IsCurrentActionExecutionComplete)
+        {
+            _playerController.UpdateAttackTrails(step, _timer);
+            MoveForward(step);
+            ProcessHit(step);
+        }
 
         if (_timer >= step.Duration)
         {
-            if (_skillStep < _weaponActionData.SkillSteps.Count - 1) { _skillStep++; PlaySkillStep(); }
-            else isComplete = true;
+            if (_skillStep < steps.Count - 1) { _skillStep++; PlaySkillStep(); }
+            else isComplete = CompleteActionExecution(true, _currentAction != ActionType.SwitchAttack);
         }
+        else CompleteActionExecution(false, _currentAction != ActionType.SwitchAttack);
     }
 
     public virtual void EndSkill()
@@ -171,25 +191,28 @@ public abstract partial class BaseForm
         _playerController.SetAnimationSpeed(1f);
     }
 
-    // Shares the authored skill attack, but never consumes E resources or starts its cooldown.
+    // Uses independently authored switch steps and never consumes E resources or starts its cooldown.
     public virtual void BeginSwitchAttack()
     {
+        if (!CanSwitchAttack) return;
         _currentAction = ActionType.SwitchAttack;
+        ApplyChainBuff();
         SnapshotAttackDamage();
         _skillStep = 0;
         FindSoftTarget();
         _playerController.SetAnimationSpeed(AttackSpeed);
-        if (CanSwitchAttack) PlaySkillStep();
+        PlaySkillStep();
     }
 
     public virtual void UpdateSwitchAttack(out bool isComplete)
     {
         if (!CanSwitchAttack) { isComplete = true; return; }
-        UpdateSkill(out isComplete);
+        UpdateSkillSteps(_weaponActionData.SwitchAttackSteps, out isComplete);
     }
 
     public virtual void EndSwitchAttack()
     {
+        _chainVulnerabilityBonusPercent = _chainVulnerabilityDuration = 0f;
         EndAttackCamera();
         _skillStep = 0;
         _softTarget = null;
@@ -211,6 +234,7 @@ public abstract partial class BaseForm
 
     protected void ConsumeUltimateResources()
     {
+        ResetActionTiming();
         _ultimateCooldownTimer = _weaponActionData != null ? _weaponActionData.UltimateCooldown : 30f;
         _playerController.StatManager.ConsumeAllUltimateGauge();
     }
@@ -220,17 +244,22 @@ public abstract partial class BaseForm
         isComplete = false;
         if (_weaponActionData == null || _weaponActionData.UltimateSteps == null || _weaponActionData.UltimateSteps.Count == 0) { isComplete = true; return; }
 
+        _playerController.SetAnimationSpeed(AttackSpeed);
         _timer += _playerController.ActionDeltaTime * AttackSpeed;
         WeaponActionData step = _weaponActionData.UltimateSteps[_ultimateStep];
-        _playerController.UpdateAttackTrails(step, _timer);
-        MoveForward(step);
-        ProcessHit(step);
+        if (!IsCurrentActionExecutionComplete)
+        {
+            _playerController.UpdateAttackTrails(step, _timer);
+            MoveForward(step);
+            ProcessHit(step);
+        }
 
         if (_timer >= step.Duration)
         {
             if (_ultimateStep < _weaponActionData.UltimateSteps.Count - 1) { _ultimateStep++; PlayUltimateStep(); }
-            else isComplete = true;
+            else isComplete = CompleteActionExecution(true);
         }
+        else CompleteActionExecution(false);
     }
 
     public virtual void EndUltimate()
@@ -246,6 +275,7 @@ public abstract partial class BaseForm
 
     public virtual void BeginCounter()
     {
+        ResetActionTiming();
         _currentAction = ActionType.Counter;
         _timer = 0f;
         _motionStep = null;
@@ -272,13 +302,15 @@ public abstract partial class BaseForm
 
         if (step == null) { isComplete = true; return; }
 
+        _playerController.SetAnimationSpeed(AttackSpeed);
         _timer += _playerController.ActionDeltaTime * AttackSpeed;
-        _playerController.UpdateAttackTrails(step, _timer);
-        MoveForward(step);
-        ProcessHit(step);
-
-        if (_timer >= step.Duration)
-            isComplete = true;
+        if (!IsCurrentActionExecutionComplete)
+        {
+            _playerController.UpdateAttackTrails(step, _timer);
+            MoveForward(step);
+            ProcessHit(step);
+        }
+        isComplete = CompleteActionExecution(_timer >= step.Duration);
     }
 
     public virtual void EndCounter()

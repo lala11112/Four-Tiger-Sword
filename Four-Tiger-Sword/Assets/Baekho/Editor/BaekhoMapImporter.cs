@@ -89,6 +89,13 @@ namespace StudioBaekho
             public string contentKey;
             public Coordinates position;
             public Coordinates rotation;
+            public MarkerClearance clearance;
+        }
+
+        [Serializable] private sealed class MarkerClearance
+        {
+            public float radius;
+            public float height;
         }
 
         [MenuItem(MenuPath, true)]
@@ -255,6 +262,11 @@ namespace StudioBaekho
                         metadata.label = item.label;
                         metadata.kind = item.kind;
                         metadata.contentKey = item.contentKey;
+                        if (item.kind == "teleport")
+                        {
+                            metadata.clearanceRadius = item.clearance.radius;
+                            metadata.clearanceHeight = item.clearance.height;
+                        }
                     }
                 }
                 if (manifest.schemaVersion >= 2)
@@ -505,8 +517,14 @@ namespace StudioBaekho
                     throw new InvalidDataException("Marker IDs must be unique, 1–100 letters, numbers, '_' or '-'.");
                 if (string.IsNullOrWhiteSpace(item.label) || item.label.Length > 80 || Regex.IsMatch(item.label, @"[\x00-\x1F\x7F]"))
                     throw new InvalidDataException("Marker label must contain 1–80 characters without control characters.");
-                if (item.kind != "enemy" && item.kind != "reward" && item.kind != "event")
-                    throw new InvalidDataException("Marker kind must be enemy, reward or event: " + item.id);
+                if (item.kind != "enemy" && item.kind != "reward" && item.kind != "event" && item.kind != "teleport")
+                    throw new InvalidDataException("Marker kind must be enemy, reward, event or teleport: " + item.id);
+                if (item.kind == "teleport")
+                {
+                    if (item.clearance == null || !Finite(item.clearance.radius) || item.clearance.radius < .1f || item.clearance.radius > 5 ||
+                        !Finite(item.clearance.height) || item.clearance.height < .25f || item.clearance.height > 20)
+                        throw new InvalidDataException("Teleport clearance requires radius 0.1–5m and height 0.25–20m: " + item.id);
+                }
                 if (item.contentKey == null || item.contentKey.Length > 200 || Regex.IsMatch(item.contentKey, @"[\x00-\x1F\x7F]"))
                     throw new InvalidDataException("Marker contentKey must contain at most 200 characters without control characters.");
                 ValidateVector(item.position, item.id + ".position", false);
@@ -775,12 +793,24 @@ namespace StudioBaekho
                 do
                 {
                     if (++count > MaxMarkers) Fail("Too many markers");
+                    string markerKind = null;
+                    bool hasClearance = false;
                     ReadObject(new[] { "id", "label", "kind", "contentKey", "position", "rotation" }, key =>
                     {
                         if (key == "position" || key == "rotation")
                             ReadObject(new[] { "x", "y", "z" }, axis => ReadNumber(false));
+                        else if (key == "clearance")
+                        {
+                            hasClearance = true;
+                            ReadObject(new[] { "radius", "height" }, dimension => ReadNumber(false));
+                        }
+                        else if (key == "kind") markerKind = ReadString();
                         else ReadString();
-                    });
+                    }, new[] { "clearance" });
+                    // JsonUtility creates empty nested objects for omitted fields. Check presence
+                    // in the source shape so old non-teleport markers remain compatible.
+                    if (markerKind == "teleport" && !hasClearance) Fail("Teleport marker requires clearance");
+                    if (markerKind != "teleport" && hasClearance) Fail("Only teleport markers may contain clearance");
                 } while (Take(','));
                 Expect(']');
             }

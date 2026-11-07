@@ -39,6 +39,10 @@ public sealed class FinisherWheelView : MonoBehaviour
     [SerializeField] private string currentRoleText = "현재 폼 · 3타";
     [SerializeField] private string otherRoleText = "기본 3타";
     [SerializeField] private string selectionSuffix = "  ·  기본 3타";
+    [Tooltip("Compensates a presentation-only Canvas reference change without changing pointer sensitivity.")]
+    [SerializeField, Min(0.01f)] private float inputScaleMultiplier = 1f;
+    [Tooltip("Maps the unchanged logical cursor radius into the authored wheel artwork.")]
+    [SerializeField, Min(0.01f)] private float cursorPresentationScale = 1f;
 
     private bool _initialized;
     private Color _normalCenterColor;
@@ -46,7 +50,7 @@ public sealed class FinisherWheelView : MonoBehaviour
 
     public ElementType SelectedElement { get; private set; }
     public bool IsVisible { get; private set; }
-    public float ScaleFactor => canvas != null ? Mathf.Max(0.0001f, canvas.scaleFactor) : 1f;
+    public float ScaleFactor => canvas != null ? Mathf.Max(0.0001f, canvas.scaleFactor * inputScaleMultiplier) : 1f;
 
     public static FinisherWheelView Create(Transform owner = null)
     {
@@ -147,7 +151,8 @@ public sealed class FinisherWheelView : MonoBehaviour
         int selected = FinisherWheelSelection.IndexOf(resolved);
         int current = FinisherWheelSelection.IndexOf(_current);
         if (wheel != null) wheel.SetSelection(selected, current);
-        virtualCursor.anchoredPosition = Vector2.ClampMagnitude(logicalCursor, FinisherWheelSelection.OuterRadius);
+        virtualCursor.anchoredPosition = Vector2.ClampMagnitude(logicalCursor, FinisherWheelSelection.OuterRadius)
+            * cursorPresentationScale;
         if (centerName != null && tintCenterByElement)
             centerName.color = selected < 0 ? ElementColor(_current) : _normalCenterColor;
         if (selectionLabel != null)

@@ -19,6 +19,8 @@ public class WaterDelayedDamageEffect : IStatusEffect
     private bool _damageDone;
     private IDamageable _damageable;
     private GameObject _targetGO;
+    private Boss _boss;
+    private int _phaseGeneration;
 
     public bool IsExpired => _damageDone;
 
@@ -39,6 +41,8 @@ public class WaterDelayedDamageEffect : IStatusEffect
     {
         _damageable = target.GetComponent<IDamageable>();
         _targetGO = target;
+        _boss = target.GetComponent<Boss>();
+        _phaseGeneration = _boss != null ? _boss.PhaseGeneration : 0;
         _elapsed = 0f;
         _damageDone = false;
     }
@@ -46,15 +50,15 @@ public class WaterDelayedDamageEffect : IStatusEffect
     public void OnUpdate(float deltaTime)
     {
         if (_damageDone) return;
+        if (!CanApplyPendingDamage()) { _damageDone = true; return; }
 
         _elapsed += deltaTime;
         if (_elapsed < _delay) return;
 
         _damageDone = true;
 
-        if (_damageable == null || _targetGO == null) return;
-
-        _targetGO.GetComponent<Enemy>().StartCoroutine(DamageApply());
+        var enemy = _targetGO.GetComponent<Enemy>();
+        if (enemy != null) enemy.StartCoroutine(DamageApply());
     }
 
     public void OnRemove(GameObject target) { }
@@ -63,14 +67,25 @@ public class WaterDelayedDamageEffect : IStatusEffect
     {
         for (int i = 0; i < 5; i++)
         {
+            if (!CanApplyPendingDamage()) yield break;
             yield return new WaitForSeconds(0.3f);
+            if (!CanApplyPendingDamage()) yield break;
             DamageManager.Apply(
                 new HitInfo(_damage, _element, _critChance, _critMultiplier, poiseDamage: 0f,
                     impactSound: _impactSound, category: PlayerAttackCategory.Secondary),
                 _damageable, _targetGO);
 
+            // The hit itself may deplete a phase; its old scheduled VFX must not cross that boundary.
+            if (_targetGO == null || !_targetGO.activeInHierarchy || !IsCurrentPhase()) yield break;
             if (_vfxPrefab != null)
                 StageTransientObject.Track(Object.Instantiate(_vfxPrefab, _targetGO.transform.position, Quaternion.identity));
         }
     }
+
+    private bool CanApplyPendingDamage() => _damageable != null && _targetGO != null
+        && _targetGO.activeInHierarchy && _targetGO.GetComponent<Enemy>()?.IsDead != true
+        && IsCurrentPhase();
+
+    private bool IsCurrentPhase() => _boss == null
+        || (!_boss.IsTransitioning && _boss.PhaseGeneration == _phaseGeneration);
 }

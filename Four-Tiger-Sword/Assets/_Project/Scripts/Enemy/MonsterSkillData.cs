@@ -1,7 +1,12 @@
 using UnityEngine;
 
+public enum EnemyPlayerHitReaction { Normal, Knockdown }
+
 public abstract class MonsterSkillData : ScriptableObject
 {
+    /// <summary>Opt in only when the created EnemyAction implements the boss execution hooks.</summary>
+    public virtual bool SupportsBossExecutionPolicy => false;
+
     [Tooltip("애니메이터 트리거 이름")]
     public string animName;
 
@@ -33,6 +38,14 @@ public abstract class MonsterSkillData : ScriptableObject
     [Header("경직 강도")]
     [Tooltip("플레이어의 Hit Stagger Resistance보다 높을 때만 피격/경직/넉백을 일으킵니다. 같거나 낮으면 피해만 줍니다.")]
     public StaggerResistLevel staggerLevel = StaggerResistLevel.LOW;
+
+    [Header("플레이어 피격 반응")]
+    [Tooltip("공격 강도에 맞춰 일반 피격 또는 다운을 지정합니다. 다운도 회피와 패링으로 방지할 수 있습니다.")]
+    public EnemyPlayerHitReaction playerHitReaction = EnemyPlayerHitReaction.Normal;
+    [Min(0f), Tooltip("다운 모션과 넘어져 있는 시간 (초)")]
+    public float playerDownSeconds = .3f;
+    [Min(0f), Tooltip("기상 모션이 끝나고 조작이 돌아오기까지의 시간 (초)")]
+    public float playerGetUpSeconds = .5f;
 
     [Header("패링")]
     [Tooltip("false로 설정하면 플레이어의 패링으로 이 공격을 막을 수 없습니다.")]

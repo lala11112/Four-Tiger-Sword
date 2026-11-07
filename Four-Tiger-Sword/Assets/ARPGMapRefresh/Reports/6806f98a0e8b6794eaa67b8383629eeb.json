@@ -1,0 +1,1074 @@
+{
+    "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap11/TwinRise_Arena.prefab",
+    "prefabPath": "Assets/ARPGMapRefresh/Prefabs/Rooms/normal_6806f98a0e8b6794eaa67b8383629eeb.prefab",
+    "disabledProps": 6,
+    "wallSkins": 256,
+    "restoredStairs": 6,
+    "colliderCount": 1275,
+    "furniture": {
+        "sourcePath": "Assets/_Game/Greybox/Blockout/BaekhoMap11/TwinRise_Arena.prefab",
+        "role": "normal",
+        "purpose": "Twin-rise turbine control with an open central fighting floor",
+        "requestedParts": 39,
+        "placedParts": 38,
+        "rejectedParts": 1,
+        "placedAssemblies": 13,
+        "occupiedFloorArea": 93.92012786865235,
+        "serviceDeckArea": 174.96722412109376,
+        "parts": [
+            {
+                "id": "SouthWestTurbine_01",
+                "assembly": "SouthWestTurbine",
+                "asset": "Assets/ARPGRoomSetV3/Models/Assemblies/LAB_TurbineServiceUnit.fbx",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -21.0,
+                    "y": 0.0,
+                    "z": -17.0
+                },
+                "position": {
+                    "x": -21.0,
+                    "y": 0.012000000104308129,
+                    "z": -17.0
+                },
+                "boundsCenter": {
+                    "x": -21.0,
+                    "y": 1.5998567342758179,
+                    "z": -17.0
+                },
+                "boundsSize": {
+                    "x": 4.94000244140625,
+                    "y": 3.175713539123535,
+                    "z": 2.6817169189453127
+                }
+            },
+            {
+                "id": "SouthWestTurbine_02",
+                "assembly": "SouthWestTurbine",
+                "asset": "Assets/LabProps29/Prefabs/06_standing_terminal.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -18.075000762939454,
+                    "y": 0.0,
+                    "z": -16.674999237060548
+                },
+                "position": {
+                    "x": -17.575000762939454,
+                    "y": 0.012000000104308129,
+                    "z": -16.674999237060548
+                },
+                "boundsCenter": {
+                    "x": -17.589994430541993,
+                    "y": 0.9744191765785217,
+                    "z": -16.619049072265626
+                },
+                "boundsSize": {
+                    "x": 1.2633934020996094,
+                    "y": 1.9248383045196534,
+                    "z": 1.0176467895507813
+                }
+            },
+            {
+                "id": "SouthWestTurbine_03",
+                "assembly": "SouthWestTurbine",
+                "asset": "Assets/LabProps29/Prefabs/11_toolbox.prefab",
+                "reason": "Unsupported footprint or floor-height transition",
+                "accepted": false,
+                "requestedPosition": {
+                    "x": -23.729999542236329,
+                    "y": 0.0,
+                    "z": -16.479999542236329
+                },
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "boundsCenter": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                "boundsSize": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "id": "NorthWestCooling_01",
+                "assembly": "NorthWestCooling",
+                "asset": "Assets/ARPGRoomSetV3/Models/Assemblies/LAB_WallCoolingManifold.fbx",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -21.0,
+                    "y": 0.0,
+                    "z": 17.0
+                },
+                "position": {
+                    "x": -21.0,
+                    "y": 0.012000000104308129,
+                    "z": 17.0
+                },
+                "boundsCenter": {
+                    "x": -21.0,
+                    "y": 1.5432499647140504,
+                    "z": 17.000438690185548
+                },
+                "boundsSize": {
+                    "x": 3.5,
+                    "y": 3.0625,
+                    "z": 1.18212890625
+                }
+            },
+            {
+                "id": "NorthWestCooling_02",
+                "assembly": "NorthWestCooling",
+                "asset": "Assets/LabProps29/Prefabs/06_standing_terminal.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -18.75,
+                    "y": 0.0,
+                    "z": 17.25
+                },
+                "position": {
+                    "x": -18.25,
+                    "y": 0.012000000104308129,
+                    "z": 17.25
+                },
+                "boundsCenter": {
+                    "x": -18.261531829833986,
+                    "y": 0.7523225545883179,
+                    "z": 17.29303741455078
+                },
+                "boundsSize": {
+                    "x": 0.9718399047851563,
+                    "y": 1.4806451797485352,
+                    "z": 0.782806396484375
+                }
+            },
+            {
+                "id": "NorthWestCooling_03",
+                "assembly": "NorthWestCooling",
+                "asset": "Assets/LabProps29/Prefabs/11_toolbox.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -23.100000381469728,
+                    "y": 0.0,
+                    "z": 17.399999618530275
+                },
+                "position": {
+                    "x": -23.100000381469728,
+                    "y": 0.012000029906630516,
+                    "z": 18.399999618530275
+                },
+                "boundsCenter": {
+                    "x": -23.09746551513672,
+                    "y": 0.2588571310043335,
+                    "z": 18.409461975097658
+                },
+                "boundsSize": {
+                    "x": 0.8935947418212891,
+                    "y": 0.49371421337127688,
+                    "z": 0.6580810546875
+                }
+            },
+            {
+                "id": "WestMaintenance_01",
+                "assembly": "WestMaintenance",
+                "asset": "Assets/ARPGRoomSetV3/Models/Assemblies/LAB_CargoLoadingStation.fbx",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -21.0,
+                    "y": 0.0,
+                    "z": -7.0
+                },
+                "position": {
+                    "x": -21.0,
+                    "y": 0.012000000104308129,
+                    "z": -7.5
+                },
+                "boundsCenter": {
+                    "x": -21.0,
+                    "y": 1.5059996843338013,
+                    "z": -7.5
+                },
+                "boundsSize": {
+                    "x": 2.447999954223633,
+                    "y": 2.987999439239502,
+                    "z": 4.319999694824219
+                }
+            },
+            {
+                "id": "WestMaintenance_02",
+                "assembly": "WestMaintenance",
+                "asset": "Assets/LabProps29/Prefabs/10_blue_storage_case.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -20.700000762939454,
+                    "y": 0.0,
+                    "z": -9.699999809265137
+                },
+                "position": {
+                    "x": -20.700000762939454,
+                    "y": 0.01200004480779171,
+                    "z": -10.700002670288086
+                },
+                "boundsCenter": {
+                    "x": -20.68451690673828,
+                    "y": 0.2465999722480774,
+                    "z": -10.695854187011719
+                },
+                "boundsSize": {
+                    "x": 0.8832931518554688,
+                    "y": 0.4691999554634094,
+                    "z": 1.15118408203125
+                }
+            },
+            {
+                "id": "WestMaintenance_03",
+                "assembly": "WestMaintenance",
+                "asset": "Assets/LabProps29/Prefabs/11_toolbox.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -20.520000457763673,
+                    "y": 0.0,
+                    "z": -4.4800004959106449
+                },
+                "position": {
+                    "x": -20.520000457763673,
+                    "y": 0.012000029906630516,
+                    "z": -4.479998588562012
+                },
+                "boundsCenter": {
+                    "x": -20.508647918701173,
+                    "y": 0.308228462934494,
+                    "z": -4.4830403327941898
+                },
+                "boundsSize": {
+                    "x": 0.789703369140625,
+                    "y": 0.5924569368362427,
+                    "z": 1.072312355041504
+                }
+            },
+            {
+                "id": "SouthEastBattery_01",
+                "assembly": "SouthEastBattery",
+                "asset": "Assets/ARPGRoomSet/Models/NewEquipment/LAB_StackedBatteryBank.fbx",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 21.0,
+                    "y": 0.0,
+                    "z": -17.0
+                },
+                "position": {
+                    "x": 21.0,
+                    "y": 0.012000000104308129,
+                    "z": -17.0
+                },
+                "boundsCenter": {
+                    "x": 21.0,
+                    "y": 1.6320000886917115,
+                    "z": -17.00729751586914
+                },
+                "boundsSize": {
+                    "x": 2.3351364135742189,
+                    "y": 3.2400002479553224,
+                    "z": 1.2405414581298829
+                }
+            },
+            {
+                "id": "SouthEastBattery_02",
+                "assembly": "SouthEastBattery",
+                "asset": "Assets/LabProps29/Prefabs/06_standing_terminal.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 23.700000762939454,
+                    "y": 0.0,
+                    "z": -16.700000762939454
+                },
+                "position": {
+                    "x": 23.200000762939454,
+                    "y": 0.012000000104308129,
+                    "z": -16.700000762939454
+                },
+                "boundsCenter": {
+                    "x": 23.1861629486084,
+                    "y": 0.9003869891166687,
+                    "z": -16.648353576660158
+                },
+                "boundsSize": {
+                    "x": 1.1662101745605469,
+                    "y": 1.7767739295959473,
+                    "z": 0.939361572265625
+                }
+            },
+            {
+                "id": "SouthEastBattery_03",
+                "assembly": "SouthEastBattery",
+                "asset": "Assets/LabProps29/Prefabs/11_toolbox.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 18.479999542236329,
+                    "y": 0.0,
+                    "z": -16.520000457763673
+                },
+                "position": {
+                    "x": 18.479999542236329,
+                    "y": 0.012000029906630516,
+                    "z": -16.520000457763673
+                },
+                "boundsCenter": {
+                    "x": 18.483041763305665,
+                    "y": 0.30822858214378359,
+                    "z": -16.50864601135254
+                },
+                "boundsSize": {
+                    "x": 1.0723114013671876,
+                    "y": 0.5924571752548218,
+                    "z": 0.7896995544433594
+                }
+            },
+            {
+                "id": "NorthEastAnalysis_01",
+                "assembly": "NorthEastAnalysis",
+                "asset": "Assets/ARPGRoomSetV3/Models/Assemblies/LAB_AnalysisBedGantry.fbx",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 21.0,
+                    "y": 0.0,
+                    "z": 17.0
+                },
+                "position": {
+                    "x": 21.0,
+                    "y": 0.012000000104308129,
+                    "z": 17.0
+                },
+                "boundsCenter": {
+                    "x": 21.0,
+                    "y": 1.2393800020217896,
+                    "z": 17.037076950073243
+                },
+                "boundsSize": {
+                    "x": 2.3013381958007814,
+                    "y": 2.4547600746154787,
+                    "z": 3.25
+                }
+            },
+            {
+                "id": "NorthEastAnalysis_02",
+                "assembly": "NorthEastAnalysis",
+                "asset": "Assets/LabProps29/Prefabs/06_standing_terminal.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 23.8125,
+                    "y": 0.0,
+                    "z": 17.3125
+                },
+                "position": {
+                    "x": 23.3125,
+                    "y": 0.012000000104308129,
+                    "z": 17.3125
+                },
+                "boundsCenter": {
+                    "x": 23.298084259033204,
+                    "y": 0.9374032020568848,
+                    "z": 17.366296768188478
+                },
+                "boundsSize": {
+                    "x": 1.2148056030273438,
+                    "y": 1.850806474685669,
+                    "z": 0.9785041809082031
+                }
+            },
+            {
+                "id": "NorthEastAnalysis_03",
+                "assembly": "NorthEastAnalysis",
+                "asset": "Assets/LabProps29/Prefabs/11_toolbox.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 18.375,
+                    "y": 0.0,
+                    "z": 17.5
+                },
+                "position": {
+                    "x": 18.375,
+                    "y": 0.012000029906630516,
+                    "z": 17.5
+                },
+                "boundsCenter": {
+                    "x": 18.3781681060791,
+                    "y": 0.3205714523792267,
+                    "z": 17.511829376220704
+                },
+                "boundsSize": {
+                    "x": 1.1169929504394532,
+                    "y": 0.617142915725708,
+                    "z": 0.822601318359375
+                }
+            },
+            {
+                "id": "EastArchive_01",
+                "assembly": "EastArchive",
+                "asset": "Assets/ARPGRoomSetV3/Models/Assemblies/LAB_LogisticsShelving.fbx",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 21.0,
+                    "y": 0.0,
+                    "z": -7.0
+                },
+                "position": {
+                    "x": 21.0,
+                    "y": 0.012000000104308129,
+                    "z": -7.0
+                },
+                "boundsCenter": {
+                    "x": 21.0,
+                    "y": 1.2257996797561646,
+                    "z": -6.999999523162842
+                },
+                "boundsSize": {
+                    "x": 1.2240009307861329,
+                    "y": 2.4275994300842287,
+                    "z": 3.40000057220459
+                }
+            },
+            {
+                "id": "EastArchive_02",
+                "assembly": "EastArchive",
+                "asset": "Assets/LabProps29/Prefabs/10_blue_storage_case.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 21.25,
+                    "y": 0.0,
+                    "z": -9.25
+                },
+                "position": {
+                    "x": 21.25,
+                    "y": 0.01200004480779171,
+                    "z": -9.25
+                },
+                "boundsCenter": {
+                    "x": 21.262901306152345,
+                    "y": 0.20749999582767487,
+                    "z": -9.246541976928711
+                },
+                "boundsSize": {
+                    "x": 0.7360782623291016,
+                    "y": 0.390999972820282,
+                    "z": 0.959320068359375
+                }
+            },
+            {
+                "id": "EastArchive_03",
+                "assembly": "EastArchive",
+                "asset": "Assets/LabProps29/Prefabs/11_toolbox.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 21.399999618530275,
+                    "y": 0.0,
+                    "z": -4.900000095367432
+                },
+                "position": {
+                    "x": 21.399999618530275,
+                    "y": 0.012000029906630516,
+                    "z": -4.399998664855957
+                },
+                "boundsCenter": {
+                    "x": 21.409461975097658,
+                    "y": 0.2588570713996887,
+                    "z": -4.402533054351807
+                },
+                "boundsSize": {
+                    "x": 0.6580810546875,
+                    "y": 0.4937140941619873,
+                    "z": 0.8935937881469727
+                }
+            },
+            {
+                "id": "WestRaisedCommand_01",
+                "assembly": "WestRaisedCommand",
+                "asset": "Assets/ARPGEnvironmentArt/Models/LAB_CommandDesk.fbx",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -13.0,
+                    "y": 2.0,
+                    "z": 7.0
+                },
+                "position": {
+                    "x": -13.0,
+                    "y": 2.01200008392334,
+                    "z": 7.0
+                },
+                "boundsCenter": {
+                    "x": -12.985672950744629,
+                    "y": 2.751230001449585,
+                    "z": 6.999999523162842
+                },
+                "boundsSize": {
+                    "x": 0.8970832824707031,
+                    "y": 1.4784598350524903,
+                    "z": 3.3000001907348635
+                }
+            },
+            {
+                "id": "WestRaisedCommand_02",
+                "assembly": "WestRaisedCommand",
+                "asset": "Assets/LabProps29/Prefabs/06_standing_terminal.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -12.75,
+                    "y": 2.0,
+                    "z": 4.75
+                },
+                "position": {
+                    "x": -12.75,
+                    "y": 2.01200008392334,
+                    "z": 4.749999046325684
+                },
+                "boundsCenter": {
+                    "x": -12.706960678100586,
+                    "y": 2.7523224353790285,
+                    "z": 4.761530876159668
+                },
+                "boundsSize": {
+                    "x": 0.7828025817871094,
+                    "y": 1.480644702911377,
+                    "z": 0.9718418121337891
+                }
+            },
+            {
+                "id": "WestRaisedCommand_03",
+                "assembly": "WestRaisedCommand",
+                "asset": "Assets/LabProps29/Prefabs/11_toolbox.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -12.600000381469727,
+                    "y": 2.0,
+                    "z": 9.100000381469727
+                },
+                "position": {
+                    "x": -12.59999942779541,
+                    "y": 2.01200008392334,
+                    "z": 9.600000381469727
+                },
+                "boundsCenter": {
+                    "x": -12.590536117553711,
+                    "y": 2.258857250213623,
+                    "z": 9.597465515136719
+                },
+                "boundsSize": {
+                    "x": 0.6580848693847656,
+                    "y": 0.4937143325805664,
+                    "z": 0.8935937881469727
+                }
+            },
+            {
+                "id": "EastRaisedSpecimen_01",
+                "assembly": "EastRaisedSpecimen",
+                "asset": "Assets/ARPGRoomSet/Models/NewEquipment/LAB_SpecimenCarousel.fbx",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 13.0,
+                    "y": 2.0,
+                    "z": 5.0
+                },
+                "position": {
+                    "x": 12.5,
+                    "y": 2.01200008392334,
+                    "z": 5.0
+                },
+                "boundsCenter": {
+                    "x": 12.500000953674317,
+                    "y": 3.4120001792907717,
+                    "z": 5.000000476837158
+                },
+                "boundsSize": {
+                    "x": 1.3884296417236329,
+                    "y": 2.8000001907348635,
+                    "z": 1.3884305953979493
+                }
+            },
+            {
+                "id": "EastRaisedSpecimen_02",
+                "assembly": "EastRaisedSpecimen",
+                "asset": "Assets/LabProps29/Prefabs/12_green_gas_cylinder.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 13.25,
+                    "y": 2.0,
+                    "z": 2.750000238418579
+                },
+                "position": {
+                    "x": 13.25,
+                    "y": 2.01200008392334,
+                    "z": 2.7499988079071047
+                },
+                "boundsCenter": {
+                    "x": 13.249998092651368,
+                    "y": 2.9120001792907717,
+                    "z": 2.749997854232788
+                },
+                "boundsSize": {
+                    "x": 0.6613616943359375,
+                    "y": 1.8000001907348633,
+                    "z": 0.6613621711730957
+                }
+            },
+            {
+                "id": "EastRaisedSpecimen_03",
+                "assembly": "EastRaisedSpecimen",
+                "asset": "Assets/LabProps29/Prefabs/11_toolbox.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 13.399999618530274,
+                    "y": 2.0,
+                    "z": 7.099999904632568
+                },
+                "position": {
+                    "x": 12.90000057220459,
+                    "y": 2.01200008392334,
+                    "z": 7.100001335144043
+                },
+                "boundsCenter": {
+                    "x": 12.909463882446289,
+                    "y": 2.258857250213623,
+                    "z": 7.097465991973877
+                },
+                "boundsSize": {
+                    "x": 0.6580848693847656,
+                    "y": 0.4937143325805664,
+                    "z": 0.8935937881469727
+                }
+            },
+            {
+                "id": "SouthDispatch_01",
+                "assembly": "SouthDispatch",
+                "asset": "Assets/LabProps29/Prefabs/06_standing_terminal.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -11.0,
+                    "y": 0.0,
+                    "z": -17.0
+                },
+                "position": {
+                    "x": -11.0,
+                    "y": 0.012000000104308129,
+                    "z": -17.0
+                },
+                "boundsCenter": {
+                    "x": -11.0,
+                    "y": 0.7958709597587586,
+                    "z": -16.952823638916017
+                },
+                "boundsSize": {
+                    "x": 0.9000015258789063,
+                    "y": 1.567741870880127,
+                    "z": 0.6169357299804688
+                }
+            },
+            {
+                "id": "SouthDispatch_02",
+                "assembly": "SouthDispatch",
+                "asset": "Assets/LabProps29/Prefabs/10_blue_storage_case.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -9.800000190734864,
+                    "y": 0.0,
+                    "z": -16.899999618530275
+                },
+                "position": {
+                    "x": -9.800000190734864,
+                    "y": 0.01200004480779171,
+                    "z": -16.899999618530275
+                },
+                "boundsCenter": {
+                    "x": -9.80000114440918,
+                    "y": 0.19600002467632295,
+                    "z": -16.887428283691408
+                },
+                "boundsSize": {
+                    "x": 0.8000001907348633,
+                    "y": 0.3680000305175781,
+                    "z": 0.5028553009033203
+                }
+            },
+            {
+                "id": "SouthDispatch_03",
+                "assembly": "SouthDispatch",
+                "asset": "Assets/LabProps29/Prefabs/13_brown_gas_cylinder.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -12.0,
+                    "y": 0.0,
+                    "z": -16.899999618530275
+                },
+                "position": {
+                    "x": -12.0,
+                    "y": 0.012000000104308129,
+                    "z": -16.899999618530275
+                },
+                "boundsCenter": {
+                    "x": -12.0,
+                    "y": 0.7620000839233398,
+                    "z": -16.899999618530275
+                },
+                "boundsSize": {
+                    "x": 0.4500007629394531,
+                    "y": 1.500000238418579,
+                    "z": 0.4500007629394531
+                }
+            },
+            {
+                "id": "NorthWestSecondaryArchive_01",
+                "assembly": "NorthWestSecondaryArchive",
+                "asset": "Assets/ARPGRoomSetV3/Models/Assemblies/LAB_LogisticsShelving.fbx",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -13.0,
+                    "y": 0.0,
+                    "z": 17.0
+                },
+                "position": {
+                    "x": -13.0,
+                    "y": 0.012000000104308129,
+                    "z": 17.0
+                },
+                "boundsCenter": {
+                    "x": -13.0,
+                    "y": 1.3471800088882447,
+                    "z": 16.999998092651368
+                },
+                "boundsSize": {
+                    "x": 3.740001678466797,
+                    "y": 2.6703600883483888,
+                    "z": 1.3464012145996094
+                }
+            },
+            {
+                "id": "NorthWestSecondaryArchive_02",
+                "assembly": "NorthWestSecondaryArchive",
+                "asset": "Assets/LabProps29/Prefabs/10_blue_storage_case.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -10.524999618530274,
+                    "y": 0.0,
+                    "z": 17.274999618530275
+                },
+                "position": {
+                    "x": -10.524999618530274,
+                    "y": 0.01200004480779171,
+                    "z": 17.274999618530275
+                },
+                "boundsCenter": {
+                    "x": -10.528802871704102,
+                    "y": 0.2270500510931015,
+                    "z": 17.289194107055665
+                },
+                "boundsSize": {
+                    "x": 1.0552520751953126,
+                    "y": 0.43010008335113528,
+                    "z": 0.8096809387207031
+                }
+            },
+            {
+                "id": "NorthWestSecondaryArchive_03",
+                "assembly": "NorthWestSecondaryArchive",
+                "asset": "Assets/LabProps29/Prefabs/11_toolbox.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -15.309999465942383,
+                    "y": 0.0,
+                    "z": 17.440000534057618
+                },
+                "position": {
+                    "x": -15.809999465942383,
+                    "y": 0.012000029906630516,
+                    "z": 17.440000534057618
+                },
+                "boundsCenter": {
+                    "x": -15.807210922241211,
+                    "y": 0.2835429012775421,
+                    "z": 17.450408935546876
+                },
+                "boundsSize": {
+                    "x": 0.9829530715942383,
+                    "y": 0.5430858135223389,
+                    "z": 0.7238922119140625
+                }
+            },
+            {
+                "id": "NorthEastLoading_01",
+                "assembly": "NorthEastLoading",
+                "asset": "Assets/ARPGRoomSetV3/Models/Assemblies/LAB_CargoLoadingStation.fbx",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 13.0,
+                    "y": 0.0,
+                    "z": 17.0
+                },
+                "position": {
+                    "x": 13.0,
+                    "y": 0.012000000104308129,
+                    "z": 17.0
+                },
+                "boundsCenter": {
+                    "x": 13.0,
+                    "y": 1.3814998865127564,
+                    "z": 17.0
+                },
+                "boundsSize": {
+                    "x": 3.9599990844726564,
+                    "y": 2.738999843597412,
+                    "z": 2.2440032958984377
+                }
+            },
+            {
+                "id": "NorthEastLoading_02",
+                "assembly": "NorthEastLoading",
+                "asset": "Assets/LabProps29/Prefabs/10_blue_storage_case.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 15.475000381469727,
+                    "y": 0.0,
+                    "z": 17.274999618530275
+                },
+                "position": {
+                    "x": 15.975000381469727,
+                    "y": 0.01200004480779171,
+                    "z": 17.274999618530275
+                },
+                "boundsCenter": {
+                    "x": 15.971197128295899,
+                    "y": 0.2270500510931015,
+                    "z": 17.28919219970703
+                },
+                "boundsSize": {
+                    "x": 1.0552520751953126,
+                    "y": 0.43010008335113528,
+                    "z": 0.8096847534179688
+                }
+            },
+            {
+                "id": "NorthEastLoading_03",
+                "assembly": "NorthEastLoading",
+                "asset": "Assets/LabProps29/Prefabs/11_toolbox.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 10.690000534057618,
+                    "y": 0.0,
+                    "z": 17.440000534057618
+                },
+                "position": {
+                    "x": 10.190000534057618,
+                    "y": 0.012000029906630516,
+                    "z": 17.440000534057618
+                },
+                "boundsCenter": {
+                    "x": 10.192790985107422,
+                    "y": 0.2835429012775421,
+                    "z": 17.450410842895509
+                },
+                "boundsSize": {
+                    "x": 0.9829521179199219,
+                    "y": 0.5430858135223389,
+                    "z": 0.7238922119140625
+                }
+            },
+            {
+                "id": "SouthMidCryo_01",
+                "assembly": "SouthMidCryo",
+                "asset": "Assets/ARPGRoomSet/Models/NewEquipment/LAB_HorizontalStasisPod.fbx",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 1.0,
+                    "y": 0.0,
+                    "z": -17.0
+                },
+                "position": {
+                    "x": 1.0,
+                    "y": 0.012000000104308129,
+                    "z": -16.5
+                },
+                "boundsCenter": {
+                    "x": 1.0,
+                    "y": 1.287000060081482,
+                    "z": -16.480384826660158
+                },
+                "boundsSize": {
+                    "x": 3.5307698249816896,
+                    "y": 2.5500001907348635,
+                    "z": 2.0400009155273439
+                }
+            },
+            {
+                "id": "SouthMidCryo_02",
+                "assembly": "SouthMidCryo",
+                "asset": "Assets/LabProps29/Prefabs/12_green_gas_cylinder.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": 3.700000047683716,
+                    "y": 0.0,
+                    "z": -16.700000762939454
+                },
+                "position": {
+                    "x": 3.700000047683716,
+                    "y": 0.012000000104308129,
+                    "z": -16.700000762939454
+                },
+                "boundsCenter": {
+                    "x": 3.700000047683716,
+                    "y": 1.091999888420105,
+                    "z": -16.700000762939454
+                },
+                "boundsSize": {
+                    "x": 0.7936348915100098,
+                    "y": 2.1599998474121095,
+                    "z": 0.7936344146728516
+                }
+            },
+            {
+                "id": "SouthMidCryo_03",
+                "assembly": "SouthMidCryo",
+                "asset": "Assets/LabProps29/Prefabs/11_toolbox.prefab",
+                "reason": "Bounded bay clearance adjustment",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -1.5199999809265137,
+                    "y": 0.0,
+                    "z": -16.520000457763673
+                },
+                "position": {
+                    "x": -1.5199999809265137,
+                    "y": 0.012000029906630516,
+                    "z": -17.020000457763673
+                },
+                "boundsCenter": {
+                    "x": -1.5169576406478882,
+                    "y": 0.30822858214378359,
+                    "z": -17.00864601135254
+                },
+                "boundsSize": {
+                    "x": 1.0723121166229249,
+                    "y": 0.5924571752548218,
+                    "z": 0.7896995544433594
+                }
+            },
+            {
+                "id": "WestInnerAnalysis_01",
+                "assembly": "WestInnerAnalysis",
+                "asset": "Assets/ARPGRoomSetV3/Models/Assemblies/LAB_AnalysisBedGantry.fbx",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -13.0,
+                    "y": 0.0,
+                    "z": -7.0
+                },
+                "position": {
+                    "x": -13.0,
+                    "y": 0.012000000104308129,
+                    "z": -7.0
+                },
+                "boundsCenter": {
+                    "x": -12.967371940612793,
+                    "y": 1.09209406375885,
+                    "z": -7.0
+                },
+                "boundsSize": {
+                    "x": 2.8600006103515627,
+                    "y": 2.1601881980895998,
+                    "z": 2.025177001953125
+                }
+            },
+            {
+                "id": "WestInnerAnalysis_02",
+                "assembly": "WestInnerAnalysis",
+                "asset": "Assets/LabProps29/Prefabs/06_standing_terminal.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -12.72499942779541,
+                    "y": 0.0,
+                    "z": -9.475000381469727
+                },
+                "position": {
+                    "x": -12.725000381469727,
+                    "y": 0.012000000104308129,
+                    "z": -9.475000381469727
+                },
+                "boundsCenter": {
+                    "x": -12.677658081054688,
+                    "y": 0.8263545036315918,
+                    "z": -9.46231460571289
+                },
+                "boundsSize": {
+                    "x": 0.861083984375,
+                    "y": 1.628709077835083,
+                    "z": 1.0690231323242188
+                }
+            },
+            {
+                "id": "WestInnerAnalysis_03",
+                "assembly": "WestInnerAnalysis",
+                "asset": "Assets/LabProps29/Prefabs/11_toolbox.prefab",
+                "reason": "Authored bay position",
+                "accepted": true,
+                "requestedPosition": {
+                    "x": -12.5600004196167,
+                    "y": 0.0,
+                    "z": -4.690000057220459
+                },
+                "position": {
+                    "x": -12.559999465942383,
+                    "y": 0.012000029906630516,
+                    "z": -4.689998626708984
+                },
+                "boundsCenter": {
+                    "x": -12.549591064453125,
+                    "y": 0.2835427224636078,
+                    "z": -4.692787170410156
+                },
+                "boundsSize": {
+                    "x": 0.7238922119140625,
+                    "y": 0.5430854558944702,
+                    "z": 0.9829521179199219
+                }
+            }
+        ]
+    }
+}

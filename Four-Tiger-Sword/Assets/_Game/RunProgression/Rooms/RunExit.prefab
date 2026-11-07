@@ -63,6 +63,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5204064579340766434}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3439449450014538686
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 724149312766034012}
+  m_Layer: 0
+  m_Name: TeleportPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &724149312766034012
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3439449450014538686}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.9590543, z: -0, w: 0.28322238}
+  m_LocalPosition: {x: -1.505877, y: 1.055, z: -1.5038028}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5204064579340766434}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5106447129183130500
 GameObject:
   m_ObjectHideFlags: 0
@@ -325,6 +356,7 @@ Transform:
   - {fileID: 372396317101538745}
   - {fileID: 6243869638232500391}
   - {fileID: 988348871993562910}
+  - {fileID: 724149312766034012}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7997554717753838891
@@ -455,6 +487,8 @@ MonoBehaviour:
   playerSpawn: {fileID: 0}
   exitPoint: {fileID: 988348871993562910}
   bossSpawn: {fileID: 0}
+  shopPoint: {fileID: 0}
+  teleportPoint: {fileID: 724149312766034012}
   exitSize: {x: 2, y: 3, z: 2}
 --- !u!1 &8058347724612115461
 GameObject:

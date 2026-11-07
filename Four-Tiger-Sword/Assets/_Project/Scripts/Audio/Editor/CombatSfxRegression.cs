@@ -331,7 +331,7 @@ public static class CombatSfxRegression
         var fire = new FireForm(fireData);
         BindPlayer(fire, player);
         var snapshot = (HitInfo)typeof(BaseForm).GetMethod("EffectHit", InstanceHidden)
-            .Invoke(fire, new object[] { 2.5f, 0f, false, null, null, true });
+            .Invoke(fire, new object[] { 2.5f, 0f, false, null, null, true, Vector3.zero });
         fireData.CommonFeedback.SecondaryHitAudio.Clip = a;
         Check(snapshot.ImpactSound.Clip == b && snapshot.Element == ElementType.ELEMENT_FIRE
             && ReferenceEquals(snapshot.Source, player),

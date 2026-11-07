@@ -3,11 +3,15 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "DashAttack", menuName = "Monster/DashAttack")]
 public class MonsterDashAttackSO : MonsterSkillData
 {
+    public override bool SupportsBossExecutionPolicy => true;
+
     [Header("데미지")]
     public float damage = 20;
     public float knockbackForce = 12f;
 
     [Header("타이밍")]
+    [Tooltip("Optional preparation Animator state. When set, animName starts at the rush; empty preserves legacy playback.")]
+    public string startupAnimName;
     // telegraphDuration은 부모 MonsterSkillData에서 관리합니다.
     // 대쉬 공격: 준비 자세(선딜) 중 번쩍임이므로 startupTime 이하로 설정하세요.
     [Tooltip("대쉬 시작 전 선딜 (준비 자세)")]
@@ -31,4 +35,3 @@ public class MonsterDashAttackSO : MonsterSkillData
         return new EnemyDashAttack(this, enemy);
     }
 }
-    

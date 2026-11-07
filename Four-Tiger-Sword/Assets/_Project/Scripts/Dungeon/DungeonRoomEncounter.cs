@@ -13,20 +13,32 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
     public DungeonEncounterState State { get; private set; } = DungeonEncounterState.Preparing;
     public int AliveCount => _alive.Count;
     public bool IsCombatActive => isActiveAndEnabled && !_disposed && !_suspended
-        && State == DungeonEncounterState.Fighting && _alive.Count > 0;
+        && State == DungeonEncounterState.Fighting && (_alive.Count > 0 || HasMoreWaves);
+    public int WaveCount => _waves.Count;
+    public int CurrentWaveNumber { get; private set; }
+    public string WaveSummary { get; private set; } = string.Empty;
     public int SpentBudget { get; private set; }
     public int RemainingBudget { get; private set; }
     public string Error { get; private set; }
     public bool WasEntered { get; private set; }
     public bool BossDefeated { get; private set; }
+    /// <summary>All waves died during entered combat; despawning never earns rewards.</summary>
+    public bool WasCombatClearedByDefeat => State == DungeonEncounterState.Cleared && WasEntered
+        && _members.Count > 0 && _confirmedDefeats == _members.Count;
     public IReadOnlyList<DungeonEncounterMember> Members => _members;
     public IReadOnlyList<DungeonEncounterGate> Gates => _gates;
     public event Action<DungeonRoomEncounter> Cleared;
+    public event Action<DungeonEncounterMember> MemberSpawned;
+    private const float ReinforcementDelay = 1.5f;
+    private const float SpawnRetryDelay = 0.25f;
+    private const float SpawnRetryTimeout = 10f;
     private readonly List<DungeonEncounterMember> _members = new();
     private readonly HashSet<DungeonEncounterMember> _alive = new();
     private readonly List<DungeonEncounterGate> _gates = new();
     private readonly List<DungeonEncounterMember> _removed = new();
+    private readonly List<List<GameObject>> _waves = new();
     private DungeonEncounterDirector _director;
+    private BaekhoMapModule _module;
     private NavMeshData _ownedNavigation;
     private GameObject _enemyRoot;
     private Vector3 _previousCenter;
@@ -35,12 +47,19 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
     private bool _suspended;
     private bool _isBoss;
     private DungeonEncounterMember _bossMember;
+    private int _confirmedDefeats;
+    private int _seed;
+    private float _waveDelayRemaining = -1f;
+    private float _reinforcementElapsed;
+    private bool HasMoreWaves => CurrentWaveNumber < _waves.Count;
 
     public void Initialize(DungeonEncounterDirector director, BaekhoMapModule module,
         Dictionary<int, float> usedSockets, int seed, GameObject bossPrefab = null, int bossExitSocketIndex = -1)
     {
         if (_director != null) return;
         _director = director;
+        _module = module;
+        _seed = seed;
         RemainingBudget = module.encounterBudget;
         var identity = module.GetComponent<BaekhoGeneratedRoom>();
         _isBoss = identity != null && (identity.role & BaekhoRoomRole.Boss) != 0;
@@ -56,17 +75,16 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
                 State = DungeonEncounterState.Cleared;
                 return;
             }
-            var prefabs = new List<GameObject>();
-            StageMapAnchors anchors = null;
             if (_isBoss)
             {
-                anchors = module.GetComponent<StageMapAnchors>();
+                var anchors = module.GetComponent<StageMapAnchors>();
                 if (bossPrefab == null) throw new InvalidOperationException("The boss stage has no boss prefab.");
                 if (anchors == null || anchors.bossSpawn == null)
                     throw new InvalidOperationException("The boss room needs StageMapAnchors.bossSpawn.");
                 if (!usedSockets.ContainsKey(bossExitSocketIndex))
                     throw new InvalidOperationException("The boss room has no connection to its end room.");
-                prefabs.Add(bossPrefab);
+                _waves.Add(new List<GameObject> { bossPrefab });
+                WaveSummary = $"1차 [{bossPrefab.name} ×1]";
             }
             bool hasMarkers = false;
             foreach (var marker in module.GetComponentsInChildren<BaekhoGameplayMarker>(true))
@@ -75,46 +93,45 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
             if (!_isBoss && hasMarkers && module.encounterBudget > 0)
             {
                 if (director.catalog == null) throw new InvalidOperationException("Dungeon enemy catalog is missing.");
-                var plan = BaekhoEncounterPlanner.Plan(module.encounterBudget, director.catalog.GetValidatedCosts(), seed);
+                int[] costs = director.catalog.GetValidatedCosts();
+                var plan = BaekhoEncounterPlanner.Plan(module.encounterBudget, costs, seed);
                 SpentBudget = plan.Spent;
                 RemainingBudget = plan.Remaining;
                 if (plan.BalanceRelaxed)
                     Debug.LogWarning($"[Dungeon Encounter] {name}: budget {module.encounterBudget} cannot support a balanced mix; composition constraints relaxed.", this);
-                for (int i = 0; i < plan.Counts.Length; i++)
-                    for (int n = 0; n < plan.Counts[i]; n++) prefabs.Add(director.catalog.enemies[i].prefab);
+                var waves = BaekhoEncounterPlanner.SplitIntoWaves(plan.Counts, costs,
+                    director.targetCostPerWave, director.maxEnemiesPerWave, seed);
+                var summaries = new List<string>();
+                for (int waveIndex = 0; waveIndex < waves.Count; waveIndex++)
+                {
+                    var wave = waves[waveIndex];
+                    var prefabs = new List<GameObject>();
+                    var roster = new List<string>();
+                    for (int i = 0; i < wave.Counts.Length; i++)
+                    {
+                        if (wave.Counts[i] == 0) continue;
+                        var prefab = director.catalog.enemies[i].prefab;
+                        roster.Add(prefab.name + " ×" + wave.Counts[i]);
+                        for (int n = 0; n < wave.Counts[i]; n++) prefabs.Add(prefab);
+                    }
+                    _waves.Add(prefabs);
+                    summaries.Add($"{waveIndex + 1}차 [{string.Join(", ", roster)}] · 코스트 {wave.Cost}");
+                }
+                WaveSummary = string.Join("\n", summaries);
             }
-            if (prefabs.Count > 0 && !DungeonEncounterPlacement.TryPrepareNavigation(module, out _ownedNavigation, out var navError))
+            if (_waves.Count > 0 && !DungeonEncounterPlacement.TryPrepareNavigation(module, out _ownedNavigation, out var navError))
                 throw new InvalidOperationException(navError);
             // Navigation is prepared before adding dynamic gate geometry.
             CreateGates(module, usedSockets, director.doorPrefab, _isBoss ? bossExitSocketIndex : -1);
-            if (prefabs.Count == 0) { State = DungeonEncounterState.Cleared; return; }
-            Physics.SyncTransforms();
-            List<DungeonEnemyPlacement> placements;
-            if (_isBoss)
-            {
-                if (!DungeonEncounterPlacement.TryPlanBoss(module, bossPrefab, anchors.bossSpawn, out var placement, out var bossError))
-                    throw new InvalidOperationException(bossError);
-                placements = new List<DungeonEnemyPlacement> { placement };
-            }
-            else if (!DungeonEncounterPlacement.TryPlan(module, prefabs, seed, director.spawnRadius, out placements, out var placementError))
-                throw new InvalidOperationException(placementError);
+            if (_waves.Count == 0) { State = DungeonEncounterState.Cleared; return; }
             _enemyRoot = new GameObject("EncounterEnemies");
-            _enemyRoot.SetActive(false);
             _enemyRoot.transform.SetParent(transform, false);
-            foreach (var placement in placements)
-            {
-                var clone = Instantiate(placement.prefab, placement.position, placement.rotation, _enemyRoot.transform);
-                var member = clone.AddComponent<DungeonEncounterMember>();
-                _members.Add(member);
-                member.Initialize(this);
-                _alive.Add(member);
-                if (_isBoss) _bossMember = member;
-            }
-            _enemyRoot.SetActive(true); // EnemyStat.Awake runs; Enemy.Start waits for room entry.
-            foreach (var member in _members)
-                if (member.IsDead) throw new InvalidOperationException($"{member.name} has no positive starting HP.");
+            if (!TryPlanNextWave(out var placements, out var placementError))
+                throw new InvalidOperationException(placementError);
+            SpawnWave(placements, !_isBoss);
+            if (_disposed || State == DungeonEncounterState.Failed) return;
             State = DungeonEncounterState.Waiting;
-            Debug.Log($"[Dungeon Encounter] {name}: {_members.Count} monsters, budget {SpentBudget}/{module.encounterBudget} (remaining {RemainingBudget}).", this);
+            Debug.Log($"[Dungeon Encounter] {name}: {WaveCount} waves, budget {SpentBudget}/{module.encounterBudget} (remaining {RemainingBudget}).\n{WaveSummary}", this);
         }
         catch (Exception exception)
         {
@@ -127,6 +144,70 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
                 authored.GetComponentInChildren<LabDoor.SlidingDoor>(true)?.SetOpenImmediate(true);
             }
             Fail(exception.Message);
+        }
+    }
+
+    private bool TryPlanNextWave(out List<DungeonEnemyPlacement> placements, out string error)
+    {
+        if (_isBoss)
+        {
+            placements = null;
+            var anchors = _module.GetComponent<StageMapAnchors>();
+            if (!DungeonEncounterPlacement.TryPlanBoss(_module, _waves[CurrentWaveNumber][0],
+                anchors.bossSpawn, out var placement, out error)) return false;
+            placements = new List<DungeonEnemyPlacement> { placement };
+            return true;
+        }
+        int waveSeed = unchecked(_seed + CurrentWaveNumber * 7919);
+        return DungeonEncounterPlacement.TryPlan(_module, _waves[CurrentWaveNumber], waveSeed,
+            _director.spawnRadius, out placements, out error);
+    }
+
+    private void SpawnWave(List<DungeonEnemyPlacement> placements, bool patrolOnly)
+    {
+        var waveRoot = new GameObject("Wave_" + (CurrentWaveNumber + 1));
+        waveRoot.SetActive(false);
+        waveRoot.transform.SetParent(_enemyRoot.transform, false);
+        var newMembers = new List<DungeonEncounterMember>();
+        foreach (var placement in placements)
+        {
+            var clone = Instantiate(placement.prefab, placement.position, placement.rotation, waveRoot.transform);
+            var member = clone.AddComponent<DungeonEncounterMember>();
+            _members.Add(member);
+            member.Initialize(this);
+            _alive.Add(member);
+            newMembers.Add(member);
+            if (_isBoss) _bossMember = member;
+        }
+        // Run EnemyStat.Awake with AI and hit colliders still disabled.
+        waveRoot.SetActive(true);
+        foreach (var member in newMembers)
+        {
+            var stats = member.GetComponent<EnemyStat>();
+            if (member.IsDead || stats == null || !(stats.CurrentHp > 0f) || float.IsInfinity(stats.CurrentHp))
+                throw new InvalidOperationException($"{member.name} has no positive starting HP.");
+        }
+        CurrentWaveNumber++;
+        _waveDelayRemaining = -1f;
+        _reinforcementElapsed = 0f;
+        foreach (var member in newMembers)
+        {
+            if (_disposed || _suspended || State == DungeonEncounterState.Failed) return;
+            MemberSpawned?.Invoke(member);
+        }
+        foreach (var member in newMembers)
+        {
+            if (_disposed || _suspended || State == DungeonEncounterState.Failed) return;
+            if (_isBoss) continue;
+            if (patrolOnly)
+            {
+                if (!member.ActivatePatrol(out var patrolError)) throw new InvalidOperationException(patrolError);
+                continue;
+            }
+            member.Enemy.SetEncounterPatrolOnly(false);
+            if (_director.Player != null)
+                member.Enemy.RememberEncounterPosition(_director.Player.transform.position);
+            if (!member.Activate(out var error)) throw new InvalidOperationException(error);
         }
     }
 
@@ -151,20 +232,26 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
         if (_disposed || _suspended || State != DungeonEncounterState.Waiting) return false;
         PruneRemoved();
         if (State != DungeonEncounterState.Waiting) return false;
-        if (_alive.Count == 0) { Complete(); return false; }
+        if (_alive.Count == 0 && !HasMoreWaves) { Complete(); return false; }
         foreach (var member in _alive)
             if (!member.CanActivate(out var error)) { Fail(error); return false; }
         foreach (var gate in _gates) gate.Lock();
         WasEntered = true;
         State = DungeonEncounterState.Fighting;
         foreach (var member in _alive)
+        {
+            member.Enemy.SetEncounterPatrolOnly(false);
             if (!member.Activate(out var error)) { Fail(error); return false; }
+        }
+        HandleWaveEnded();
         return true;
     }
 
     public void NotifyEnemyRemoved(DungeonEncounterMember member)
     {
         if (_disposed || _suspended || !_alive.Remove(member)) return;
+        if (member != null && member.HasDied && WasEntered && State == DungeonEncounterState.Fighting)
+            _confirmedDefeats++;
         if (_isBoss)
         {
             if (member != null && member == _bossMember && member.HasDied && WasEntered &&
@@ -175,7 +262,36 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
                 return;
             }
         }
-        if (_alive.Count == 0 && (State == DungeonEncounterState.Waiting || State == DungeonEncounterState.Fighting)) Complete();
+        HandleWaveEnded();
+    }
+
+    private void HandleWaveEnded()
+    {
+        if (_alive.Count > 0 || (State != DungeonEncounterState.Waiting && State != DungeonEncounterState.Fighting)) return;
+        if (!HasMoreWaves) { Complete(); return; }
+        if (State == DungeonEncounterState.Fighting && _waveDelayRemaining < 0f)
+        {
+            _waveDelayRemaining = ReinforcementDelay;
+            _reinforcementElapsed = 0f;
+        }
+    }
+
+    private void UpdateReinforcements()
+    {
+        if (State != DungeonEncounterState.Fighting || _alive.Count > 0 || !HasMoreWaves) return;
+        if (Time.deltaTime <= 0f) return;
+        _waveDelayRemaining -= Time.deltaTime;
+        _reinforcementElapsed += Time.deltaTime;
+        if (_waveDelayRemaining > 0f) return;
+        // A moving player or a corpse can temporarily occupy every authored spawn marker.
+        if (!TryPlanNextWave(out var placements, out var error))
+        {
+            if (_reinforcementElapsed >= ReinforcementDelay + SpawnRetryTimeout) { Fail(error); return; }
+            _waveDelayRemaining = SpawnRetryDelay;
+            return;
+        }
+        try { SpawnWave(placements, false); }
+        catch (Exception exception) { Fail(exception.Message); }
     }
 
     /// <summary>Stop combat during transition/end without treating frozen members as defeated.</summary>
@@ -183,9 +299,13 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
     {
         if (_disposed || _suspended) return;
         _suspended = true;
+        _waveDelayRemaining = -1f;
         _hasPrevious = false;
         foreach (var member in _members) if (member != null) member.Freeze();
     }
+
+    /// <summary>Forget only entrance movement; retain visitation, combat and cleared state.</summary>
+    public void ResetPlayerMotionHistory() => _hasPrevious = false;
 
     private void Update()
     {
@@ -194,7 +314,9 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
         {
             PruneRemoved();
             if (State == DungeonEncounterState.Failed) return;
-            if (_alive.Count == 0) Complete();
+            HandleWaveEnded();
+            UpdateReinforcements();
+            if (State == DungeonEncounterState.Failed) return;
         }
         if (State == DungeonEncounterState.Fighting || WasEntered) return;
         var player = _director != null ? _director.Player : null;
@@ -234,6 +356,7 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
         if (State == DungeonEncounterState.Cleared || State == DungeonEncounterState.Failed || _disposed) return;
         if (_isBoss && !BossDefeated) { Fail("The boss encounter ended without a confirmed boss death."); return; }
         State = DungeonEncounterState.Cleared;
+        _waveDelayRemaining = -1f;
         foreach (var gate in _gates) if (gate != null) gate.Open();
         Cleared?.Invoke(this);
     }
@@ -241,6 +364,7 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
     private void Fail(string error)
     {
         State = DungeonEncounterState.Failed;
+        _waveDelayRemaining = -1f;
         Error = error;
         foreach (var member in _members) if (member != null) { member.Freeze(); member.Release(); }
         _alive.Clear();
@@ -253,6 +377,7 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
     {
         if (_director == null || _disposed) return;
         _disposed = true;
+        _waveDelayRemaining = -1f;
         foreach (var member in _members) if (member != null) { member.Freeze(); member.Release(); }
         _alive.Clear();
         foreach (var gate in _gates) if (gate != null) gate.Open(true);
