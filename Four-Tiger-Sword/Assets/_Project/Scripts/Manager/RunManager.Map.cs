@@ -28,7 +28,7 @@ public sealed partial class RunManager
         if (IsMapOpen) return owner != null && owner == _mapOwner && MapContextIsCurrent()
             && _mapWorldPause != null && _mapWorldPause.IsValid;
         if (!isActiveAndEnabled || !OwnerIsAvailable(owner) || State != RunState.Playing || _transition != null
-            || IsShopOpen || player == null || !player.isActiveAndEnabled || player.IsStageTransitioning
+            || IsShopOpen || IsInventoryOpen || IsRewardOpen || HasPendingItemChoice || player == null || !player.isActiveAndEnabled || player.IsStageTransitioning
             || player.IsGameplayModalPaused || player.IsFinisherSelecting || player.StatManager == null
             || player.StatManager.CurrentHp <= 0f || stageManager == null || !stageManager.IsReady
             || stageManager.Result == null || !stageManager.Result.success || stageManager.Result.root == null
@@ -78,7 +78,7 @@ public sealed partial class RunManager
     }
 
     private bool MapContextIsCurrent()
-        => isActiveAndEnabled && State == RunState.Playing && _transition == null && !IsShopOpen
+        => isActiveAndEnabled && State == RunState.Playing && _transition == null && !IsShopOpen && !IsInventoryOpen
             && _mapPlayer != null && player == _mapPlayer && _mapPlayer.isActiveAndEnabled
             && _mapPlayer.IsMapPaused && !_mapPlayer.IsShopPaused && !_mapPlayer.IsStageTransitioning && !_mapPlayer.IsFinisherSelecting
             && _mapPlayer.StatManager != null && _mapPlayer.StatManager.CurrentHp > 0f
@@ -153,11 +153,11 @@ public sealed partial class RunManager
 
     private void OnApplicationFocus(bool focused)
     {
-        if (!focused) CleanupMapOnShutdown();
+        if (!focused) { CleanupMapOnShutdown(); CleanupInventoryOnShutdown(); }
     }
 
     private void OnApplicationPause(bool paused)
     {
-        if (paused) CleanupMapOnShutdown();
+        if (paused) { CleanupMapOnShutdown(); CleanupInventoryOnShutdown(); }
     }
 }

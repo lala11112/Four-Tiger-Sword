@@ -22,9 +22,9 @@ public sealed partial class RunManager
     public bool TryOpenShop(UnityEngine.Object owner)
     {
         if (IsShopOpen) return owner != null && owner == _shopOwner && ShopContextIsCurrent();
-        if (!isActiveAndEnabled || !OwnerIsAvailable(owner) || State != RunState.Playing || _transition != null || IsMapOpen
+        if (!isActiveAndEnabled || !OwnerIsAvailable(owner) || State != RunState.Playing || _transition != null || IsMapOpen || IsInventoryOpen || IsRewardOpen || HasPendingItemChoice
             || player == null || !player.isActiveAndEnabled || player.IsStageTransitioning
-            || player.IsMapPaused
+            || player.IsMapPaused || player.IsInventoryPaused
             || player.StatManager == null || player.StatManager.CurrentHp <= 0f
             || stageManager == null || !stageManager.IsReady || stageManager.Result == null
             || stageManager.Result.root == null) return false;
@@ -76,6 +76,8 @@ public sealed partial class RunManager
     private void Update()
     {
         UpdateMapSession();
+        UpdateInventorySession();
+        UpdateItemChoiceSession();
         if (!IsShopOpen) return;
         if (!ShopContextIsCurrent() || !OwnerIsAvailable(_shopOwner)
             || _shopWorldPause == null || !_shopWorldPause.IsValid) CloseShop();
@@ -139,11 +141,14 @@ public sealed partial class RunManager
 
     private void SuspendPlayerAndCloseShop()
     {
+        CloseItemChoiceModal();
         bool wasOpen = IsShopOpen;
         bool mapWasOpen = IsMapOpen;
+        bool inventoryWasOpen = IsInventoryOpen;
         // Return camera ownership before the transition captures its restoration state.
         // World time remains zero until the player is blocked; no gameplay frame can escape.
         if (mapWasOpen) ClearMapSession(_mapPlayer != null && !_mapPlayer.IsStageTransitioning, false);
+        if (inventoryWasOpen) ClearInventorySession(_inventoryPlayer != null && !_inventoryPlayer.IsStageTransitioning, false);
         if (wasOpen) ClearShopSession(_shopPlayer != null && !_shopPlayer.IsStageTransitioning);
         try
         {
@@ -152,8 +157,10 @@ public sealed partial class RunManager
         finally
         {
             ReleaseMapWorldPause();
+            ReleaseInventoryWorldPause();
             ReleaseShopWorldPause();
             if (mapWasOpen) NotifyMapOpenChanged(false);
+            if (inventoryWasOpen) NotifyInventoryOpenChanged(false);
             if (wasOpen) NotifyShopOpenChanged(false);
         }
     }
@@ -161,7 +168,7 @@ public sealed partial class RunManager
     private void RefreshRunCursor()
     {
         if (player != null && player.IsFinisherSelecting) return;
-        bool playing = isActiveAndEnabled && State == RunState.Playing && !IsShopOpen && !IsMapOpen;
+        bool playing = isActiveAndEnabled && State == RunState.Playing && !IsShopOpen && !IsMapOpen && !IsInventoryOpen && !IsRewardOpen;
         Cursor.visible = !playing;
         Cursor.lockState = playing ? CursorLockMode.Locked : CursorLockMode.None;
     }
@@ -193,9 +200,11 @@ public sealed partial class RunManager
     }
     private void OnDisable()
     {
+        CloseItemChoiceModal();
         CancelStagePresentation();
         ReleaseUpgradeSavePause();
         CleanupMapOnShutdown();
+        CleanupInventoryOnShutdown();
         CleanupShopOnShutdown();
     }
 }

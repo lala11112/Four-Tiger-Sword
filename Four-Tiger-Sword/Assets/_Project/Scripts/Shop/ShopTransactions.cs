@@ -16,7 +16,23 @@ public enum ShopFusionResult
     Unavailable,
     InvalidMaterials,
     NotOwned,
-    NoCandidates
+    NoCandidates,
+    ChoiceRequired,
+    InvalidChoice
+}
+
+public sealed class ShopFusionChoice
+{
+    public int Token { get; }
+    public string FirstId { get; }
+    public string SecondId { get; }
+    public int Grade { get; }
+    public IReadOnlyList<ItemDefinition> Candidates { get; }
+    internal int Sequence { get; }
+    internal ShopFusionChoice(int token, string first, string second, int grade, int sequence,
+        List<ItemDefinition> candidates)
+    { Token = token; FirstId = first; SecondId = second; Grade = grade; Sequence = sequence;
+        Candidates = candidates.AsReadOnly(); }
 }
 
 /// <summary>One stage's shared transaction gate and independent fusion random sequence.</summary>
@@ -29,15 +45,19 @@ public sealed class ShopTransactions
     private readonly int _stageSeed;
     private int _successfulFusions;
     private bool _transactionInProgress;
+    private readonly EngravingSnapshot _engraving;
+    private readonly Dictionary<string, ShopFusionChoice> _choices = new(StringComparer.Ordinal);
+    private int _nextChoiceToken;
 
     public ShopTransactions(PlayerItemRuntime items, PlayerWallet wallet, PlayerStatManager stats,
-        EconomySettingsSO settings, int stageSeed)
+        EconomySettingsSO settings, int stageSeed, EngravingSnapshot engraving = null)
     {
         _items = items;
         _wallet = wallet;
         _stats = stats;
         _settings = settings;
         _stageSeed = stageSeed;
+        _engraving = engraving ?? EngravingSnapshot.Empty;
     }
 
     private bool Available => !_transactionInProgress && _items != null && _items.IsInitialized
@@ -52,13 +72,22 @@ public sealed class ShopTransactions
         finally { _transactionInProgress = false; }
     }
 
+    public ShopRefreshResult TryRefresh(ShopStock stock)
+    {
+        if (!Available || stock == null) return ShopRefreshResult.Unavailable;
+        _transactionInProgress = true;
+        try { return stock.TryRefresh(_wallet, _items, _stats); }
+        finally { _transactionInProgress = false; }
+    }
+
     public bool TryGetSalePrice(string itemId, out int price)
     {
         price = 0;
         if (_items == null || _settings == null || !_settings.Validate(out _)) return false;
         var item = OwnedDefinition(itemId);
         if (!ValidDefinition(item) || item.purchasePrice <= 0) return false;
-        price = (int)Math.Floor((double)item.purchasePrice * _settings.saleFraction);
+        float fraction = _engraving.Has("sell") ? _engraving.Amount("sell") : _settings.saleFraction;
+        price = (int)Math.Floor((double)item.purchasePrice * fraction + .000001d);
         return true;
     }
 
@@ -91,6 +120,7 @@ public sealed class ShopTransactions
     {
         resultItem = null;
         if (!Available) return ShopFusionResult.Unavailable;
+        if (_engraving.Has("fusion")) return ShopFusionResult.ChoiceRequired;
         var validation = FusionCandidates(firstId, secondId, out _, out float upgradeChance,
             out var sameGrade, out var higherGrade);
         if (validation != ShopFusionResult.Success) return validation;
@@ -104,6 +134,59 @@ public sealed class ShopTransactions
             var selected = pool[random.Next(pool.Count)];
             if (!_items.TryExchangeItems(firstId, secondId, selected.itemId)) return ShopFusionResult.Unavailable;
             _successfulFusions = unchecked(_successfulFusions + 1);
+            _choices.Clear();
+            resultItem = selected;
+            return ShopFusionResult.Success;
+        }
+        finally { _transactionInProgress = false; }
+    }
+
+    /// <summary>Preparing or closing a choice never advances RNG or consumes either material.</summary>
+    public ShopFusionResult BeginFusionChoice(string firstId, string secondId, out ShopFusionChoice choice)
+    {
+        choice = null;
+        if (!Available || !_engraving.Has("fusion")) return ShopFusionResult.Unavailable;
+        var validation = FusionCandidates(firstId, secondId, out _, out float chance,
+            out var same, out var higher);
+        if (validation != ShopFusionResult.Success) return validation;
+        if (StringComparer.Ordinal.Compare(firstId, secondId) > 0) (firstId, secondId) = (secondId, firstId);
+        string key = firstId + "\n" + secondId;
+        if (_choices.TryGetValue(key, out choice) && choice.Sequence == _successfulFusions) return ShopFusionResult.Success;
+        var random = new Random(unchecked(_stageSeed ^ 0x46555345 ^ (_successfulFusions * 0x1F123BB5)));
+        var pool = random.NextDouble() < chance ? higher : same;
+        int count = Math.Min(Math.Min(3, Math.Max(1, _engraving.Limit("fusion"))), pool.Count);
+        var candidates = new List<ItemDefinition>(count);
+        for (int i = 0; i < count; i++)
+        {
+            int index = random.Next(pool.Count);
+            candidates.Add(pool[index]); pool.RemoveAt(index);
+        }
+        choice = new ShopFusionChoice(++_nextChoiceToken, firstId, secondId, candidates[0].grade,
+            _successfulFusions, candidates);
+        _choices[key] = choice;
+        return ShopFusionResult.Success;
+    }
+
+    public ShopFusionResult CommitFusionChoice(int token, string resultId, out ItemDefinition resultItem)
+    {
+        resultItem = null;
+        if (!Available || !_engraving.Has("fusion")) return ShopFusionResult.Unavailable;
+        ShopFusionChoice choice = null;
+        foreach (var entry in _choices.Values) if (entry.Token == token) { choice = entry; break; }
+        if (choice == null || choice.Sequence != _successfulFusions) return ShopFusionResult.InvalidChoice;
+        var validation = FusionCandidates(choice.FirstId, choice.SecondId, out _, out _, out var same, out var higher);
+        if (validation != ShopFusionResult.Success) return validation;
+        ItemDefinition selected = null;
+        foreach (var item in choice.Candidates)
+            if (item.itemId == resultId && _items.Catalog.Find(item.itemId) == item
+                && (same.Contains(item) || higher.Contains(item))) { selected = item; break; }
+        if (selected == null) return ShopFusionResult.InvalidChoice;
+        _transactionInProgress = true;
+        try
+        {
+            if (!_items.TryExchangeItems(choice.FirstId, choice.SecondId, selected.itemId)) return ShopFusionResult.Unavailable;
+            _successfulFusions = unchecked(_successfulFusions + 1);
+            _choices.Clear();
             resultItem = selected;
             return ShopFusionResult.Success;
         }
@@ -174,6 +257,8 @@ public sealed class ShopTransactions
             || !string.Equals(item.projectId, catalog.projectId, StringComparison.Ordinal)
             || item.purchasePrice < 0 || catalog.Find(item.itemId) != item || item.effects == null) return false;
         foreach (var effect in item.effects)
+            if (effect == null || !effect.IsValid()) return false;
+        foreach (var effect in item.boundaryEffects ?? Array.Empty<BoundaryItemEffect>())
             if (effect == null || !effect.IsValid()) return false;
         return true;
     }

@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I32
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I32
+  itemId: I32
+  displayName: "\uAC1C\uC804 \uBD09\uC778\uD328"
+  description: "\uD45C\uBA74\uC5D0 \uAC78\uC1E0\uB97C \uC2EC\uC740 \uC721\uAC01 \uBD09\uC778\uD328."
+  effectText: "\uC804\uD22C\uC5D0 \uC9C4\uC785\uD558\uBA74 \uCD5C\uB300 HP\uC758
+    6%\uC5D0 \uD574\uB2F9\uD558\uB294 \uBCF4\uD638\uB9C9\uC744 5\uCD08\uAC04 \uC5BB\uB294\uB2E4.
+    \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 15\uCD08."
+  synergyIds:
+  - S08
+  synergyNames:
+  - "\uC218\uD638"
+  primarySynergyId: S08
+  primarySynergyName: "\uC218\uD638"
+  primarySynergyIcon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
+  element: 0
+  grade: 2
+  purchasePrice: 40
+  effects: []
+  boundaryEffects:
+  - effectId: I32
+    stat: 8
+    amount: 0.06
+    trigger: 3
+    family: 0
+    element: 0
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: -1
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 0
+    maximumBaseGold: 0
+    durationSeconds: 5
+    cooldownSeconds: 15
+  icon: {fileID: 21300000, guid: 7ab267dcc79d5e543a518f86663ec8a1, type: 3}
+  contentStatus: draft
+  contentRevision: 20261108
+  sourceJson: "{\"id\":\"I32\",\"name\":\"\uAC1C\uC804 \uBD09\uC778\uD328\",\"description\":\"\uD45C\uBA74\uC5D0
+    \uAC78\uC1E0\uB97C \uC2EC\uC740 \uC721\uAC01 \uBD09\uC778\uD328.\",\"effect\":\"\uC804\uD22C\uC5D0
+    \uC9C4\uC785\uD558\uBA74 \uCD5C\uB300 HP\uC758 6%\uC5D0 \uD574\uB2F9\uD558\uB294
+    \uBCF4\uD638\uB9C9\uC744 5\uCD08\uAC04 \uC5BB\uB294\uB2E4. \uC7AC\uC0AC\uC6A9
+    \uB300\uAE30\uC2DC\uAC04 15\uCD08.\",\"synergies\":[\"S08\"],\"primarySynergy\":\"S08\",\"designIntent\":\"\uAD50\uC804
+    \uCD08\uBC18\uC5D0 \uC548\uC804\uD558\uAC8C \uC811\uADFC\uD55C\uB2E4.\",\"origin\":\"new\",\"image\":\"Art/Items/I32.png\"}"

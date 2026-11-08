@@ -5,7 +5,9 @@ using UnityEngine;
 public sealed class EconomySettingsSO : ScriptableObject
 {
     [Min(0)] public int startingGold = 0;
-    [Min(0)] public int ordinaryKillGold = 10;
+    [HideInInspector, Min(0)] public int ordinaryKillGold = 10; // Legacy serialized content.
+    [Min(0)] public int ordinaryKillGoldMin = 5;
+    [Min(0)] public int ordinaryKillGoldMax = 15;
     [Min(0)] public int bossKillGold = 50;
     [Min(1)] public int baseItemCount = 3;
     [Min(0)] public int healingPrice = 20;
@@ -16,7 +18,9 @@ public sealed class EconomySettingsSO : ScriptableObject
 
     public bool Validate(out string error)
     {
-        if (startingGold < 0 || ordinaryKillGold < 0 || bossKillGold < 0 || healingPrice < 0)
+        if (startingGold < 0 || ordinaryKillGold < 0 || ordinaryKillGoldMin < 0
+            || ordinaryKillGoldMax < ordinaryKillGoldMin || ordinaryKillGoldMax == int.MaxValue
+            || bossKillGold < 0 || healingPrice < 0)
             error = "Gold values and shop prices cannot be negative.";
         else if (baseItemCount < 1)
             error = "The shop's base item count must be positive.";

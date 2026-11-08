@@ -14,6 +14,7 @@ public class WaterDelayedDamageEffect : IStatusEffect
     private readonly float _critMultiplier;
     private readonly GameObject _vfxPrefab;
     private readonly CombatSoundCue _impactSound;
+    private readonly PlayerController _owner;
 
     private float _elapsed;
     private bool _damageDone;
@@ -26,7 +27,8 @@ public class WaterDelayedDamageEffect : IStatusEffect
 
     public WaterDelayedDamageEffect(float damage, float delay, ElementType element,
                                     float critChance, float critMultiplier,
-                                    GameObject vfxPrefab = null, CombatSoundCue impactSound = default)
+                                    GameObject vfxPrefab = null, CombatSoundCue impactSound = default,
+                                    PlayerController owner = null)
     {
         _damage = damage;
         _delay = delay;
@@ -35,6 +37,7 @@ public class WaterDelayedDamageEffect : IStatusEffect
         _critMultiplier = critMultiplier;
         _vfxPrefab = vfxPrefab;
         _impactSound = impactSound;
+        _owner = owner;
     }
 
     public void OnApply(GameObject target)
@@ -72,7 +75,7 @@ public class WaterDelayedDamageEffect : IStatusEffect
             if (!CanApplyPendingDamage()) yield break;
             DamageManager.Apply(
                 new HitInfo(_damage, _element, _critChance, _critMultiplier, poiseDamage: 0f,
-                    impactSound: _impactSound, category: PlayerAttackCategory.Secondary),
+                    impactSound: _impactSound, category: PlayerAttackCategory.Secondary, source: _owner),
                 _damageable, _targetGO);
 
             // The hit itself may deplete a phase; its old scheduled VFX must not cross that boundary.

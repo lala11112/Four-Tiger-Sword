@@ -72,10 +72,17 @@ public sealed class ItemDefinition : ScriptableObject
     public string itemId;
     public string displayName;
     [TextArea] public string description;
+    [TextArea] public string effectText;
+    public string[] synergyIds = Array.Empty<string>();
+    public string[] synergyNames = Array.Empty<string>();
+    public string primarySynergyId;
+    public string primarySynergyName;
+    public Sprite primarySynergyIcon;
     public ElementType element;
     [Range(1, 4)] public int grade = 1;
     public int purchasePrice;
     public ItemEffect[] effects = Array.Empty<ItemEffect>();
+    public BoundaryItemEffect[] boundaryEffects = Array.Empty<BoundaryItemEffect>();
     public Sprite icon;
     public string contentStatus;
     public int contentRevision;

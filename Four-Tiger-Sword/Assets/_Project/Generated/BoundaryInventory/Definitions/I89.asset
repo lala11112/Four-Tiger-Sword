@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I89
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I89
+  itemId: I89
+  displayName: "\uB0B1\uAE08 \uCCB4"
+  description: "\uC791\uC740 \uC0AC\uAC01 \uAD6C\uBA4D\uC744 \uB0B8 \uAC80\uC740
+    \uCCB4."
+  effectText: "\uAE30\uBCF8 \uACE8\uB4DC \uBCF4\uC0C1\uC774 1~10\uC778 \uC801\uC744
+    \uCC98\uCE58\uD558\uBA74 \uACE8\uB4DC\uB97C 1 \uB354 \uC5BB\uB294\uB2E4."
+  synergyIds:
+  - S19
+  synergyNames:
+  - "\uC218\uD655"
+  primarySynergyId: S19
+  primarySynergyName: "\uC218\uD655"
+  primarySynergyIcon: {fileID: 21300000, guid: 84ef614b15c1b134c93a6e74e5980a5d, type: 3}
+  element: 0
+  grade: 1
+  purchasePrice: 20
+  effects: []
+  boundaryEffects:
+  - effectId: I89
+    stat: 12
+    amount: 1
+    trigger: 1
+    family: 0
+    element: 0
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: -1
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 1
+    maximumBaseGold: 10
+    durationSeconds: 0
+    cooldownSeconds: 0
+  icon: {fileID: 21300000, guid: 5ed2809e7587e42419cbac7d945e7193, type: 3}
+  contentStatus: draft
+  contentRevision: 20261108
+  sourceJson: "{\"id\":\"I89\",\"name\":\"\uB0B1\uAE08 \uCCB4\",\"description\":\"\uC791\uC740
+    \uC0AC\uAC01 \uAD6C\uBA4D\uC744 \uB0B8 \uAC80\uC740 \uCCB4.\",\"effect\":\"\uAE30\uBCF8
+    \uACE8\uB4DC \uBCF4\uC0C1\uC774 1~10\uC778 \uC801\uC744 \uCC98\uCE58\uD558\uBA74
+    \uACE8\uB4DC\uB97C 1 \uB354 \uC5BB\uB294\uB2E4.\",\"synergies\":[\"S19\"],\"primarySynergy\":\"S19\",\"designIntent\":\"\uAE30\uBCF8
+    \uACE8\uB4DC\uAC00 \uC801\uC740 \uC801\uC744 \uCC98\uCE58\uD560 \uB54C \uBCF4\uC0C1\uC744
+    \uB354 \uC5BB\uB294\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I89.png\"}"

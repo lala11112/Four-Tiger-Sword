@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I13
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I13
+  itemId: I13
+  displayName: "\uBE5B\uB098\uB294 \uC870\uAC01"
+  description: "\uBD89\uC740 \uB048\uC774 \uB2EC\uB9B0 \uAC80\uC740 \uAE08\uC18D
+    \uD2C0\uC5D0 \uC0BC\uAC01 \uAC70\uC6B8 \uC870\uAC01\uC774 \uBB3C\uB824 \uC788\uB2E4."
+  effectText: "\uCE58\uBA85\uD0C0 \uD655\uB960\uC774 2%p \uC99D\uAC00\uD55C\uB2E4."
+  synergyIds:
+  - S01
+  synergyNames:
+  - "\uCE58\uBA85"
+  primarySynergyId: S01
+  primarySynergyName: "\uCE58\uBA85"
+  primarySynergyIcon: {fileID: 21300000, guid: 304cfc208f00d3a4295c6e20f5e9861a, type: 3}
+  element: 0
+  grade: 1
+  purchasePrice: 20
+  effects: []
+  boundaryEffects:
+  - effectId: I13
+    stat: 3
+    amount: 2
+    trigger: 0
+    family: 0
+    element: 0
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: -1
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 0
+    maximumBaseGold: 0
+    durationSeconds: 0
+    cooldownSeconds: 0
+  icon: {fileID: 21300000, guid: ba5475693c985df42abb53eaf36f0c67, type: 3}
+  contentStatus: draft
+  contentRevision: 20261108
+  sourceJson: "{\"id\":\"I13\",\"name\":\"\uBE5B\uB098\uB294 \uC870\uAC01\",\"description\":\"\uBD89\uC740
+    \uB048\uC774 \uB2EC\uB9B0 \uAC80\uC740 \uAE08\uC18D \uD2C0\uC5D0 \uC0BC\uAC01
+    \uAC70\uC6B8 \uC870\uAC01\uC774 \uBB3C\uB824 \uC788\uB2E4.\",\"effect\":\"\uCE58\uBA85\uD0C0
+    \uD655\uB960\uC774 2%p \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S01\"],\"primarySynergy\":\"S01\",\"image\":\"Art/Items/I13.png\",\"origin\":\"existing\"}"

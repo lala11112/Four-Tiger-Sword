@@ -102,13 +102,15 @@ public static class ActionTimingRegression
             Property(Player, "FormManager", Forms);
             Form = new ProbeForm(Data);
             Forms.ChangeForm(Form);
+            // Build enters Idle immediately, which plays the Animator. Bind an active rig first.
+            Host.SetActive(true);
+            Animator.Rebind();
+            Animator.Update(0f);
             Machine = new PlayerStateMachineSetup(Player).Build();
             Property(Player, "StateMachine", Machine);
             Attack = State<PlayerAttackState>();
             Skill = State<PlayerSkillState>();
             Ultimate = State<PlayerUltimateState>();
-            Host.SetActive(true);
-            Animator.Rebind();
             Animator.Update(0f);
         }
 
@@ -467,6 +469,34 @@ public static class ActionTimingRegression
                     && f.Host.transform.position == ultimateExitPosition,
                 "Water ultimate final cleanup is idempotent after execution already restored its temporary effects.");
             Near(f.Stats.CurrentUltimateGauge, 0f, "Water ultimate spends its gauge once despite repeated completion cleanup.");
+
+            // The injected action delta must not depend on the Editor's current Time.deltaTime.
+            // Actual local hit stop and world pause still own the timeline independently.
+            var waterClock = CombatActorClock.GetOrCreate(f.Player);
+            Property(f.Player, "ActorClock", waterClock);
+            SetField(waterClock, "_animator", f.Animator);
+            f.Stats.AddUltimateGauge(f.StatsData.maxUltimateGauge);
+            water.BeginUltimate();
+            waterClock.Request(f.Player, 60f, 0f, HitStopStacking.Maximum);
+            Check(!Advance(water, "AdvanceUltimate", .9f) && (int)GetField(water, "_ultimateHits") == 0,
+                "A stopped actor cannot advance Water ultimate even when a catch-up delta is supplied.");
+            Near((float)GetField(water, "_ultimateElapsed"), 0f, "Actor hit stop freezes Water's mandatory hit timeline.");
+            waterClock.ClearStops();
+            Check(!Advance(water, "AdvanceUltimate", .9f) && (int)GetField(water, "_ultimateHits") == 4,
+                "Clearing local hit stop resumes all four scheduled catch-up hits without relying on Editor delta.");
+            float waterWorldScale = Time.timeScale;
+            try
+            {
+                Time.timeScale = 0f;
+                Check(!Advance(water, "AdvanceUltimate", 1.11f) && (int)GetField(water, "_ultimateHits") == 4,
+                    "World pause cannot advance Water ultimate's remaining scheduled hits.");
+                Near((float)GetField(water, "_ultimateElapsed"), .9f, "World pause preserves Water's elapsed action time.");
+            }
+            finally { Time.timeScale = waterWorldScale; }
+            Check(Advance(water, "AdvanceUltimate", 1.11f) && (int)GetField(water, "_ultimateHits") == 10,
+                "Water ultimate resumes its six remaining hits after world pause.");
+            water.EndUltimate();
+            Property(f.Player, "ActorClock", null);
 
             var woodData = f.Track(ScriptableObject.CreateInstance<WoodFormActionDataSO>());
             woodData.SkillSteps = new List<WeaponActionData> { Step() };

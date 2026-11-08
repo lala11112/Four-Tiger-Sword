@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I90
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I90
+  itemId: I90
+  displayName: "\uBC00\uBD09 \uC8FC\uBA38\uB2C8"
+  description: "\uBD89\uC740 \uC7A0\uAE08\uC1E0\uB97C \uB2E8 \uAC01\uC9C4 \uAC80\uC740
+    \uC8FC\uBA38\uB2C8."
+  effectText: "\uC790\uC2E0\uC758 HP\uAC00 \uAC00\uB4DD \uCC2C \uC0C1\uD0DC\uC5D0\uC11C
+    \uAE30\uBCF8 \uACE8\uB4DC\uB97C \uC8FC\uB294 \uC801\uC744 \uCC98\uCE58\uD558\uBA74
+    \uACE8\uB4DC\uB97C 2 \uB354 \uC5BB\uB294\uB2E4."
+  synergyIds:
+  - S19
+  synergyNames:
+  - "\uC218\uD655"
+  primarySynergyId: S19
+  primarySynergyName: "\uC218\uD655"
+  primarySynergyIcon: {fileID: 21300000, guid: 84ef614b15c1b134c93a6e74e5980a5d, type: 3}
+  element: 0
+  grade: 2
+  purchasePrice: 40
+  effects: []
+  boundaryEffects:
+  - effectId: I90
+    stat: 12
+    amount: 2
+    trigger: 1
+    family: 0
+    element: 0
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: -1
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 1
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 1
+    maximumBaseGold: 0
+    durationSeconds: 0
+    cooldownSeconds: 0
+  icon: {fileID: 21300000, guid: d211c1ffdef7b454d87003282e20d6e8, type: 3}
+  contentStatus: draft
+  contentRevision: 20261108
+  sourceJson: "{\"id\":\"I90\",\"name\":\"\uBC00\uBD09 \uC8FC\uBA38\uB2C8\",\"description\":\"\uBD89\uC740
+    \uC7A0\uAE08\uC1E0\uB97C \uB2E8 \uAC01\uC9C4 \uAC80\uC740 \uC8FC\uBA38\uB2C8.\",\"effect\":\"\uC790\uC2E0\uC758
+    HP\uAC00 \uAC00\uB4DD \uCC2C \uC0C1\uD0DC\uC5D0\uC11C \uAE30\uBCF8 \uACE8\uB4DC\uB97C
+    \uC8FC\uB294 \uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uACE8\uB4DC\uB97C 2 \uB354
+    \uC5BB\uB294\uB2E4.\",\"synergies\":[\"S19\"],\"primarySynergy\":\"S19\",\"designIntent\":\"\uC790\uC2E0\uC758
+    HP\uAC00 \uAC00\uB4DD \uCC2C \uC0C1\uD0DC\uC5D0\uC11C \uC801\uC744 \uCC98\uCE58\uD558\uBA74
+    \uBCF4\uC0C1\uC744 \uB354 \uC5BB\uB294\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I90.png\"}"

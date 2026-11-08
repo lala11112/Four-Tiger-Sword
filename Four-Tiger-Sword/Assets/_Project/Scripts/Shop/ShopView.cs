@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>Temporary uGUI adapter; replace this prefab or implement IShopView for the final UI.</summary>
-public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnimatedModalView
+public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnimatedModalView, IShopProgressionView
 {
     public const int CurrentTabsLayoutVersion = 2;
     [SerializeField] private GameObject panel;
@@ -36,6 +36,12 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
     public event Action<string> SellRequested;
     public event Action FusionRequested;
     public event Action<int> FusionSlotCleared;
+    public event Action RefreshRequested;
+    public event Action<string> FusionResultSelected;
+    public event Action FusionChoiceCancelled;
+    private UnityEngine.UI.Button _refreshButton;
+    private TMP_Text _refreshLabel;
+    private ShopFusionChoicePanel _fusionChoices;
 
     [Serializable]
     public sealed class TabControls
@@ -169,6 +175,7 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
         }
         for (int i = count; i < _rows.Count; i++) _rows[i].gameObject.SetActive(false);
         RenderTabs(state);
+        RenderProgression(state);
         if (tabs != null && (opening || state.Tab != _lastTab) && tabs.Scroll != null)
         {
             tabs.Scroll.StopMovement();
@@ -295,6 +302,9 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
         }
         bool changedTab = _state == null || _state.Tab != state.Tab;
         _state = state;
+        if (state.UsesSynergyCatalog) _stockFilter = _ownedFilter = ElementType.ELEMENT_NONE;
+        ShowCatalogFilters(boundary.StockFilters, state.UsesSynergyCatalog);
+        ShowCatalogFilters(boundary.OwnedFilters, state.UsesSynergyCatalog);
         SetVisibility(state.Visible);
         interactionPrompt.SetActive(state.ShowInteractionPrompt && !state.Visible);
         if (!state.Visible) return;
@@ -354,6 +364,7 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
             Canvas.ForceUpdateCanvases();
             boundary.OwnedScroll.verticalNormalizedPosition = OwnedScroll(state.Tab);
         }
+        RenderProgression(state);
         if (opening)
         {
             boundary.Backdrop?.Show();
@@ -476,6 +487,38 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
             }
     }
 
+    private void RenderProgression(ShopViewState state)
+    {
+        if (HasBoundaryLayout && _refreshButton == null)
+        {
+            _refreshButton = Instantiate(boundary.HealingButton, boundary.ServicePanel);
+            _refreshButton.name = "RefreshStockButton";
+            _refreshButton.onClick.RemoveAllListeners();
+            _refreshButton.onClick.AddListener(() => { if (IsInteractionReady) RefreshRequested?.Invoke(); });
+            _refreshLabel = _refreshButton.GetComponentInChildren<TMP_Text>(true);
+            UIButtonMotion.Install(_refreshButton.gameObject);
+        }
+        if (_refreshButton != null)
+        {
+            float width = boundary.ServicePanel.rect.width;
+            Place(boundary.HealingButton.transform as RectTransform, 0, 90, (width - 16) / 2, 56);
+            Place(_refreshButton.transform as RectTransform, (width + 16) / 2, 90, (width - 16) / 2, 56);
+            _refreshButton.interactable = state.CanRefresh;
+            _refreshLabel.text = $"상품 새로고침 · {state.RefreshCost:N0} G";
+            _refreshLabel.enableAutoSizing = true; _refreshLabel.fontSizeMin = 15; _refreshLabel.fontSizeMax = 21;
+        }
+        if (_fusionChoices == null && state.FusionChoiceActive && panel != null)
+        {
+            var host = new GameObject("FusionChoices", typeof(RectTransform), typeof(ShopFusionChoicePanel));
+            host.transform.SetParent(panel.transform, false);
+            _fusionChoices = host.GetComponent<ShopFusionChoicePanel>();
+            _fusionChoices.Configure(message,
+                id => { if (IsInteractionReady) FusionResultSelected?.Invoke(id); },
+                () => { if (IsInteractionReady) FusionChoiceCancelled?.Invoke(); });
+        }
+        if (_fusionChoices != null) _fusionChoices.Render(state.FusionChoiceActive, state.FusionCandidates);
+    }
+
     private void RenderBoundaryDetail(ShopViewState state)
     {
         bool offer = state.Tab == ShopTab.Buy && state.DetailSource != ShopDetailSource.Owned;
@@ -483,7 +526,10 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
         var stock = state.SelectedOffer;
         bool any = offer ? stock != null : owned != null;
         boundary.DetailTitle.text = any ? offer ? stock.Name : owned.Name : "아이템을 선택하세요";
-        boundary.DetailMeta.text = any ? $"{(offer ? stock.Grade : owned.Grade)}등급 · {ShopOfferView.ElementName(offer ? stock.Element : owned.Element)}" : string.Empty;
+        string synergyName = any ? offer ? stock.PrimarySynergyName : owned.PrimarySynergyName : null;
+        boundary.DetailMeta.text = !any ? string.Empty : !string.IsNullOrEmpty(synergyName)
+            ? ItemDisplayText.Meta(offer ? stock.Grade : owned.Grade, synergyName)
+            : $"{(offer ? stock.Grade : owned.Grade)}등급 · {ShopOfferView.ElementName(offer ? stock.Element : owned.Element)}";
         boundary.DetailBody.text = any ? (offer ? stock.Description : owned.Description) ?? string.Empty : string.Empty;
         string detailId = any ? (offer ? "offer:" + stock.Id : "owned:" + owned.Id) : string.Empty;
         if (_detailId != detailId)
@@ -576,6 +622,12 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
         for (int i = 0; i < buttons.Length && i < FilterElements.Length; i++)
             if (buttons[i]?.targetGraphic is UnityEngine.UI.Image image)
                 image.sprite = element == FilterElements[i] ? boundary.TabSelected : boundary.TabNormal;
+    }
+    private static void ShowCatalogFilters(UnityEngine.UI.Button[] buttons, bool synergyCatalog)
+    {
+        if (buttons == null) return;
+        for (int i = 0; i < buttons.Length; i++)
+            if (buttons[i] != null) buttons[i].gameObject.SetActive(!synergyCatalog || i == 0);
     }
     private static void Place(RectTransform rect, float x, float y, float width, float height)
     { rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0, 1); rect.anchoredPosition = new Vector2(x, -y); rect.sizeDelta = new Vector2(width, height); }

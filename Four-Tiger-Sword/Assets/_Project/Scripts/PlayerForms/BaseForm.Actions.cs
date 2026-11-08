@@ -147,6 +147,7 @@ public abstract partial class BaseForm
 
     public virtual void BeginSkill()
     {
+        BeginItemCast();
         _currentAction = ActionType.Skill;
         _playerController.StatManager.TryConsumeSp(SkillSpCost);
         _skillStep = 0;
@@ -195,6 +196,7 @@ public abstract partial class BaseForm
     public virtual void BeginSwitchAttack()
     {
         if (!CanSwitchAttack) return;
+        BeginItemCast();
         _currentAction = ActionType.SwitchAttack;
         ApplyChainBuff();
         SnapshotAttackDamage();
@@ -234,6 +236,7 @@ public abstract partial class BaseForm
 
     protected void ConsumeUltimateResources()
     {
+        BeginItemCast();
         ResetActionTiming();
         _ultimateCooldownTimer = _weaponActionData != null ? _weaponActionData.UltimateCooldown : 30f;
         _playerController.StatManager.ConsumeAllUltimateGauge();

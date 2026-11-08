@@ -11,6 +11,16 @@ public sealed class DungeonEncounterMember : MonoBehaviour
     public bool IsDead => Enemy == null || Enemy.IsDead;
     public bool IsAwake { get; private set; }
     public bool HasDied { get; private set; }
+    public int RewardRoomId { get; private set; }
+    public int RewardWaveIndex { get; private set; }
+    public int RewardSpawnIndex { get; private set; }
+
+    internal void SetRewardIdentity(int roomId, int waveIndex, int spawnIndex)
+    {
+        RewardRoomId = roomId;
+        RewardWaveIndex = waveIndex;
+        RewardSpawnIndex = spawnIndex;
+    }
     private EnemyStat _stats;
     private NavMeshAgent _agent;
     private Collider[] _colliders;

@@ -42,7 +42,7 @@ public sealed class ShopOfferView : MonoBehaviour
         icon.color = state.Icon != null ? Color.white : Color.clear;
         buttonLabel.text = gradeLabel != null ? string.Empty : state.ButtonLabel;
         purchaseButton.interactable = gradeLabel != null || state.CanBuy;
-        Card(state.Selected, state.Element, state.Grade, false);
+        Card(state.Selected, state.Element, state.Grade, false, state.PrimarySynergyName, state.PrimarySynergyIcon);
     }
 
     public void RenderOwned(ShopOwnedItemViewState state, Action<string> select, bool selling)
@@ -56,17 +56,18 @@ public sealed class ShopOfferView : MonoBehaviour
         icon.color = state.Icon != null ? Color.white : Color.clear;
         buttonLabel.text = gradeLabel != null ? string.Empty : state.Selected ? "선택됨" : "선택";
         purchaseButton.interactable = state.CanSelect;
-        Card(state.Selected, state.Element, state.Grade, state.IsMaterial);
+        Card(state.Selected, state.Element, state.Grade, state.IsMaterial, state.PrimarySynergyName, state.PrimarySynergyIcon);
     }
 
-    private void Card(bool selected, ElementType element, int grade, bool material)
+    private void Card(bool selected, ElementType element, int grade, bool material, string synergyName, Sprite synergyIcon)
     {
         if (cardBackground != null) cardBackground.sprite = selected ? selectedBackground : normalBackground;
-        if (gradeLabel != null) gradeLabel.text = $"{grade}등급 · {ElementName(element)}" + (material ? " · 재료" : string.Empty);
+        if (gradeLabel != null) gradeLabel.text = (!string.IsNullOrEmpty(synergyName)
+            ? ItemDisplayText.Meta(grade, synergyName) : $"{grade}등급 · {ElementName(element)}") + (material ? " · 재료" : string.Empty);
         int index = element switch { ElementType.ELEMENT_FIRE => 0, ElementType.ELEMENT_WATER => 1,
             ElementType.ELEMENT_WOOD => 2, ElementType.ELEMENT_GOLD => 3, ElementType.ELEMENT_EARTH => 4, _ => -1 };
         if (elementBadge != null)
-        { elementBadge.sprite = index >= 0 && elementIcons != null && index < elementIcons.Length ? elementIcons[index] : null;
+        { elementBadge.sprite = synergyIcon != null ? synergyIcon : index >= 0 && elementIcons != null && index < elementIcons.Length ? elementIcons[index] : null;
             elementBadge.color = elementBadge.sprite != null ? Color.white : Color.clear; }
     }
 

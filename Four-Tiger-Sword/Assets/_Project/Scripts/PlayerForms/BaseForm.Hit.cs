@@ -77,7 +77,8 @@ public abstract partial class BaseForm
             var result = DamageManager.Apply(
                 new HitInfo(baseDamage * DamageAttackStat, Element, critChance, critMultiplier, trueDamage: DealsTrueDamage, source: _playerController, power: knockback, poiseDamage: poiseDamage, staggerResistLevel: step.StaggerResistLevel, impactSound: ResolveHitSound(step, hitEvent),
                     category: CurrentAttackCategory, itemDamageMultiplier: DamageItemMultiplier,
-                    sourceDamageMultiplier: DamageSourceMultiplier, hasSourceDamageSnapshot: true, isDirectPlayerHit: true),
+                    sourceDamageMultiplier: DamageSourceMultiplier, hasSourceDamageSnapshot: true, isDirectPlayerHit: true,
+                    castId: ItemCastId),
                 damageable, target);
 
             if (!result.Applied) continue;
@@ -134,21 +135,23 @@ public abstract partial class BaseForm
 
     protected virtual int QueryOverlap(WeaponActionData step, Vector3 center)
     {
+        float reach = _currentAction == ActionType.Attack || _currentAction == ActionType.AirAttack
+            ? _playerController.Engravings?.NormalReachMultiplier ?? 1f : 1f;
         switch (step.HitBoxShape)
         {
             case HitBoxShape.Sphere:
-                return Physics.OverlapSphereNonAlloc(center, step.HitBoxRadius, _overlapBuffer, _enemyLayer);
+                return Physics.OverlapSphereNonAlloc(center, step.HitBoxRadius * reach, _overlapBuffer, _enemyLayer);
 
             case HitBoxShape.Box:
-                return Physics.OverlapBoxNonAlloc(center, step.HitBoxSize, _overlapBuffer,
+                return Physics.OverlapBoxNonAlloc(center, step.HitBoxSize * reach, _overlapBuffer,
                     _playerController.transform.rotation, _enemyLayer);
 
             case HitBoxShape.Capsule:
-                float offset = (step.HitBoxHeight / 2f) - step.HitBoxRadius;
+                float offset = ((step.HitBoxHeight / 2f) - step.HitBoxRadius) * reach;
                 return Physics.OverlapCapsuleNonAlloc(
                     center + _playerController.transform.up * offset,
                     center - _playerController.transform.up * offset,
-                    step.HitBoxRadius, _overlapBuffer, _enemyLayer);
+                    step.HitBoxRadius * reach, _overlapBuffer, _enemyLayer);
 
             default:
                 return 0;

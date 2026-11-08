@@ -15,6 +15,21 @@ public static class DamageManager
             if (!targetGO.activeInHierarchy) return default;
         }
         float damage = info.BaseDamage;
+        var sourcePlayer = info.Source as PlayerController;
+        var targetEnemy = targetGO.GetComponent<Enemy>();
+        var targetStats = targetGO.GetComponent<EnemyStat>();
+        var family = ItemDamageContext.Family(info.Category);
+        bool canTrigger = info.Origin == DamageOrigin.AuthoredAction && family != BoundaryAttackFamily.Any;
+        if (!canTrigger) family = BoundaryAttackFamily.Any;
+        var hitContext = new ItemHitContext(targetGO.GetInstanceID(), targetStats != null ? targetStats.CurrentHp : 0f,
+            targetStats != null ? targetStats.MaxHp : 0f, targetEnemy != null && targetEnemy.Rank != EnemyRank.Normal,
+            family, info.Element, canTrigger, info.CastId);
+        var itemRuntime = sourcePlayer != null && targetEnemy != null ? sourcePlayer.ItemRuntime : null;
+        var itemModifiers = itemRuntime != null ? itemRuntime.EvaluateOutgoing(hitContext)
+            : new ItemOutgoingModifiers(1f, 0f, 0f, 0f);
+        var engravings = sourcePlayer != null && targetEnemy != null ? sourcePlayer.Engravings : null;
+        damage *= Mathf.Max(0f, itemModifiers.DamageMultiplier
+            + (engravings != null ? engravings.OutgoingDamageBonus(info, targetEnemy) : 0f));
         if (info.Category == PlayerAttackCategory.Normal || info.Category == PlayerAttackCategory.SwitchAttack)
             damage *= Mathf.Max(0f, info.ItemDamageMultiplier);
         if (info.HasSourceDamageSnapshot)
@@ -45,22 +60,30 @@ public static class DamageManager
             if (boss != null && boss.Data != null)
                 multiplier = boss.Data.ResolveElementMultiplier(info.Element, multiplier);
             damage *= multiplier;
-            critical = Random.value < Mathf.Clamp01(info.CriticalChance);
-            if (critical) damage *= Mathf.Max(0f, info.CriticalMultiplier);
+            critical = Random.value < Mathf.Clamp01(info.CriticalChance + itemModifiers.CriticalChanceBonus
+                + (engravings != null ? engravings.OutgoingCriticalBonus(info) : 0f));
+            if (critical) damage *= Mathf.Max(0f, info.CriticalMultiplier + itemModifiers.CriticalMultiplierBonus);
             if (!info.ArmorPierce)
             {
                 float defense = enemy != null
                     ? (targetGO.GetComponent<FormTargetEffects>()?.EffectiveDefense ?? enemy.GetStat(EnemyStatType.DEF))
                     : player != null ? player.StatManager.GetStat(StatType.ST_DEF) : 0f;
-                damage *= 100f / (100f + Mathf.Max(0f, defense));
+                damage *= 100f / (100f + Mathf.Max(0f, defense) * (1f - itemModifiers.IgnoreDefenseRatio));
             }
         }
         if (float.IsNaN(damage) || float.IsInfinity(damage)) return default;
         damage = Mathf.Max(0f, damage);
         Vector3 impactPosition = targetGO.transform.position;
-        DamageResult result = target.TakeDamage(damage, info.Element, critical, info.Power,
-            Mathf.Max(0f, info.PoiseDamage * info.PoiseDamageMultiplier),
-            info.StaggerResistLevel, info.IsParryable, info.Source);
+        DamageResult result;
+        using (ItemDamageContext.Push(new ItemDeathContext(sourcePlayer, family, canTrigger,
+            critical, info.IsDirectPlayerHit, info.Origin), itemRuntime, hitContext,
+            () => engravings?.CommitOutgoing(info, targetEnemy, critical)))
+        {
+            result = target.TakeDamage(damage, info.Element, critical, info.Power,
+                Mathf.Max(0f, info.PoiseDamage * info.PoiseDamageMultiplier),
+                info.StaggerResistLevel, info.IsParryable, info.Source);
+            if (result.Applied) ItemDamageContext.CommitOutgoing(result.HealthDamage, result.ShieldDamage);
+        }
         if (result.Applied && result.CausedOrdinaryStagger && info.IsDirectPlayerHit
             && info.Category != PlayerAttackCategory.Secondary
             && info.Source is PlayerController && target is Enemy staggeredEnemy)

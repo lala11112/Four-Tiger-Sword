@@ -40,6 +40,7 @@ public sealed class PlayerUpgradeService
 #endif
 
     public PlayerUpgradeSettingsSO Settings { get; }
+    public EngravingSettingsSO EngravingSettings { get; }
     public int Balance => _profile?.currency ?? 0;
     public bool IsReady { get; private set; }
     public string LastError { get; private set; }
@@ -51,9 +52,10 @@ public sealed class PlayerUpgradeService
     private bool _transactionInProgress;
 
     /// <summary>Explicit dependencies let regressions use memory or temporary files, never the real save.</summary>
-    public PlayerUpgradeService(PlayerUpgradeSettingsSO settings, IPlayerUpgradeStore store)
+    public PlayerUpgradeService(PlayerUpgradeSettingsSO settings, IPlayerUpgradeStore store, EngravingSettingsSO engravings = null)
     {
         Settings = settings;
+        EngravingSettings = engravings != null ? engravings : EngravingSettingsSO.Default;
         _store = store ?? throw new ArgumentNullException(nameof(store));
         TryReload(out _);
     }
@@ -97,12 +99,20 @@ public sealed class PlayerUpgradeService
         {
             if (Settings == null) return Reject("PlayerUpgradeSettings 강화 설정을 찾을 수 없습니다.", out error);
             if (!Settings.Validate(out error)) { LastError = error; return false; }
+            if (!EngravingSettings.Validate(out error)) { LastError = error; return false; }
             if (!_store.TryLoad(out var loaded, out error)) { LastError = error; return false; }
             if (loaded == null || !loaded.Validate(out error))
                 return Reject(error ?? "강화 저장 데이터가 없습니다.", out error);
             if (loaded.healthLevel > Settings.maxLevel || loaded.attackLevel > Settings.maxLevel
                 || loaded.defenseLevel > Settings.maxLevel)
                 return Reject("저장된 강화 단계가 설정된 최대 단계를 초과합니다. 기존 파일은 보존됩니다.", out error);
+            var owned = new HashSet<string>(loaded.unlockedNodeIds ?? Array.Empty<string>(), StringComparer.Ordinal);
+            foreach (string id in owned)
+            {
+                var definition = EngravingSettings.Find(id);
+                if (definition == null || definition.parentId != "origin" && !owned.Contains(definition.parentId))
+                    return Reject("저장된 각인 또는 선행 조건이 유효하지 않습니다. 기존 파일은 보존됩니다.", out error);
+            }
             _profile = loaded.Copy();
             IsReady = true;
             LastError = null;
@@ -128,6 +138,40 @@ public sealed class PlayerUpgradeService
         else next.defenseLevel++;
         return Commit(next, null, out error);
     }
+
+    public bool IsNodeUnlocked(string id) => id == "origin" || _profile != null && id != null
+        && Array.IndexOf(_profile.unlockedNodeIds ?? Array.Empty<string>(), id) >= 0;
+
+    public EngravingPurchaseState GetNodePurchaseState(string id)
+    {
+        var definition = EngravingSettings.Find(id)?.Copy();
+        if (definition != null) definition.description = EngravingSettings.Describe(id);
+        bool unlocked = IsNodeUnlocked(id);
+        int cost = EngravingSettings.Cost(id);
+        string error = !IsReady ? LastError ?? "강화 데이터를 불러오지 못했습니다."
+            : definition == null ? "존재하지 않는 각인입니다."
+            : unlocked ? "이미 해금한 각인입니다."
+            : !IsNodeUnlocked(definition.parentId) ? "선행 각인을 먼저 해금하세요."
+            : Balance < cost ? Settings.currencyName + "이(가) 부족합니다." : null;
+        return new EngravingPurchaseState(id, definition, unlocked, cost, error);
+    }
+
+    public bool TryUnlockNode(string id, out string error)
+    {
+        if (!CanMutate(out error)) return false;
+        if (!EngravingSettings.Validate(out error)) return Reject(error, out error);
+        var state = GetNodePurchaseState(id);
+        if (!state.CanPurchase) return Reject(state.Error ?? "이 각인은 구매할 수 없습니다.", out error);
+        var next = _profile.Copy();
+        next.currency -= state.Cost;
+        var ids = new List<string>(next.unlockedNodeIds ?? Array.Empty<string>()) { id };
+        ids.Sort(StringComparer.Ordinal);
+        next.unlockedNodeIds = ids.ToArray();
+        return Commit(next, null, out error);
+    }
+
+    public EngravingSnapshot CreateEngravingSnapshot() => new EngravingSnapshot(EngravingSettings,
+        IsReady ? _profile.unlockedNodeIds : Array.Empty<string>());
 
     /// <summary>Repeated successful reward IDs are no-ops. Failed writes leave the ID retryable.</summary>
     public bool TryGrantReward(string uniqueId, int amount, out string error)
@@ -158,6 +202,7 @@ public sealed class PlayerUpgradeService
         _transactionInProgress = true;
         try
         {
+            next.version = PlayerUpgradeProfile.CurrentVersion;
             if (!_store.TrySave(next.Copy(), out error))
                 return Reject(error ?? "강화 데이터를 저장하지 못했습니다.", out error);
             _profile = next;

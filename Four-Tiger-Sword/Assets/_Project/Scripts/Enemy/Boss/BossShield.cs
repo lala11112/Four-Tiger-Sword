@@ -26,12 +26,13 @@ public class BossShield : MonoBehaviour
         OnShieldChanged?.Invoke(_currentAbsorption);
     }
 
-    public float Absorb(float damage)
+    public float Absorb(float damage, Action<float> beforeNotify = null)
     {
         if (damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return damage;
         if (!IsActive || damage <= 0f) return damage;
         float absorbed = Mathf.Min(_currentAbsorption, damage);
         _currentAbsorption -= absorbed;
+        beforeNotify?.Invoke(absorbed);
         OnShieldChanged?.Invoke(_currentAbsorption);
         if (!IsActive) OnShieldBroken?.Invoke();
         return damage - absorbed;

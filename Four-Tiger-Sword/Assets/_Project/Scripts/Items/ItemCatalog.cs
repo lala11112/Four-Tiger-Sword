@@ -21,6 +21,7 @@ public sealed class ItemCatalog : ScriptableObject
     public string catalogSha256;
     public string manifestSha256;
     public ItemDefinition[] items = Array.Empty<ItemDefinition>();
+    public ItemSynergyDefinition[] synergies = Array.Empty<ItemSynergyDefinition>();
     public ItemPolicy policy = new ItemPolicy();
 
     public ItemDefinition Find(string itemId)

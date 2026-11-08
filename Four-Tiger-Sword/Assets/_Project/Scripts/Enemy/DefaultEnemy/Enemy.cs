@@ -35,6 +35,9 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public IEnemyBrain Brain { get; private set; }
     public bool IsDead => _isDie;
+    [SerializeField] private EnemyRank enemyRank = EnemyRank.Normal;
+    public EnemyRank Rank => this is Boss ? EnemyRank.Boss : enemyRank;
+    public ItemDeathContext DeathContext { get; private set; }
     public bool EncounterPatrolOnly { get; private set; }
     internal Vector3 PatrolOrigin { get; private set; }
     public virtual MonsterSkillDataSO ActiveSkillSet => EnemyStat?.MonsterSkillData;
@@ -246,6 +249,7 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         if (!CanReceiveDamage(damage)) return default;
         float hpBefore = EnemyStat.CurrentHp;
+        var hitContext = ItemDamageContext.Current;
 
         GetComponent<PoiseHandler>()?.TakePoiseDamage(poiseDamage);
 
@@ -265,6 +269,8 @@ public class Enemy : MonoBehaviour, IDamageable
 
         EnemyStat.CurrentHp = Mathf.Max(0f, EnemyStat.CurrentHp - damage);
         float healthDamage = hpBefore - EnemyStat.CurrentHp;
+        // Phase depletion also publishes callbacks; commit this contact before those can dispatch another hit.
+        ItemDamageContext.CommitOutgoing(healthDamage, 0f);
         // A boss may consume this health bar without confirming the actor's death.
         // Latch before callbacks so reentrant hits cannot consume another phase.
         bool healthDepletionHandled = EnemyStat.CurrentHp <= 0f && TryHandleHealthDepleted();
@@ -284,7 +290,9 @@ public class Enemy : MonoBehaviour, IDamageable
 
         if (EnemyStat.CurrentHp <= 0f && !healthDepletionHandled && !_isDie)
         {
+            DeathContext = hitContext;
             Die();
+            hitContext.Player?.Engravings?.NotifyKill(this, hitContext);
             OnDied?.Invoke();
         }
         return new DamageResult(DamageOutcome.Applied, healthDamage, killed: IsDead,
@@ -315,6 +323,7 @@ public class Enemy : MonoBehaviour, IDamageable
         if (_isDie || !IsSelfDestructing || CurrentAction != action) return;
         float remainingHp = EnemyStat.CurrentHp;
         EnemyStat.CurrentHp = 0f;
+        DeathContext = default;
         Die();
         OnDamaged?.Invoke(remainingHp, Element, false);
         OnDied?.Invoke();
@@ -330,6 +339,18 @@ public class Enemy : MonoBehaviour, IDamageable
     private bool CanReceiveKnockback(StaggerResistLevel attackLevel)
         => !ResistsKnockback && StaggerResistLevel != StaggerResistLevel.SUPER_ARMOR
             && (IsGroggy || PendingGroggy || attackLevel >= StaggerResistLevel);
+
+    /// <summary>Displaces without manufacturing a damage/poise/hit event.</summary>
+    public bool TryApplyExternalKnockback(Vector3 power, StaggerResistLevel attackLevel, object source = null)
+    {
+        if (!isActiveAndEnabled || IsDead || EncounterPatrolOnly || IsSelfDestructing || EnemyStat == null
+            || EnemyStat.CurrentHp <= 0f || !CanReceiveKnockback(attackLevel)
+            || !KnockbackMotion.IsFinite(power.sqrMagnitude) || power.sqrMagnitude <= 0f) return false;
+        if (_navMeshAgent == null) _navMeshAgent = GetComponent<NavMeshAgent>();
+        if (_navMeshAgent == null || !_navMeshAgent.enabled || !_navMeshAgent.isOnNavMesh) return false;
+        ApplyKnockback(power, source);
+        return IsKnockbacking;
+    }
 
     private void ApplyKnockback(Vector3 power, object source = null)
     {

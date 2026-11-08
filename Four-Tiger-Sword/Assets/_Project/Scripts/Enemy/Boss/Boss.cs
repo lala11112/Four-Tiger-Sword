@@ -168,7 +168,8 @@ public abstract class Boss : Enemy
         float modified = CurrentPhase?.ModifyIncomingDamage(damage, this) ?? damage;
         if (float.IsNaN(modified) || float.IsInfinity(modified) || modified < 0f) return default;
         if (Shield == null) Shield = GetComponent<BossShield>();
-        float remaining = Shield != null ? Shield.Absorb(modified) : modified;
+        float remaining = Shield != null
+            ? Shield.Absorb(modified, absorbedDamage => ItemDamageContext.CommitOutgoing(0f, absorbedDamage)) : modified;
         float absorbed = modified - remaining;
         DamageResult result = base.TakeDamage(remaining, damageType, isCritical, power,
             poiseDamage, staggerResistLevel, isParryable, source);

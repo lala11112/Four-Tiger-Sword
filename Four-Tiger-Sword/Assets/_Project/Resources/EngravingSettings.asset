@@ -1,0 +1,534 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 103d37cfd7d20e64aaf1c020e1b5748b, type: 3}
+  m_Name: EngravingSettings
+  m_EditorClassIdentifier: Assembly-CSharp::EngravingSettingsSO
+  tierCosts: 000000000a000000140000002800000050000000
+  baseRewardChoices: 3
+  emptyRewardGold: 10
+  baseRefreshCost: 20
+  nodes:
+  - id: origin
+    parentId: 
+    displayName: "\uCCAB \uAC01\uC778"
+    description: "\uC774\uBBF8 \uC5F4\uB9B0 \uBB34\uB8CC \uC2DC\uC791\uC810. \uC6D0\uD558\uB294
+      \uC131\uC7A5 \uAC00\uC9C0\uB97C \uC120\uD0DD\uD558\uC138\uC694."
+    tier: 0
+    amount: 0
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: atk
+    parentId: origin
+    displayName: "\uACF5\uACA9\uB825"
+    description: "\uAE30\uBCF8 \uACF5\uACA9\uB825 +8%"
+    tier: 1
+    amount: 0.08
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: hp
+    parentId: origin
+    displayName: "\uCD5C\uB300 \uCCB4\uB825"
+    description: "\uAE30\uBCF8 \uCD5C\uB300 \uCCB4\uB825 +10%"
+    tier: 1
+    amount: 0.1
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: footwork
+    parentId: origin
+    displayName: "\uBC1C\uB180\uB9BC"
+    description: "\uC774\uB3D9\uC18D\uB3C4 +8% (\uB300\uC2DC \uAC70\uB9AC \uC81C\uC678)"
+    tier: 1
+    amount: 0.08
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: gold
+    parentId: origin
+    displayName: "\uCD9C\uACA9 \uC790\uAE08"
+    description: "\uCD9C\uACA9 \uACE8\uB4DC +30"
+    tier: 1
+    amount: 30
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: heirloom
+    parentId: origin
+    displayName: "\uCD9C\uACA9 \uC720\uD488"
+    description: "\uCD9C\uACA9 \uC2DC 1\uB4F1\uAE09 \uD6C4\uBCF4 \uCD5C\uB300 3\uAC1C
+      \uC911 1\uAC1C \uC120\uD0DD"
+    tier: 1
+    amount: 0
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 3
+  - id: crit
+    parentId: atk
+    displayName: "\uCE58\uBA85\uD0C0 \uD655\uB960"
+    description: "\uCE58\uBA85\uD0C0 \uD655\uB960 +5%p"
+    tier: 2
+    amount: 0.05
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: bossdmg
+    parentId: atk
+    displayName: "\uAC70\uBB3C \uC0AC\uB0E5"
+    description: "\uBCF4\uC2A4\uC5D0\uAC8C \uC8FC\uB294 \uC9C1\uC811 \uD53C\uD574
+      +10%"
+    tier: 2
+    amount: 0.1
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: speed
+    parentId: atk
+    displayName: "\uACF5\uACA9 \uC18D\uB3C4"
+    description: "\uACF5\uACA9\uC18D\uB3C4 +6%"
+    tier: 2
+    amount: 0.06
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: heal
+    parentId: hp
+    displayName: "\uD68C\uBCF5 \uC99D\uD3ED"
+    description: "\uC77C\uBC18 \uD68C\uBCF5\uB7C9 +15% (\uBD80\uD65C \uC81C\uC678)"
+    tier: 2
+    amount: 0.15
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: guard
+    parentId: hp
+    displayName: "\uC704\uAE30 \uBC29\uC5B4"
+    description: "\uD53C\uACA9 \uC9C1\uC804 \uCCB4\uB825 30% \uC774\uD558\uC774\uBA74
+      \uBC1B\uB294 \uD53C\uD574 -20%"
+    tier: 2
+    amount: 0.2
+    secondary: 0
+    duration: 0
+    threshold: 0.3
+    range: 0
+    cap: 0
+    limit: 0
+  - id: bossguard
+    parentId: hp
+    displayName: "\uAC70\uBB3C \uBC29\uC5B4"
+    description: "\uBCF4\uC2A4 \uAC1C\uCCB4\uBCC4 \uCCAB \uC720\uD6A8 \uD53C\uACA9
+      \uD53C\uD574 -50%. \uD398\uC774\uC988 \uC804\uD658\uC73C\uB85C \uC7AC\uCDA9\uC804\uB418\uC9C0
+      \uC54A\uC74C"
+    tier: 2
+    amount: 0.5
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: armor
+    parentId: hp
+    displayName: "\uB2E8\uB2E8\uD55C \uAC01\uC778"
+    description: "\uBC1B\uB294 \uD53C\uD574 -5%"
+    tier: 2
+    amount: 0.05
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: counter
+    parentId: footwork
+    displayName: "\uD68C\uD53C \uBC18\uACA9"
+    description: "\uC2E4\uC81C \uACF5\uACA9 \uD68C\uD53C \uD6C4 5\uCD08 \uC548\uC758
+      \uB2E4\uC74C \uC9C1\uC811 \uC720\uD6A8 \uC801\uC911 \uD53C\uD574 +20%"
+    tier: 2
+    amount: 0.2
+    secondary: 0
+    duration: 5
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: pursuit
+    parentId: footwork
+    displayName: "\uCD94\uACA9"
+    description: "\uC9C1\uC811 \uCC98\uCE58 \uD6C4 3\uCD08\uAC04 \uC774\uB3D9\uC18D\uB3C4
+      +15%"
+    tier: 2
+    amount: 0.15
+    secondary: 0
+    duration: 3
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: escape
+    parentId: footwork
+    displayName: "\uD0C8\uCD9C"
+    description: "\uC720\uD6A8 \uD53C\uACA9 \uD6C4 2\uCD08\uAC04 \uC774\uB3D9\uC18D\uB3C4
+      +15%"
+    tier: 2
+    amount: 0.15
+    secondary: 0
+    duration: 2
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: firstblood
+    parentId: gold
+    displayName: "\uC804\uB9AC\uD488"
+    description: "\uC77C\uBC18 \uC801\uC758 \uC6D0\uB798 \uAE30\uBCF8 \uCC98\uCE58
+      \uACE8\uB4DC +20%. \uC18C\uC218\uB294 \uB7F0 \uC548\uC5D0\uC11C \uC774\uC6D4"
+    tier: 2
+    amount: 0.2
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: discount
+    parentId: gold
+    displayName: "\uC0C1\uC810 \uD560\uC778"
+    description: "\uC0C1\uC810 \uC544\uC774\uD15C \uAD6C\uB9E4 \uAC00\uACA9 -10%"
+    tier: 2
+    amount: 0.1
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: sell
+    parentId: gold
+    displayName: "\uB9E4\uAC01 \uC218\uC644"
+    description: "\uB9E4\uAC01 \uAC00\uACA9\uC774 \uAE30\uC900\uAC00\uC758 60%\uB85C
+      \uC99D\uAC00"
+    tier: 2
+    amount: 0.6
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: reroll
+    parentId: heirloom
+    displayName: "\uBCF4\uC0C1 \uC7AC\uC120\uD0DD"
+    description: "\uC77C\uBC18 \uC804\uD22C \uBCF4\uC0C1 \uC7AC\uC120\uD0DD\uC744
+      \uB7F0\uB2F9 \uCD1D 3\uD68C \uC81C\uACF5"
+    tier: 2
+    amount: 0
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 3
+  - id: starterelement
+    parentId: heirloom
+    displayName: "\uC720\uD488\uC758 \uACC4\uD1B5: \uC2DC\uB108\uC9C0 \uC120\uD0DD"
+    description: "\uC720\uD488\uC758 \uC2DC\uB108\uC9C0 \uACC4\uD1B5 \uC120\uD0DD.
+      1\uB4F1\uAE09 \uD6C4\uBCF4\uAC00 \uC788\uB294 \uC2DC\uB108\uC9C0 \uC911 \uC120\uD0DD"
+    tier: 2
+    amount: 0
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: choices
+    parentId: heirloom
+    displayName: "\uB113\uC740 \uC120\uD0DD"
+    description: "\uC77C\uBC18 \uC804\uD22C \uBCF4\uC0C1 \uD6C4\uBCF4 +1\uAC1C (\uC120\uD0DD\uD55C
+      1\uAC1C\uB9CC \uD68D\uB4DD)"
+    tier: 2
+    amount: 1
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: severe
+    parentId: crit
+    displayName: "\uCE58\uBA85\uD0C0 \uD53C\uD574"
+    description: "\uCE58\uBA85\uD0C0 \uD53C\uD574 \uBC30\uC728 +20%p"
+    tier: 3
+    amount: 0.2
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: pity
+    parentId: crit
+    displayName: "\uC2E4\uD328\uC758 \uCD95\uC801"
+    description: "\uBE44\uCE58\uBA85 \uC9C1\uC811 \uC801\uC911\uB9C8\uB2E4 \uCE58\uBA85\uD0C0
+      \uD655\uB960 +2%p, \uCD5C\uB300 +20%p. \uCE58\uBA85\uD0C0 \uBC1C\uC0DD \uC2DC
+      \uCD08\uAE30\uD654"
+    tier: 3
+    amount: 0.02
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0.2
+    limit: 0
+  - id: reach
+    parentId: speed
+    displayName: "\uAE34 \uC0AC\uAC70\uB9AC"
+    description: "\uC77C\uBC18 \uADFC\uC811\uACF5\uACA9 \uD310\uC815 \uBC94\uC704
+      +15%"
+    tier: 3
+    amount: 0.15
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: combo
+    parentId: speed
+    displayName: "\uC5F0\uC18D \uC801\uC911"
+    description: "\uB3D9\uC77C \uB300\uC0C1 \uC5F0\uC18D \uC9C1\uC811 \uC801\uC911\uB9C8\uB2E4
+      \uD53C\uD574 +5%, \uCD5C\uB300 +15%. \uCCAB \uD0C0\uACA9\uC740 \uAE30\uBCF8
+      \uD53C\uD574, \uB300\uC0C1 \uBCC0\uACBD \uB610\uB294 3\uCD08 \uACBD\uACFC \uC2DC
+      \uCD08\uAE30\uD654"
+    tier: 3
+    amount: 0.05
+    secondary: 0
+    duration: 3
+    threshold: 0
+    range: 0
+    cap: 0.15
+    limit: 0
+  - id: shield
+    parentId: heal
+    displayName: "\uB118\uCE58\uB294 \uC0DD\uBA85"
+    description: "\uCD08\uACFC \uD68C\uBCF5\uC758 50%\uB97C 10\uCD08 \uBC29\uC5B4\uB9C9\uC73C\uB85C
+      \uC804\uD658. \uCD5C\uC885 \uAC01\uC778 \uBC29\uC5B4\uB9C9\uC740 \uCD5C\uB300
+      \uCCB4\uB825 10% \uC0C1\uD55C"
+    tier: 3
+    amount: 0.5
+    secondary: 0
+    duration: 10
+    threshold: 0
+    range: 0
+    cap: 0.1
+    limit: 0
+  - id: roomheal
+    parentId: heal
+    displayName: "\uC804\uD22C\uC758 \uC228"
+    description: "\uC815\uC0C1 \uC804\uD22C\uBC29 \uCD5C\uCD08 \uD074\uB9AC\uC5B4
+      \uC2DC \uCD5C\uB300 \uCCB4\uB825\uC758 3% \uD68C\uBCF5"
+    tier: 3
+    amount: 0.03
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: revive
+    parentId: guard
+    displayName: "\uB2E4\uC2DC \uC77C\uC5B4\uC11C\uAE30"
+    description: "\uB7F0\uB2F9 1\uD68C \uCE58\uBA85 \uD53C\uD574\uC5D0\uC11C \uCCB4\uB825
+      30% \uBCF5\uC6D0, 2\uCD08 \uBB34\uC801, \uC8FC\uBCC0 4m \uC801 \uBC00\uCCD0\uB0B4\uAE30"
+    tier: 3
+    amount: 0.3
+    secondary: 8
+    duration: 2
+    threshold: 0
+    range: 4
+    cap: 0
+    limit: 1
+  - id: crowdguard
+    parentId: armor
+    displayName: "\uD3EC\uC704 \uBC29\uC5B4"
+    description: "5m \uC548\uC5D0 \uC0B4\uC544 \uC788\uB294 \uC801 3\uBA85 \uC774\uC0C1\uC774\uBA74
+      \uBC1B\uB294 \uD53C\uD574 -10%"
+    tier: 3
+    amount: 0.1
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 5
+    cap: 0
+    limit: 3
+  - id: backstab
+    parentId: counter
+    displayName: "\uD6C4\uBC29 \uACF5\uB7B5"
+    description: "\uC801 \uD6C4\uBC29 120\xB0 \uBC94\uC704\uC5D0\uC11C \uC9C1\uC811
+      \uD53C\uD574 +20%"
+    tier: 3
+    amount: 0.2
+    secondary: 0
+    duration: 0
+    threshold: 120
+    range: 0
+    cap: 0
+    limit: 0
+  - id: haste
+    parentId: pursuit
+    displayName: "\uC804\uD22C \uAC00\uC18D"
+    description: "\uC9C1\uC811 \uCC98\uCE58 \uD6C4 3\uCD08\uAC04 \uACF5\uACA9\uC18D\uB3C4
+      +10%"
+    tier: 3
+    amount: 0.1
+    secondary: 0
+    duration: 3
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: refresh
+    parentId: discount
+    displayName: "\uC0C8\uB85C\uACE0\uCE68 \uD560\uC778"
+    description: "\uC0C1\uD488 \uC0C8\uB85C\uACE0\uCE68 \uBE44\uC6A9 -25%"
+    tier: 3
+    amount: 0.25
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: hold
+    parentId: reroll
+    displayName: "\uD6C4\uBCF4 \uBCF4\uAD00"
+    description: "\uC7AC\uC120\uD0DD \uC2DC \uD6C4\uBCF4 1\uAC1C\uB97C \uBCF4\uAD00\uD558\uACE0
+      \uB098\uBA38\uC9C0\uB9CC \uAD50\uCCB4"
+    tier: 3
+    amount: 0
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 1
+  - id: synergy
+    parentId: choices
+    displayName: "\uC870\uD569\uC758 \uC2E4\uB9C8\uB9AC"
+    description: "\uB2E4\uC74C \uC2DC\uB108\uC9C0 \uB2E8\uACC4\uB97C \uC644\uC131\uD560
+      \uBBF8\uBCF4\uC720 \uC544\uC774\uD15C\uC758 \uC77C\uBC18 \uBCF4\uC0C1 \uAC00\uC911\uCE58
+      \xD73"
+    tier: 3
+    amount: 3
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: critheal
+    parentId: severe
+    displayName: "\uCE58\uBA85 \uD68C\uBCF5"
+    description: "\uC9C1\uC811 \uCE58\uBA85\uD0C0 \uCC98\uCE58 \uC2DC \uCD5C\uB300
+      \uCCB4\uB825\uC758 2% \uD68C\uBCF5"
+    tier: 4
+    amount: 0.02
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: opener
+    parentId: reach
+    displayName: "\uC120\uC81C\uACF5\uACA9"
+    description: "\uB9CC\uD53C \uC801\uC758 \uCCAB \uC9C1\uC811 \uD0C0\uACA9 \uD53C\uD574
+      +25%"
+    tier: 4
+    amount: 0.25
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: finisher
+    parentId: combo
+    displayName: "\uB9C8\uBB34\uB9AC \uC77C\uACA9"
+    description: "\uCCB4\uB825 30% \uC774\uD558 \uC801\uC5D0\uAC8C \uC9C1\uC811 \uD53C\uD574
+      +15%"
+    tier: 4
+    amount: 0.15
+    secondary: 0
+    duration: 0
+    threshold: 0.3
+    range: 0
+    cap: 0
+    limit: 0
+  - id: stock
+    parentId: refresh
+    displayName: "\uD48D\uC131\uD55C \uC9C4\uC5F4"
+    description: "\uC11C\uB85C \uB2E4\uB978 \uC544\uC774\uD15C \uC0C1\uD488 \uC218
+      +1"
+    tier: 4
+    amount: 1
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 0
+  - id: fusion
+    parentId: synergy
+    displayName: "\uD569\uC131 \uC120\uD0DD"
+    description: "\uAE30\uC874 \uD569\uC131 \uC7AC\uB8CC\uB85C \uC0DD\uC131\uD55C
+      \uACB0\uACFC \uD6C4\uBCF4 \uCD5C\uB300 3\uAC1C \uC911 1\uAC1C \uC120\uD0DD"
+    tier: 4
+    amount: 0
+    secondary: 0
+    duration: 0
+    threshold: 0
+    range: 0
+    cap: 0
+    limit: 3

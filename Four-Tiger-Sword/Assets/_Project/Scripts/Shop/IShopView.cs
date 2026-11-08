@@ -23,6 +23,14 @@ public interface IShopLayoutView
     void ToggleBuyInventory();
 }
 
+/// <summary>Optional new actions keep existing shop adapters compatible.</summary>
+public interface IShopProgressionView
+{
+    event Action RefreshRequested;
+    event Action<string> FusionResultSelected;
+    event Action FusionChoiceCancelled;
+}
+
 /// <summary>Optional motion contract. The owner keeps its pause until the close callback completes.</summary>
 public interface IAnimatedModalView
 {
@@ -56,6 +64,10 @@ public sealed class ShopViewState
     public ShopOwnedItemViewState SelectedOwned;
     public ShopDetailSource DetailSource;
     public bool CanSell, CanFuse;
+    public bool UsesSynergyCatalog;
+    public bool CanRefresh, FusionChoiceActive;
+    public int RefreshCost, RefreshCount;
+    public ShopOwnedItemViewState[] FusionCandidates = Array.Empty<ShopOwnedItemViewState>();
     public string FusionOddsText, EmptyMessage;
 }
 
@@ -63,6 +75,8 @@ public sealed class ShopOfferViewState
 {
     public string Id, Name, Description, ButtonLabel;
     public Sprite Icon;
+    public string PrimarySynergyName;
+    public Sprite PrimarySynergyIcon;
     public ElementType Element;
     public int Price, Grade;
     public bool CanBuy;
@@ -74,6 +88,8 @@ public sealed class ShopOwnedItemViewState
     public string Id, Name, Description;
     public int Grade, SalePrice;
     public Sprite Icon;
+    public string PrimarySynergyName;
+    public Sprite PrimarySynergyIcon;
     public ElementType Element;
     public bool CanSelect, Selected, CanSell;
     public bool IsMaterial, CanAddMaterial;

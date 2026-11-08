@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>Player-owned item effects; importing or editing a catalog never grants ownership.</summary>
 [DisallowMultipleComponent]
-public sealed class PlayerItemRuntime : MonoBehaviour
+public sealed partial class PlayerItemRuntime : MonoBehaviour
 {
     public const float BaseDodgeSpCost = 20f;
     public const float BaseSwitchSpCost = 10f;
@@ -47,6 +47,7 @@ public sealed class PlayerItemRuntime : MonoBehaviour
             try
             {
                 bool hadItems = _owned.Count > 0;
+                ResetBoundaryForCatalogChange();
                 catalog = value;
                 _owned.Clear();
                 _ownedItems.Clear();
@@ -166,6 +167,9 @@ public sealed class PlayerItemRuntime : MonoBehaviour
         if (definition == null || catalog == null
             || !string.Equals(definition.projectId, catalog.projectId, StringComparison.Ordinal)
             || string.IsNullOrWhiteSpace(definition.candidateKey) || definition.effects == null) return false;
+        if (definition.boundaryEffects != null)
+            foreach (var effect in definition.boundaryEffects)
+                if (effect == null || !effect.IsValid()) return false;
         var active = new ActiveEffect[definition.effects.Length];
         for (int i = 0; i < active.Length; i++)
         {
@@ -217,7 +221,8 @@ public sealed class PlayerItemRuntime : MonoBehaviour
     public void Tick(float scaledDt)
     {
         if (!_initialized || _suspended || !ItemEffect.IsFinite(scaledDt) || scaledDt <= 0f) return;
-        if (_stats == null || _stats.CurrentHp <= 0f) { ClearTimedEffects(); return; }
+        if (_stats == null || _stats.CurrentHp <= 0f) { ClearTimedEffects(); ClearBoundaryTransient(); return; }
+        TickBoundary(scaledDt);
         bool changed = false;
         foreach (var owned in _owned.Values)
         {
@@ -243,12 +248,15 @@ public sealed class PlayerItemRuntime : MonoBehaviour
     public void RecalculateForCurrentForm()
     {
         if (!_initialized || _stats == null) return;
+        SyncBoundarySources();
         if (_suspended || catalog == null) { _stats.RemoveItemResourceModifiers(this); return; }
         // Submit every resource delta as one replacement, then clamp current resources once.
         var form = CurrentForm;
-        _stats.SetItemResourceModifiers(this, Sum(ItemStat.MaxHp, form), Sum(ItemStat.MaxSp, form),
+        _stats.SetItemResourceModifiers(this, Sum(ItemStat.MaxHp, form) + PassiveBoundaryStat(BoundaryItemStat.MaxHpRatio), Sum(ItemStat.MaxSp, form),
             Sum(ItemStat.SpRegen, form), ValidPositive(catalog.policy?.maxSpCap, 200f),
-            ValidPositive(catalog.policy?.regenCap, 40f));
+            ValidPositive(catalog.policy?.regenCap, 40f), PassiveBoundaryStat(BoundaryItemStat.AttackRatio),
+            PassiveBoundaryStat(BoundaryItemStat.DefenseRatio), PassiveBoundaryStat(BoundaryItemStat.CriticalChancePoints),
+            PassiveBoundaryStat(BoundaryItemStat.CriticalDamagePoints), PassiveBoundaryStat(BoundaryItemStat.ShieldGainRatio));
     }
 
     public float GetNormalDamageMultiplier(ElementType form) => DamageMultiplier(ItemStat.NormalDamage, form);
@@ -286,6 +294,7 @@ public sealed class PlayerItemRuntime : MonoBehaviour
     {
         _suspended = true;
         ClearTimedEffects();
+        ClearBoundaryTransient();
         if (_stats != null) _stats.RemoveItemResourceModifiers(this);
     }
 

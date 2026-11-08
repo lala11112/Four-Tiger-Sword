@@ -3,7 +3,7 @@ public partial class PlayerController
     /// <summary>A non-destructive modal pause: the active action and all run resources are retained.</summary>
     public bool IsShopPaused { get; private set; }
     public bool IsMapPaused { get; private set; }
-    public bool IsGameplayModalPaused => IsShopPaused || IsMapPaused;
+    public bool IsGameplayModalPaused => IsShopPaused || IsMapPaused || IsInventoryPaused || IsRewardPaused;
 
     internal void SetShopPaused(bool paused)
     {

@@ -28,6 +28,9 @@ public abstract partial class BaseForm : IForm
 
     protected enum ActionType { Attack, AirAttack, Skill, Ultimate, Counter, HeavyAttack, SwitchAttack }
     protected ActionType _currentAction = ActionType.Attack;
+    private static long _nextItemCastId;
+    protected long ItemCastId { get; private set; }
+    private void BeginItemCast() => ItemCastId = System.Threading.Interlocked.Increment(ref _nextItemCastId);
 
     // ── SP 비용 & 쿨타임 ─────────────────────────────────────────────────────
     public virtual float SkillSpCost => 0f;
@@ -62,7 +65,9 @@ public abstract partial class BaseForm : IForm
 
     /// <summary>공격 속도 배율. 1.0 = 기본, 2.0 = 2배 빠름. 스탯 시스템에서 읽어옵니다.</summary>
     protected float AttackSpeed => Mathf.Max(0.1f,
-        (_playerController?.StatManager?.GetStat(StatType.ST_ATK_SPD) ?? 1f) * FormSpAttackSpeedMultiplier);
+        (_playerController?.StatManager?.GetStat(StatType.ST_ATK_SPD) ?? 1f) * FormSpAttackSpeedMultiplier
+        * (ItemDamageContext.Family(CurrentAttackCategory) == BoundaryAttackFamily.Normal
+            ? _playerController?.ItemRuntime?.NormalAttackRateMultiplier ?? 1f : 1f));
 
     public BaseForm(WeaponActionDataSO weaponActionData)
     {

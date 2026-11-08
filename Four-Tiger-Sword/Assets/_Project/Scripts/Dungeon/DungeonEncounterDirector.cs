@@ -72,6 +72,7 @@ public sealed class DungeonEncounterDirector : MonoBehaviour
     public void SuspendEncounters()
     {
         _suspended = true;
+        RefreshItemCombatState();
         foreach (var room in _rooms) if (room != null) room.SuspendEncounter();
     }
 
@@ -155,6 +156,7 @@ public sealed class DungeonEncounterDirector : MonoBehaviour
 
     private void Update()
     {
+        RefreshItemCombatState();
         if ((player == null || _boundPlayer == null) && Time.unscaledTime >= _nextPlayerSearch) FindPlayer();
         if (_root != null && _root == _generator.CurrentRoot) return;
         if (_preparation != null) StopCoroutine(_preparation);
@@ -184,10 +186,17 @@ public sealed class DungeonEncounterDirector : MonoBehaviour
 
     private void OnDisable()
     {
+        _boundPlayer?.ItemRuntime?.SetCombatState(false);
         if (_boundPlayer != null) _boundPlayer.UnbindEncounterDirector(this);
         _boundPlayer = null;
         if (_generator != null) _generator.Completed -= OnGenerated;
         if (_preparation != null) StopCoroutine(_preparation);
         _preparation = null;
+    }
+
+    internal void RefreshItemCombatState()
+    {
+        if (_boundPlayer != null)
+            _boundPlayer.ItemRuntime?.SetCombatState(IsPlayerInCombat(_boundPlayer));
     }
 }

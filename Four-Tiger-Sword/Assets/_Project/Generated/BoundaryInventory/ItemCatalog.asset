@@ -1,0 +1,1983 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 247fa2ccbab7f134abe555ebf94f9ae8, type: 3}
+  m_Name: Boundary ZERO Items
+  m_EditorClassIdentifier: Assembly-CSharp::ItemCatalog
+  projectId: boundaryzero-inventory-2026-11-08
+  contentRevision: 20261108
+  contentStatus: draft
+  sourceJson: "{\r\n  \"version\": 1,\r\n  \"revision\": \"2026-11-08\",\r\n  \"title\":
+    \"\uACBD\uACC4 ZERO \xB7 \uC778\uBCA4\uD1A0\uB9AC \uC544\uC774\uD15C 59\uC885\",\r\n 
+    \"rules\": [\r\n    \"\uC218\uCE58\uB294 \uC804\uD22C \uD14C\uC2A4\uD2B8\uC6A9
+    \uAE30\uD68D\uAC12\uC774\uB2E4.\",\r\n    \"\uAC19\uC740 \uC2DC\uB108\uC9C0\uC758
+    \uC11C\uB85C \uB2E4\uB978 \uC544\uC774\uD15C 2\xB74\xB76\uC885\uC744 \uBCF4\uC720\uD558\uBA74
+    \uD574\uB2F9 \uB2E8\uACC4\uAC00 \uC801\uC6A9\uB41C\uB2E4. \uC0C1\uC704 \uB2E8\uACC4\uAC00
+    \uD558\uC704 \uB2E8\uACC4\uB97C \uB300\uCCB4\uD558\uBA70, 6\uC885 \uC774\uC0C1\uC5D0\uC11C\uB294
+    6\uB2E8\uACC4 \uD6A8\uACFC\uAC00 \uC801\uC6A9\uB41C\uB2E4.\",\r\n    \"\uB450
+    \uC2DC\uB108\uC9C0\uC5D0 \uC18D\uD55C \uC544\uC774\uD15C\uC740 \uC591\uCABD\uC5D0\uC11C
+    \uAC01\uAC01 1\uC885\uC73C\uB85C \uC13C\uB2E4. \uAC19\uC740 \uC544\uC774\uD15C\uC758
+    \uC911\uBCF5 \uD68D\uB4DD\uC740 \uC885\uB958 \uC218\uB97C \uB298\uB9AC\uC9C0
+    \uC54A\uB294\uB2E4.\",\r\n    \"\uCD94\uAC00 \uD0C0\uACA9\uC740 \uBCC4\uB3C4\uC758
+    \uC801\uC911\xB7\uCC98\uCE58 \uD6A8\uACFC\uB098 \uCD94\uAC00 \uD0C0\uACA9\uC744
+    \uB2E4\uC2DC \uBC1C\uB3D9\uD558\uC9C0 \uC54A\uB294\uB2E4. \uC544\uC774\uD15C
+    \uD6A8\uACFC\uC758 \uC7AC\uBC1C\uB3D9\uC740 \uBA85\uC2DC\uB41C \uACBD\uC6B0\uB97C
+    \uC81C\uC678\uD558\uACE0 \uC9C0\uC18D\uC2DC\uAC04\uB9CC \uAC31\uC2E0\uD55C\uB2E4.\"\r\n 
+    ],\r\n  \"items\": [\r\n    {\r\n      \"id\": \"I01\",\r\n      \"name\": \"\uC0C8\uC2F9
+    \uBD80\uC801\",\r\n      \"description\": \"\uBD89\uC740 \uB048 \uC544\uB798
+    \uC0C1\uC544\uC0C9 \uC78E \uB450 \uC7A5\uC774 \uACB9\uCCD0 \uB2EC\uB9B0 \uBD80\uC801\uC774\uB2E4.\",\r\n     
+    \"effect\": \"\uCD5C\uB300 HP\uAC00 5% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S03\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S03\",\r\n      \"image\": \"Art/Items/I01.png\",\r\n      \"origin\": \"existing\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I02\",\r\n      \"name\": \"\uC228\uACB0 \uB9E4\uB4ED\",\r\n     
+    \"description\": \"\uC0C1\uC544\uC0C9 \uB048\uC744 \uD314\uC790 \uBAA8\uC591\uC73C\uB85C
+    \uC5EE\uACE0 \uAC80\uC740 \uAE08\uC18D \uD638\uB8E8\uB77C\uAE30\uB97C \uB9E4\uB2EC\uC558\uB2E4.\",\r\n     
+    \"effect\": \"HP\uAC00 30% \uC774\uD558\uC778 \uC801\uC744 \uD3C9\uD0C0\uB85C
+    \uACF5\uACA9\uD558\uBA74 \uCE58\uBA85\uD0C0 \uD655\uB960\uC774 8%p \uC99D\uAC00\uD55C\uB2E4.
+    \uC801\uC758 HP\uB294 \uC801\uC911 \uC9C1\uC804\uC5D0 \uD655\uC778\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S01\",\r\n        \"S10\"\r\n      ],\r\n     
+    \"primarySynergy\": \"S01\",\r\n      \"image\": \"Art/Items/I02.png\",\r\n     
+    \"origin\": \"existing\"\r\n    },\r\n    {\r\n      \"id\": \"I04\",\r\n     
+    \"name\": \"\uB2E4\uC2DC \uD53C\uB294 \uAC00\uC9C0\",\r\n      \"description\":
+    \"\uB450 \uAC08\uB798 \uC740\uBE5B \uAC00\uC9C0 \uB05D\uC5D0 \uBD89\uC740 \uAF43\uBD09\uC624\uB9AC\uAC00
+    \uB9FA\uD614\uB2E4.\",\r\n      \"effect\": \"\uD654 \uC18D\uC131 \uD3C9\uD0C0\uC640
+    \uC2A4\uD0AC \uD53C\uD574\uAC00 4% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S05\"\r\n      ],\r\n      \"primarySynergy\": \"S05\",\r\n     
+    \"image\": \"Art/Items/I04.png\",\r\n      \"origin\": \"revised\",\r\n     
+    \"designIntent\": \"\uD3C9\uD0C0\uC640 \uC2A4\uD0AC\uC758 \uD654 \uC18D\uC131
+    \uD53C\uD574\uB97C \uD568\uAED8 \uAC15\uD654\uD55C\uB2E4.\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I05\",\r\n      \"name\": \"\uBD88\uC528 \uC7A5\uC2DD\",\r\n     
+    \"description\": \"\uC0BC\uAC01\uD615 \uAE08\uC18D \uD2C0 \uC548\uC5D0 \uC8FC\uD669\uBE5B
+    \uBD88\uC528 \uC870\uAC01\uC774 \uB9E4\uB2EC\uB824 \uC788\uB2E4.\",\r\n     
+    \"effect\": \"\uD654 \uC18D\uC131 \uD3C9\uD0C0 \uD53C\uD574\uAC00 8% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S05\",\r\n        \"S02\"\r\n      ],\r\n     
+    \"primarySynergy\": \"S05\",\r\n      \"image\": \"Art/Items/I05.png\",\r\n     
+    \"origin\": \"revised\",\r\n      \"designIntent\": \"\uD654 \uC18D\uC131 \uD3C9\uD0C0\uB97C
+    \uC8FC\uB825\uC73C\uB85C \uC4F0\uB294 \uAD6C\uC131\uC744 \uAC15\uD654\uD55C\uB2E4.\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I06\",\r\n      \"name\": \"\uBD89\uC740 \uC778\uC7A5\",\r\n     
+    \"description\": \"\uC9E7\uC740 \uAC80\uC740 \uC190\uC7A1\uC774 \uC544\uB798
+    \uBD89\uC740 \uC0AC\uAC01 \uB3C4\uC7A5\uBA74\uC774 \uB193\uC600\uB2E4.\",\r\n     
+    \"effect\": \"\uCE58\uBA85\uD0C0 \uD53C\uD574 \uBC30\uC728\uC774 10%p \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S01\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S01\",\r\n      \"image\": \"Art/Items/I06.png\",\r\n      \"origin\": \"existing\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I07\",\r\n      \"name\": \"\uD0C0\uC624\uB974\uB294
+    \uB9E4\uB4ED\",\r\n      \"description\": \"\uAD75\uC740 \uAC80\uC740 \uB048\uC758
+    \uB9E4\uB4ED\uC744 \uC8FC\uD669\uBE5B \uC2E4\uC774 \uB530\uB77C \uAC10\uACE0
+    \uC788\uB2E4.\",\r\n      \"effect\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
+    \uC8FC\uB294 \uD654 \uC18D\uC131 \uD53C\uD574\uAC00 8% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S05\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S05\",\r\n      \"image\": \"Art/Items/I07.png\",\r\n      \"origin\": \"revised\",\r\n     
+    \"designIntent\": \"\uD654 \uC18D\uC131 \uACF5\uACA9\uC73C\uB85C \uC815\uC608\xB7\uBCF4\uC2A4\uB97C
+    \uC0C1\uB300\uD560 \uB54C \uD53C\uD574\uB97C \uB298\uB9B0\uB2E4.\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I08\",\r\n      \"name\": \"\uC774\uC5B4\uC9C0\uB294 \uBD88\uAF43\",\r\n     
+    \"description\": \"\uBD88\uC528\uB97C \uB2F4\uC740 \uB450 \uAE08\uC18D \uD1B5\uC774
+    \uBD89\uC740 \uACBD\uCCA9\uC73C\uB85C \uC774\uC5B4\uC838 \uC788\uB2E4.\",\r\n     
+    \"effect\": \"\uD654 \uC18D\uC131 \uC2A4\uD0AC \uD53C\uD574\uAC00 7% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S05\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S05\",\r\n      \"image\": \"Art/Items/I08.png\",\r\n      \"origin\": \"revised\",\r\n     
+    \"designIntent\": \"\uD654 \uC18D\uC131 \uC2A4\uD0AC\uC744 \uC8FC\uB825\uC73C\uB85C
+    \uC4F0\uB294 \uAD6C\uC131\uC744 \uAC15\uD654\uD55C\uB2E4.\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I09\",\r\n      \"name\": \"\uD759\uBE5B \uBD80\uC801\",\r\n     
+    \"description\": \"\uD669\uD1A0\uC0C9 \uB3C4\uC790\uAE30 \uBD80\uC801\uC758 \uAC08\uB77C\uC9C4
+    \uD2C8\uC744 \uD669\uB3D9 \uAEBE\uC1E0 \uC138 \uAC1C\uAC00 \uC787\uB294\uB2E4.\",\r\n     
+    \"effect\": \"\uCD5C\uB300 HP\uAC00 8% \uC99D\uAC00\uD55C\uB2E4. \uD68D\uB4DD
+    \uC2DC \uD604\uC7AC HP\uB294 \uADF8\uB300\uB85C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S03\"\r\n      ],\r\n      \"primarySynergy\": \"S03\",\r\n     
+    \"image\": \"Art/Items/I09.png\",\r\n      \"origin\": \"existing\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I100\",\r\n      \"name\": \"\uB9C8\uAC10 \uB798\uCE6B\",\r\n     
+    \"description\": \"\uD1B1\uB2C8 \uB05D\uC774 \uBD89\uC740 \uAC80\uC740 \uC18C\uD615
+    \uB798\uCE6B.\",\r\n      \"effect\": \"HP\uAC00 25% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C
+    \uAC00\uD558\uB294 \uD3C9\uD0C0\uC758 \uCE58\uBA85\uD0C0 \uD53C\uD574 \uBC30\uC728\uC774
+    15%p \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S10\",\r\n       
+    \"S01\"\r\n      ],\r\n      \"primarySynergy\": \"S10\",\r\n      \"designIntent\":
+    \"\uCCB4\uB825\uC774 \uB0AE\uC740 \uC801\uC5D0\uAC8C \uAC00\uD558\uB294 \uD3C9\uD0C0
+    \uCE58\uBA85\uD0C0\uB97C \uAC15\uD654\uD55C\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n     
+    \"image\": \"Art/Items/I100.png\"\r\n    },\r\n    {\r\n      \"id\": \"I13\",\r\n     
+    \"name\": \"\uBE5B\uB098\uB294 \uC870\uAC01\",\r\n      \"description\": \"\uBD89\uC740
+    \uB048\uC774 \uB2EC\uB9B0 \uAC80\uC740 \uAE08\uC18D \uD2C0\uC5D0 \uC0BC\uAC01
+    \uAC70\uC6B8 \uC870\uAC01\uC774 \uBB3C\uB824 \uC788\uB2E4.\",\r\n      \"effect\":
+    \"\uCE58\uBA85\uD0C0 \uD655\uB960\uC774 2%p \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S01\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S01\",\r\n      \"image\": \"Art/Items/I13.png\",\r\n      \"origin\": \"existing\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I14\",\r\n      \"name\": \"\uB9DE\uBB3C\uB9B0
+    \uACE0\uB9AC\",\r\n      \"description\": \"\uBC1D\uC740 \uC1E0\uBE5B\uACFC \uC9D9\uC740
+    \uD68C\uC0C9\uC758 \uD1B1\uB2C8 \uACE0\uB9AC \uB450 \uAC1C\uAC00 \uC11C\uB85C
+    \uB9DE\uBB3C\uB824 \uC788\uB2E4.\",\r\n      \"effect\": \"\uD3C9\uD0C0 \uACF5\uACA9\uC18D\uB3C4\uAC00
+    5% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S02\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S02\",\r\n      \"image\": \"Art/Items/I14.png\",\r\n     
+    \"origin\": \"existing\"\r\n    },\r\n    {\r\n      \"id\": \"I15\",\r\n     
+    \"name\": \"\uC815\uB828\uB41C \uC778\uC7A5\",\r\n      \"description\": \"\uC9D9\uC740
+    \uAC15\uCCA0 \uBC18\uC9C0 \uC704\uC5D0 \uD669\uB3D9 \uD14C\uB97C \uB450\uB978
+    \uD314\uAC01\uD615 \uC0C1\uC544\uC0C9 \uC778\uC7A5\uBA74\uC774 \uB193\uC600\uB2E4.\",\r\n     
+    \"effect\": \"HP\uAC00 80% \uC774\uC0C1\uC778 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\uB97C
+    \uB9DE\uD788\uBA74 \uC9C1\uC811 \uD53C\uD574\uAC00 12% \uC99D\uAC00\uD55C\uB2E4.
+    \uC801\uC758 HP\uB294 \uC801\uC911 \uC9C1\uC804\uC5D0 \uD655\uC778\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S01\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S01\",\r\n      \"image\": \"Art/Items/I15.png\",\r\n      \"origin\": \"existing\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I16\",\r\n      \"name\": \"\uC624\uC0C9 \uC5F0\uACB0\uACE0\uB9AC\",\r\n     
+    \"description\": \"\uAC00\uC6B4\uB370\uAC00 \uBE48 \uC740\uBE5B \uC5F0\uACB0\uAD6C
+    \uB458\uB808\uC5D0 \uCC28\uBD84\uD55C \uB2E4\uC12F \uC0C9 \uC870\uAC01\uC774
+    \uBC15\uD600 \uC788\uB2E4.\",\r\n      \"effect\": \"\uC218 \uC18D\uC131\uACFC
+    \uD654 \uC18D\uC131 \uD53C\uD574\uAC00 \uAC01\uAC01 4% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S05\",\r\n        \"S04\"\r\n      ],\r\n     
+    \"primarySynergy\": \"S05\",\r\n      \"image\": \"Art/Items/I16.png\",\r\n     
+    \"origin\": \"revised\",\r\n      \"designIntent\": \"\uC218 \uC18D\uC131\uACFC
+    \uD654 \uC18D\uC131 \uACF5\uACA9\uC744 \uD568\uAED8 \uC4F0\uB294 \uAD6C\uC131\uC758
+    \uD53C\uD574\uB97C \uB298\uB9B0\uB2E4.\"\r\n    },\r\n    {\r\n      \"id\":
+    \"I17\",\r\n      \"name\": \"\uBB3C\uBC29\uC6B8 \uC7A5\uC2DD\",\r\n      \"description\":
+    \"\uAFC0\uBE5B \uAE08\uC18D \uD14C\uAC00 \uC605\uC740 \uC7BF\uD478\uB978 \uBB3C\uBC29\uC6B8
+    \uBAA8\uC591 \uC720\uB9AC\uB97C \uAC10\uC2FC\uB2E4.\",\r\n      \"effect\": \"\uC218
+    \uC18D\uC131 \uD3C9\uD0C0 \uD53C\uD574\uAC00 8% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S04\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S04\",\r\n      \"image\": \"Art/Items/I17.png\",\r\n      \"origin\": \"revised\",\r\n     
+    \"designIntent\": \"\uC218 \uC18D\uC131 \uD3C9\uD0C0\uB97C \uC8FC\uB825\uC73C\uB85C
+    \uC4F0\uB294 \uAD6C\uC131\uC744 \uAC15\uD654\uD55C\uB2E4.\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I18\",\r\n      \"name\": \"\uAE4A\uC740 \uBB3C\uBCD1\",\r\n     
+    \"description\": \"\uB113\uC801\uD55C \uCCAD\uB85D\uC0C9 \uC720\uB9AC \uBAB8\uCCB4\uC5D0
+    \uAC01\uC9C4 \uD669\uB3D9 \uB9C8\uAC1C\uB97C \uB07C\uC6B4 \uD734\uB300 \uBB3C\uBCD1\uC774\uB2E4.\",\r\n     
+    \"effect\": \"\uC218 \uC18D\uC131 \uC2A4\uD0AC \uD53C\uD574\uAC00 7% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S04\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S04\",\r\n      \"image\": \"Art/Items/I18.png\",\r\n      \"origin\": \"revised\",\r\n     
+    \"designIntent\": \"\uC218 \uC18D\uC131 \uC2A4\uD0AC\uC744 \uC8FC\uB825\uC73C\uB85C
+    \uC4F0\uB294 \uAD6C\uC131\uC744 \uAC15\uD654\uD55C\uB2E4.\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I19\",\r\n      \"name\": \"\uD750\uB974\uB294 \uB9E4\uB4ED\",\r\n     
+    \"description\": \"\uC740\uBE5B \uB9AC\uBCF8\uC744 \uB290\uC2A8\uD558\uAC8C \uBB36\uACE0
+    \uD55C\uCABD \uB05D\uC744 \uAE38\uAC8C S\uC790\uB85C \uB298\uC5B4\uB728\uB838\uB2E4.\",\r\n     
+    \"effect\": \"HP\uAC00 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294
+    \uC218 \uC18D\uC131 \uD53C\uD574\uAC00 10% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S04\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S04\",\r\n      \"image\": \"Art/Items/I19.png\",\r\n      \"origin\": \"revised\",\r\n     
+    \"designIntent\": \"\uC218 \uC18D\uC131 \uACF5\uACA9\uC73C\uB85C \uCCB4\uB825\uC774
+    \uB0AE\uC740 \uC801\uC744 \uB9C8\uBB34\uB9AC\uD558\uAE30 \uC27D\uAC8C \uD55C\uB2E4.\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I20\",\r\n      \"name\": \"\uB04A\uC784\uC5C6\uB294
+    \uBB3C\uACB0\",\r\n      \"description\": \"\uC740\uBE5B\uACFC \uC7BF\uD478\uB978
+    \uAC15\uCCA0 \uC6D0\uD310\uC774 \uBB3C\uACB0 \uBAA8\uC591\uC758 \uCE35\uC744
+    \uC774\uB8E8\uBA70 \uACB9\uCCD0 \uC788\uB2E4.\",\r\n      \"effect\": \"\uC218
+    \uC18D\uC131 \uD53C\uD574\uAC00 5% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S04\"\r\n      ],\r\n      \"primarySynergy\": \"S04\",\r\n     
+    \"image\": \"Art/Items/I20.png\",\r\n      \"origin\": \"revised\",\r\n     
+    \"designIntent\": \"\uC870\uAC74 \uC5C6\uC774 \uC218 \uC18D\uC131 \uACF5\uACA9
+    \uD53C\uD574\uB97C \uB298\uB9B0\uB2E4.\"\r\n    },\r\n    {\r\n      \"id\":
+    \"I21\",\r\n      \"name\": \"\uACBD\uB7C9 \uBC1C\uBAA9\uC1E0\",\r\n      \"description\":
+    \"\uC0AC\uC120 \uD648\uC744 \uB0B8 \uBB34\uAD11 \uD569\uAE08 \uBC1C\uBAA9\uC1E0.\",\r\n     
+    \"effect\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uC8FC\uB294 \uC218 \uC18D\uC131
+    \uD53C\uD574\uAC00 8% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n       
+    \"S04\"\r\n      ],\r\n      \"primarySynergy\": \"S04\",\r\n      \"designIntent\":
+    \"\uC218 \uC18D\uC131 \uACF5\uACA9\uC73C\uB85C \uC815\uC608\xB7\uBCF4\uC2A4\uB97C
+    \uC0C1\uB300\uD560 \uB54C \uD53C\uD574\uB97C \uB298\uB9B0\uB2E4.\",\r\n     
+    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I21.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I22\",\r\n      \"name\": \"\uD0C4\uC131 \uB4A4\uCD95\uD3B8\",\r\n     
+    \"description\": \"\uD0C4\uC131\uB9C9\uC744 \uC811\uC5B4 \uB123\uC740 \uAD6C\uB450
+    \uB4A4\uCD95\uD3B8.\",\r\n      \"effect\": \"HP\uAC00 80% \uC774\uC0C1\uC778
+    \uC801\uC5D0\uAC8C \uC8FC\uB294 \uD654 \uC18D\uC131 \uD53C\uD574\uAC00 10% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S05\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S05\",\r\n      \"designIntent\": \"\uCCB4\uB825\uC774 \uB192\uC740 \uC801\uC5D0\uAC8C
+    \uD654 \uC18D\uC131 \uACF5\uACA9\uC73C\uB85C \uCD08\uBC18 \uD53C\uD574\uB97C
+    \uB298\uB9B0\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n      \"image\":
+    \"Art/Items/I22.png\"\r\n    },\r\n    {\r\n      \"id\": \"I30\",\r\n      \"name\":
+    \"\uD68C\uBCF5 \uC644\uCDA9\uAD00\",\r\n      \"description\": \"\uC11C\uB85C
+    \uB2E4\uB978 \uB0B4\uD53C\uB97C \uACB9\uCE5C \uB0A9\uC791\uD55C \uAD00.\",\r\n     
+    \"effect\": \"\uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uCD5C\uB300 HP\uC758 3%\uC5D0
+    \uD574\uB2F9\uD558\uB294 \uBCF4\uD638\uB9C9\uC744 4\uCD08\uAC04 \uC5BB\uB294\uB2E4.
+    \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04\uC740 5\uCD08\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S08\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S08\",\r\n      \"designIntent\": \"\uC801 \uCC98\uCE58 \uC9C1\uD6C4 \uB2E4\uC74C
+    \uACF5\uACA9\uC5D0 \uB300\uBE44\uD560 \uBCF4\uD638\uB9C9\uC744 \uC5BB\uB294\uB2E4.\",\r\n     
+    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I30.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I31\",\r\n      \"name\": \"\uCDA9\uACA9 \uBCF4\uC874\uD310\",\r\n     
+    \"description\": \"\uB20C\uB9B0 \uC790\uAD6D\uC774 \uB0A8\uC740 \uC801\uCE35
+    \uD569\uAE08\uD310.\",\r\n      \"effect\": \"\uD55C \uBC88\uC758 \uC801 \uACF5\uACA9\uC73C\uB85C
+    \uCD5C\uB300 HP\uC758 15% \uC774\uC0C1\uC744 \uC783\uC73C\uBA74 \uCD5C\uB300
+    HP\uC758 4%\uC5D0 \uD574\uB2F9\uD558\uB294 \uBCF4\uD638\uB9C9\uC744 4\uCD08\uAC04
+    \uC5BB\uB294\uB2E4. \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04\uC740 10\uCD08\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S08\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S08\",\r\n      \"designIntent\": \"\uD070 \uD53C\uD574\uB97C \uBC1B\uC740
+    \uC9C1\uD6C4 \uBCF4\uD638\uB9C9\uC73C\uB85C \uD6C4\uC18D \uD53C\uD574\uB97C \uC904\uC778\uB2E4.\",\r\n     
+    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I31.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I32\",\r\n      \"name\": \"\uAC1C\uC804 \uBD09\uC778\uD328\",\r\n     
+    \"description\": \"\uD45C\uBA74\uC5D0 \uAC78\uC1E0\uB97C \uC2EC\uC740 \uC721\uAC01
+    \uBD09\uC778\uD328.\",\r\n      \"effect\": \"\uC804\uD22C\uC5D0 \uC9C4\uC785\uD558\uBA74
+    \uCD5C\uB300 HP\uC758 6%\uC5D0 \uD574\uB2F9\uD558\uB294 \uBCF4\uD638\uB9C9\uC744
+    5\uCD08\uAC04 \uC5BB\uB294\uB2E4. \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04
+    15\uCD08.\",\r\n      \"synergies\": [\r\n        \"S08\"\r\n      ],\r\n     
+    \"primarySynergy\": \"S08\",\r\n      \"designIntent\": \"\uAD50\uC804 \uCD08\uBC18\uC5D0
+    \uC548\uC804\uD558\uAC8C \uC811\uADFC\uD55C\uB2E4.\",\r\n      \"origin\": \"new\",\r\n     
+    \"image\": \"Art/Items/I32.png\"\r\n    },\r\n    {\r\n      \"id\": \"I33\",\r\n     
+    \"name\": \"\uACA9\uBCBD \uC811\uCC29\uD540\",\r\n      \"description\": \"\uC606\uBA74\uC5D0
+    \uBBF8\uC138 \uD648\uC774 \uC788\uB294 \uACA9\uBCBD \uACE0\uC815\uD540.\",\r\n     
+    \"effect\": \"\uC0C8\uB85C \uC5BB\uB294 \uBCF4\uD638\uB9C9\uC758 \uD761\uC218\uB7C9\uC774
+    10% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S08\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S08\",\r\n      \"designIntent\": \"\uBCF4\uD638\uB9C9\uC744
+    \uB9CC\uB4DC\uB294 \uC5EC\uB7EC \uC218\uB2E8\uC744 \uD568\uAED8 \uC4F4\uB2E4.\",\r\n     
+    \"origin\": \"new\",\r\n      \"image\": \"Art/Items/I33.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I34\",\r\n      \"name\": \"\uC608\uC555 \uACA9\uB9C9\",\r\n     
+    \"description\": \"\uAC00\uC6B4\uB370\uAC00 \uC19F\uC740 \uB450 \uACB9\uC758
+    \uC138\uB77C\uBBF9 \uACA9\uB9C9.\",\r\n      \"effect\": \"\uC2A4\uD0AC\uC774
+    \uC801\uC5D0\uAC8C \uC801\uC911\uD558\uBA74 \uCD5C\uB300 HP\uC758 3%\uC5D0 \uD574\uB2F9\uD558\uB294
+    \uBCF4\uD638\uB9C9\uC744 3\uCD08\uAC04 \uC5BB\uB294\uB2E4. \uC7AC\uC0AC\uC6A9
+    \uB300\uAE30\uC2DC\uAC04\uC740 8\uCD08\uB2E4.\",\r\n      \"synergies\": [\r\n       
+    \"S08\",\r\n        \"S16\"\r\n      ],\r\n      \"primarySynergy\": \"S08\",\r\n     
+    \"designIntent\": \"\uC2A4\uD0AC \uC801\uC911\uC73C\uB85C \uBCF4\uD638\uB9C9\uC744
+    \uC5BB\uB294\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n      \"image\":
+    \"Art/Items/I34.png\"\r\n    },\r\n    {\r\n      \"id\": \"I41\",\r\n      \"name\":
+    \"\uC808\uB2E8 \uAC01\uC778\uC790\",\r\n      \"description\": \"\uB05D\uC774
+    \uB124\uBAA8\uB09C \uBB34\uAD11 \uC808\uB2E8 \uAC01\uC778\uC790.\",\r\n     
+    \"effect\": \"\uD53C\uD574 \uC801\uC6A9 \uC9C1\uC804 HP\uAC00 \uCD5C\uB300 HP\uC758
+    20% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAC00\uD558\uB294 \uD3C9\uD0C0 \uD53C\uD574\uAC00
+    14% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S10\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S10\",\r\n      \"designIntent\": \"\uD3C9\uD0C0\uB85C
+    \uB0A8\uC740 HP\uB97C \uD655\uC2E4\uD788 \uAE4E\uB294\uB2E4.\",\r\n      \"origin\":
+    \"new\",\r\n      \"image\": \"Art/Items/I41.png\"\r\n    },\r\n    {\r\n     
+    \"id\": \"I42\",\r\n      \"name\": \"\uD3D0\uC1C4 \uB9C8\uAC1C\",\r\n      \"description\":
+    \"\uC410\uAE30 \uB450 \uAC1C\uB97C \uB9DE\uBB3C\uB9B0 \uB0A9\uC791\uD55C \uB9C8\uAC1C.\",\r\n     
+    \"effect\": \"HP\uAC00 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294
+    \uC2A4\uD0AC \uD53C\uD574\uAC00 13% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S10\"\r\n      ],\r\n      \"primarySynergy\": \"S10\",\r\n     
+    \"designIntent\": \"\uC2A4\uD0AC\uB85C \uCCB4\uB825\uC774 \uB0AE\uC740 \uC801\uC744
+    \uB9C8\uBB34\uB9AC\uD558\uAE30 \uC27D\uAC8C \uD55C\uB2E4.\",\r\n      \"origin\":
+    \"revised\",\r\n      \"image\": \"Art/Items/I42.png\"\r\n    },\r\n    {\r\n     
+    \"id\": \"I43\",\r\n      \"name\": \"\uB9C8\uAC10 \uC800\uC6B8\uCD94\",\r\n     
+    \"description\": \"\uD558\uB2E8\uC744 \uC0AC\uC120\uC73C\uB85C \uAE4E\uC740 \uBB34\uAD11
+    \uC800\uC6B8\uCD94.\",\r\n      \"effect\": \"\uD53C\uD574 \uC801\uC6A9 \uC9C1\uC804
+    HP\uAC00 \uCD5C\uB300 HP\uC758 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294
+    \uD3C9\uD0C0\uC640 \uC2A4\uD0AC \uD53C\uD574\uAC00 6% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S10\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S10\",\r\n      \"designIntent\": \"\uCCB4\uB825\uC774 \uB0AE\uC740 \uC801\uC5D0\uAC8C
+    \uC870\uAC74 \uD558\uB098\uB85C \uB9C8\uBB34\uB9AC \uD53C\uD574\uB97C \uB354\uD55C\uB2E4.\",\r\n     
+    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I43.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I44\",\r\n      \"name\": \"\uC885\uACB0 \uC811\uC810\",\r\n     
+    \"description\": \"\uC11C\uB85C \uB2FF\uB294 \uBA74\uC744 \uB113\uD78C \uC811\uC810
+    \uD55C \uC30D.\",\r\n      \"effect\": \"HP\uAC00 30% \uC774\uD558\uC778 \uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
+    \uC8FC\uB294 \uD3C9\uD0C0\uC640 \uC2A4\uD0AC \uD53C\uD574\uAC00 12% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S10\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S10\",\r\n      \"designIntent\": \"\uCCB4\uB825\uC774 \uB0AE\uC544\uC9C4 \uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
+    \uD3C9\uD0C0\uC640 \uC2A4\uD0AC \uD53C\uD574\uB97C \uB298\uB9B0\uB2E4.\",\r\n     
+    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I44.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I46\",\r\n      \"name\": \"\uC2DC\uB8CC \uAC1C\uBD09\uC1E0\",\r\n     
+    \"description\": \"\uB69C\uAED1 \uAC00\uC7A5\uC790\uB9AC\uC5D0 \uB07C\uC6B0\uB294
+    \uAC01\uC9C4 \uAC08\uACE0\uB9AC.\",\r\n      \"effect\": \"\uC804\uD22C \uC911
+    \uAC01 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\uB85C \uCC98\uC74C \uAC00\uD55C \uD53C\uD574\uAC00
+    10% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S02\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S02\",\r\n      \"designIntent\": \"\uC5EC\uB7EC
+    \uC801\uC5D0\uAC8C \uD3C9\uD0C0\uB97C \uD55C \uBC88\uC529 \uB3CC\uB9B0\uB2E4.\",\r\n     
+    \"origin\": \"new\",\r\n      \"image\": \"Art/Items/I46.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I47\",\r\n      \"name\": \"\uCD08\uC555 \uC810\uD654\uD540\",\r\n     
+    \"description\": \"\uD45C\uBA74\uC744 \uC0CC\uB529\uD55C \uBE44\uB300\uCE6D \uC811\uCD09\uD540.\",\r\n     
+    \"effect\": \"HP\uAC00 90% \uC774\uC0C1\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294
+    \uC2A4\uD0AC \uD53C\uD574\uAC00 15% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S16\"\r\n      ],\r\n      \"primarySynergy\": \"S16\",\r\n     
+    \"designIntent\": \"\uCCB4\uB825\uC774 \uB192\uC740 \uC801\uC5D0\uAC8C \uC2A4\uD0AC\uB85C
+    \uCD08\uBC18 \uD53C\uD574\uB97C \uB298\uB9B0\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n     
+    \"image\": \"Art/Items/I47.png\"\r\n    },\r\n    {\r\n      \"id\": \"I48\",\r\n     
+    \"name\": \"\uAC1C\uC804 \uB3C4\uB7C9\uD3B8\",\r\n      \"description\": \"\uCCAB
+    \uB208\uAE08\uB9CC \uAE4A\uAC8C \uD30C\uC778 \uCE21\uC815 \uC870\uAC01.\",\r\n     
+    \"effect\": \"\uC790\uC2E0\uC758 HP\uAC00 80% \uC774\uC0C1\uC774\uBA74 \uD3C9\uD0C0
+    \uD53C\uD574\uAC00 6% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n       
+    \"S02\"\r\n      ],\r\n      \"primarySynergy\": \"S02\",\r\n      \"designIntent\":
+    \"\uC790\uC2E0\uC758 HP\uB97C \uB192\uAC8C \uC720\uC9C0\uD558\uBA74 \uD3C9\uD0C0
+    \uD53C\uD574\uB97C \uB298\uB9B0\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n     
+    \"image\": \"Art/Items/I48.png\"\r\n    },\r\n    {\r\n      \"id\": \"I50\",\r\n     
+    \"name\": \"\uC120\uBD09 \uBCF4\uD638\uD328\",\r\n      \"description\": \"\uC55E\uCABD
+    \uBAA8\uC11C\uB9AC\uAC00 \uB450\uAEBC\uC6B4 \uC138\uB77C\uBBF9 \uBCF4\uD638\uD328.\",\r\n     
+    \"effect\": \"\uC804\uD22C \uC911 \uC790\uC2E0\uC758 HP\uAC00 \uCC98\uC74C 40%
+    \uC774\uD558\uAC00 \uB418\uBA74 \uCD5C\uB300 HP\uC758 6%\uC5D0 \uD574\uB2F9\uD558\uB294
+    \uBCF4\uD638\uB9C9\uC744 5\uCD08\uAC04 \uC5BB\uB294\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S08\"\r\n      ],\r\n      \"primarySynergy\": \"S08\",\r\n     
+    \"designIntent\": \"\uC804\uD22C \uC911 \uCC98\uC74C\uC73C\uB85C \uCCB4\uB825\uC774
+    \uB0AE\uC544\uC84C\uC744 \uB54C \uBCF4\uD638\uB9C9\uC744 \uC5BB\uB294\uB2E4.\",\r\n     
+    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I50.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I51\",\r\n      \"name\": \"\uD55C\uACC4 \uC7A0\uAE08\uD310\",\r\n     
+    \"description\": \"\uBD89\uC740 \uCD5C\uC800 \uB208\uAE08\uC774 \uC788\uB294
+    \uAC80\uC740 \uC7A0\uAE08\uD310.\",\r\n      \"effect\": \"\uC790\uC2E0\uC758
+    HP\uAC00 \uCD5C\uB300 HP\uC758 30% \uC774\uD558\uC77C \uB54C \uC801\uC5D0\uAC8C
+    \uBC1B\uB294 \uD53C\uD574\uAC00 7% \uAC10\uC18C\uD55C\uB2E4. \uD53C\uD574\uB97C
+    \uBC1B\uAE30 \uC9C1\uC804 HP\uB85C \uD310\uB2E8\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S03\"\r\n      ],\r\n      \"primarySynergy\": \"S03\",\r\n     
+    \"designIntent\": \"\uB0AE\uC740 HP\uB85C \uBC84\uD2F0\uB294 \uC2DC\uAC04\uC744
+    \uB298\uB9B0\uB2E4.\",\r\n      \"origin\": \"new\",\r\n      \"image\": \"Art/Items/I51.png\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I56\",\r\n      \"name\": \"\uBC15\uC790 \uD074\uB9AD\uC1E0\",\r\n     
+    \"description\": \"\uBCFC\uACFC \uC2A4\uD504\uB9C1\uC744 \uB123\uC740 \uC9C1\uC0AC\uAC01\uD615
+    \uD074\uB9AD\uC1E0.\",\r\n      \"effect\": \"\uACF5\uACA9\uB825\uC774 6% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S02\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S02\",\r\n      \"designIntent\": \"\uBCC4\uB3C4 \uC870\uAC74 \uC5C6\uC774
+    \uACF5\uACA9\uB825\uC744 \uB192\uC778\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n     
+    \"image\": \"Art/Items/I56.png\"\r\n    },\r\n    {\r\n      \"id\": \"I57\",\r\n     
+    \"name\": \"\uC0AC\uC5F0 \uB204\uB984\uC1E0\",\r\n      \"description\": \"\uB124
+    \uBC88\uC9F8 \uD648\uC774 \uC720\uB3C5 \uAE4A\uC740 \uC18C\uD615 \uB204\uB984\uC1E0.\",\r\n     
+    \"effect\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD3C9\uD0C0\uB97C \uB9DE\uD790
+    \uB54C \uCE58\uBA85\uD0C0 \uD655\uB960\uC774 5%p \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S01\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S01\",\r\n      \"designIntent\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
+    \uD3C9\uD0C0 \uCE58\uBA85\uD0C0\uB97C \uB0B4\uAE30 \uC27D\uAC8C \uD55C\uB2E4.\",\r\n     
+    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I57.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I60\",\r\n      \"name\": \"\uD30C\uC1C4 \uACC4\uC218\uD3B8\",\r\n     
+    \"description\": \"\uB05D\uC744 \uBB49\uD22D\uD558\uAC8C \uC5F0\uB9C8\uD55C \uACC4\uC218\uC6A9
+    \uAE08\uC18D\uD3B8.\",\r\n      \"effect\": \"HP\uAC00 80% \uC774\uC0C1\uC778
+    \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C \uC904 \uB54C \uC591\uC218 \uC720\uD6A8
+    \uBC29\uC5B4\uB825\uC744 20% \uBB34\uC2DC\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S14\"\r\n      ],\r\n      \"primarySynergy\": \"S14\",\r\n     
+    \"designIntent\": \"\uCCB4\uB825\uC774 \uB192\uC740 \uC801\uC758 \uBC29\uC5B4\uB825\uC744
+    \uC77C\uBD80 \uBB34\uC2DC\uD55C\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n     
+    \"image\": \"Art/Items/I60.png\"\r\n    },\r\n    {\r\n      \"id\": \"I61\",\r\n     
+    \"name\": \"\uC410\uAE30 \uACBD\uB3C4\uD3B8\",\r\n      \"description\": \"\uB05D\uC744
+    \uC0BC\uAC01\uC73C\uB85C \uAE4E\uC740 \uACE0\uACBD\uB3C4 \uC2DC\uD3B8.\",\r\n     
+    \"effect\": \"\uD3C9\uD0C0 \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uB300\uC0C1\uC758
+    \uC591\uC218 \uC720\uD6A8 \uBC29\uC5B4\uB825\uC744 12% \uBB34\uC2DC\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S14\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S14\",\r\n      \"designIntent\": \"\uD3C9\uD0C0 \uC704\uC8FC\uB85C \uBC29\uC5B4\uB825\uC774
+    \uC788\uB294 \uC801\uC744 \uC0C1\uB300\uD55C\uB2E4.\",\r\n      \"origin\": \"new\",\r\n     
+    \"image\": \"Art/Items/I61.png\"\r\n    },\r\n    {\r\n      \"id\": \"I62\",\r\n     
+    \"name\": \"\uCE68\uD22C \uACF5\uCC28\uD540\",\r\n      \"description\": \"\uB2E8\uBA74\uC744
+    \uAC00\uB298\uAC8C \uAE4E\uC740 \uBB34\uAD11 \uACF5\uCC28\uD540.\",\r\n     
+    \"effect\": \"\uC2A4\uD0AC\uB85C \uD53C\uD574\uB97C \uC904 \uB54C \uC801\uC758
+    \uC591\uC218 \uC720\uD6A8 \uBC29\uC5B4\uB825\uC744 12% \uBB34\uC2DC\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S14\",\r\n        \"S16\"\r\n      ],\r\n     
+    \"primarySynergy\": \"S14\",\r\n      \"designIntent\": \"\uC2A4\uD0AC\uB85C
+    \uD53C\uD574\uB97C \uC904 \uB54C \uC801\uC758 \uBC29\uC5B4\uB825\uC744 \uC77C\uBD80
+    \uBB34\uC2DC\uD55C\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n      \"image\":
+    \"Art/Items/I62.png\"\r\n    },\r\n    {\r\n      \"id\": \"I63\",\r\n      \"name\":
+    \"\uC2EC\uCE35 \uCD94\uC801\uAE30\",\r\n      \"description\": \"\uB450 \uB2E8\uACC4\uB85C
+    \uC7A0\uAE30\uB294 \uB0A9\uC791\uD55C \uCD94\uC801\uAE30.\",\r\n      \"effect\":
+    \"HP\uAC00 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C \uC904
+    \uB54C \uC591\uC218 \uC720\uD6A8 \uBC29\uC5B4\uB825\uC744 18% \uBB34\uC2DC\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S14\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S14\",\r\n      \"designIntent\": \"\uCCB4\uB825\uC774 \uB0AE\uC740 \uC801\uC758
+    \uBC29\uC5B4\uB825\uC744 \uC77C\uBD80 \uBB34\uC2DC\uD55C\uB2E4.\",\r\n      \"origin\":
+    \"revised\",\r\n      \"image\": \"Art/Items/I63.png\"\r\n    },\r\n    {\r\n     
+    \"id\": \"I64\",\r\n      \"name\": \"\uCE35\uBD84\uB9AC \uC2DC\uD3B8\",\r\n     
+    \"description\": \"\uC11C\uB85C \uB2E4\uB978 \uC18C\uC7AC\uAC00 \uC0AC\uC120\uC73C\uB85C
+    \uB9DE\uB2FF\uC740 \uC2DC\uD3B8.\",\r\n      \"effect\": \"\uD3C9\uD0C0\uC640
+    \uC2A4\uD0AC\uB85C \uD53C\uD574\uB97C \uC904 \uB54C \uC801\uC758 \uC591\uC218
+    \uC720\uD6A8 \uBC29\uC5B4\uB825\uC744 7% \uBB34\uC2DC\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S14\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S14\",\r\n      \"designIntent\": \"\uD3C9\uD0C0\uC640 \uC2A4\uD0AC\uC774 \uC801\uC758
+    \uBC29\uC5B4\uB825\uC744 \uC77C\uBD80 \uBB34\uC2DC\uD55C\uB2E4.\",\r\n      \"origin\":
+    \"revised\",\r\n      \"image\": \"Art/Items/I64.png\"\r\n    },\r\n    {\r\n     
+    \"id\": \"I65\",\r\n      \"name\": \"\uC911\uAC11 \uCC9C\uACF5\uC2EC\",\r\n     
+    \"description\": \"\uB05D\uC744 \uB2E8\uB2E8\uD558\uAC8C \uC18C\uACB0\uD55C \uBB34\uAD11
+    \uCC9C\uACF5\uC2EC.\",\r\n      \"effect\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
+    \uD3C9\uD0C0\uB098 \uC2A4\uD0AC\uB85C \uD53C\uD574\uB97C \uAC00\uD560 \uB54C
+    \uB300\uC0C1\uC758 \uC591\uC218 \uC720\uD6A8 \uBC29\uC5B4\uB825\uC744 14% \uBB34\uC2DC\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S15\",\r\n        \"S14\"\r\n      ],\r\n     
+    \"primarySynergy\": \"S15\",\r\n      \"designIntent\": \"\uBC29\uC5B4\uB825\uC774
+    \uB192\uC740 \uC815\uC608\uC640 \uBCF4\uC2A4\uC5D0 \uC9D1\uC911\uD55C\uB2E4.\",\r\n     
+    \"origin\": \"new\",\r\n      \"image\": \"Art/Items/I65.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I66\",\r\n      \"name\": \"\uC704\uD611 \uD45C\uC2DD\uD310\",\r\n     
+    \"description\": \"\uAD75\uC740 \uD55C \uC904\uC744 \uC0C8\uAE34 \uB450\uAEBC\uC6B4
+    \uD45C\uC2DD\uD310.\",\r\n      \"effect\": \"\uC804\uD22C \uC911 \uAC01 \uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
+    \uD3C9\uD0C0\uB098 \uC2A4\uD0AC\uB85C \uCC98\uC74C \uAC00\uD55C \uD53C\uD574\uAC00
+    18% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S15\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S15\",\r\n      \"designIntent\": \"\uC704\uD611\uB3C4\uAC00
+    \uB192\uC740 \uC801\uC5D0\uAC8C \uBA3C\uC800 \uAC15\uD55C \uD53C\uD574\uB97C
+    \uC900\uB2E4.\",\r\n      \"origin\": \"new\",\r\n      \"image\": \"Art/Items/I66.png\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I67\",\r\n      \"name\": \"\uB300\uD615 \uC555\uB825\uC790\",\r\n     
+    \"description\": \"\uAD75\uC740 \uBCF4\uAC15\uB300\uB97C \uC811\uC5B4 \uB123\uC740
+    \uCE21\uC815\uC790.\",\r\n      \"effect\": \"HP\uAC00 \uCD5C\uB300 HP\uC758
+    50% \uC774\uD558\uC778 \uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uAC00\uD558\uB294
+    \uD3C9\uD0C0 \uD53C\uD574\uAC00 11% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S15\"\r\n      ],\r\n      \"primarySynergy\": \"S15\",\r\n     
+    \"designIntent\": \"\uAD50\uC804 \uD6C4\uBC18\uC5D0 \uD3C9\uD0C0\uB97C \uC774\uC5B4\uAC00\uBA70
+    \uB9C8\uBB34\uB9AC\uD55C\uB2E4.\",\r\n      \"origin\": \"new\",\r\n      \"image\":
+    \"Art/Items/I67.png\"\r\n    },\r\n    {\r\n      \"id\": \"I68\",\r\n      \"name\":
+    \"\uD1A0\uBC8C \uAC80\uCCB4\uAD00\",\r\n      \"description\": \"\uCDA9\uACA9
+    \uD761\uC218 \uB0B4\uD53C\uAC00 \uB4E4\uC5B4\uAC04 \uC9E7\uC740 \uAC80\uCCB4\uAD00.\",\r\n     
+    \"effect\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uB97C \uCC98\uCE58\uD558\uBA74 \uCD5C\uB300
+    HP\uC758 0.5%\uB97C \uD68C\uBCF5\uD55C\uB2E4. \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04\uC740
+    20\uCD08\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S15\"\r\n      ],\r\n     
+    \"primarySynergy\": \"S15\",\r\n      \"designIntent\": \"\uADF9\uC18C\uB7C9\uC758
+    HP\uB97C \uCC9C\uCC9C\uD788 \uBCF4\uCDA9\uD55C\uB2E4.\",\r\n      \"origin\":
+    \"revised\",\r\n      \"image\": \"Art/Items/I68.png\"\r\n    },\r\n    {\r\n     
+    \"id\": \"I69\",\r\n      \"name\": \"\uD3EC\uC704 \uCC28\uB2E8\uD328\",\r\n     
+    \"description\": \"\uAC00\uC7A5\uC790\uB9AC \uC138 \uBA74\uC5D0 \uCDA9\uACA9
+    \uD761\uC218\uCE35\uC744 \uB367\uB304 \uD328.\",\r\n      \"effect\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC758
+    \uACF5\uACA9\uC73C\uB85C \uBC1B\uB294 \uD53C\uD574\uAC00 6% \uAC10\uC18C\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S15\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S15\",\r\n      \"designIntent\": \"\uC815\uC608\uC640 \uBCF4\uC2A4\uAC00 \uC788\uB294
+    \uC804\uD22C\uC5D0\uC11C \uD53C\uACA9 \uBD80\uB2F4\uC744 \uB0AE\uCD98\uB2E4.\",\r\n     
+    \"origin\": \"new\",\r\n      \"image\": \"Art/Items/I69.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I71\",\r\n      \"name\": \"\uCD08\uC810 \uC410\uAE30\",\r\n     
+    \"description\": \"\uB05D\uC774 \uD55C\uCABD\uC73C\uB85C \uAC08\uB9B0 \uBC31\uC0C9
+    \uC138\uB77C\uBBF9 \uC410\uAE30.\",\r\n      \"effect\": \"\uC2A4\uD0AC\uC774
+    \uCC98\uC74C \uB9DE\uD78C \uC801\uC5D0\uAC8C \uC8FC\uB294 \uCCAB \uD0C0\uACA9
+    \uD53C\uD574\uAC00 7% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n       
+    \"S16\"\r\n      ],\r\n      \"primarySynergy\": \"S16\",\r\n      \"designIntent\":
+    \"\uC2A4\uD0AC\uC774 \uCC98\uC74C \uB9DE\uD78C \uC801\uC5D0\uAC8C \uCCAB \uD0C0\uACA9
+    \uD53C\uD574\uB97C \uB298\uB9B0\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n     
+    \"image\": \"Art/Items/I71.png\"\r\n    },\r\n    {\r\n      \"id\": \"I72\",\r\n     
+    \"name\": \"\uD751\uC5F0 \uC2DC\uCE68\",\r\n      \"description\": \"\uD751\uC5F0
+    \uBC14\uB298\uC744 \uBD89\uC740 \uB208\uAE08\uD310\uC5D0 \uB07C\uC6B4 \uBD80\uD488.\",\r\n     
+    \"effect\": \"\uC2A4\uD0AC \uD53C\uD574\uAC00 5% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S16\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S16\",\r\n      \"designIntent\": \"\uBCC4\uB3C4 \uC870\uAC74 \uC5C6\uC774
+    \uC2A4\uD0AC \uD53C\uD574\uB97C \uB298\uB9B0\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n     
+    \"image\": \"Art/Items/I72.png\"\r\n    },\r\n    {\r\n      \"id\": \"I73\",\r\n     
+    \"name\": \"\uC5C7\uB208\uAE08 \uCD94\",\r\n      \"description\": \"\uB450 \uBA74\uC758
+    \uB208\uAE08\uC774 \uC5B4\uAE0B\uB09C \uAC01\uC9C4 \uCCA0\uC81C \uCD94.\",\r\n     
+    \"effect\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uC8FC\uB294 \uC2A4\uD0AC
+    \uD53C\uD574\uAC00 8% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n       
+    \"S16\"\r\n      ],\r\n      \"primarySynergy\": \"S16\",\r\n      \"designIntent\":
+    \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uC8FC\uB294 \uC2A4\uD0AC \uD53C\uD574\uB97C
+    \uB298\uB9B0\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n      \"image\":
+    \"Art/Items/I73.png\"\r\n    },\r\n    {\r\n      \"id\": \"I75\",\r\n      \"name\":
+    \"\uC885\uACB0 \uD540\",\r\n      \"description\": \"\uB05D\uC5D0 \uC881\uC740
+    \uC801\uC0C9 \uB760\uAC00 \uAC10\uAE34 \uBC31\uC0C9 \uACE0\uC815\uD540.\",\r\n     
+    \"effect\": \"\uD604\uC7AC HP\uAC00 25% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C
+    \uACF5\uACA9 \uC2A4\uD0AC\uB85C \uC8FC\uB294 \uD53C\uD574\uAC00 9% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S16\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S16\",\r\n      \"designIntent\": \"\uC2A4\uD0AC\uC744 \uB9C8\uBB34\uB9AC \uC218\uB2E8\uC73C\uB85C
+    \uBCF4\uC874\",\r\n      \"origin\": \"new\",\r\n      \"image\": \"Art/Items/I75.png\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I77\",\r\n      \"name\": \"\uAC1C\uB9C9 \uD749\uD310\",\r\n     
+    \"description\": \"\uBC31\uC0C9 \uC678\uD310 \uC704\uB85C \uBD89\uC740 \uC774\uC74C\uC120\uC774
+    \uB4DC\uB7EC\uB09C \uD749\uD310.\",\r\n      \"effect\": \"\uC804\uD22C\uB9C8\uB2E4
+    \uCC98\uC74C \uBC1B\uB294 \uC801\uC758 \uACF5\uACA9 \uD53C\uD574\uAC00 12% \uAC10\uC18C\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S03\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S03\",\r\n      \"designIntent\": \"\uC804\uD22C \uC911 \uCC98\uC74C \uBC1B\uB294
+    \uD53C\uD574\uB97C \uC904\uC778\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n     
+    \"image\": \"Art/Items/I77.png\"\r\n    },\r\n    {\r\n      \"id\": \"I78\",\r\n     
+    \"name\": \"\uC751\uAE09 \uAC01\uCCA0\",\r\n      \"description\": \"\uB450 \uBA74\uC744
+    \uC9C1\uAC01\uC73C\uB85C \uC811\uC740 \uAC80\uC740 \uAC01\uCCA0.\",\r\n     
+    \"effect\": \"\uCD5C\uB300 HP\uC758 20% \uC774\uC0C1\uC5D0 \uD574\uB2F9\uD558\uB294
+    \uD53C\uD574\uB97C \uD55C \uBC88\uC5D0 \uBC1B\uC73C\uBA74 \uADF8 \uD53C\uACA9
+    \uC9C1\uD6C4\uBD80\uD130 3\uCD08 \uB3D9\uC548 \uBC1B\uB294 \uD53C\uD574\uAC00
+    8% \uAC10\uC18C\uD55C\uB2E4. \uC7AC\uBC1C\uB3D9 \uC2DC \uC9C0\uC18D\uC2DC\uAC04\uB9CC
+    \uAC31\uC2E0\uB41C\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S03\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S03\",\r\n      \"designIntent\": \"\uD070
+    \uD53C\uACA9 \uB4A4 \uD6C4\uC18D \uD53C\uD574 \uC644\uD654\",\r\n      \"origin\":
+    \"new\",\r\n      \"image\": \"Art/Items/I78.png\"\r\n    },\r\n    {\r\n     
+    \"id\": \"I81\",\r\n      \"name\": \"\uC804\uC9C4 \uACA9\uC790\",\r\n      \"description\":
+    \"\uAC80\uC740 \uD2C0\uC5D0 \uBC31\uC0C9 \uACA9\uC790\uB97C \uB304 \uC791\uC740
+    \uC7A5\uAC11\uD310.\",\r\n      \"effect\": \"\uD3C9\uD0C0\uB97C \uC801\uC911\uC2DC\uD0A4\uBA74
+    1.5\uCD08 \uB3D9\uC548 \uC801\uC758 \uACF5\uACA9\uC73C\uB85C \uBC1B\uB294 \uD53C\uD574\uAC00
+    5% \uAC10\uC18C\uD55C\uB2E4. \uC7AC\uBC1C\uB3D9 \uC2DC \uC9C0\uC18D\uC2DC\uAC04\uB9CC
+    \uAC31\uC2E0\uB41C\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S03\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S03\",\r\n      \"designIntent\": \"\uADFC\uC811
+    \uAD50\uC804\uC5D0\uC11C \uACF5\uACA9 \uD750\uB984 \uC720\uC9C0\",\r\n      \"origin\":
+    \"new\",\r\n      \"image\": \"Art/Items/I81.png\"\r\n    },\r\n    {\r\n     
+    \"id\": \"I89\",\r\n      \"name\": \"\uB0B1\uAE08 \uCCB4\",\r\n      \"description\":
+    \"\uC791\uC740 \uC0AC\uAC01 \uAD6C\uBA4D\uC744 \uB0B8 \uAC80\uC740 \uCCB4.\",\r\n     
+    \"effect\": \"\uAE30\uBCF8 \uACE8\uB4DC \uBCF4\uC0C1\uC774 1~10\uC778 \uC801\uC744
+    \uCC98\uCE58\uD558\uBA74 \uACE8\uB4DC\uB97C 1 \uB354 \uC5BB\uB294\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S19\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S19\",\r\n      \"designIntent\": \"\uAE30\uBCF8 \uACE8\uB4DC\uAC00 \uC801\uC740
+    \uC801\uC744 \uCC98\uCE58\uD560 \uB54C \uBCF4\uC0C1\uC744 \uB354 \uC5BB\uB294\uB2E4.\",\r\n     
+    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I89.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I90\",\r\n      \"name\": \"\uBC00\uBD09 \uC8FC\uBA38\uB2C8\",\r\n     
+    \"description\": \"\uBD89\uC740 \uC7A0\uAE08\uC1E0\uB97C \uB2E8 \uAC01\uC9C4
+    \uAC80\uC740 \uC8FC\uBA38\uB2C8.\",\r\n      \"effect\": \"\uC790\uC2E0\uC758
+    HP\uAC00 \uAC00\uB4DD \uCC2C \uC0C1\uD0DC\uC5D0\uC11C \uAE30\uBCF8 \uACE8\uB4DC\uB97C
+    \uC8FC\uB294 \uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uACE8\uB4DC\uB97C 2 \uB354
+    \uC5BB\uB294\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S19\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S19\",\r\n      \"designIntent\": \"\uC790\uC2E0\uC758
+    HP\uAC00 \uAC00\uB4DD \uCC2C \uC0C1\uD0DC\uC5D0\uC11C \uC801\uC744 \uCC98\uCE58\uD558\uBA74
+    \uBCF4\uC0C1\uC744 \uB354 \uC5BB\uB294\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n     
+    \"image\": \"Art/Items/I90.png\"\r\n    },\r\n    {\r\n      \"id\": \"I91\",\r\n     
+    \"name\": \"\uC774\uC911 \uC7A5\uBD80\",\r\n      \"description\": \"\uBC31\uC0C9
+    \uC7A5\uBD80 \uBAA8\uC11C\uB9AC\uC5D0 \uAC80\uC740 \uAE08\uC18D\uD310\uC774 \uB458\uB7EC\uC838
+    \uC788\uB2E4.\",\r\n      \"effect\": \"\uC804\uD22C\uC5D0\uC11C \uCC98\uC74C\uC73C\uB85C
+    \uAE30\uBCF8 \uACE8\uB4DC\uB97C \uC8FC\uB294 \uC801\uC744 \uCC98\uCE58\uD558\uBA74
+    \uACE8\uB4DC\uB97C 3 \uB354 \uC5BB\uB294\uB2E4.\",\r\n      \"synergies\": [\r\n       
+    \"S19\"\r\n      ],\r\n      \"primarySynergy\": \"S19\",\r\n      \"designIntent\":
+    \"\uC804\uD22C\uC5D0\uC11C \uCC98\uC74C \uACE8\uB4DC\uB97C \uD68D\uB4DD\uD558\uB294
+    \uCC98\uCE58\uC758 \uBCF4\uC0C1\uC744 \uB298\uB9B0\uB2E4.\",\r\n      \"origin\":
+    \"revised\",\r\n      \"image\": \"Art/Items/I91.png\"\r\n    },\r\n    {\r\n     
+    \"id\": \"I92\",\r\n      \"name\": \"\uC2ED\uAE08 \uBD84\uB3D9\",\r\n      \"description\":
+    \"\uC606\uBA74\uC5D0 \uBD89\uC740 \uB208\uAE08 \uD558\uB098\uAC00 \uC0C8\uACA8\uC9C4
+    \uBC31\uC0C9 \uBD84\uB3D9.\",\r\n      \"effect\": \"\uAE30\uBCF8 \uACE8\uB4DC\uB97C
+    \uC8FC\uB294 \uC815\uC608\xB7\uBCF4\uC2A4\uB97C \uCC98\uCE58\uD558\uBA74 \uACE8\uB4DC\uB97C
+    4 \uB354 \uC5BB\uB294\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S19\",\r\n       
+    \"S15\"\r\n      ],\r\n      \"primarySynergy\": \"S19\",\r\n      \"designIntent\":
+    \"\uC815\uC608\xB7\uBCF4\uC2A4 \uCC98\uCE58 \uC2DC \uACE0\uC815 \uCD94\uAC00
+    \uACE8\uB4DC\uB97C \uC5BB\uB294\uB2E4.\",\r\n      \"origin\": \"revised\",\r\n     
+    \"image\": \"Art/Items/I92.png\"\r\n    },\r\n    {\r\n      \"id\": \"I93\",\r\n     
+    \"name\": \"\uC808\uB2E8 \uACC4\uC0B0\uD310\",\r\n      \"description\": \"\uC0AC\uAC01
+    \uBAA8\uC11C\uB9AC \uD558\uB098\uAC00 \uC798\uB9B0 \uAC80\uC740 \uACC4\uC0B0\uD310.\",\r\n     
+    \"effect\": \"\uC2A4\uD0AC\uB85C \uAE30\uBCF8 \uACE8\uB4DC\uB97C \uC8FC\uB294
+    \uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uACE8\uB4DC\uB97C 1 \uB354 \uC5BB\uB294\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S19\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S19\",\r\n      \"designIntent\": \"\uC2A4\uD0AC\uB85C \uB9C8\uBB34\uB9AC\uD55C
+    \uC801\uC5D0\uAC8C\uC11C \uACE8\uB4DC\uB97C \uB354 \uC5BB\uB294\uB2E4.\",\r\n     
+    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I93.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I94\",\r\n      \"name\": \"\uD68C\uC218 \uD45C\uCC30\",\r\n     
+    \"description\": \"\uBD89\uC740 \uAC78\uC1E0\uAC00 \uBC15\uD78C \uBB34\uAD11
+    \uBC31\uC0C9 \uD45C\uCC30.\",\r\n      \"effect\": \"\uD3C9\uD0C0\uB85C \uAE30\uBCF8
+    \uACE8\uB4DC\uB97C \uC8FC\uB294 \uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uACE8\uB4DC\uB97C
+    1 \uB354 \uC5BB\uB294\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S19\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S19\",\r\n      \"designIntent\": \"\uD3C9\uD0C0\uB85C
+    \uB9C8\uBB34\uB9AC\uD55C \uC801\uC5D0\uAC8C\uC11C \uACE8\uB4DC\uB97C \uB354 \uC5BB\uB294\uB2E4.\",\r\n     
+    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I94.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I95\",\r\n      \"name\": \"\uC410\uAE30 \uC6B8\uB9BC\uC1E0\",\r\n     
+    \"description\": \"\uAC80\uC740 \uBAB8\uCCB4 \uC0AC\uC774\uC5D0 \uBD89\uC740
+    \uAE08\uC18D\uD3B8\uC774 \uB07C\uC6CC\uC9C4 \uC1E0.\",\r\n      \"effect\": \"\uD3C9\uD0C0
+    \uD53C\uD574\uAC00 7% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n       
+    \"S02\"\r\n      ],\r\n      \"primarySynergy\": \"S02\",\r\n      \"designIntent\":
+    \"\uBCC4\uB3C4 \uC870\uAC74 \uC5C6\uC774 \uD3C9\uD0C0 \uD53C\uD574\uB97C \uB298\uB9B0\uB2E4.\",\r\n     
+    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I95.png\"\r\n    }\r\n 
+    ],\r\n  \"synergies\": [\r\n    {\r\n      \"id\": \"S01\",\r\n      \"name\":
+    \"\uCE58\uBA85\",\r\n      \"tiers\": [\r\n        {\r\n          \"count\":
+    2,\r\n          \"text\": \"\uCE58\uBA85\uD0C0 \uD655\uB960 +5%p \xB7 \uCE58\uBA85\uD0C0
+    \uD53C\uD574 \uBC30\uC728 +10%p\",\r\n          \"values\": {\r\n           
+    \"critChanceBonusPoints\": 5,\r\n            \"critDamageMultiplierBonusPoints\":
+    10\r\n          }\r\n        },\r\n        {\r\n          \"count\": 4,\r\n         
+    \"text\": \"\uCE58\uBA85\uD0C0 \uD655\uB960 +10%p \xB7 \uCE58\uBA85\uD0C0 \uD53C\uD574
+    \uBC30\uC728 +20%p\",\r\n          \"values\": {\r\n            \"critChanceBonusPoints\":
+    10,\r\n            \"critDamageMultiplierBonusPoints\": 20\r\n          }\r\n       
+    },\r\n        {\r\n          \"count\": 6,\r\n          \"text\": \"\uCE58\uBA85\uD0C0
+    \uD655\uB960 +15%p \xB7 \uCE58\uBA85\uD0C0 \uD53C\uD574 \uBC30\uC728 +35%p\",\r\n         
+    \"values\": {\r\n            \"critChanceBonusPoints\": 15,\r\n            \"critDamageMultiplierBonusPoints\":
+    35\r\n          }\r\n        }\r\n      ],\r\n      \"effect\": \"\uCE58\uBA85\uD0C0
+    \uD53C\uD574 \uBC30\uC728\uC740 %p\uB85C \uB354\uD55C\uB2E4. \uC608\uB97C \uB4E4\uC5B4
+    150%\uC5D0\uC11C 2\uC138\uD2B8 \uC801\uC6A9 \uC2DC 160%\uAC00 \uB41C\uB2E4. \uCE58\uBA85\uD0C0
+    \uD655\uB960\uC740 100%\uB97C \uB118\uC9C0 \uC54A\uB294\uB2E4.\",\r\n      \"summary\":
+    \"\uCE58\uBA85\uD0C0 \uD655\uB960\uACFC \uCE58\uBA85\uD0C0 \uD53C\uD574\uB97C
+    \uD568\uAED8 \uB192\uC778\uB2E4.\",\r\n      \"members\": [\r\n        \"I02\",\r\n       
+    \"I06\",\r\n        \"I13\",\r\n        \"I15\",\r\n        \"I57\",\r\n       
+    \"I100\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S01.svg\",\r\n      \"iconPng\":
+    \"Art/Synergies/S01.png\"\r\n    },\r\n    {\r\n      \"id\": \"S02\",\r\n     
+    \"name\": \"\uB9F9\uACF5\",\r\n      \"tiers\": [\r\n        {\r\n          \"count\":
+    2,\r\n          \"text\": \"\uACF5\uACA9\uB825 +5% \xB7 \uACF5\uACA9\uC18D\uB3C4
+    +4%\",\r\n          \"values\": {\r\n            \"attackPowerBonusPct\": 5,\r\n           
+    \"normalAttackRateBonusPct\": 4\r\n          }\r\n        },\r\n        {\r\n         
+    \"count\": 4,\r\n          \"text\": \"\uACF5\uACA9\uB825 +10% \xB7 \uACF5\uACA9\uC18D\uB3C4
+    +8%\",\r\n          \"values\": {\r\n            \"attackPowerBonusPct\": 10,\r\n           
+    \"normalAttackRateBonusPct\": 8\r\n          }\r\n        },\r\n        {\r\n         
+    \"count\": 6,\r\n          \"text\": \"\uACF5\uACA9\uB825 +18% \xB7 \uACF5\uACA9\uC18D\uB3C4
+    +15%\",\r\n          \"values\": {\r\n            \"attackPowerBonusPct\": 18,\r\n           
+    \"normalAttackRateBonusPct\": 15\r\n          }\r\n        }\r\n      ],\r\n     
+    \"effect\": \"\uACF5\uACA9\uC18D\uB3C4\uB294 \uD3C9\uD0C0\uC758 \uACF5\uACA9
+    \uBE48\uB3C4\uB97C \uB73B\uD55C\uB2E4.\",\r\n      \"summary\": \"\uACF5\uACA9\uB825\uACFC
+    \uD3C9\uD0C0 \uACF5\uACA9\uC18D\uB3C4\uB97C \uD568\uAED8 \uB192\uC778\uB2E4.\",\r\n     
+    \"members\": [\r\n        \"I05\",\r\n        \"I14\",\r\n        \"I46\",\r\n       
+    \"I48\",\r\n        \"I56\",\r\n        \"I95\"\r\n      ],\r\n      \"icon\":
+    \"Art/Synergies/S02.svg\",\r\n      \"iconPng\": \"Art/Synergies/S02.png\"\r\n   
+    },\r\n    {\r\n      \"id\": \"S03\",\r\n      \"name\": \"\uCCA0\uBCBD\",\r\n     
+    \"tiers\": [\r\n        {\r\n          \"count\": 2,\r\n          \"text\": \"\uCD5C\uB300
+    HP +8% \xB7 \uBC29\uC5B4\uB825 +10%\",\r\n          \"values\": {\r\n           
+    \"maxHpBonusPct\": 8,\r\n            \"defenseBonusPct\": 10\r\n          }\r\n       
+    },\r\n        {\r\n          \"count\": 4,\r\n          \"text\": \"\uCD5C\uB300
+    HP +16% \xB7 \uBC29\uC5B4\uB825 +20%\",\r\n          \"values\": {\r\n           
+    \"maxHpBonusPct\": 16,\r\n            \"defenseBonusPct\": 20\r\n          }\r\n       
+    },\r\n        {\r\n          \"count\": 6,\r\n          \"text\": \"\uCD5C\uB300
+    HP +25% \xB7 \uBC29\uC5B4\uB825 +30%\",\r\n          \"values\": {\r\n           
+    \"maxHpBonusPct\": 25,\r\n            \"defenseBonusPct\": 30\r\n          }\r\n       
+    }\r\n      ],\r\n      \"effect\": \"\uCD5C\uB300 HP \uC99D\uAC00\uB294 \uC989\uC2DC
+    \uD68C\uBCF5\uC744 \uC8FC\uC9C0 \uC54A\uB294\uB2E4. \uCD5C\uB300 HP\uAC00 \uC904\uC5B4
+    \uD604\uC7AC HP\uBCF4\uB2E4 \uB0AE\uC544\uC9C0\uBA74 \uD604\uC7AC HP\uB97C \uC0C8
+    \uCD5C\uB300\uCE58\uAE4C\uC9C0 \uB0AE\uCD98\uB2E4.\",\r\n      \"summary\": \"\uCD5C\uB300
+    HP\uC640 \uBC29\uC5B4\uB825\uC744 \uD568\uAED8 \uB192\uC778\uB2E4.\",\r\n     
+    \"members\": [\r\n        \"I01\",\r\n        \"I09\",\r\n        \"I51\",\r\n       
+    \"I77\",\r\n        \"I78\",\r\n        \"I81\"\r\n      ],\r\n      \"icon\":
+    \"Art/Synergies/S03.svg\",\r\n      \"iconPng\": \"Art/Synergies/S03.png\"\r\n   
+    },\r\n    {\r\n      \"id\": \"S04\",\r\n      \"name\": \"\uC1C4\uB3C4\uD558\uB294
+    \uBB3C\uACB0\",\r\n      \"tiers\": [\r\n        {\r\n          \"count\": 2,\r\n         
+    \"text\": \"\uC218 \uC18D\uC131 \uD53C\uD574 +5%\",\r\n          \"values\":
+    {\r\n            \"waterDamageBonusPct\": 5\r\n          }\r\n        },\r\n       
+    {\r\n          \"count\": 4,\r\n          \"text\": \"\uC218 \uC18D\uC131 \uD53C\uD574
+    +10%\",\r\n          \"values\": {\r\n            \"waterDamageBonusPct\": 10\r\n         
+    }\r\n        },\r\n        {\r\n          \"count\": 6,\r\n          \"text\":
+    \"\uC218 \uC18D\uC131 \uD53C\uD574 +15%\",\r\n          \"values\": {\r\n           
+    \"waterDamageBonusPct\": 15\r\n          }\r\n        }\r\n      ],\r\n     
+    \"effect\": \"\uC218 \uC18D\uC131\uC73C\uB85C \uC8FC\uB294 \uD53C\uD574\uAC00
+    \uD604\uC7AC \uC138\uD2B8 \uB2E8\uACC4\uC758 \uBE44\uC728\uB9CC\uD07C \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"summary\": \"\uC218 \uC18D\uC131\uC73C\uB85C \uC8FC\uB294 \uD53C\uD574\uB97C
+    \uB192\uC778\uB2E4.\",\r\n      \"members\": [\r\n        \"I16\",\r\n       
+    \"I17\",\r\n        \"I18\",\r\n        \"I19\",\r\n        \"I20\",\r\n       
+    \"I21\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S04.svg\",\r\n      \"iconPng\":
+    \"Art/Synergies/S04.png\"\r\n    },\r\n    {\r\n      \"id\": \"S05\",\r\n     
+    \"name\": \"\uD0C0\uC624\uB974\uB294 \uBD88\uC528\",\r\n      \"tiers\": [\r\n       
+    {\r\n          \"count\": 2,\r\n          \"text\": \"\uD654 \uC18D\uC131 \uD53C\uD574
+    +5%\",\r\n          \"values\": {\r\n            \"fireDamageBonusPct\": 5\r\n         
+    }\r\n        },\r\n        {\r\n          \"count\": 4,\r\n          \"text\":
+    \"\uD654 \uC18D\uC131 \uD53C\uD574 +10%\",\r\n          \"values\": {\r\n           
+    \"fireDamageBonusPct\": 10\r\n          }\r\n        },\r\n        {\r\n         
+    \"count\": 6,\r\n          \"text\": \"\uD654 \uC18D\uC131 \uD53C\uD574 +15%\",\r\n         
+    \"values\": {\r\n            \"fireDamageBonusPct\": 15\r\n          }\r\n       
+    }\r\n      ],\r\n      \"effect\": \"\uD654 \uC18D\uC131\uC73C\uB85C \uC8FC\uB294
+    \uD53C\uD574\uAC00 \uD604\uC7AC \uC138\uD2B8 \uB2E8\uACC4\uC758 \uBE44\uC728\uB9CC\uD07C
+    \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"summary\": \"\uD654 \uC18D\uC131\uC73C\uB85C
+    \uC8FC\uB294 \uD53C\uD574\uB97C \uB192\uC778\uB2E4.\",\r\n      \"members\":
+    [\r\n        \"I04\",\r\n        \"I05\",\r\n        \"I07\",\r\n        \"I08\",\r\n       
+    \"I16\",\r\n        \"I22\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S05.svg\",\r\n     
+    \"iconPng\": \"Art/Synergies/S05.png\"\r\n    },\r\n    {\r\n      \"id\": \"S08\",\r\n     
+    \"name\": \"\uC218\uD638\",\r\n      \"summary\": \"\uD53C\uACA9 \uD6C4 \uB2E4\uC74C
+    \uD53C\uD574\uB97C \uB9C9\uB294 \uBCF4\uD638\uB9C9\",\r\n      \"effect\": \"\uC801
+    \uACF5\uACA9\uC73C\uB85C HP\uAC00 \uC2E4\uC81C \uAC10\uC18C\uD55C \uC9C1\uD6C4
+    4\uCD08\uAC04 \uBCF4\uD638\uB9C9\uC744 \uC5BB\uB294\uB2E4. \uC7AC\uC0AC\uC6A9
+    \uB300\uAE30\uC2DC\uAC04 10\uCD08. \uB2EC\uC131\uD55C \uCD5C\uACE0 \uB2E8\uACC4\uC758
+    \uC218\uCE58\uB9CC \uC801\uC6A9\uD55C\uB2E4.\",\r\n      \"tiers\": [\r\n       
+    {\r\n          \"count\": 2,\r\n          \"text\": \"HP\uB97C \uC783\uC740 \uC9C1\uD6C4
+    4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 3% \uBCF4\uD638\uB9C9, \uC7AC\uC0AC\uC6A9
+    \uB300\uAE30\uC2DC\uAC04 10\uCD08\",\r\n          \"values\": {\r\n           
+    \"shieldMaxHpPct\": 3\r\n          }\r\n        },\r\n        {\r\n         
+    \"count\": 4,\r\n          \"text\": \"HP\uB97C \uC783\uC740 \uC9C1\uD6C4 4\uCD08\uAC04
+    \uCD5C\uB300 HP\uC758 4% \uBCF4\uD638\uB9C9, \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04
+    10\uCD08\",\r\n          \"values\": {\r\n            \"shieldMaxHpPct\": 4\r\n         
+    }\r\n        },\r\n        {\r\n          \"count\": 6,\r\n          \"text\":
+    \"HP\uB97C \uC783\uC740 \uC9C1\uD6C4 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 5% \uBCF4\uD638\uB9C9,
+    \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 10\uCD08\",\r\n          \"values\":
+    {\r\n            \"shieldMaxHpPct\": 5\r\n          }\r\n        }\r\n      ],\r\n     
+    \"members\": [\r\n        \"I30\",\r\n        \"I31\",\r\n        \"I32\",\r\n       
+    \"I33\",\r\n        \"I34\",\r\n        \"I50\"\r\n      ],\r\n      \"icon\":
+    \"Art/Synergies/S08.svg\",\r\n      \"iconPng\": \"Art/Synergies/S08.png\"\r\n   
+    },\r\n    {\r\n      \"id\": \"S10\",\r\n      \"name\": \"\uB9C8\uBB34\uB9AC\",\r\n     
+    \"summary\": \"HP\uAC00 \uB0AE\uC740 \uC801\uC5D0\uAC8C \uD53C\uD574 \uC99D\uAC00\",\r\n     
+    \"effect\": \"\uD53C\uD574 \uC801\uC6A9 \uC9C1\uC804 HP\uAC00 \uCD5C\uB300 HP\uC758
+    30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAC00\uD558\uB294 \uD3C9\uD0C0\uC640
+    \uC2A4\uD0AC \uD53C\uD574\uAC00 \uC99D\uAC00\uD55C\uB2E4. \uB2EC\uC131\uD55C
+    \uCD5C\uACE0 \uB2E8\uACC4\uC758 \uC218\uCE58\uB9CC \uC801\uC6A9\uD55C\uB2E4.\",\r\n     
+    \"tiers\": [\r\n        {\r\n          \"count\": 2,\r\n          \"text\": \"HP
+    30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574
+    +4%\",\r\n          \"values\": {\r\n            \"damagePct\": 4\r\n         
+    }\r\n        },\r\n        {\r\n          \"count\": 4,\r\n          \"text\":
+    \"HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574
+    +6%\",\r\n          \"values\": {\r\n            \"damagePct\": 6\r\n         
+    }\r\n        },\r\n        {\r\n          \"count\": 6,\r\n          \"text\":
+    \"HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574
+    +8%\",\r\n          \"values\": {\r\n            \"damagePct\": 8\r\n         
+    }\r\n        }\r\n      ],\r\n      \"members\": [\r\n        \"I02\",\r\n       
+    \"I41\",\r\n        \"I42\",\r\n        \"I43\",\r\n        \"I44\",\r\n       
+    \"I100\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S10.svg\",\r\n      \"iconPng\":
+    \"Art/Synergies/S10.png\"\r\n    },\r\n    {\r\n      \"id\": \"S14\",\r\n     
+    \"name\": \"\uAD00\uD1B5\",\r\n      \"summary\": \"\uD3C9\uD0C0\uC640 \uC2A4\uD0AC\uC774
+    \uB300\uC0C1 \uBC29\uC5B4\uB825 \uC77C\uBD80 \uBB34\uC2DC\",\r\n      \"effect\":
+    \"\uD3C9\uD0C0\uC640 \uC2A4\uD0AC \uD53C\uD574\uB97C \uACC4\uC0B0\uD560 \uB54C
+    \uB300\uC0C1\uC758 \uC720\uD6A8 \uBC29\uC5B4\uB825 \uC911 \uC591\uC218\uC778
+    \uBD80\uBD84\uC744 \uC77C\uC815 \uBE44\uC728 \uBB34\uC2DC\uD55C\uB2E4. \uB2EC\uC131\uD55C
+    \uCD5C\uACE0 \uB2E8\uACC4\uC758 \uC218\uCE58\uB9CC \uC801\uC6A9\uD55C\uB2E4.\",\r\n     
+    \"tiers\": [\r\n        {\r\n          \"count\": 2,\r\n          \"text\": \"\uD3C9\uD0C0\xB7\uC2A4\uD0AC
+    \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uC591\uC218 \uC720\uD6A8 \uBC29\uC5B4\uB825\uC758
+    6% \uBB34\uC2DC\",\r\n          \"values\": {\r\n            \"ignoreDefensePct\":
+    6\r\n          }\r\n        },\r\n        {\r\n          \"count\": 4,\r\n         
+    \"text\": \"\uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uC591\uC218
+    \uC720\uD6A8 \uBC29\uC5B4\uB825\uC758 9% \uBB34\uC2DC\",\r\n          \"values\":
+    {\r\n            \"ignoreDefensePct\": 9\r\n          }\r\n        },\r\n       
+    {\r\n          \"count\": 6,\r\n          \"text\": \"\uD3C9\uD0C0\xB7\uC2A4\uD0AC
+    \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uC591\uC218 \uC720\uD6A8 \uBC29\uC5B4\uB825\uC758
+    12% \uBB34\uC2DC\",\r\n          \"values\": {\r\n            \"ignoreDefensePct\":
+    12\r\n          }\r\n        }\r\n      ],\r\n      \"members\": [\r\n       
+    \"I60\",\r\n        \"I61\",\r\n        \"I62\",\r\n        \"I63\",\r\n       
+    \"I64\",\r\n        \"I65\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S14.svg\",\r\n     
+    \"iconPng\": \"Art/Synergies/S14.png\"\r\n    },\r\n    {\r\n      \"id\": \"S15\",\r\n     
+    \"name\": \"\uAC70\uBB3C\uC0AC\uB0E5\",\r\n      \"summary\": \"\uC815\uC608\uC640
+    \uBCF4\uC2A4\uC5D0\uAC8C \uD53C\uD574 \uC99D\uAC00\",\r\n      \"effect\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
+    \uAC00\uD558\uB294 \uD3C9\uD0C0\uC640 \uC2A4\uD0AC \uD53C\uD574\uAC00 \uC99D\uAC00\uD55C\uB2E4.
+    \uB2EC\uC131\uD55C \uCD5C\uACE0 \uB2E8\uACC4\uC758 \uC218\uCE58\uB9CC \uC801\uC6A9\uD55C\uB2E4.\",\r\n     
+    \"tiers\": [\r\n        {\r\n          \"count\": 2,\r\n          \"text\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
+    \uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574 +4%\",\r\n          \"values\": {\r\n           
+    \"damagePct\": 4\r\n          }\r\n        },\r\n        {\r\n          \"count\":
+    4,\r\n          \"text\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
+    \uD53C\uD574 +6%\",\r\n          \"values\": {\r\n            \"damagePct\":
+    6\r\n          }\r\n        },\r\n        {\r\n          \"count\": 6,\r\n         
+    \"text\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
+    \uD53C\uD574 +8%\",\r\n          \"values\": {\r\n            \"damagePct\":
+    8\r\n          }\r\n        }\r\n      ],\r\n      \"members\": [\r\n       
+    \"I65\",\r\n        \"I66\",\r\n        \"I67\",\r\n        \"I68\",\r\n       
+    \"I69\",\r\n        \"I92\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S15.svg\",\r\n     
+    \"iconPng\": \"Art/Synergies/S15.png\"\r\n    },\r\n    {\r\n      \"id\": \"S16\",\r\n     
+    \"name\": \"\uC219\uB828\",\r\n      \"summary\": \"\uC9C1\uC811 \uC0AC\uC6A9\uD558\uB294
+    \uACF5\uACA9 \uC2A4\uD0AC\uC758 \uD53C\uD574\uB97C \uB192\uC778\uB2E4.\",\r\n     
+    \"effect\": \"\uC9C1\uC811 \uC0AC\uC6A9\uD558\uB294 \uACF5\uACA9 \uC2A4\uD0AC\uC758
+    \uC6D0\uB798 \uD0C0\uACA9\uC5D0 \uC2A4\uD0AC \uD53C\uD574 \uC99D\uAC00\uC728\uC744
+    \uC801\uC6A9\uD55C\uB2E4. \uC7A5\uBE44\uB098 \uC2DC\uB108\uC9C0\uAC00 \uBCC4\uB3C4\uB85C
+    \uBC1C\uC0DD\uC2DC\uD0A8 \uCD94\uAC00 \uD0C0\uACA9\uC5D0\uB294 \uC801\uC6A9\uD558\uC9C0
+    \uC54A\uB294\uB2E4.\",\r\n      \"tiers\": [\r\n        {\r\n          \"count\":
+    2,\r\n          \"text\": \"\uC2A4\uD0AC \uD53C\uD574 +4%\",\r\n          \"values\":
+    {\r\n            \"percent\": 4\r\n          }\r\n        },\r\n        {\r\n         
+    \"count\": 4,\r\n          \"text\": \"\uC2A4\uD0AC \uD53C\uD574 +8%\",\r\n         
+    \"values\": {\r\n            \"percent\": 8\r\n          }\r\n        },\r\n       
+    {\r\n          \"count\": 6,\r\n          \"text\": \"\uC2A4\uD0AC \uD53C\uD574
+    +12%\",\r\n          \"values\": {\r\n            \"percent\": 12\r\n         
+    }\r\n        }\r\n      ],\r\n      \"members\": [\r\n        \"I34\",\r\n       
+    \"I47\",\r\n        \"I62\",\r\n        \"I71\",\r\n        \"I72\",\r\n       
+    \"I73\",\r\n        \"I75\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S16.svg\",\r\n     
+    \"iconPng\": \"Art/Synergies/S16.png\"\r\n    },\r\n    {\r\n      \"id\": \"S19\",\r\n     
+    \"name\": \"\uC218\uD655\",\r\n      \"summary\": \"\uC801 \uCC98\uCE58 \uBCF4\uC0C1
+    \uACE8\uB4DC\uC758 \uC77C\uBD80\uB97C \uB354 \uC5BB\uB294\uB2E4.\",\r\n     
+    \"effect\": \"\uC801\uC744 \uCC98\uCE58\uD560 \uB54C\uB9C8\uB2E4 \uAE30\uBCF8
+    \uBCF4\uC0C1 \uACE8\uB4DC\uC5D0 \uD45C\uC2DC \uBE44\uC728\uC744 \uACF1\uD574
+    \uB204\uC801\uD55C\uB2E4. \uB204\uC801\uAC12\uC758 \uC815\uC218 \uBD80\uBD84\uC744
+    \uCD94\uAC00 \uACE8\uB4DC\uB85C \uC9C0\uAE09\uD558\uACE0 \uC18C\uC218 \uBD80\uBD84\uC740
+    \uB2E4\uC74C \uCC98\uCE58\uAE4C\uC9C0 \uC774\uC6D4\uD55C\uB2E4. \uCD94\uAC00
+    \uACE8\uB4DC\uB294 \uB204\uC801 \uB300\uC0C1\uC5D0\uC11C \uC81C\uC678\uD558\uBA70,
+    \uB204\uC801\uAC12\uC740 \uC0C8 \uD50C\uB808\uC774\uB97C \uC2DC\uC791\uD560 \uB54C
+    \uCD08\uAE30\uD654\uD55C\uB2E4.\",\r\n      \"tiers\": [\r\n        {\r\n         
+    \"count\": 2,\r\n          \"text\": \"\uC801 \uCC98\uCE58 \uAE30\uBCF8 \uACE8\uB4DC
+    \uBCF4\uB108\uC2A4 6%\",\r\n          \"values\": {\r\n            \"percent\":
+    6\r\n          }\r\n        },\r\n        {\r\n          \"count\": 4,\r\n         
+    \"text\": \"\uC801 \uCC98\uCE58 \uAE30\uBCF8 \uACE8\uB4DC \uBCF4\uB108\uC2A4
+    12%\",\r\n          \"values\": {\r\n            \"percent\": 12\r\n         
+    }\r\n        },\r\n        {\r\n          \"count\": 6,\r\n          \"text\":
+    \"\uC801 \uCC98\uCE58 \uAE30\uBCF8 \uACE8\uB4DC \uBCF4\uB108\uC2A4 18%\",\r\n         
+    \"values\": {\r\n            \"percent\": 18\r\n          }\r\n        }\r\n     
+    ],\r\n      \"members\": [\r\n        \"I89\",\r\n        \"I90\",\r\n       
+    \"I91\",\r\n        \"I92\",\r\n        \"I93\",\r\n        \"I94\"\r\n     
+    ],\r\n      \"icon\": \"Art/Synergies/S19.svg\",\r\n      \"iconPng\": \"Art/Synergies/S19.png\"\r\n   
+    }\r\n  ]\r\n}"
+  manifestJson: "{\r\n  \"balanceRevision\": 1,\r\n  \"sourceRevision\": \"2026-11-08\",\r\n 
+    \"prices\": [\r\n    20,\r\n    40,\r\n    80,\r\n    160\r\n  ],\r\n  \"i89MaximumBaseGold\":
+    10,\r\n  \"ordinaryEnemyBaseGoldMin\": 5,\r\n  \"ordinaryEnemyBaseGoldMax\":
+    15,\r\n  \"grades\": {\r\n    \"I01\": 2,\r\n    \"I02\": 3,\r\n    \"I04\":
+    2,\r\n    \"I05\": 3,\r\n    \"I06\": 2,\r\n    \"I07\": 2,\r\n    \"I08\": 2,\r\n   
+    \"I09\": 4,\r\n    \"I100\": 3,\r\n    \"I13\": 1,\r\n    \"I14\": 4,\r\n   
+    \"I15\": 2,\r\n    \"I16\": 3,\r\n    \"I17\": 2,\r\n    \"I18\": 2,\r\n    \"I19\":
+    2,\r\n    \"I20\": 2,\r\n    \"I21\": 2,\r\n    \"I22\": 2,\r\n    \"I30\": 3,\r\n   
+    \"I31\": 2,\r\n    \"I32\": 2,\r\n    \"I33\": 3,\r\n    \"I34\": 4,\r\n    \"I41\":
+    1,\r\n    \"I42\": 2,\r\n    \"I43\": 3,\r\n    \"I44\": 2,\r\n    \"I46\": 2,\r\n   
+    \"I47\": 1,\r\n    \"I48\": 2,\r\n    \"I50\": 3,\r\n    \"I51\": 1,\r\n    \"I56\":
+    4,\r\n    \"I57\": 2,\r\n    \"I60\": 2,\r\n    \"I61\": 3,\r\n    \"I62\": 3,\r\n   
+    \"I63\": 2,\r\n    \"I64\": 3,\r\n    \"I65\": 3,\r\n    \"I66\": 1,\r\n    \"I67\":
+    2,\r\n    \"I68\": 1,\r\n    \"I69\": 2,\r\n    \"I71\": 1,\r\n    \"I72\": 3,\r\n   
+    \"I73\": 2,\r\n    \"I75\": 1,\r\n    \"I77\": 1,\r\n    \"I78\": 2,\r\n    \"I81\":
+    4,\r\n    \"I89\": 1,\r\n    \"I90\": 2,\r\n    \"I91\": 1,\r\n    \"I92\": 3,\r\n   
+    \"I93\": 1,\r\n    \"I94\": 1,\r\n    \"I95\": 4\r\n  }\r\n}"
+  catalogSha256: e32b2b0374e0e359d4a6374a9449ed402c5bbb35d28c9c11126de204e9bb72ab
+  manifestSha256: 54b7f2a4a70fd2fae8a9329405eead4171ed7162e7d5cc3f0e505601401426ac
+  items:
+  - {fileID: 11400000, guid: 62e63ead92085cd4785896fe5174eaa3, type: 2}
+  - {fileID: 11400000, guid: bceac72669f38ed4587bcdb40cb2b3f7, type: 2}
+  - {fileID: 11400000, guid: d5488925128beb047a27e710064529dc, type: 2}
+  - {fileID: 11400000, guid: c9430acc0408bed478ada306a6acff8b, type: 2}
+  - {fileID: 11400000, guid: f02cd20cd58b8884ab4d04998835350b, type: 2}
+  - {fileID: 11400000, guid: 4a4a7f7e31ab8bf48b7ed68fd292e192, type: 2}
+  - {fileID: 11400000, guid: aed7937ee8c87ce4ab7f9a26ddbc64f6, type: 2}
+  - {fileID: 11400000, guid: cf034936ec43ef345a6bc6f551676fcf, type: 2}
+  - {fileID: 11400000, guid: 09bd20c285778ae4491eda559648c3a2, type: 2}
+  - {fileID: 11400000, guid: b88aa3f5711b3ea4da52bdb51fcd9e89, type: 2}
+  - {fileID: 11400000, guid: 53bbd138a730fdb46af5d469b0e2ded4, type: 2}
+  - {fileID: 11400000, guid: de3064796681c4e4d867ca2f8fe39f00, type: 2}
+  - {fileID: 11400000, guid: 6f8e918573e5c824f8ce4928fc0891bc, type: 2}
+  - {fileID: 11400000, guid: d4e1e6aa8c9d2e7408e20fbe1cfc0eb3, type: 2}
+  - {fileID: 11400000, guid: 33bd0a71e999713459b5bab3a472fb67, type: 2}
+  - {fileID: 11400000, guid: e734ded983f42b64393fba3769da3ecb, type: 2}
+  - {fileID: 11400000, guid: 047cdcacc8608e1478f102de913152cd, type: 2}
+  - {fileID: 11400000, guid: 778546b50d41d4f418ab42abe8677c20, type: 2}
+  - {fileID: 11400000, guid: f0a89b5979660dd49a0ce177cccbcb9c, type: 2}
+  - {fileID: 11400000, guid: 366c91e16310fe247b9f7cdd65a9b18f, type: 2}
+  - {fileID: 11400000, guid: f29c9904d2ad05d49af459065db7a813, type: 2}
+  - {fileID: 11400000, guid: 3079f140dbeb75243a6af1afe3512c2e, type: 2}
+  - {fileID: 11400000, guid: fa53f21d4ba656142ab774f6a339ca2f, type: 2}
+  - {fileID: 11400000, guid: 68d50c3889397754fa8adf23bdb519e0, type: 2}
+  - {fileID: 11400000, guid: 0370c2b5341cb1c49a14ae8157676c15, type: 2}
+  - {fileID: 11400000, guid: 6c0bb664ebf04d142ba42f610b17e2ce, type: 2}
+  - {fileID: 11400000, guid: 0d6266a0aa4eecf4792ca86be8177ebe, type: 2}
+  - {fileID: 11400000, guid: 657ed20acfb00db449e5db686390d3c9, type: 2}
+  - {fileID: 11400000, guid: 965ebc23a28e15141a632f1ab332db0d, type: 2}
+  - {fileID: 11400000, guid: 9de662e2f0c47304d859d2941deebe73, type: 2}
+  - {fileID: 11400000, guid: e2bafb0aff941fe43b73a228c1c404f5, type: 2}
+  - {fileID: 11400000, guid: 87628ac481ff26145a94157aa0ca8e8a, type: 2}
+  - {fileID: 11400000, guid: 73a8c44f3e2318f4ba3dd1186dc32c68, type: 2}
+  - {fileID: 11400000, guid: 7f56298e3e67a034ea03163c5f1c0dff, type: 2}
+  - {fileID: 11400000, guid: d086fbda0ea43a64cb16e2d1a5b62eb2, type: 2}
+  - {fileID: 11400000, guid: 68172d5825b06174eb22b99d1e1bf2b2, type: 2}
+  - {fileID: 11400000, guid: 58572e4cc78cec846adce6c641f9526c, type: 2}
+  - {fileID: 11400000, guid: fe28c67cd405f344ab21ea17241d65cb, type: 2}
+  - {fileID: 11400000, guid: 6c99b346d8aee7645b65f7d4fea61142, type: 2}
+  - {fileID: 11400000, guid: bd56d310f65f1be4db0ae99f1e7b8697, type: 2}
+  - {fileID: 11400000, guid: 1a54127dbafb6cd4fb671b8779f942c2, type: 2}
+  - {fileID: 11400000, guid: e13812603b4d2254aa49fcc26288404e, type: 2}
+  - {fileID: 11400000, guid: 5a9a343f96ea7464baed29b0d5b6927d, type: 2}
+  - {fileID: 11400000, guid: 456c9f10ff89d4f499ae256f7c60c121, type: 2}
+  - {fileID: 11400000, guid: 41386e4d4f7993e44a5851bb2c78c29c, type: 2}
+  - {fileID: 11400000, guid: a0dd6d9196af53846b4357a288a6531d, type: 2}
+  - {fileID: 11400000, guid: fac99f19099fc6d42bd16943ef4a8014, type: 2}
+  - {fileID: 11400000, guid: 453e9f37a172f6c42b45a37eda98a839, type: 2}
+  - {fileID: 11400000, guid: 1a4996c532770cf41ba114f34a8a5fe5, type: 2}
+  - {fileID: 11400000, guid: 8dad9e77cb0f5db47bc3d8dd6dc7d03b, type: 2}
+  - {fileID: 11400000, guid: 5e67a214d2f8ad34d9ef6722513aa635, type: 2}
+  - {fileID: 11400000, guid: f7c789c40721bf44096d2ada76edcfd3, type: 2}
+  - {fileID: 11400000, guid: a1b0452c25883c142b2dbacbb7c34b41, type: 2}
+  - {fileID: 11400000, guid: 9a78ad21ff058304b8ef9855e92d7d2c, type: 2}
+  - {fileID: 11400000, guid: e7ee36f246744f84d8f641bdc0a2cb7d, type: 2}
+  - {fileID: 11400000, guid: a5c1d56e228b85942af47995585370b5, type: 2}
+  - {fileID: 11400000, guid: 0bf5b359091578c42b705ba47526e18e, type: 2}
+  - {fileID: 11400000, guid: 4d6b5c66ab68afb4db5dc334ddaf2372, type: 2}
+  - {fileID: 11400000, guid: 021abbda56ea0ad46a20284cfbd3c404, type: 2}
+  synergies:
+  - id: S01
+    displayName: "\uCE58\uBA85"
+    summary: "\uCE58\uBA85\uD0C0 \uD655\uB960\uACFC \uCE58\uBA85\uD0C0 \uD53C\uD574\uB97C
+      \uD568\uAED8 \uB192\uC778\uB2E4."
+    description: "\uCE58\uBA85\uD0C0 \uD53C\uD574 \uBC30\uC728\uC740 %p\uB85C \uB354\uD55C\uB2E4.
+      \uC608\uB97C \uB4E4\uC5B4 150%\uC5D0\uC11C 2\uC138\uD2B8 \uC801\uC6A9 \uC2DC
+      160%\uAC00 \uB41C\uB2E4. \uCE58\uBA85\uD0C0 \uD655\uB960\uC740 100%\uB97C \uB118\uC9C0
+      \uC54A\uB294\uB2E4."
+    icon: {fileID: 21300000, guid: 304cfc208f00d3a4295c6e20f5e9861a, type: 3}
+    members:
+    - I02
+    - I06
+    - I13
+    - I15
+    - I57
+    - I100
+    tiers:
+    - count: 2
+      text: "\uCE58\uBA85\uD0C0 \uD655\uB960 +5%p \xB7 \uCE58\uBA85\uD0C0 \uD53C\uD574
+        \uBC30\uC728 +10%p"
+      effects:
+      - effectId: S01:chance
+        stat: 3
+        amount: 5
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+      - effectId: S01:damage
+        stat: 4
+        amount: 10
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 4
+      text: "\uCE58\uBA85\uD0C0 \uD655\uB960 +10%p \xB7 \uCE58\uBA85\uD0C0 \uD53C\uD574
+        \uBC30\uC728 +20%p"
+      effects:
+      - effectId: S01:chance
+        stat: 3
+        amount: 10
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+      - effectId: S01:damage
+        stat: 4
+        amount: 20
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 6
+      text: "\uCE58\uBA85\uD0C0 \uD655\uB960 +15%p \xB7 \uCE58\uBA85\uD0C0 \uD53C\uD574
+        \uBC30\uC728 +35%p"
+      effects:
+      - effectId: S01:chance
+        stat: 3
+        amount: 15
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+      - effectId: S01:damage
+        stat: 4
+        amount: 35
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+  - id: S02
+    displayName: "\uB9F9\uACF5"
+    summary: "\uACF5\uACA9\uB825\uACFC \uD3C9\uD0C0 \uACF5\uACA9\uC18D\uB3C4\uB97C
+      \uD568\uAED8 \uB192\uC778\uB2E4."
+    description: "\uACF5\uACA9\uC18D\uB3C4\uB294 \uD3C9\uD0C0\uC758 \uACF5\uACA9
+      \uBE48\uB3C4\uB97C \uB73B\uD55C\uB2E4."
+    icon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+    members:
+    - I05
+    - I14
+    - I46
+    - I48
+    - I56
+    - I95
+    tiers:
+    - count: 2
+      text: "\uACF5\uACA9\uB825 +5% \xB7 \uACF5\uACA9\uC18D\uB3C4 +4%"
+      effects:
+      - effectId: S02:attack
+        stat: 1
+        amount: 0.05
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+      - effectId: S02:rate
+        stat: 5
+        amount: 0.04
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 4
+      text: "\uACF5\uACA9\uB825 +10% \xB7 \uACF5\uACA9\uC18D\uB3C4 +8%"
+      effects:
+      - effectId: S02:attack
+        stat: 1
+        amount: 0.1
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+      - effectId: S02:rate
+        stat: 5
+        amount: 0.08
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 6
+      text: "\uACF5\uACA9\uB825 +18% \xB7 \uACF5\uACA9\uC18D\uB3C4 +15%"
+      effects:
+      - effectId: S02:attack
+        stat: 1
+        amount: 0.18
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+      - effectId: S02:rate
+        stat: 5
+        amount: 0.15
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+  - id: S03
+    displayName: "\uCCA0\uBCBD"
+    summary: "\uCD5C\uB300 HP\uC640 \uBC29\uC5B4\uB825\uC744 \uD568\uAED8 \uB192\uC778\uB2E4."
+    description: "\uCD5C\uB300 HP \uC99D\uAC00\uB294 \uC989\uC2DC \uD68C\uBCF5\uC744
+      \uC8FC\uC9C0 \uC54A\uB294\uB2E4. \uCD5C\uB300 HP\uAC00 \uC904\uC5B4 \uD604\uC7AC
+      HP\uBCF4\uB2E4 \uB0AE\uC544\uC9C0\uBA74 \uD604\uC7AC HP\uB97C \uC0C8 \uCD5C\uB300\uCE58\uAE4C\uC9C0
+      \uB0AE\uCD98\uB2E4."
+    icon: {fileID: 21300000, guid: 356b4a7791059524a89f4e7f8acbc2cc, type: 3}
+    members:
+    - I01
+    - I09
+    - I51
+    - I77
+    - I78
+    - I81
+    tiers:
+    - count: 2
+      text: "\uCD5C\uB300 HP +8% \xB7 \uBC29\uC5B4\uB825 +10%"
+      effects:
+      - effectId: S03:hp
+        stat: 0
+        amount: 0.08
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+      - effectId: S03:defense
+        stat: 2
+        amount: 0.1
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 4
+      text: "\uCD5C\uB300 HP +16% \xB7 \uBC29\uC5B4\uB825 +20%"
+      effects:
+      - effectId: S03:hp
+        stat: 0
+        amount: 0.16
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+      - effectId: S03:defense
+        stat: 2
+        amount: 0.2
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 6
+      text: "\uCD5C\uB300 HP +25% \xB7 \uBC29\uC5B4\uB825 +30%"
+      effects:
+      - effectId: S03:hp
+        stat: 0
+        amount: 0.25
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+      - effectId: S03:defense
+        stat: 2
+        amount: 0.3
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+  - id: S04
+    displayName: "\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0"
+    summary: "\uC218 \uC18D\uC131\uC73C\uB85C \uC8FC\uB294 \uD53C\uD574\uB97C \uB192\uC778\uB2E4."
+    description: "\uC218 \uC18D\uC131\uC73C\uB85C \uC8FC\uB294 \uD53C\uD574\uAC00
+      \uD604\uC7AC \uC138\uD2B8 \uB2E8\uACC4\uC758 \uBE44\uC728\uB9CC\uD07C \uC99D\uAC00\uD55C\uB2E4."
+    icon: {fileID: 21300000, guid: f8d9839b28f4fc64b9c4f55629b3072e, type: 3}
+    members:
+    - I16
+    - I17
+    - I18
+    - I19
+    - I20
+    - I21
+    tiers:
+    - count: 2
+      text: "\uC218 \uC18D\uC131 \uD53C\uD574 +5%"
+      effects:
+      - effectId: S04
+        stat: 6
+        amount: 0.05
+        trigger: 0
+        family: 0
+        element: 5
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 4
+      text: "\uC218 \uC18D\uC131 \uD53C\uD574 +10%"
+      effects:
+      - effectId: S04
+        stat: 6
+        amount: 0.1
+        trigger: 0
+        family: 0
+        element: 5
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 6
+      text: "\uC218 \uC18D\uC131 \uD53C\uD574 +15%"
+      effects:
+      - effectId: S04
+        stat: 6
+        amount: 0.15
+        trigger: 0
+        family: 0
+        element: 5
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+  - id: S05
+    displayName: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+    summary: "\uD654 \uC18D\uC131\uC73C\uB85C \uC8FC\uB294 \uD53C\uD574\uB97C \uB192\uC778\uB2E4."
+    description: "\uD654 \uC18D\uC131\uC73C\uB85C \uC8FC\uB294 \uD53C\uD574\uAC00
+      \uD604\uC7AC \uC138\uD2B8 \uB2E8\uACC4\uC758 \uBE44\uC728\uB9CC\uD07C \uC99D\uAC00\uD55C\uB2E4."
+    icon: {fileID: 21300000, guid: 6b4f687bf95b86c4e93ee4be174e5361, type: 3}
+    members:
+    - I04
+    - I05
+    - I07
+    - I08
+    - I16
+    - I22
+    tiers:
+    - count: 2
+      text: "\uD654 \uC18D\uC131 \uD53C\uD574 +5%"
+      effects:
+      - effectId: S05
+        stat: 6
+        amount: 0.05
+        trigger: 0
+        family: 0
+        element: 2
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 4
+      text: "\uD654 \uC18D\uC131 \uD53C\uD574 +10%"
+      effects:
+      - effectId: S05
+        stat: 6
+        amount: 0.1
+        trigger: 0
+        family: 0
+        element: 2
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 6
+      text: "\uD654 \uC18D\uC131 \uD53C\uD574 +15%"
+      effects:
+      - effectId: S05
+        stat: 6
+        amount: 0.15
+        trigger: 0
+        family: 0
+        element: 2
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+  - id: S08
+    displayName: "\uC218\uD638"
+    summary: "\uD53C\uACA9 \uD6C4 \uB2E4\uC74C \uD53C\uD574\uB97C \uB9C9\uB294 \uBCF4\uD638\uB9C9"
+    description: "\uC801 \uACF5\uACA9\uC73C\uB85C HP\uAC00 \uC2E4\uC81C \uAC10\uC18C\uD55C
+      \uC9C1\uD6C4 4\uCD08\uAC04 \uBCF4\uD638\uB9C9\uC744 \uC5BB\uB294\uB2E4. \uC7AC\uC0AC\uC6A9
+      \uB300\uAE30\uC2DC\uAC04 10\uCD08. \uB2EC\uC131\uD55C \uCD5C\uACE0 \uB2E8\uACC4\uC758
+      \uC218\uCE58\uB9CC \uC801\uC6A9\uD55C\uB2E4."
+    icon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
+    members:
+    - I30
+    - I31
+    - I32
+    - I33
+    - I34
+    - I50
+    tiers:
+    - count: 2
+      text: "HP\uB97C \uC783\uC740 \uC9C1\uD6C4 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758
+        3% \uBCF4\uD638\uB9C9, \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 10\uCD08"
+      effects:
+      - effectId: S08
+        stat: 8
+        amount: 0.03
+        trigger: 2
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 4
+        cooldownSeconds: 10
+    - count: 4
+      text: "HP\uB97C \uC783\uC740 \uC9C1\uD6C4 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758
+        4% \uBCF4\uD638\uB9C9, \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 10\uCD08"
+      effects:
+      - effectId: S08
+        stat: 8
+        amount: 0.04
+        trigger: 2
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 4
+        cooldownSeconds: 10
+    - count: 6
+      text: "HP\uB97C \uC783\uC740 \uC9C1\uD6C4 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758
+        5% \uBCF4\uD638\uB9C9, \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 10\uCD08"
+      effects:
+      - effectId: S08
+        stat: 8
+        amount: 0.05
+        trigger: 2
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 4
+        cooldownSeconds: 10
+  - id: S10
+    displayName: "\uB9C8\uBB34\uB9AC"
+    summary: "HP\uAC00 \uB0AE\uC740 \uC801\uC5D0\uAC8C \uD53C\uD574 \uC99D\uAC00"
+    description: "\uD53C\uD574 \uC801\uC6A9 \uC9C1\uC804 HP\uAC00 \uCD5C\uB300 HP\uC758
+      30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAC00\uD558\uB294 \uD3C9\uD0C0\uC640
+      \uC2A4\uD0AC \uD53C\uD574\uAC00 \uC99D\uAC00\uD55C\uB2E4. \uB2EC\uC131\uD55C
+      \uCD5C\uACE0 \uB2E8\uACC4\uC758 \uC218\uCE58\uB9CC \uC801\uC6A9\uD55C\uB2E4."
+    icon: {fileID: 21300000, guid: e242e1bfa4075de44b865b526f506c52, type: 3}
+    members:
+    - I02
+    - I41
+    - I42
+    - I43
+    - I44
+    - I100
+    tiers:
+    - count: 2
+      text: "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +4%"
+      effects:
+      - effectId: S10
+        stat: 6
+        amount: 0.04
+        trigger: 0
+        family: 3
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: 0.3
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 4
+      text: "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +6%"
+      effects:
+      - effectId: S10
+        stat: 6
+        amount: 0.06
+        trigger: 0
+        family: 3
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: 0.3
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 6
+      text: "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +8%"
+      effects:
+      - effectId: S10
+        stat: 6
+        amount: 0.08
+        trigger: 0
+        family: 3
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: 0.3
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+  - id: S14
+    displayName: "\uAD00\uD1B5"
+    summary: "\uD3C9\uD0C0\uC640 \uC2A4\uD0AC\uC774 \uB300\uC0C1 \uBC29\uC5B4\uB825
+      \uC77C\uBD80 \uBB34\uC2DC"
+    description: "\uD3C9\uD0C0\uC640 \uC2A4\uD0AC \uD53C\uD574\uB97C \uACC4\uC0B0\uD560
+      \uB54C \uB300\uC0C1\uC758 \uC720\uD6A8 \uBC29\uC5B4\uB825 \uC911 \uC591\uC218\uC778
+      \uBD80\uBD84\uC744 \uC77C\uC815 \uBE44\uC728 \uBB34\uC2DC\uD55C\uB2E4. \uB2EC\uC131\uD55C
+      \uCD5C\uACE0 \uB2E8\uACC4\uC758 \uC218\uCE58\uB9CC \uC801\uC6A9\uD55C\uB2E4."
+    icon: {fileID: 21300000, guid: 9fac5d8b6848b5a4483ff48eb719037a, type: 3}
+    members:
+    - I60
+    - I61
+    - I62
+    - I63
+    - I64
+    - I65
+    tiers:
+    - count: 2
+      text: "\uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uC591\uC218
+        \uC720\uD6A8 \uBC29\uC5B4\uB825\uC758 6% \uBB34\uC2DC"
+      effects:
+      - effectId: S14
+        stat: 7
+        amount: 0.06
+        trigger: 0
+        family: 3
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 4
+      text: "\uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uC591\uC218
+        \uC720\uD6A8 \uBC29\uC5B4\uB825\uC758 9% \uBB34\uC2DC"
+      effects:
+      - effectId: S14
+        stat: 7
+        amount: 0.09
+        trigger: 0
+        family: 3
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 6
+      text: "\uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uC591\uC218
+        \uC720\uD6A8 \uBC29\uC5B4\uB825\uC758 12% \uBB34\uC2DC"
+      effects:
+      - effectId: S14
+        stat: 7
+        amount: 0.12
+        trigger: 0
+        family: 3
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+  - id: S15
+    displayName: "\uAC70\uBB3C\uC0AC\uB0E5"
+    summary: "\uC815\uC608\uC640 \uBCF4\uC2A4\uC5D0\uAC8C \uD53C\uD574 \uC99D\uAC00"
+    description: "\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uAC00\uD558\uB294 \uD3C9\uD0C0\uC640
+      \uC2A4\uD0AC \uD53C\uD574\uAC00 \uC99D\uAC00\uD55C\uB2E4. \uB2EC\uC131\uD55C
+      \uCD5C\uACE0 \uB2E8\uACC4\uC758 \uC218\uCE58\uB9CC \uC801\uC6A9\uD55C\uB2E4."
+    icon: {fileID: 21300000, guid: ea13f41cbb31a694f917a34c7bf61f48, type: 3}
+    members:
+    - I65
+    - I66
+    - I67
+    - I68
+    - I69
+    - I92
+    tiers:
+    - count: 2
+      text: "\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +4%"
+      effects:
+      - effectId: S15
+        stat: 6
+        amount: 0.04
+        trigger: 0
+        family: 3
+        element: 0
+        eliteOrBossOnly: 1
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 4
+      text: "\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +6%"
+      effects:
+      - effectId: S15
+        stat: 6
+        amount: 0.06
+        trigger: 0
+        family: 3
+        element: 0
+        eliteOrBossOnly: 1
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 6
+      text: "\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +8%"
+      effects:
+      - effectId: S15
+        stat: 6
+        amount: 0.08
+        trigger: 0
+        family: 3
+        element: 0
+        eliteOrBossOnly: 1
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+  - id: S16
+    displayName: "\uC219\uB828"
+    summary: "\uC9C1\uC811 \uC0AC\uC6A9\uD558\uB294 \uACF5\uACA9 \uC2A4\uD0AC\uC758
+      \uD53C\uD574\uB97C \uB192\uC778\uB2E4."
+    description: "\uC9C1\uC811 \uC0AC\uC6A9\uD558\uB294 \uACF5\uACA9 \uC2A4\uD0AC\uC758
+      \uC6D0\uB798 \uD0C0\uACA9\uC5D0 \uC2A4\uD0AC \uD53C\uD574 \uC99D\uAC00\uC728\uC744
+      \uC801\uC6A9\uD55C\uB2E4. \uC7A5\uBE44\uB098 \uC2DC\uB108\uC9C0\uAC00 \uBCC4\uB3C4\uB85C
+      \uBC1C\uC0DD\uC2DC\uD0A8 \uCD94\uAC00 \uD0C0\uACA9\uC5D0\uB294 \uC801\uC6A9\uD558\uC9C0
+      \uC54A\uB294\uB2E4."
+    icon: {fileID: 21300000, guid: 576f373fee8b00f4287fdcb49863d6c9, type: 3}
+    members:
+    - I34
+    - I47
+    - I62
+    - I71
+    - I72
+    - I73
+    - I75
+    tiers:
+    - count: 2
+      text: "\uC2A4\uD0AC \uD53C\uD574 +4%"
+      effects:
+      - effectId: S16
+        stat: 6
+        amount: 0.04
+        trigger: 0
+        family: 2
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 4
+      text: "\uC2A4\uD0AC \uD53C\uD574 +8%"
+      effects:
+      - effectId: S16
+        stat: 6
+        amount: 0.08
+        trigger: 0
+        family: 2
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 6
+      text: "\uC2A4\uD0AC \uD53C\uD574 +12%"
+      effects:
+      - effectId: S16
+        stat: 6
+        amount: 0.12
+        trigger: 0
+        family: 2
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+  - id: S19
+    displayName: "\uC218\uD655"
+    summary: "\uC801 \uCC98\uCE58 \uBCF4\uC0C1 \uACE8\uB4DC\uC758 \uC77C\uBD80\uB97C
+      \uB354 \uC5BB\uB294\uB2E4."
+    description: "\uC801\uC744 \uCC98\uCE58\uD560 \uB54C\uB9C8\uB2E4 \uAE30\uBCF8
+      \uBCF4\uC0C1 \uACE8\uB4DC\uC5D0 \uD45C\uC2DC \uBE44\uC728\uC744 \uACF1\uD574
+      \uB204\uC801\uD55C\uB2E4. \uB204\uC801\uAC12\uC758 \uC815\uC218 \uBD80\uBD84\uC744
+      \uCD94\uAC00 \uACE8\uB4DC\uB85C \uC9C0\uAE09\uD558\uACE0 \uC18C\uC218 \uBD80\uBD84\uC740
+      \uB2E4\uC74C \uCC98\uCE58\uAE4C\uC9C0 \uC774\uC6D4\uD55C\uB2E4. \uCD94\uAC00
+      \uACE8\uB4DC\uB294 \uB204\uC801 \uB300\uC0C1\uC5D0\uC11C \uC81C\uC678\uD558\uBA70,
+      \uB204\uC801\uAC12\uC740 \uC0C8 \uD50C\uB808\uC774\uB97C \uC2DC\uC791\uD560
+      \uB54C \uCD08\uAE30\uD654\uD55C\uB2E4."
+    icon: {fileID: 21300000, guid: 84ef614b15c1b134c93a6e74e5980a5d, type: 3}
+    members:
+    - I89
+    - I90
+    - I91
+    - I92
+    - I93
+    - I94
+    tiers:
+    - count: 2
+      text: "\uC801 \uCC98\uCE58 \uAE30\uBCF8 \uACE8\uB4DC \uBCF4\uB108\uC2A4 6%"
+      effects:
+      - effectId: S19
+        stat: 13
+        amount: 0.06
+        trigger: 1
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 1
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 4
+      text: "\uC801 \uCC98\uCE58 \uAE30\uBCF8 \uACE8\uB4DC \uBCF4\uB108\uC2A4 12%"
+      effects:
+      - effectId: S19
+        stat: 13
+        amount: 0.12
+        trigger: 1
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 1
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 6
+      text: "\uC801 \uCC98\uCE58 \uAE30\uBCF8 \uACE8\uB4DC \uBCF4\uB108\uC2A4 18%"
+      effects:
+      - effectId: S19
+        stat: 13
+        amount: 0.18
+        trigger: 1
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 1
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+  policy:
+    maxSpCap: 200
+    regenCap: 40
+    minDodgeCost: 8
+    minSwitchCost: 4

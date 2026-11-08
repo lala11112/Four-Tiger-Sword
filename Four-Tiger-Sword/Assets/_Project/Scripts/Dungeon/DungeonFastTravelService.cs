@@ -52,7 +52,7 @@ public sealed class DungeonFastTravelService
         reason = null;
         if (_run == null || !_run.isActiveAndEnabled || _run.State != RunState.Playing || !_run.IsMapSessionCurrent || _run.IsShopOpen
             || _stage == null || _stage != _run.stageManager || !_stage.IsReady || _player == null || _player != _run.player
-            || !_player.isActiveAndEnabled || _player.IsStageTransitioning || _player.IsShopPaused || _player.IsFinisherSelecting
+            || !_player.isActiveAndEnabled || _player.IsStageTransitioning || _player.IsShopPaused || _player.IsInventoryPaused || _player.IsFinisherSelecting
             || _player.Controller == null || !_player.Controller.enabled || _player.StatManager == null || _player.StatManager.CurrentHp <= 0f
             || _run.CurrentChapterIndex != _chapterIndex || _run.CurrentStageIndex != _stageIndex)
             return Fail("현재 상태에서는 순간이동할 수 없습니다.", out reason);

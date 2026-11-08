@@ -77,7 +77,8 @@ public class FormEffectRunner : MonoBehaviour
             else DamageArea(center, radius, new HitInfo(hit.BaseDamage * interval, hit.Element, hit.CriticalChance,
                 hit.CriticalMultiplier, hit.PoiseDamageMultiplier, hit.ArmorPierce, hit.Power, hit.PoiseDamage,
                 hit.StaggerResistLevel, hit.IsParryable, hit.Source, hit.TrueDamage, hit.ImpactSound,
-                hit.Category, hit.ItemDamageMultiplier, hit.SourceDamageMultiplier, hit.HasSourceDamageSnapshot));
+                hit.Category, hit.ItemDamageMultiplier, hit.SourceDamageMultiplier, hit.HasSourceDamageSnapshot,
+                false, hit.CastId, hit.Origin));
             remaining -= interval;
         }
         // TODO: 가시 덩굴/치유 영역의 지속 VFX 연결.

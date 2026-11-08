@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I48
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I48
+  itemId: I48
+  displayName: "\uAC1C\uC804 \uB3C4\uB7C9\uD3B8"
+  description: "\uCCAB \uB208\uAE08\uB9CC \uAE4A\uAC8C \uD30C\uC778 \uCE21\uC815
+    \uC870\uAC01."
+  effectText: "\uC790\uC2E0\uC758 HP\uAC00 80% \uC774\uC0C1\uC774\uBA74 \uD3C9\uD0C0
+    \uD53C\uD574\uAC00 6% \uC99D\uAC00\uD55C\uB2E4."
+  synergyIds:
+  - S02
+  synergyNames:
+  - "\uB9F9\uACF5"
+  primarySynergyId: S02
+  primarySynergyName: "\uB9F9\uACF5"
+  primarySynergyIcon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+  element: 0
+  grade: 2
+  purchasePrice: 40
+  effects: []
+  boundaryEffects:
+  - effectId: I48
+    stat: 6
+    amount: 0.06
+    trigger: 0
+    family: 1
+    element: 0
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: -1
+    selfHpMin: 0.8
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 0
+    maximumBaseGold: 0
+    durationSeconds: 0
+    cooldownSeconds: 0
+  icon: {fileID: 21300000, guid: 6365a8e4069690e40b5ead07fadc8413, type: 3}
+  contentStatus: draft
+  contentRevision: 20261108
+  sourceJson: "{\"id\":\"I48\",\"name\":\"\uAC1C\uC804 \uB3C4\uB7C9\uD3B8\",\"description\":\"\uCCAB
+    \uB208\uAE08\uB9CC \uAE4A\uAC8C \uD30C\uC778 \uCE21\uC815 \uC870\uAC01.\",\"effect\":\"\uC790\uC2E0\uC758
+    HP\uAC00 80% \uC774\uC0C1\uC774\uBA74 \uD3C9\uD0C0 \uD53C\uD574\uAC00 6% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S02\"],\"primarySynergy\":\"S02\",\"designIntent\":\"\uC790\uC2E0\uC758
+    HP\uB97C \uB192\uAC8C \uC720\uC9C0\uD558\uBA74 \uD3C9\uD0C0 \uD53C\uD574\uB97C
+    \uB298\uB9B0\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I48.png\"}"

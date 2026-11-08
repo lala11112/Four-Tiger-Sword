@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>A selectable workshop backed by the existing permanent-upgrade account.</summary>
-public sealed class HubWorkshopView : MonoBehaviour
+public sealed partial class HubWorkshopView : MonoBehaviour
 {
     [Serializable]
     public sealed class References
@@ -51,10 +51,11 @@ public sealed class HubWorkshopView : MonoBehaviour
         references = ui;
         entries = rows;
         InitializeListeners();
+        InitializeEngravingListeners();
         Refresh();
     }
 
-    private void Awake() => InitializeListeners();
+    private void Awake() { InitializeListeners(); InitializeEngravingListeners(); }
 
     private void InitializeListeners()
     {
@@ -91,14 +92,17 @@ public sealed class HubWorkshopView : MonoBehaviour
         _service = service;
         if (_service != null) _service.Changed += Refresh;
         _message = null;
+        _engravingMessage = null;
         Refresh();
     }
 
     public void Open()
     {
         InitializeListeners();
+        InitializeEngravingListeners();
         if (references?.panel == null) return;
         references.panel.SetActive(true);
+        ApplySelectedPage();
         EnsureMotion();
         _closing = false;
         int version = ++_motionVersion;
@@ -109,6 +113,13 @@ public sealed class HubWorkshopView : MonoBehaviour
         {
             if (!IsOpen || _closing || version != _motionVersion) return;
             SetInteraction(true);
+            Refresh();
+            if (_selectedPage == WorkshopPage.Engravings && engravingView != null)
+            {
+                var button = engravingView.GetNodeButton(engravingView.SelectedId);
+                if (button != null && EventSystem.current != null) EventSystem.current.SetSelectedGameObject(button.gameObject);
+                return;
+            }
             if (EventSystem.current != null && entries != null)
                 foreach (var entry in entries)
                     if (entry != null && entry.stat == SelectedStat && entry.selectButton != null)
@@ -149,7 +160,8 @@ public sealed class HubWorkshopView : MonoBehaviour
         if (_motion != null || references?.panel == null) return;
         _interaction = references.panel.GetComponent<CanvasGroup>();
         if (_interaction == null) _interaction = references.panel.AddComponent<CanvasGroup>();
-        var visual = references.panel.transform.Find("Window") as RectTransform;
+        var visual = engravingView != null ? references.panel.transform as RectTransform
+            : references.panel.transform.Find("Window") as RectTransform;
         if (visual == null) visual = references.panel.transform as RectTransform;
         Canvas.ForceUpdateCanvases();
         _motion = UIModalMotion.Ensure(references.panel, visual);
@@ -225,6 +237,7 @@ public sealed class HubWorkshopView : MonoBehaviour
             references.status.color = !ready || (_message != null ? _messageIsError : !string.IsNullOrEmpty(_service.LastError))
                 ? new Color32(247, 151, 151, 255) : _message != null ? new Color32(159, 215, 194, 255)
                 : new Color32(143, 163, 183, 255);
+        RefreshEngraving();
     }
 
     private void LateUpdate()
@@ -268,6 +281,7 @@ public sealed class HubWorkshopView : MonoBehaviour
     {
         if (_service != null) _service.Changed -= Refresh;
         RemoveListeners();
+        RemoveEngravingListeners();
     }
 
     private void OnDisable() => Close();

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,12 +11,14 @@ public sealed class PlayerUpgradeFileStore : IPlayerUpgradeStore
     private readonly string _path;
     private readonly string _backupPath;
     private bool _loadedFromBackup;
+    private readonly EngravingSettingsSO _engravings;
 
-    public PlayerUpgradeFileStore(string path)
+    public PlayerUpgradeFileStore(string path, EngravingSettingsSO engravings = null)
     {
         if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("A save path is required.", nameof(path));
         _path = Path.GetFullPath(path);
         _backupPath = _path + ".bak";
+        _engravings = engravings;
     }
 
     public bool TryLoad(out PlayerUpgradeProfile profile, out string error)
@@ -49,7 +52,7 @@ public sealed class PlayerUpgradeFileStore : IPlayerUpgradeStore
         catch (Exception failure) { error = failure.Message; return false; }
     }
 
-    private static bool Read(string path, out PlayerUpgradeProfile profile, out string error)
+    private bool Read(string path, out PlayerUpgradeProfile profile, out string error)
     {
         profile = null;
         error = null;
@@ -61,8 +64,18 @@ public sealed class PlayerUpgradeFileStore : IPlayerUpgradeStore
                 if (!Regex.IsMatch(json, "\"" + field + "\"\\s*:"))
                     throw new InvalidDataException("필수 저장 항목이 없습니다: " + field);
             profile = JsonUtility.FromJson<PlayerUpgradeProfile>(json);
+            if (profile != null && profile.version == 2 && !Regex.IsMatch(json, "\"unlockedNodeIds\"\\s*:"))
+                throw new InvalidDataException("필수 저장 항목이 없습니다: unlockedNodeIds");
             if (profile == null || !profile.Validate(out error))
                 throw new InvalidDataException(error ?? "저장 데이터가 비어 있습니다.");
+            var definitions = _engravings != null ? _engravings : EngravingSettingsSO.Default;
+            var owned = new HashSet<string>(profile.unlockedNodeIds ?? Array.Empty<string>(), StringComparer.Ordinal);
+            foreach (string id in owned)
+            {
+                var node = definitions.Find(id);
+                if (node == null || node.parentId != "origin" && !owned.Contains(node.parentId))
+                    throw new InvalidDataException("저장된 각인 또는 선행 조건이 유효하지 않습니다: " + id);
+            }
             return true;
         }
         catch (Exception failure)

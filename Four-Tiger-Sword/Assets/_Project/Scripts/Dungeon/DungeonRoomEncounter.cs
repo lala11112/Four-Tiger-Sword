@@ -169,10 +169,12 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
         waveRoot.SetActive(false);
         waveRoot.transform.SetParent(_enemyRoot.transform, false);
         var newMembers = new List<DungeonEncounterMember>();
+        int rewardRoomId = _module.GetComponent<BaekhoGeneratedRoom>().instanceId;
         foreach (var placement in placements)
         {
             var clone = Instantiate(placement.prefab, placement.position, placement.rotation, waveRoot.transform);
             var member = clone.AddComponent<DungeonEncounterMember>();
+            member.SetRewardIdentity(rewardRoomId, CurrentWaveNumber, newMembers.Count);
             _members.Add(member);
             member.Initialize(this);
             _alive.Add(member);
@@ -238,6 +240,7 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
         foreach (var gate in _gates) gate.Lock();
         WasEntered = true;
         State = DungeonEncounterState.Fighting;
+        _director.RefreshItemCombatState();
         foreach (var member in _alive)
         {
             member.Enemy.SetEncounterPatrolOnly(false);
@@ -356,6 +359,7 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
         if (State == DungeonEncounterState.Cleared || State == DungeonEncounterState.Failed || _disposed) return;
         if (_isBoss && !BossDefeated) { Fail("The boss encounter ended without a confirmed boss death."); return; }
         State = DungeonEncounterState.Cleared;
+        _director?.RefreshItemCombatState();
         _waveDelayRemaining = -1f;
         foreach (var gate in _gates) if (gate != null) gate.Open();
         Cleared?.Invoke(this);
@@ -364,6 +368,7 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
     private void Fail(string error)
     {
         State = DungeonEncounterState.Failed;
+        _director?.RefreshItemCombatState();
         _waveDelayRemaining = -1f;
         Error = error;
         foreach (var member in _members) if (member != null) { member.Freeze(); member.Release(); }
@@ -377,6 +382,7 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
     {
         if (_director == null || _disposed) return;
         _disposed = true;
+        _director?.RefreshItemCombatState();
         _waveDelayRemaining = -1f;
         foreach (var member in _members) if (member != null) { member.Freeze(); member.Release(); }
         _alive.Clear();

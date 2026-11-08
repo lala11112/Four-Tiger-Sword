@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I14
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I14
+  itemId: I14
+  displayName: "\uB9DE\uBB3C\uB9B0 \uACE0\uB9AC"
+  description: "\uBC1D\uC740 \uC1E0\uBE5B\uACFC \uC9D9\uC740 \uD68C\uC0C9\uC758 \uD1B1\uB2C8
+    \uACE0\uB9AC \uB450 \uAC1C\uAC00 \uC11C\uB85C \uB9DE\uBB3C\uB824 \uC788\uB2E4."
+  effectText: "\uD3C9\uD0C0 \uACF5\uACA9\uC18D\uB3C4\uAC00 5% \uC99D\uAC00\uD55C\uB2E4."
+  synergyIds:
+  - S02
+  synergyNames:
+  - "\uB9F9\uACF5"
+  primarySynergyId: S02
+  primarySynergyName: "\uB9F9\uACF5"
+  primarySynergyIcon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+  element: 0
+  grade: 4
+  purchasePrice: 160
+  effects: []
+  boundaryEffects:
+  - effectId: I14
+    stat: 5
+    amount: 0.05
+    trigger: 0
+    family: 0
+    element: 0
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: -1
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 0
+    maximumBaseGold: 0
+    durationSeconds: 0
+    cooldownSeconds: 0
+  icon: {fileID: 21300000, guid: 52974a279f8ce1e4b88821befabe4617, type: 3}
+  contentStatus: draft
+  contentRevision: 20261108
+  sourceJson: "{\"id\":\"I14\",\"name\":\"\uB9DE\uBB3C\uB9B0 \uACE0\uB9AC\",\"description\":\"\uBC1D\uC740
+    \uC1E0\uBE5B\uACFC \uC9D9\uC740 \uD68C\uC0C9\uC758 \uD1B1\uB2C8 \uACE0\uB9AC
+    \uB450 \uAC1C\uAC00 \uC11C\uB85C \uB9DE\uBB3C\uB824 \uC788\uB2E4.\",\"effect\":\"\uD3C9\uD0C0
+    \uACF5\uACA9\uC18D\uB3C4\uAC00 5% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S02\"],\"primarySynergy\":\"S02\",\"image\":\"Art/Items/I14.png\",\"origin\":\"existing\"}"

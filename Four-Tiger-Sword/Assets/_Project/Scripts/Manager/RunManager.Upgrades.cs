@@ -249,6 +249,7 @@ public sealed partial class RunManager
         {
             _upgradeRoomRoot = result.root;
             _upgradeRoomLedger.BeginGeneration(CurrentChapterIndex, CurrentStageIndex);
+            _itemRewardLedger.BeginGeneration(CurrentChapterIndex, CurrentStageIndex);
         }
         foreach (var module in result.rooms)
         {
@@ -263,11 +264,21 @@ public sealed partial class RunManager
 
     private void OnUpgradeCombatRoomCleared(DungeonRoomEncounter room)
     {
-        if (State != RunState.Playing || IsUpgradeSaveBlocked || room == null || !room.WasCombatClearedByDefeat
+        // A completed encounter's callback can arrive after another observer pauses for a save failure.
+        // Preserve that committed clear while still rejecting terminal and unrelated error states.
+        bool acceptingClears = State == RunState.Playing || State == RunState.Error
+            && IsUpgradeSaveBlocked && _upgradeResumeState == RunState.Playing;
+        if (!acceptingClears || room == null || !room.WasCombatClearedByDefeat
             || stageManager == null || !stageManager.IsReady || stageManager.Result == null
             || stageManager.Result.root != _upgradeRoomRoot || _upgradeRoomRoot == null
             || !room.transform.IsChildOf(_upgradeRoomRoot.transform) || !_upgradeRooms.TryGetValue(room, out int id)) return;
-        _upgradeRoomLedger.RecordClearedRoom(id);
+        bool firstClear = _upgradeRoomLedger.RecordClearedRoom(id);
+        var identity = room.GetComponent<BaekhoGeneratedRoom>();
+        if (identity != null && (identity.role & BaekhoRoomRole.Boss) == 0
+            && _itemRewardLedger.TryRecord(id, out string receipt)) _itemRewardInbox.Enqueue(receipt);
+        // Reserve the receipt before healing can notify observers or change composition readiness.
+        if (firstClear) player?.Engravings?.NotifyRoomCleared();
+        FlushItemRewardReceipts();
     }
 
     private void UnbindUpgradeRooms()

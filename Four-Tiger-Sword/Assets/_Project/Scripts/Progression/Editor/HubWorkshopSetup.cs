@@ -86,7 +86,7 @@ public static class HubWorkshopSetup
             throw new InvalidOperationException("The workshop and interaction prompt must start hidden.");
         var fit = view.UI.panel.GetComponentInChildren<BoundaryZeroWindowFit>(true);
         if (fit == null) throw new InvalidOperationException("The workshop is missing its responsive window fit.");
-        if (view.GetComponentsInChildren<UnityEngine.UI.Image>(true).Any(image => image.sprite == null
+        if (view.UI.panel.transform.Find("Window").GetComponentsInChildren<UnityEngine.UI.Image>(true).Any(image => image.sprite == null
             && image.name != "Modal" && image.name != "Viewport"))
             throw new InvalidOperationException("The workshop contains an image without an authored BoundaryZERO sprite.");
         if (view.UI.statusScroll == null || view.UI.statusScroll.viewport == null || view.UI.statusScroll.content == null

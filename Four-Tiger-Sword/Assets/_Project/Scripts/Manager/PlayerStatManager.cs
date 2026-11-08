@@ -14,13 +14,20 @@ public class PlayerStatManager : MonoBehaviour
 
     private bool _initialized;
     private float _permanentHealthRatio, _permanentAttackRatio, _permanentDefenseRatio;
+    private float _engravingHealthRatio, _engravingAttackRatio, _engravingCriticalPoints, _engravingCriticalDamagePoints, _engravingAttackSpeedRatio;
     private readonly Dictionary<object, ItemResourceModifiers> _itemResourceModifiers = new(ReferenceSourceComparer.Instance);
 
     private readonly struct ItemResourceModifiers
     {
         public readonly float MaxHpRatio, MaxSpAdd, SpRegenAdd, MaxSpCap, SpRegenCap;
-        public ItemResourceModifiers(float hpRatio, float spAdd, float regenAdd, float spCap, float regenCap)
-        { MaxHpRatio = hpRatio; MaxSpAdd = spAdd; SpRegenAdd = regenAdd; MaxSpCap = spCap; SpRegenCap = regenCap; }
+        public readonly float AttackRatio, DefenseRatio, CriticalChancePoints, CriticalDamagePoints, ShieldGainRatio;
+        public ItemResourceModifiers(float hpRatio, float spAdd, float regenAdd, float spCap, float regenCap,
+            float attackRatio, float defenseRatio, float critChancePoints, float critDamagePoints, float shieldGainRatio)
+        {
+            MaxHpRatio = hpRatio; MaxSpAdd = spAdd; SpRegenAdd = regenAdd; MaxSpCap = spCap; SpRegenCap = regenCap;
+            AttackRatio = attackRatio; DefenseRatio = defenseRatio; CriticalChancePoints = critChancePoints;
+            CriticalDamagePoints = critDamagePoints; ShieldGainRatio = shieldGainRatio;
+        }
     }
 
     private sealed class ReferenceSourceComparer : IEqualityComparer<object>
@@ -69,6 +76,7 @@ public class PlayerStatManager : MonoBehaviour
     {
         baseData = data;
         _permanentHealthRatio = _permanentAttackRatio = _permanentDefenseRatio = 0f;
+        _engravingHealthRatio = _engravingAttackRatio = _engravingCriticalPoints = _engravingCriticalDamagePoints = _engravingAttackSpeedRatio = 0f;
         baseValues.Clear();
         addValues.Clear();
         multValues.Clear();
@@ -154,14 +162,18 @@ public class PlayerStatManager : MonoBehaviour
 
     /// <summary>Replaces one item's owner contribution atomically without touching form/skill modifiers.</summary>
     public void SetItemResourceModifiers(object source, float maxHpRatio, float maxSpAdd, float spRegenAdd,
-        float maxSpCap = 200f, float spRegenCap = 40f)
+        float maxSpCap = 200f, float spRegenCap = 40f, float attackRatio = 0f, float defenseRatio = 0f,
+        float criticalChancePoints = 0f, float criticalDamagePoints = 0f, float shieldGainRatio = 0f)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
         if (!IsFinite(maxHpRatio) || !IsFinite(maxSpAdd) || !IsFinite(spRegenAdd)
-            || !IsFinite(maxSpCap) || !IsFinite(spRegenCap) || maxSpCap <= 0f || spRegenCap <= 0f)
+            || !IsFinite(maxSpCap) || !IsFinite(spRegenCap) || maxSpCap <= 0f || spRegenCap <= 0f
+            || !IsFinite(attackRatio) || !IsFinite(defenseRatio) || !IsFinite(criticalChancePoints)
+            || !IsFinite(criticalDamagePoints) || !IsFinite(shieldGainRatio))
             throw new ArgumentException("Item resource modifiers and positive caps must be finite.");
         EnsureInitialized();
-        _itemResourceModifiers[source] = new ItemResourceModifiers(maxHpRatio, maxSpAdd, spRegenAdd, maxSpCap, spRegenCap);
+        _itemResourceModifiers[source] = new ItemResourceModifiers(maxHpRatio, maxSpAdd, spRegenAdd, maxSpCap, spRegenCap,
+            attackRatio, defenseRatio, criticalChancePoints, criticalDamagePoints, shieldGainRatio);
         RecalculateAll();
     }
 
@@ -188,6 +200,24 @@ public class PlayerStatManager : MonoBehaviour
             _currentHp = MaxHp;
             NotifyResourceChanged(OnHpChanged, _currentHp, MaxHp);
         }
+    }
+
+    /// <summary>Replaces the run snapshot without changing workshop, form or owned-item sources.</summary>
+    public void SetEngravingBonuses(float healthRatio, float attackRatio, float criticalPoints,
+        float criticalDamagePoints, float attackSpeedRatio, bool refillHealth = false)
+    {
+        foreach (float value in new[] { healthRatio, attackRatio, criticalPoints, criticalDamagePoints, attackSpeedRatio })
+            if (!IsFinite(value) || value < 0f) throw new ArgumentException("Engraving bonuses must be finite and nonnegative.");
+        EnsureInitialized();
+        bool changed = _engravingHealthRatio != healthRatio || _engravingAttackRatio != attackRatio
+            || _engravingCriticalPoints != criticalPoints || _engravingCriticalDamagePoints != criticalDamagePoints
+            || _engravingAttackSpeedRatio != attackSpeedRatio;
+        _engravingHealthRatio = healthRatio; _engravingAttackRatio = attackRatio;
+        _engravingCriticalPoints = criticalPoints; _engravingCriticalDamagePoints = criticalDamagePoints;
+        _engravingAttackSpeedRatio = attackSpeedRatio;
+        if (changed) RecalculateAll();
+        if (refillHealth && _currentHp != MaxHp)
+        { _currentHp = MaxHp; NotifyResourceChanged(OnHpChanged, _currentHp, MaxHp); }
     }
 
     // === 스탯 재계산: 버프 적용 후 각 스탯별로 계산 ===
@@ -217,9 +247,16 @@ public class PlayerStatManager : MonoBehaviour
             if (stat == StatType.ST_HP) mult += modifiers.MaxHpRatio;
             else if (stat == StatType.ST_SP) add += modifiers.MaxSpAdd;
             else if (stat == StatType.ST_SP_REGEN) add += modifiers.SpRegenAdd;
+            else if (stat == StatType.ST_ATK) mult += modifiers.AttackRatio;
+            else if (stat == StatType.ST_DEF) mult += modifiers.DefenseRatio;
+            else if (stat == StatType.ST_CRT) add += modifiers.CriticalChancePoints;
+            else if (stat == StatType.ST_CRTD) add += modifiers.CriticalDamagePoints;
         }
-        double permanentRatio = stat == StatType.ST_HP ? _permanentHealthRatio
-            : stat == StatType.ST_ATK ? _permanentAttackRatio : stat == StatType.ST_DEF ? _permanentDefenseRatio : 0d;
+        if (stat == StatType.ST_CRT) add += _engravingCriticalPoints;
+        else if (stat == StatType.ST_CRTD) add += _engravingCriticalDamagePoints;
+        else if (stat == StatType.ST_ATK_SPD) mult += _engravingAttackSpeedRatio;
+        double permanentRatio = stat == StatType.ST_HP ? _permanentHealthRatio + _engravingHealthRatio
+            : stat == StatType.ST_ATK ? _permanentAttackRatio + _engravingAttackRatio : stat == StatType.ST_DEF ? _permanentDefenseRatio : 0d;
         double result = (baseValues.GetValueOrDefault(stat) * (1d + permanentRatio) + add) * (1d + mult);
         return ApplyClamp(stat, (float)Math.Max(-float.MaxValue, Math.Min(float.MaxValue, result)));
     }
@@ -289,19 +326,29 @@ public class PlayerStatManager : MonoBehaviour
     // ── HP / TakeDamage ──────────────────────────────────────────────────────────
 
     /// <summary>피해를 적용합니다. PlayerController.TakeDamage에서 호출됩니다.</summary>
-    public DamageResult TakeDamage(float damage, ElementType damageType, bool isCritical)
+    public DamageResult TakeDamage(float damage, ElementType damageType, bool isCritical,
+        Action<DamageResult> beforeNotify = null)
     {
         EnsureInitialized();
         if (GetComponent<PlayerController>()?.IsStageTransitioning == true) return default;
+        if (GetComponent<PlayerEngravingRuntime>()?.IsInvulnerable == true) return default;
         if (_currentHp <= 0f || damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return default;
         float hpBefore = _currentHp;
         float absorbed = AbsorbWithShields(Mathf.Max(0f, damage));
         damage = Mathf.Max(0f, damage - absorbed);
         _currentHp = Mathf.Max(0f, _currentHp - damage);
         float healthDamage = hpBefore - _currentHp;
+        bool revived = false;
+        if (_currentHp <= 0f && GetComponent<PlayerEngravingRuntime>() is { } engravings
+            && engravings.TryRevive(out float restoredHp))
+        { _currentHp = restoredHp; revived = true; }
+        var result = new DamageResult(DamageOutcome.Applied, healthDamage, absorbed, _currentHp <= 0f, revived: revived);
+        // Commit reactive item state before an observer can synchronously deal the next hit.
+        // The original hit has already consumed its shields and HP, so a new shield cannot protect it.
+        beforeNotify?.Invoke(result);
         if (healthDamage > 0f) OnDamageTaken?.Invoke(healthDamage, damageType, isCritical);
         OnHpChanged?.Invoke(_currentHp, GetStat(StatType.ST_HP));
-        return new DamageResult(DamageOutcome.Applied, healthDamage, absorbed, _currentHp <= 0f);
+        return new DamageResult(result.Outcome, result.HealthDamage, result.ShieldDamage, _currentHp <= 0f, revived: revived);
     }
 
     // ── SP 메서드 ────────────────────────────────────────────────────────────────
@@ -387,10 +434,36 @@ public class PlayerStatManager : MonoBehaviour
         get { float total = 0f; foreach (var layer in _shields) total += layer.Amount; return total; }
     }
     public void GrantShield(float amount, float duration)
-        => GrantShield(_defaultShieldSource, Mathf.Max(GetShield(_defaultShieldSource), amount), duration);
+        => ReplaceShield(_defaultShieldSource, Mathf.Max(GetShield(_defaultShieldSource), AmplifiedShield(amount)), duration);
 
     /// <summary>출처별 방어막. 같은 출처는 교체하고 다른 출처는 독립적으로 유지합니다.</summary>
     public void GrantShield(object source, float amount, float duration)
+        => ReplaceShield(source, AmplifiedShield(amount), duration);
+
+    private float AmplifiedShield(float amount)
+    {
+        double ratio = 0d;
+        foreach (var modifiers in _itemResourceModifiers.Values) ratio += modifiers.ShieldGainRatio;
+        return amount * Mathf.Max(0f, 1f + (float)ratio);
+    }
+
+    /// <summary>Amplifies only the new gain, and caps the final amount belonging to this source.</summary>
+    public void AddCappedShield(object source, float rawGain, float finalCap, float duration)
+    {
+        if (source == null || !IsFinite(rawGain) || rawGain <= 0f || !IsFinite(finalCap) || finalCap <= 0f
+            || !IsFinite(duration) || duration <= 0f) return;
+        ReplaceShield(source, Mathf.Min(finalCap, GetShield(source) + AmplifiedShield(rawGain)), duration);
+    }
+
+    public void ClampShield(object source, float finalCap)
+    {
+        var layer = _shields.Find(candidate => ReferenceEquals(candidate.Source, source));
+        if (layer == null || !IsFinite(finalCap)) return;
+        layer.Amount = Mathf.Min(layer.Amount, Mathf.Max(0f, finalCap));
+        if (layer.Amount <= 0f) RemoveShield(source);
+    }
+
+    private void ReplaceShield(object source, float amount, float duration)
     {
         if (source == null) return;
         RemoveShield(source);
@@ -427,7 +500,12 @@ public class PlayerStatManager : MonoBehaviour
     {
         EnsureInitialized();
         if (_currentHp <= 0f || !IsFinite(amount) || amount <= 0f) return;
-        _currentHp = Mathf.Min(MaxHp, _currentHp + amount);
+        var engravings = GetComponent<PlayerEngravingRuntime>();
+        amount *= engravings != null ? engravings.HealingMultiplier : 1f;
+        if (!IsFinite(amount)) return;
+        float actual = Mathf.Min(amount, Mathf.Max(0f, MaxHp - _currentHp));
+        _currentHp += actual;
+        engravings?.NotifyOverheal(amount - actual);
         OnHpChanged?.Invoke(_currentHp, MaxHp);
     }
     /// <summary>체력을 비용으로 소모합니다. 보호막과 피격 이벤트를 거치지 않으며 최소 체력을 남깁니다.</summary>

@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I22
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I22
+  itemId: I22
+  displayName: "\uD0C4\uC131 \uB4A4\uCD95\uD3B8"
+  description: "\uD0C4\uC131\uB9C9\uC744 \uC811\uC5B4 \uB123\uC740 \uAD6C\uB450 \uB4A4\uCD95\uD3B8."
+  effectText: "HP\uAC00 80% \uC774\uC0C1\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294 \uD654
+    \uC18D\uC131 \uD53C\uD574\uAC00 10% \uC99D\uAC00\uD55C\uB2E4."
+  synergyIds:
+  - S05
+  synergyNames:
+  - "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+  primarySynergyId: S05
+  primarySynergyName: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+  primarySynergyIcon: {fileID: 21300000, guid: 6b4f687bf95b86c4e93ee4be174e5361, type: 3}
+  element: 0
+  grade: 2
+  purchasePrice: 40
+  effects: []
+  boundaryEffects:
+  - effectId: I22
+    stat: 6
+    amount: 0.1
+    trigger: 0
+    family: 0
+    element: 2
+    eliteOrBossOnly: 0
+    targetHpMin: 0.8
+    targetHpMax: -1
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 0
+    maximumBaseGold: 0
+    durationSeconds: 0
+    cooldownSeconds: 0
+  icon: {fileID: 21300000, guid: 5eae0a6d43fc1a74989b0ec5610b490c, type: 3}
+  contentStatus: draft
+  contentRevision: 20261108
+  sourceJson: "{\"id\":\"I22\",\"name\":\"\uD0C4\uC131 \uB4A4\uCD95\uD3B8\",\"description\":\"\uD0C4\uC131\uB9C9\uC744
+    \uC811\uC5B4 \uB123\uC740 \uAD6C\uB450 \uB4A4\uCD95\uD3B8.\",\"effect\":\"HP\uAC00
+    80% \uC774\uC0C1\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294 \uD654 \uC18D\uC131 \uD53C\uD574\uAC00
+    10% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S05\"],\"primarySynergy\":\"S05\",\"designIntent\":\"\uCCB4\uB825\uC774
+    \uB192\uC740 \uC801\uC5D0\uAC8C \uD654 \uC18D\uC131 \uACF5\uACA9\uC73C\uB85C
+    \uCD08\uBC18 \uD53C\uD574\uB97C \uB298\uB9B0\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I22.png\"}"

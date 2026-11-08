@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I05
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I05
+  itemId: I05
+  displayName: "\uBD88\uC528 \uC7A5\uC2DD"
+  description: "\uC0BC\uAC01\uD615 \uAE08\uC18D \uD2C0 \uC548\uC5D0 \uC8FC\uD669\uBE5B
+    \uBD88\uC528 \uC870\uAC01\uC774 \uB9E4\uB2EC\uB824 \uC788\uB2E4."
+  effectText: "\uD654 \uC18D\uC131 \uD3C9\uD0C0 \uD53C\uD574\uAC00 8% \uC99D\uAC00\uD55C\uB2E4."
+  synergyIds:
+  - S05
+  - S02
+  synergyNames:
+  - "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+  - "\uB9F9\uACF5"
+  primarySynergyId: S05
+  primarySynergyName: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+  primarySynergyIcon: {fileID: 21300000, guid: 6b4f687bf95b86c4e93ee4be174e5361, type: 3}
+  element: 0
+  grade: 3
+  purchasePrice: 80
+  effects: []
+  boundaryEffects:
+  - effectId: I05
+    stat: 6
+    amount: 0.08
+    trigger: 0
+    family: 1
+    element: 2
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: -1
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 0
+    maximumBaseGold: 0
+    durationSeconds: 0
+    cooldownSeconds: 0
+  icon: {fileID: 21300000, guid: 3b34f68daba7e2342bdfcb4eb607f189, type: 3}
+  contentStatus: draft
+  contentRevision: 20261108
+  sourceJson: "{\"id\":\"I05\",\"name\":\"\uBD88\uC528 \uC7A5\uC2DD\",\"description\":\"\uC0BC\uAC01\uD615
+    \uAE08\uC18D \uD2C0 \uC548\uC5D0 \uC8FC\uD669\uBE5B \uBD88\uC528 \uC870\uAC01\uC774
+    \uB9E4\uB2EC\uB824 \uC788\uB2E4.\",\"effect\":\"\uD654 \uC18D\uC131 \uD3C9\uD0C0
+    \uD53C\uD574\uAC00 8% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S05\",\"S02\"],\"primarySynergy\":\"S05\",\"image\":\"Art/Items/I05.png\",\"origin\":\"revised\",\"designIntent\":\"\uD654
+    \uC18D\uC131 \uD3C9\uD0C0\uB97C \uC8FC\uB825\uC73C\uB85C \uC4F0\uB294 \uAD6C\uC131\uC744
+    \uAC15\uD654\uD55C\uB2E4.\"}"

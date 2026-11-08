@@ -26,7 +26,7 @@ public class PlayerRunState : IPlayerState
             moveDir = _playerController.Movement.GetDirectionSlope(moveDir);
         }
 
-        Vector3 velocity = moveDir * _playerController.RunSpeed;
+        Vector3 velocity = moveDir * _playerController.EffectiveRunSpeed;
         velocity.y += _playerController.VerticalVelocity;
 
         _playerController.Controller.Move(velocity * _playerController.ActionDeltaTime);

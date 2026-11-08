@@ -59,7 +59,8 @@ public abstract partial class BaseForm
             category: secondary ? PlayerAttackCategory.Secondary : CurrentAttackCategory,
             itemDamageMultiplier: secondary ? 1f : DamageItemMultiplier,
             sourceDamageMultiplier: secondary ? CaptureSourceDamageMultiplier() : DamageSourceMultiplier,
-            hasSourceDamageSnapshot: true);
+            hasSourceDamageSnapshot: true, castId: ItemCastId,
+            origin: secondary ? DamageOrigin.AdditionalEffect : DamageOrigin.AuthoredAction);
 
     protected Vector3 CustomKnockbackPower(WeaponActionData step, HitEvent hitEvent, Transform target)
     {

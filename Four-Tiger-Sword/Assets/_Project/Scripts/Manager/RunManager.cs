@@ -63,8 +63,10 @@ public sealed partial class RunManager : MonoBehaviour
     {
         if (_transition != null || !_hasPending || State == RunState.Won || State == RunState.Lost) return;
         if (!CanLeaveUpgradeRewards()) return;
+        EnsureRunEngravings();
         UnbindUpgradeRooms();
         SuspendPlayerAndCloseShop();
+        player?.Engravings?.ClearStageTransient();
         stageManager?.Suspend();
         if (definition == null || !definition.Validate(out _))
         {
@@ -91,6 +93,7 @@ public sealed partial class RunManager : MonoBehaviour
         CurrentChapterIndex = _pendingChapter;
         CurrentStageIndex = _pendingStage;
         CurrentStageSeed = stageSeed;
+        EnsureRunItemChoices();
         LastError = null;
         // Keep loading visible while placing the camera and evaluating the player's Idle pose.
         _stageIntroPause = CombatHitStopService.AcquireWorldScale(this, 0f);
@@ -130,7 +133,7 @@ public sealed partial class RunManager : MonoBehaviour
     {
         if (_grantingUpgradeRewards || _endingUpgradeRun) return;
         if (IsUpgradeSaveBlocked) { _advanceAfterUpgradeSave = true; return; }
-        if (State != RunState.Playing || _transition != null) return;
+        if (State != RunState.Playing || _transition != null || HasPendingItemChoice || IsRewardOpen) return;
         if (!CanLeaveUpgradeRewards()) { _advanceAfterUpgradeSave = true; return; }
         if (!definition.TryGetNext(CurrentChapterIndex, CurrentStageIndex, out _pendingChapter, out _pendingStage))
         { EndRun(true); return; }
@@ -228,7 +231,7 @@ public sealed partial class RunManager : MonoBehaviour
 
     private void SetState(RunState state)
     {
-        if (state != RunState.Playing) CleanupMapOnShutdown();
+        if (state != RunState.Playing) { CloseItemChoiceModal(); CleanupMapOnShutdown(); CleanupInventoryOnShutdown(); }
         State = state;
         RefreshRunCursor();
         StateChanged?.Invoke(state);
@@ -240,6 +243,7 @@ public sealed partial class RunManager : MonoBehaviour
         if (!CanLeaveUpgradeRewards()) return;
         CancelStagePresentation();
         CloseMap();
+        CloseInventory();
         CloseShop();
         CombatHitStopService.SetExternalWorldTimeScale(1f);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -274,7 +278,9 @@ public sealed partial class RunManager : MonoBehaviour
     {
         CancelStagePresentation();
         CleanupUpgradeRewards();
+        CloseItemChoiceModal();
         CleanupMapOnShutdown();
+        CleanupInventoryOnShutdown();
         CleanupShopOnShutdown();
         if (stageManager != null) { stageManager.ExitRequested -= Advance; stageManager.Failed -= OnStageFailure; stageManager.OnStageClear -= OnUpgradeStageClear; }
         if (player != null) player.Died -= Lose;

@@ -303,10 +303,14 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     {
         if (!isActiveAndEnabled || IsStageTransitioning || StatManager.CurrentHp <= 0f
             || damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return default;
+        if (Engravings?.IsInvulnerable == true) return default;
         if (StateMachine.CurrentState is PlayerDashState dash)
         {
             if (damage > 0f && source is EnemyAction && dash.TryConfirmSuccessfulDodge())
+            {
                 FormManager.NotifySuccessfulDodge();
+                Engravings?.NotifySuccessfulDodge();
+            }
             return default;
         }
         if ((FormManager.CurrentForm as BaseForm)?.BlocksIncomingDamage(damage, power, source) == true)
@@ -326,8 +330,19 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         }
 
         Debug.Log("플레이어 피격!");
+        var attackingEnemy = source is EnemyAction enemyAction ? enemyAction.Owner : source as Enemy;
+        var itemIncoming = new ItemIncomingContext(attackingEnemy != null,
+            attackingEnemy != null && attackingEnemy.Rank != EnemyRank.Normal, StatManager.CurrentHp, StatManager.MaxHp);
         damage *= (FormManager.CurrentForm as BaseForm)?.IncomingDamageMultiplier ?? 1f;
-        var result = StatManager.TakeDamage(damage, damageType, isCritical);
+        damage *= ItemRuntime != null ? ItemRuntime.EvaluateIncoming(itemIncoming) : 1f;
+        damage *= Engravings != null ? Engravings.IncomingMultiplier(attackingEnemy, itemIncoming.HpBefore, itemIncoming.MaxHpBefore) : 1f;
+        var result = StatManager.TakeDamage(damage, damageType, isCritical,
+            committed =>
+            {
+                Engravings?.CommitIncoming(attackingEnemy, committed.HealthDamage, committed.ShieldDamage);
+                ItemRuntime?.CommitIncoming(itemIncoming, committed.HealthDamage, committed.ShieldDamage);
+            });
+        if (result.Revived) { HandleEngravingRevive(); return result; }
         if (result.Applied && result.HealthDamage + result.ShieldDamage > 0f)
         {
             CancelPendingSwitchAttack();

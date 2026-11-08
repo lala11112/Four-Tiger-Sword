@@ -6,7 +6,7 @@ public partial class PlayerController
     /// <summary>Moves within this stage without resetting resources, cooldowns or world effects.</summary>
     public bool TryFastTravel(Vector3 position, Quaternion rotation)
     {
-        if (!isActiveAndEnabled || IsStageTransitioning || IsShopPaused || IsFinisherSelecting || IsInRoomCombat
+        if (!isActiveAndEnabled || IsStageTransitioning || IsShopPaused || IsInventoryPaused || IsFinisherSelecting || IsInRoomCombat
             || StatManager == null || StatManager.CurrentHp <= 0f || Controller == null || !Controller.enabled
             || !KnockbackMotion.IsFinite(position.sqrMagnitude) || !KnockbackMotion.IsFinite(rotation.x)
             || !KnockbackMotion.IsFinite(rotation.y) || !KnockbackMotion.IsFinite(rotation.z)

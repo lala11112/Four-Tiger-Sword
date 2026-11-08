@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I18
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I18
+  itemId: I18
+  displayName: "\uAE4A\uC740 \uBB3C\uBCD1"
+  description: "\uB113\uC801\uD55C \uCCAD\uB85D\uC0C9 \uC720\uB9AC \uBAB8\uCCB4\uC5D0
+    \uAC01\uC9C4 \uD669\uB3D9 \uB9C8\uAC1C\uB97C \uB07C\uC6B4 \uD734\uB300 \uBB3C\uBCD1\uC774\uB2E4."
+  effectText: "\uC218 \uC18D\uC131 \uC2A4\uD0AC \uD53C\uD574\uAC00 7% \uC99D\uAC00\uD55C\uB2E4."
+  synergyIds:
+  - S04
+  synergyNames:
+  - "\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0"
+  primarySynergyId: S04
+  primarySynergyName: "\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0"
+  primarySynergyIcon: {fileID: 21300000, guid: f8d9839b28f4fc64b9c4f55629b3072e, type: 3}
+  element: 0
+  grade: 2
+  purchasePrice: 40
+  effects: []
+  boundaryEffects:
+  - effectId: I18
+    stat: 6
+    amount: 0.07
+    trigger: 0
+    family: 2
+    element: 5
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: -1
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 0
+    maximumBaseGold: 0
+    durationSeconds: 0
+    cooldownSeconds: 0
+  icon: {fileID: 21300000, guid: fcfcbe6607cbb5045a03a2f915db5fb9, type: 3}
+  contentStatus: draft
+  contentRevision: 20261108
+  sourceJson: "{\"id\":\"I18\",\"name\":\"\uAE4A\uC740 \uBB3C\uBCD1\",\"description\":\"\uB113\uC801\uD55C
+    \uCCAD\uB85D\uC0C9 \uC720\uB9AC \uBAB8\uCCB4\uC5D0 \uAC01\uC9C4 \uD669\uB3D9
+    \uB9C8\uAC1C\uB97C \uB07C\uC6B4 \uD734\uB300 \uBB3C\uBCD1\uC774\uB2E4.\",\"effect\":\"\uC218
+    \uC18D\uC131 \uC2A4\uD0AC \uD53C\uD574\uAC00 7% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S04\"],\"primarySynergy\":\"S04\",\"image\":\"Art/Items/I18.png\",\"origin\":\"revised\",\"designIntent\":\"\uC218
+    \uC18D\uC131 \uC2A4\uD0AC\uC744 \uC8FC\uB825\uC73C\uB85C \uC4F0\uB294 \uAD6C\uC131\uC744
+    \uAC15\uD654\uD55C\uB2E4.\"}"

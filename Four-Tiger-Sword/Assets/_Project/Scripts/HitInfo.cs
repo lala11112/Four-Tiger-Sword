@@ -1,6 +1,7 @@
 using UnityEngine;
 
 public enum PlayerAttackCategory { Other, Normal, SwitchAttack, Skill, Ultimate, Counter, Heavy, Secondary }
+public enum DamageOrigin { AuthoredAction, AdditionalEffect, Environmental }
 
 public readonly struct HitInfo
 {
@@ -24,6 +25,8 @@ public readonly struct HitInfo
     public readonly bool HasSourceDamageSnapshot;
     /// <summary>Explicit player attack contact. Persistent and secondary damage leave this false.</summary>
     public readonly bool IsDirectPlayerHit;
+    public readonly long CastId;
+    public readonly DamageOrigin Origin;
 
     public readonly Vector3 Power;
 
@@ -43,7 +46,8 @@ public readonly struct HitInfo
                    CombatSoundCue impactSound = default,
                    PlayerAttackCategory category = PlayerAttackCategory.Other, float itemDamageMultiplier = 1f,
                    float sourceDamageMultiplier = 1f, bool hasSourceDamageSnapshot = false,
-                   bool isDirectPlayerHit = false)
+                   bool isDirectPlayerHit = false, long castId = 0,
+                   DamageOrigin origin = DamageOrigin.AuthoredAction)
     {
         BaseDamage            = damage;
         Element               = element;
@@ -63,13 +67,15 @@ public readonly struct HitInfo
         SourceDamageMultiplier = sourceDamageMultiplier;
         HasSourceDamageSnapshot = hasSourceDamageSnapshot;
         IsDirectPlayerHit = isDirectPlayerHit;
+        CastId = castId;
+        Origin = category == PlayerAttackCategory.Secondary ? DamageOrigin.AdditionalEffect : origin;
     }
 
     public HitInfo WithDirectPlayerHit(bool isDirectPlayerHit = true)
         => new HitInfo(BaseDamage, Element, CriticalChance, CriticalMultiplier, PoiseDamageMultiplier,
             ArmorPierce, Power, PoiseDamage, StaggerResistLevel, IsParryable, Source, TrueDamage,
             ImpactSound, Category, ItemDamageMultiplier, SourceDamageMultiplier, HasSourceDamageSnapshot,
-            isDirectPlayerHit && Category != PlayerAttackCategory.Secondary);
+            isDirectPlayerHit && Category != PlayerAttackCategory.Secondary, CastId, Origin);
 
     public HitInfo WithoutDirectPlayerHit() => WithDirectPlayerHit(false);
 }

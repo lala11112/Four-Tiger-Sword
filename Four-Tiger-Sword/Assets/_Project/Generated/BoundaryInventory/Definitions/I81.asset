@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I81
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I81
+  itemId: I81
+  displayName: "\uC804\uC9C4 \uACA9\uC790"
+  description: "\uAC80\uC740 \uD2C0\uC5D0 \uBC31\uC0C9 \uACA9\uC790\uB97C \uB304
+    \uC791\uC740 \uC7A5\uAC11\uD310."
+  effectText: "\uD3C9\uD0C0\uB97C \uC801\uC911\uC2DC\uD0A4\uBA74 1.5\uCD08 \uB3D9\uC548
+    \uC801\uC758 \uACF5\uACA9\uC73C\uB85C \uBC1B\uB294 \uD53C\uD574\uAC00 5% \uAC10\uC18C\uD55C\uB2E4.
+    \uC7AC\uBC1C\uB3D9 \uC2DC \uC9C0\uC18D\uC2DC\uAC04\uB9CC \uAC31\uC2E0\uB41C\uB2E4."
+  synergyIds:
+  - S03
+  synergyNames:
+  - "\uCCA0\uBCBD"
+  primarySynergyId: S03
+  primarySynergyName: "\uCCA0\uBCBD"
+  primarySynergyIcon: {fileID: 21300000, guid: 356b4a7791059524a89f4e7f8acbc2cc, type: 3}
+  element: 0
+  grade: 4
+  purchasePrice: 160
+  effects: []
+  boundaryEffects:
+  - effectId: I81
+    stat: 10
+    amount: 0.05
+    trigger: 5
+    family: 0
+    element: 0
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: -1
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 0
+    maximumBaseGold: 0
+    durationSeconds: 1.5
+    cooldownSeconds: 0
+  icon: {fileID: 21300000, guid: 3fc0d322064267643bee58ec8a5f5a10, type: 3}
+  contentStatus: draft
+  contentRevision: 20261108
+  sourceJson: "{\"id\":\"I81\",\"name\":\"\uC804\uC9C4 \uACA9\uC790\",\"description\":\"\uAC80\uC740
+    \uD2C0\uC5D0 \uBC31\uC0C9 \uACA9\uC790\uB97C \uB304 \uC791\uC740 \uC7A5\uAC11\uD310.\",\"effect\":\"\uD3C9\uD0C0\uB97C
+    \uC801\uC911\uC2DC\uD0A4\uBA74 1.5\uCD08 \uB3D9\uC548 \uC801\uC758 \uACF5\uACA9\uC73C\uB85C
+    \uBC1B\uB294 \uD53C\uD574\uAC00 5% \uAC10\uC18C\uD55C\uB2E4. \uC7AC\uBC1C\uB3D9
+    \uC2DC \uC9C0\uC18D\uC2DC\uAC04\uB9CC \uAC31\uC2E0\uB41C\uB2E4.\",\"synergies\":[\"S03\"],\"primarySynergy\":\"S03\",\"designIntent\":\"\uADFC\uC811
+    \uAD50\uC804\uC5D0\uC11C \uACF5\uACA9 \uD750\uB984 \uC720\uC9C0\",\"origin\":\"new\",\"image\":\"Art/Items/I81.png\"}"

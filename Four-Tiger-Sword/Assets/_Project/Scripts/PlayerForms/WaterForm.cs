@@ -218,7 +218,8 @@ public class WaterForm : BaseForm, IHeavyAttackForm
                     power: KnockbackMotion.Power(_heavyDashDirection, step.KnockbackForce),
                     poiseDamage: step.PoiseDamage, staggerResistLevel: step.StaggerResistLevel,
                     impactSound: ResolveHitSound(step), category: PlayerAttackCategory.Heavy,
-                    sourceDamageMultiplier: DamageSourceMultiplier, hasSourceDamageSnapshot: true, isDirectPlayerHit: true);
+                    sourceDamageMultiplier: DamageSourceMultiplier, hasSourceDamageSnapshot: true, isDirectPlayerHit: true,
+                    castId: ItemCastId);
                 var result = DamageManager.Apply(hit, target, component.gameObject);
                 if (!result.Applied) continue;
                 if (!HasHeavyChainTarget)
@@ -344,9 +345,15 @@ public class WaterForm : BaseForm, IHeavyAttackForm
         : base.HasCompletedRequiredActionHits;
 
     public override void UpdateUltimate(out bool isComplete) => AdvanceUltimate(_playerController.ActionDeltaTime, out isComplete);
+    private bool IsUltimateTimelinePaused => _playerController.ActionTimeScale <= 0f || Time.timeScale <= 0f;
     private void AdvanceUltimate(float dt, out bool isComplete)
     {
         _playerController.SetAnimationSpeed(FixedActionSpeed);
+        if (IsUltimateTimelinePaused)
+        {
+            isComplete = IsCurrentActionExecutionComplete && CompleteActionExecution(true);
+            return;
+        }
         _ultimateElapsed += Mathf.Max(0f, dt) * FixedActionSpeed;
         if (IsCurrentActionExecutionComplete)
         {
@@ -376,7 +383,7 @@ public class WaterForm : BaseForm, IHeavyAttackForm
             }
             _ultimateHits++;
             // A newly applied attacker stop postpones any remaining scheduled hits.
-            if (_playerController.ActionDeltaTime <= 0f) break;
+            if (IsUltimateTimelinePaused) break;
         }
         if (_ultimateHits >= 10) RestoreUltimateExecution();
         isComplete = CompleteActionExecution(_ultimateHits >= 10);

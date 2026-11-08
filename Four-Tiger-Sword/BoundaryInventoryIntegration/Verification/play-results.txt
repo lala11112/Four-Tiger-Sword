@@ -1,0 +1,12 @@
+PASS: live inventory binding (32 checks).
+Initial ownership: 0
+Full59: PASS: live inventory binding (32 checks).
+PASS I closes inventory and resumes time
+PASS actual queued I/Tab/Esc inputs: inventory toggles, Esc closes, Tab map preserved, no modal overlap
+PASS actual StageShopService: 3 purchases, I13 sale10G, I21+I44 fusion, immediate inventory sync
+PASS result transition releases inventory modal and prevents reopening
+PASS RestartRun reload resets ownership and fractional gold
+PASS runtime stage regeneration into second chapter retains I01/I89 and +5% maxHP; inventory/time/input restored
+PASS scripted lethal damage while inventory open closes modal, clears inventory input pause, reaches Lost and prevents reopening
+FINAL shared display adapter: empty=PASS: live inventory binding (32 checks).; full59=PASS: live inventory binding (32 checks).
+FINAL PASS authored close button releases modal; actual generated ordinary rewards5..15 and boss150

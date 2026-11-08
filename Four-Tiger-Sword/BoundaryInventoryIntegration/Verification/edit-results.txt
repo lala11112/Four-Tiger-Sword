@@ -1,0 +1,14 @@
+BoundaryItemRuntimeRegression: Boundary inventory runtime: all 59 item mappings; 542 checks passed.
+BoundaryCombatIntegrationRegression: PASS: Boundary combat integration (351 checks: damage, cast identity/reentrancy, boss phases, final death ordering, gold, sale and fusion).
+InventoryIntegrationRegression: PASS: inventory presentation (105 checks).
+InventoryModalRegression: PASS: inventory modal ownership (38 checks).
+BaekhoItemRuntimeRegression: Baekho item runtime: 8 regression scenarios passed; 20 imported items verified.
+BaekhoItemCombatRegression: PASS: damage category exclusions, one item multiplier, origin snapshots, five switch lifecycles, independent E costs/cooldowns/buffs, five R resource paths and Water collision cleanup.
+ShopEconomyRegression: Shop economy: 1035 checks passed (settings, wallet boundaries, seeded stock, ownership, transactions, healing, reentry, observer failures and confirmed death rewards).
+ShopTradeRegression: Shop trades: 384 checks passed (sale, overflow, fusion grades, owned identities, random isolation, atomic resources, timers, reentry and observer failures).
+ShopModalRegression: PASS: shop modal ownership (29 checks).
+BossPhaseSupportRegression: Boss phase support: 35 checks passed.
+FormChainEffectsRegression: PASS: 61 chain action, 20-second buff, refresh, cleanup, confirmed-target vulnerability, immunity, final-hit and direct/delayed classification checks.
+MapModalRegression: PASS: map modal ownership (37 checks).
+ActionTimingRegression: PASS: action timing (161 checks: independent gates, per-hit skill reservations and cancellation, production combat exits, mandatory hits and stages, resources, real Animator completion, same-state restart, missing-motion fallback, and Water execution-tail isolation).
+AttackRecoveryRegression: PASS: attack recovery (49 checks: authored timing, opt-in compatibility, single/multi-hit boundaries, buffered and late clicks, movement priority, terminal restart and cleanup, no-input playback, finisher isolation and reset, attack speed and actor hit-stop).

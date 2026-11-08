@@ -42,6 +42,9 @@ public sealed class StageShopService : MonoBehaviour
     private ShopDetailSource _detailSource;
     private ItemDefinition _fusionResult;
     private string _message;
+    private int _rewardStageSeed;
+    private EngravingSnapshot _engraving = EngravingSnapshot.Empty;
+    private ShopFusionChoice _fusionChoice;
 
     private void OnEnable()
     {
@@ -52,12 +55,6 @@ public sealed class StageShopService : MonoBehaviour
         if (_viewInstance != null) _viewInstance.gameObject.SetActive(true);
         if (_goldInstance != null) _goldInstance.gameObject.SetActive(true);
         if (_initialized) { _lastInRange = IsInRange; Refresh(); }
-    }
-
-    private void Start()
-    {
-        try { EnsureInitialized(); Refresh(); }
-        catch (Exception error) { Debug.LogError("[Shop] " + error.Message, this); }
     }
 
     private void EnsureInitialized()
@@ -73,7 +70,8 @@ public sealed class StageShopService : MonoBehaviour
         if (!(shopViewPrefab is IShopView) || !(goldViewPrefab is IGoldView) || counterPrefab == null)
             throw new InvalidOperationException("Assign shop, gold HUD and counter prefabs.");
         Wallet = _player.GetComponent<PlayerWallet>() ?? _player.gameObject.AddComponent<PlayerWallet>();
-        Wallet.Initialize(settings.startingGold);
+        _engraving = _player.GetComponent<PlayerEngravingRuntime>()?.Snapshot ?? EngravingSnapshot.Empty;
+        Wallet.Initialize((int)Math.Min(int.MaxValue, (long)settings.startingGold + (int)_engraving.Amount("gold")));
         _viewInstance = Instantiate(shopViewPrefab, transform);
         _goldInstance = Instantiate(goldViewPrefab, transform);
         _view = (IShopView)_viewInstance;
@@ -88,6 +86,12 @@ public sealed class StageShopService : MonoBehaviour
         _view.SellRequested += Sell;
         _view.FusionRequested += FuseSelected;
         _view.FusionSlotCleared += ClearFusionSlot;
+        if (_view is IShopProgressionView progression)
+        {
+            progression.RefreshRequested += RefreshStock;
+            progression.FusionResultSelected += SelectFusionResult;
+            progression.FusionChoiceCancelled += CancelFusionChoice;
+        }
         Wallet.GoldChanged += GoldChanged;
         _items.OnOwnedItemsChanged += Refresh;
         _player.StatManager.OnHpChanged += HealthChanged;
@@ -101,6 +105,7 @@ public sealed class StageShopService : MonoBehaviour
         EnsureInitialized();
         SuspendStage();
         if (result == null || !result.success) throw new InvalidOperationException("Shop needs a generated stage.");
+        _rewardStageSeed = stageSeed;
         // Bind rewards only after encounter preparation succeeded. Cleanup never emits Enemy.OnDied.
         foreach (var room in result.rooms)
         {
@@ -112,7 +117,7 @@ public sealed class StageShopService : MonoBehaviour
                 _rewardRooms.Add(encounter);
             }
             foreach (var member in encounter.Members)
-                BindKillReward(member, room == result.bossRoom ? settings.bossKillGold : settings.ordinaryKillGold);
+                BindKillReward(member);
         }
         if (result.shopRoom == null) return;
         var anchors = result.shopRoom.GetComponent<StageMapAnchors>();
@@ -121,13 +126,13 @@ public sealed class StageShopService : MonoBehaviour
         Instantiate(counterPrefab, ShopPoint.position, ShopPoint.rotation, ShopPoint);
         if (!_stageStocks.TryGetValue(stageSeed, out var stock))
         {
-            stock = ShopStock.Create(_items.Catalog, _items, settings, stageSeed);
+            stock = ShopStock.Create(_items.Catalog, _items, settings, stageSeed, _engraving);
             _stageStocks.Add(stageSeed, stock);
         }
         CurrentStock = stock;
         if (!_stageTransactions.TryGetValue(stageSeed, out _transactions))
         {
-            _transactions = new ShopTransactions(_items, Wallet, _player.StatManager, settings, stageSeed);
+            _transactions = new ShopTransactions(_items, Wallet, _player.StatManager, settings, stageSeed, _engraving);
             _stageTransactions.Add(stageSeed, _transactions);
         }
         CurrentStock.Changed += Refresh;
@@ -137,15 +142,22 @@ public sealed class StageShopService : MonoBehaviour
         Refresh();
     }
 
-    private void BindReinforcementReward(DungeonEncounterMember member) => BindKillReward(member, settings.ordinaryKillGold);
+    private void BindReinforcementReward(DungeonEncounterMember member) => BindKillReward(member);
 
-    private void BindKillReward(DungeonEncounterMember member, int gold)
+    private void BindKillReward(DungeonEncounterMember member)
     {
         if (member == null || member.IsDead) return;
         var reward = member.GetComponent<EnemyGoldReward>() ?? member.gameObject.AddComponent<EnemyGoldReward>();
+        if (reward.IsInitialized) return;
         if (member.Enemy is Boss boss && boss.Data != null && boss.Data.rewardGroup != null)
             reward.Initialize(Wallet, _items, boss.Data.rewardGroup);
-        else reward.Initialize(Wallet, gold);
+        else
+        {
+            int gold = member.Enemy is Boss ? settings.bossKillGold
+                : EnemyGoldRoll.Roll(_rewardStageSeed, member.RewardRoomId, member.RewardWaveIndex,
+                    member.RewardSpawnIndex, settings.ordinaryKillGoldMin, settings.ordinaryKillGoldMax);
+            reward.Initialize(Wallet, gold, _items);
+        }
     }
 
     private void UnbindRewardRooms()
@@ -217,7 +229,7 @@ public sealed class StageShopService : MonoBehaviour
 
     public ShopPurchaseResult TryBuy(string id)
     {
-        if (!CanTransact) return ShopPurchaseResult.Unavailable;
+        if (!CanTransact || _fusionChoice != null) return ShopPurchaseResult.Unavailable;
         _transactionInProgress = true;
         try
         {
@@ -238,7 +250,7 @@ public sealed class StageShopService : MonoBehaviour
 
     public ShopSaleResult TrySell(string itemId)
     {
-        if (!CanTransact) return ShopSaleResult.Unavailable;
+        if (!CanTransact || _fusionChoice != null) return ShopSaleResult.Unavailable;
         _transactionInProgress = true;
         try
         {
@@ -263,6 +275,18 @@ public sealed class StageShopService : MonoBehaviour
         _transactionInProgress = true;
         try
         {
+            if (_engraving.Has("fusion"))
+            {
+                var prepared = _transactions.BeginFusionChoice(firstId, secondId, out var choice);
+                if (prepared == ShopFusionResult.Success)
+                {
+                    _fusionChoice = choice;
+                    _message = "결과 후보 하나를 선택하세요. 확정할 때 재료 두 개를 소모합니다.";
+                    return ShopFusionResult.ChoiceRequired;
+                }
+                _message = "선택한 재료로 합성 후보를 준비할 수 없습니다.";
+                return prepared;
+            }
             var result = _transactions.TryFuse(firstId, secondId, out var item);
             _message = result switch
             {
@@ -282,10 +306,51 @@ public sealed class StageShopService : MonoBehaviour
         finally { _transactionInProgress = false; Refresh(); }
     }
 
+    public ShopRefreshResult TryRefreshStock()
+    {
+        if (!CanTransact || _tab != ShopTab.Buy || _fusionChoice != null) return ShopRefreshResult.Unavailable;
+        _transactionInProgress = true;
+        try
+        {
+            var result = _transactions.TryRefresh(CurrentStock);
+            _message = result == ShopRefreshResult.Success ? "상품을 새로 진열했습니다."
+                : result == ShopRefreshResult.InsufficientGold ? "새로고침할 골드가 부족합니다."
+                : result == ShopRefreshResult.NoCandidates ? "새로 진열할 미보유 상품이 없습니다."
+                : "지금은 상품을 새로고침할 수 없습니다.";
+            if (result == ShopRefreshResult.Success) _offerSelection = null;
+            return result;
+        }
+        finally { _transactionInProgress = false; Refresh(); }
+    }
+
+    public ShopFusionResult TryCommitFusionChoice(string itemId)
+    {
+        if (!CanTransact || _fusionChoice == null) return ShopFusionResult.Unavailable;
+        _transactionInProgress = true;
+        try
+        {
+            var result = _transactions.CommitFusionChoice(_fusionChoice.Token, itemId, out var item);
+            if (result == ShopFusionResult.Success)
+            {
+                _fusionChoice = null; _fusionFirst = _fusionSecond = null; _fusionResult = item;
+                _message = $"{item.displayName} ({item.grade}등급)을 획득했습니다.";
+            }
+            else _message = "합성 후보나 재료가 변경되었습니다. 취소하고 재료를 다시 확인하세요.";
+            return result;
+        }
+        finally { _transactionInProgress = false; Refresh(); }
+    }
+
+    private void RefreshStock() => TryRefreshStock();
+    private void SelectFusionResult(string itemId) => TryCommitFusionChoice(itemId);
+    private void CancelFusionChoice()
+    { if (!CanTransact || _fusionChoice == null) return; _fusionChoice = null; _message = "합성을 취소했습니다. 재료는 유지됩니다."; Refresh(); }
+
     public void SelectTab(ShopTab tab)
     {
         if (!CanTransact || !Enum.IsDefined(typeof(ShopTab), tab) || _tab == tab) return;
         _tab = tab;
+        _fusionChoice = null;
         _fusionFirst = _fusionSecond = null;
         _fusionResult = null;
         _message = TabHint();
@@ -322,7 +387,7 @@ public sealed class StageShopService : MonoBehaviour
     /// <summary>Only the explicit detail action mutates materials; inspecting cards is side-effect free.</summary>
     public void ToggleFusionMaterial(string itemId)
     {
-        if (!CanTransact || _tab != ShopTab.Fuse || !_items.Contains(itemId)) return;
+        if (!CanTransact || _fusionChoice != null || _tab != ShopTab.Fuse || !_items.Contains(itemId)) return;
         if (_fusionFirst == itemId) { ClearFusionSlot(0); return; }
         if (_fusionSecond == itemId) { ClearFusionSlot(1); return; }
         var item = _items.Catalog.Find(itemId);
@@ -338,10 +403,11 @@ public sealed class StageShopService : MonoBehaviour
 
     public void ClearFusionSlot(int slot)
     {
-        if (!CanTransact || _tab != ShopTab.Fuse || slot < 0 || slot > 1) return;
+        if (!CanTransact || _fusionChoice != null || _tab != ShopTab.Fuse || slot < 0 || slot > 1) return;
         if (slot == 0) { _fusionFirst = _fusionSecond; _fusionSecond = null; }
         else _fusionSecond = null;
         _fusionResult = null;
+        _fusionChoice = null;
         _message = TabHint();
         Refresh();
     }
@@ -352,6 +418,7 @@ public sealed class StageShopService : MonoBehaviour
         _offerSelection = null;
         _detailSource = ShopDetailSource.None;
         _fusionResult = null;
+        _fusionChoice = null;
     }
 
     private string TabHint() => _tab switch
@@ -422,8 +489,20 @@ public sealed class StageShopService : MonoBehaviour
             Hp = _player.StatManager.CurrentHp,
             MaxHp = _player.StatManager.MaxHp,
             Message = _message,
-            Tab = _tab
+            Tab = _tab,
+            UsesSynergyCatalog = _items.Catalog?.synergies != null && _items.Catalog.synergies.Length > 0
         };
+        state.RefreshCost = CurrentStock?.RefreshCost ?? 20;
+        state.RefreshCount = CurrentStock?.RefreshCount ?? 0;
+        state.CanRefresh = state.Visible && _tab == ShopTab.Buy && _fusionChoice == null
+            && CurrentStock.CanRefresh(_items) && Wallet.Gold >= state.RefreshCost;
+        state.FusionChoiceActive = state.Visible && _tab == ShopTab.Fuse && _fusionChoice != null;
+        if (state.FusionChoiceActive)
+        {
+            state.FusionCandidates = new ShopOwnedItemViewState[_fusionChoice.Candidates.Count];
+            for (int i = 0; i < state.FusionCandidates.Length; i++)
+                state.FusionCandidates[i] = OwnedState(_fusionChoice.Candidates[i]);
+        }
         if (CurrentStock != null)
         {
             state.Offers = new ShopOfferViewState[CurrentStock.Offers.Count];
@@ -439,7 +518,9 @@ public sealed class StageShopService : MonoBehaviour
                     Id = offer.Id, Icon = offer.Item != null ? offer.Item.icon : null,
                     Name = offer.IsHealing ? "체력 회복" : offer.Item.displayName,
                     Description = offer.IsHealing ? $"최대 체력의 {settings.healingFraction * 100:0}%를 즉시 회복합니다."
-                        : offer.Item.description,
+                        : ItemDisplayText.Description(offer.Item, _items.Catalog),
+                    PrimarySynergyName = offer.Item != null ? offer.Item.primarySynergyName : null,
+                    PrimarySynergyIcon = offer.Item != null ? offer.Item.primarySynergyIcon : null,
                     Price = offer.Price, ButtonLabel = label,
                     Grade = offer.Item != null ? offer.Item.grade : 0,
                     Element = offer.Item != null ? offer.Item.element : ElementType.ELEMENT_NONE,
@@ -494,13 +575,13 @@ public sealed class StageShopService : MonoBehaviour
             if (item.itemId == _fusionFirst) state.FusionFirst = row;
             if (item.itemId == _fusionSecond) state.FusionSecond = row;
         }
-        state.CanSell = state.Visible && state.SelectedSale != null && state.SelectedSale.CanSell;
+        state.CanSell = state.Visible && _fusionChoice == null && state.SelectedSale != null && state.SelectedSale.CanSell;
         state.FusionResult = _fusionResult != null ? OwnedState(_fusionResult) : null;
         state.FusionOddsText = "같은 등급 아이템을 두 개 선택하세요.";
         if (_transactions != null && _fusionFirst != null && _fusionSecond != null)
         {
             var preview = _transactions.GetFusionPreview(_fusionFirst, _fusionSecond, out int grade, out float chance);
-            state.CanFuse = state.Visible && preview == ShopFusionResult.Success;
+            state.CanFuse = state.Visible && _fusionChoice == null && preview == ShopFusionResult.Success;
             state.FusionOddsText = preview == ShopFusionResult.Success
                 ? chance <= 0f ? $"{grade}등급 100% · 골드 소모 없음"
                     : $"{grade}등급 {(1f - chance) * 100f:0.#}% / {grade + 1}등급 {chance * 100f:0.#}%\n골드 소모 없음"
@@ -516,7 +597,8 @@ public sealed class StageShopService : MonoBehaviour
         bool sellable = _transactions != null && _transactions.TryGetSalePrice(item.itemId, out price);
         return new ShopOwnedItemViewState
         {
-            Id = item.itemId, Name = item.displayName, Description = item.description,
+            Id = item.itemId, Name = item.displayName, Description = ItemDisplayText.Description(item, _items.Catalog),
+            PrimarySynergyName = item.primarySynergyName, PrimarySynergyIcon = item.primarySynergyIcon,
             Grade = item.grade, Icon = item.icon, SalePrice = price,
             Element = item.element,
             CanSell = sellable && price <= int.MaxValue - Wallet.Gold
@@ -565,6 +647,12 @@ public sealed class StageShopService : MonoBehaviour
         _view.SellRequested -= Sell;
         _view.FusionRequested -= FuseSelected;
         _view.FusionSlotCleared -= ClearFusionSlot;
+        if (_view is IShopProgressionView progression)
+        {
+            progression.RefreshRequested -= RefreshStock;
+            progression.FusionResultSelected -= SelectFusionResult;
+            progression.FusionChoiceCancelled -= CancelFusionChoice;
+        }
         if (Wallet != null) Wallet.GoldChanged -= GoldChanged;
         if (_items != null) _items.OnOwnedItemsChanged -= Refresh;
         if (_player != null && _player.StatManager != null) _player.StatManager.OnHpChanged -= HealthChanged;

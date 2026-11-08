@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Generated_Torso_Skin
-  m_Shader: {fileID: 4800000, guid: a4c8f68acf7c9844e97a36914026acb1, type: 3}
+  m_Shader: {fileID: 4800000, guid: 0dde7f0097aeb2541aea684ca0ad0e3c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
@@ -20,23 +20,21 @@ Material:
   - _FADEUVSET_UV1
   - _GREYSCALESTAGE_BEFORELIGHTING
   - _HEIGHTGRADIENTPOSITIONSPACE_LOCAL
-  - _LIGHTMODEL_TOON
+  - _LIGHTMODEL_FAKEGI
   - _MATCAPBLENDMODE_MULTIPLY
-  - _OUTLINETYPE_CONSTANT
+  - _OUTLINETYPE_NONE
   - _RECEIVEDSHADOWSTYPE_CLASSIC
   - _RECEIVE_SHADOWS_ON
   - _REFLECTIONS_NONE
   - _RIMLIGHTINGSTAGE_AFTERLIGHTING
-  - _RIM_LIGHTING_ON
   - _SHADINGMODEL_BASIC
-  - _SPECULARMODEL_CLASSIC
+  - _SPECULARMODEL_NONE
   - _TEXTUREBLENDINGMODE_RGB
   - _TEXTUREBLENDINGSOURCE_VERTEXCOLOR
   - _TRIPLANARNORMALSPACE_WORLD
   - _USE_WIND_VERTICAL_MASK
-  m_InvalidKeywords:
-  - _GLITCHWORLDSPACE_ON
-  m_LightmapFlags: 4
+  m_InvalidKeywords: []
+  m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -219,7 +217,7 @@ Material:
     - _DitherScale: 1
     - _DstBlend: 0
     - _EmissionEnabled: 0
-    - _EmissionSelfGlow: 1
+    - _EmissionSelfGlow: 0
     - _FaceDownCutoff: 0.25
     - _FadeAmount: 0
     - _FadeBurnOn: 0
@@ -249,7 +247,7 @@ Material:
     - _HandDrawn: 0
     - _HandDrawnAmount: 10
     - _HandDrawnSpeed: 5
-    - _HardnessFakeGI: 0.75
+    - _HardnessFakeGI: 0.4
     - _HeightGradientOn: 0
     - _HeightGradientPositionSpace: 0
     - _HighlightCutoff: 0.5
@@ -281,7 +279,7 @@ Material:
     - _IntersectionFadeFactor: 1
     - _IntersectionFadeOn: 0
     - _IntersectionGlowOn: 0
-    - _LightModel: 2
+    - _LightModel: 5
     - _LightmapColorCorrection: 0
     - _Matcap: 0
     - _MatcapBlend: 1
@@ -306,8 +304,8 @@ Material:
     - _NormalStrength: 1
     - _OcclusionStrength: 1
     - _OutlineMode: 6
-    - _OutlineThickness: 0.035
-    - _OutlineType: 2
+    - _OutlineThickness: 0.04
+    - _OutlineType: 0
     - _Parallax: 0.02
     - _Pixelate: 0
     - _PixelateSize: 32
@@ -321,7 +319,7 @@ Material:
     - _ReflectionsAtten: 0.5
     - _RenderPreset: 1
     - _RimAttenuation: 0.09
-    - _RimLighting: 1
+    - _RimLighting: 0
     - _RimLightingStage: 2
     - _SSSAtten: 1
     - _SSSFrontAtten: 0.3
@@ -341,7 +339,7 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularAtten: 0.055
     - _SpecularHighlights: 1
-    - _SpecularModel: 1
+    - _SpecularModel: 0
     - _SpecularToonCutoff: 0.5
     - _SpecularToonSmoothness: 0.075
     - _SpherizeNormals: 0
@@ -355,9 +353,9 @@ Material:
     - _TextureBlendingMode: 0
     - _TextureBlendingSource: 0
     - _TimingSeed: 0
-    - _ToonCutoff: 0.28
+    - _ToonCutoff: 0.3
     - _ToonFactor: 0
-    - _ToonSmoothness: 0.16
+    - _ToonSmoothness: 0.24
     - _TopNormalStrength: 1
     - _TriplanarMappingOn: 0
     - _TriplanarNoiseTransitionOn: 0
@@ -393,7 +391,7 @@ Material:
     m_Colors:
     - _AOColor: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 0.97995263, g: 0.86716825, b: 0.8361925, a: 1}
-    - _CustomAmbientColor: {r: 0.5, g: 0.48, b: 0.53, a: 1}
+    - _CustomAmbientColor: {r: 0.46, g: 0.45, b: 0.48, a: 1}
     - _DepthGlowColor: {r: 1, g: 0.9869999, b: 0.6, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
     - _FadeBurnColor: {r: 1, g: 1, b: 0, a: 1}
@@ -406,7 +404,7 @@ Material:
     - _HitColor: {r: 1, g: 1, b: 1, a: 1}
     - _HologramColor: {r: 1.25, g: 2.8, b: 6.8, a: 1}
     - _HologramLineDirection: {r: 0, g: 1, b: 0, a: 0}
-    - _OutlineColor: {r: 0.43, g: 0.29, b: 0.27, a: 1}
+    - _OutlineColor: {r: 0.11, g: 0.065, b: 0.075, a: 1}
     - _RimColor: {r: 0.65, g: 0.71, b: 0.83, a: 1}
     - _RimOffset: {r: 0, g: 0, b: 0, a: 0}
     - _SSSColor: {r: 1, g: 1, b: 1, a: 1}

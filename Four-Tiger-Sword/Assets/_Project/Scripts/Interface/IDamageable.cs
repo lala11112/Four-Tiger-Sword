@@ -14,14 +14,16 @@ public readonly struct DamageResult
     public readonly float ShieldDamage;
     public readonly bool Killed;
     public readonly bool CausedOrdinaryStagger;
+    public readonly bool Revived;
     public bool Applied => Outcome == DamageOutcome.Applied;
     public DamageResult(DamageOutcome outcome, float healthDamage = 0f, float shieldDamage = 0f,
-        bool killed = false, bool causedOrdinaryStagger = false)
+        bool killed = false, bool causedOrdinaryStagger = false, bool revived = false)
     {
         Outcome = outcome;
         HealthDamage = healthDamage;
         ShieldDamage = shieldDamage;
         Killed = killed;
         CausedOrdinaryStagger = causedOrdinaryStagger;
+        Revived = revived;
     }
 }

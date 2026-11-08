@@ -47,6 +47,8 @@ public class PlayerInputHandler : MonoBehaviour
     private bool _wasActionStopped;
     private bool _shopInputBlocked;
     private bool _mapInputBlocked;
+    private bool _inventoryInputBlocked;
+    private bool _rewardInputBlocked;
     private bool _waitForGameplayRelease;
     private bool _finisherInputBlocked;
     private bool _finisherNeedsRelease;
@@ -162,6 +164,26 @@ public class PlayerInputHandler : MonoBehaviour
         ClearGameplayInput();
     }
 
+    internal void SetInventoryInputBlocked(bool blocked)
+    {
+        if (_inventoryInputBlocked == blocked) return;
+        _inventoryInputBlocked = blocked;
+        _waitForGameplayRelease = true;
+        FinisherPressedThisFrame = false;
+        _finisherNeedsRelease = true;
+        ClearGameplayInput();
+    }
+
+    internal void SetRewardInputBlocked(bool blocked)
+    {
+        if (_rewardInputBlocked == blocked) return;
+        _rewardInputBlocked = blocked;
+        _waitForGameplayRelease = true;
+        FinisherPressedThisFrame = false;
+        _finisherNeedsRelease = true;
+        ClearGameplayInput();
+    }
+
     private void ClearGameplayInput()
     {
         MoveInput = Vector2.zero;
@@ -200,11 +222,11 @@ public class PlayerInputHandler : MonoBehaviour
         if (!IsFinisherHeld) _finisherNeedsRelease = false;
         bool waitForChainSkillRelease = _chainSkillNeedsRelease;
         if (!(ChainSkillAction?.IsPressed() ?? false)) _chainSkillNeedsRelease = false;
-        if (_shopInputBlocked || _mapInputBlocked || _finisherInputBlocked || _waitForGameplayRelease)
+        if (_shopInputBlocked || _mapInputBlocked || _inventoryInputBlocked || _rewardInputBlocked || _finisherInputBlocked || _waitForGameplayRelease)
         {
             ClearGameplayInput();
             // Ignore the entire first neutral frame so its WasPressedThisFrame flags cannot leak.
-            if (!_shopInputBlocked && !_mapInputBlocked && !_finisherInputBlocked && !AnyGameplayButtonHeld()) _waitForGameplayRelease = false;
+            if (!_shopInputBlocked && !_mapInputBlocked && !_inventoryInputBlocked && !_rewardInputBlocked && !_finisherInputBlocked && !AnyGameplayButtonHeld()) _waitForGameplayRelease = false;
             return;
         }
         if (!AllowsCombatInput)

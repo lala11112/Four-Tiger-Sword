@@ -13,15 +13,20 @@ public sealed class EnemyGoldReward : MonoBehaviour
     private readonly List<ItemDefinition> _itemRewards = new List<ItemDefinition>();
     private int _amount;
     private bool _initialized, _subscribed, _paid;
+    public bool IsInitialized => _initialized;
+    public int BaseGold => _amount;
 
     public void Initialize(PlayerWallet wallet, int amount)
+        => Initialize(wallet, amount, null);
+
+    public void Initialize(PlayerWallet wallet, int amount, PlayerItemRuntime items)
     {
         if (wallet == null) throw new ArgumentNullException(nameof(wallet));
         if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount));
         Unsubscribe();
         _wallet = wallet;
         _amount = amount;
-        _items = null;
+        _items = items;
         _itemRewards.Clear();
         _enemy = GetComponent<Enemy>();
         _initialized = true;
@@ -65,6 +70,17 @@ public sealed class EnemyGoldReward : MonoBehaviour
         var items = _items;
         int amount = _amount;
         var rewards = _itemRewards.ToArray();
+        var death = _enemy != null ? _enemy.DeathContext : default;
+        int engravingBonus = death.Player != null && death.Player.Engravings != null
+            ? death.Player.Engravings.BonusKillGold(_enemy, death, _amount) : 0;
+        if (items != null && death.Player != null && death.Player.ItemRuntime == items)
+        {
+            var context = new ItemKillContext(_enemy.gameObject.GetInstanceID(), _enemy.Rank != EnemyRank.Normal,
+                death.Family, death.CanTrigger, amount, death.PlayerHp, death.PlayerMaxHp, death.CombatEpoch, death.WasInCombat);
+            int bonus = items.ProcessKill(context);
+            amount = (int)Math.Min(int.MaxValue, (long)amount + bonus);
+        }
+        amount = (int)Math.Min(int.MaxValue, (long)amount + engravingBonus);
         if (wallet != null) wallet.AddGold(amount);
         if (items == null || !items.IsInitialized || items.Catalog == null) return;
         // Ownership is checked again at death: acquiring an item after spawn skips it without compensation.
