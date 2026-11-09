@@ -31,7 +31,9 @@ public static class BoundaryZeroOverlayRegression
 
             overlay.ShowLoading();
             Check(root.GetComponent<Canvas>().sortingOrder == 200, "Loading must cover open gameplay modals.");
-            VisibleTitle(overlay.Title, "구역 준비 중");
+            Check(overlay.Title.text == "이동 중..." && !overlay.Details.gameObject.activeSelf,
+                "Loading must show only its concise heading.");
+            VisibleTitle(overlay.Title, "이동 중...");
             Check(overlay.Title.rectTransform.rect.height >= 60, "The loading title clips the existing Noto font line height.");
             var loading = root.transform.Find("Modal/ReferenceFrame/Loading");
             Check(loading != null && loading.gameObject.activeSelf, "Loading mode did not enable its authored layers.");

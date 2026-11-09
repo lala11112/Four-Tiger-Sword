@@ -30,8 +30,8 @@ public sealed class BoundaryZeroRunOverlay : MonoBehaviour
     private uint _revealVersion;
     private bool _revealPrepared;
     private GameObject _resultSummaryRoot;
-    private TMP_Text _resultProgress, _clearedRooms;
-    private ResultValue _stageReward, _deathReward, _balance;
+    private TMP_Text _resultProgress, _clearedRooms, _conversionSource;
+    private ResultValue _stageReward, _deathReward, _goldConversion, _balance;
     private RunResultSummary _resultSummary;
     private bool _hasResultSummary, _rewardTransferPrepared;
     private const float RewardReadSeconds = .25f;
@@ -134,12 +134,13 @@ public sealed class BoundaryZeroRunOverlay : MonoBehaviour
     private void PrepareRewardTransfer()
     {
         if (!_hasResultSummary || !_resultSummary.Balance.HasValue || _resultSummary.Balance.Value < 0
-            || _resultSummary.StageReward < 0 || _resultSummary.DeathReward < 0) return;
+            || _resultSummary.StageReward < 0 || _resultSummary.DeathReward < 0 || _resultSummary.GoldConversionReward < 0) return;
         long finalBalance = _resultSummary.Balance.Value;
         // Invalid/unknown snapshots stay readable; never invent a balance or overflow a large reward.
         if (_resultSummary.StageReward > finalBalance
             || _resultSummary.DeathReward > finalBalance - _resultSummary.StageReward
-            || (_resultSummary.StageReward == 0 && _resultSummary.DeathReward == 0)) return;
+            || _resultSummary.GoldConversionReward > finalBalance - _resultSummary.StageReward - _resultSummary.DeathReward
+            || (_resultSummary.StageReward == 0 && _resultSummary.DeathReward == 0 && _resultSummary.GoldConversionReward == 0)) return;
         _rewardTransferPrepared = true;
         ApplyRewardTransfer(0f);
     }
@@ -154,7 +155,10 @@ public sealed class BoundaryZeroRunOverlay : MonoBehaviour
             - (long)System.Math.Floor(_resultSummary.DeathReward * (double)progress);
         _stageReward.Amount.text = FormatAmount(stage);
         _deathReward.Amount.text = FormatAmount(death);
-        _balance.Amount.text = FormatAmount(_resultSummary.Balance.Value - stage - death);
+        long conversion = progress >= 1f ? 0L : _resultSummary.GoldConversionReward
+            - (long)System.Math.Floor(_resultSummary.GoldConversionReward * (double)progress);
+        _goldConversion.Amount.text = FormatAmount(conversion);
+        _balance.Amount.text = FormatAmount(_resultSummary.Balance.Value - stage - death - conversion);
     }
 
     public void CancelResultReveal()
@@ -224,6 +228,10 @@ public sealed class BoundaryZeroRunOverlay : MonoBehaviour
         SetMode(true, false, false);
         SetResultLayout(false);
         SetTitleFont(bodyFont, FontStyles.Bold);
+        title.text = "이동 중...";
+        details.text = string.Empty;
+        details.gameObject.SetActive(false);
+        stageLabel.gameObject.SetActive(false);
         details.richText = false;
         Place(title.rectTransform, 160, 1168, 1100, 60);
         title.fontSize = 36;
@@ -272,6 +280,8 @@ public sealed class BoundaryZeroRunOverlay : MonoBehaviour
         _clearedRooms.text = $"클리어한 전투 방 {FormatAmount(summary.ClearedRooms)}개";
         SetResultValue(_stageReward, summary.StageReward, currency);
         SetResultValue(_deathReward, summary.DeathReward, currency);
+        SetResultValue(_goldConversion, summary.GoldConversionReward, currency);
+        _conversionSource.text = $"{FormatAmount(summary.GoldBeforeConversion)} 금화";
         SetResultValue(_balance, summary.Balance, currency);
     }
 
@@ -279,21 +289,23 @@ public sealed class BoundaryZeroRunOverlay : MonoBehaviour
     {
         if (_resultSummaryRoot != null) return;
 
-        var root = CreateRect("ResultsSummary", details.rectTransform.parent, 1380, 570, 950, 385);
+        var root = CreateRect("ResultsSummary", details.rectTransform.parent, 1380, 550, 950, 470);
         _resultSummaryRoot = root.gameObject;
         _resultSummaryRoot.SetActive(false);
         var primary = new Color(.93f, .95f, .98f, 1f);
         var secondary = new Color(.68f, .75f, .81f, 1f);
 
         _resultProgress = CreateSummaryLabel("Progress", root, 0, 0, 950, 64, 48, 32, secondary, TextAlignmentOptions.Left);
-        _stageReward = CreateResultRow(root, "StageReward", "스테이지 보상", 83, primary, secondary);
-        _deathReward = CreateResultRow(root, "DeathReward", "사망 보상", 164, primary, secondary);
-        _clearedRooms = CreateSummaryLabel("ClearedRooms", root, 0, 242, 500, 42, 34, 25, secondary, TextAlignmentOptions.Left);
+        _stageReward = CreateResultRow(root, "StageReward", "스테이지 보상", 72, primary, secondary);
+        _deathReward = CreateResultRow(root, "DeathReward", "사망 보상", 148, primary, secondary);
+        _goldConversion = CreateResultRow(root, "GoldConversion", "금화 환전", 224, primary, secondary);
+        _clearedRooms = CreateSummaryLabel("ClearedRooms", root, 0, 308, 570, 42, 34, 25, secondary, TextAlignmentOptions.Left);
+        _conversionSource = CreateSummaryLabel("ConversionSource", root, 590, 308, 360, 42, 30, 22, secondary, TextAlignmentOptions.Right);
 
-        var rule = CreateRect("BalanceRule", root, 0, 292, 950, 2).gameObject.AddComponent<UnityEngine.UI.Image>();
+        var rule = CreateRect("BalanceRule", root, 0, 366, 950, 2).gameObject.AddComponent<UnityEngine.UI.Image>();
         rule.color = new Color(.68f, .75f, .81f, .3f);
         rule.raycastTarget = false;
-        _balance = CreateResultRow(root, "Balance", "현재 보유량", 310, primary, secondary);
+        _balance = CreateResultRow(root, "Balance", "현재 보유량", 386, primary, secondary);
     }
 
     private ResultValue CreateResultRow(RectTransform root, string name, string heading, float y, Color primary, Color secondary)

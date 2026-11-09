@@ -10,22 +10,25 @@ public sealed partial class HubWorkshopView
     [SerializeField] private PentaUpgradeView engravingView;
     [SerializeField] private GameObject basicWindow;
     [SerializeField] private UnityEngine.UI.Button[] basicPageButtons, engravingPageButtons;
+    [SerializeField] private Sprite normalTab, selectedTab;
     private WorkshopPage _selectedPage;
     private bool _engravingListeners;
-    private string _engravingMessage;
+    private string _engravingMessage, _engravingMessageNode;
 
     public WorkshopPage SelectedPage => _selectedPage;
     public PentaUpgradeView EngravingView => engravingView;
     public GameObject BasicWindow => basicWindow;
 
     public void ConfigureEngravings(PentaUpgradeView tree, GameObject basic,
-        UnityEngine.UI.Button[] basicButtons, UnityEngine.UI.Button[] treeButtons)
+        UnityEngine.UI.Button[] basicButtons, UnityEngine.UI.Button[] treeButtons, Sprite normal, Sprite selected)
     {
         RemoveEngravingListeners();
         engravingView = tree;
         basicWindow = basic;
         basicPageButtons = basicButtons;
         engravingPageButtons = treeButtons;
+        normalTab = normal;
+        selectedTab = selected;
         if (engravingView != null) engravingView.SetHosted(true);
         InitializeEngravingListeners();
         ApplySelectedPage();
@@ -87,14 +90,16 @@ public sealed partial class HubWorkshopView
         UpdatePageButtons(engravingPageButtons, tree);
     }
 
-    private static void UpdatePageButtons(UnityEngine.UI.Button[] buttons, bool selected)
+    private void UpdatePageButtons(UnityEngine.UI.Button[] buttons, bool selected)
     {
         if (buttons == null) return;
         foreach (var button in buttons)
         {
             if (button == null) continue;
-            var text = button.GetComponentInChildren<TMPro.TMP_Text>();
-            if (text != null) text.color = selected ? new Color32(238, 191, 201, 255) : new Color32(171, 186, 201, 255);
+            if (button.image != null && normalTab != null && selectedTab != null)
+                button.image.sprite = selected ? selectedTab : normalTab;
+            var text = button.GetComponentInChildren<TMPro.TMP_Text>(true);
+            if (text != null) text.color = selected ? new Color32(255, 226, 230, 255) : new Color32(200, 213, 226, 255);
         }
     }
 
@@ -115,17 +120,17 @@ public sealed partial class HubWorkshopView
             {
                 Id = concept.Id,
                 DisplayName = state.Definition?.displayName ?? concept.Name,
-                Description = state.Definition?.description ?? concept.Description,
+                Description = concept.Id == "origin" ? "무료 시작 각인" : state.Definition?.description ?? concept.Description,
                 Availability = availability,
                 CanPurchase = ready && state.CanPurchase && !_purchasing && IsInteractionReady,
-                CostLabel = owned ? "해금 완료" : state.Definition == null ? "—" : $"{currency}  {state.Cost:N0}",
-                StatusText = owned ? concept.Id == "origin" ? "무료 시작점입니다." : "영구 각인이 적용됩니다."
-                    : !ready ? _service?.LastError ?? "각인 설정을 불러올 수 없습니다."
-                    : state.Error ?? "각인을 해금하면 자동으로 저장됩니다."
+                CostLabel = owned || state.Definition == null ? "—" : $"{currency}  {state.Cost:N0}",
+                StatusText = !ready ? _service?.LastError ?? "각인 설정을 불러올 수 없습니다." : ""
             });
         }
         engravingView.SetPurchaseBusy(_purchasing);
-        engravingView.ApplyPresentation(states, _service != null && _service.IsReady ? $"{currency}  {_service.Balance:N0}" : currency + "  —", _engravingMessage);
+        engravingView.ApplyPresentation(states,
+            _service != null && _service.IsReady ? $"{currency}  {_service.Balance:N0}" : currency + "  —",
+            _engravingMessageNode == engravingView.SelectedId ? _engravingMessage : null);
     }
 
     private void PurchaseEngraving(string id)
@@ -137,7 +142,8 @@ public sealed partial class HubWorkshopView
         try
         {
             bool success = _service.TryUnlockNode(id, out string error);
-            _engravingMessage = success ? "각인을 해금하고 저장했습니다." : error ?? "각인을 저장하지 못했습니다.";
+            _engravingMessageNode = id;
+            _engravingMessage = success ? null : error ?? "각인을 저장하지 못했습니다.";
         }
         finally { _purchasing = false; Refresh(); }
     }

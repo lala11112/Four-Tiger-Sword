@@ -51,6 +51,7 @@ public static class BossHitReactionVariantsSetup
             configure(root);
             BossMobilitySetup.Configure(root, Folder);
             BossPhaseTwoVisualSetup.Configure(root, Folder);
+            ConfigurePhaseEntryFlight(root, path);
             PrefabUtility.SaveAsPrefabAsset(root, path, out bool saved);
             if (!saved) throw new InvalidOperationException("Could not save boss variant: " + path);
         }
@@ -58,6 +59,17 @@ public static class BossHitReactionVariantsSetup
         {
             PrefabUtility.UnloadPrefabContents(root);
         }
+    }
+
+    public static void ConfigurePhaseEntryFlight(GameObject root, string path)
+    {
+        if (path != AdditivePath) return;
+        var skill = AssetDatabase.LoadAssetAtPath<BossPhaseBurstSkillSO>(SwordRobotBossSetup.Folder + "/Phase2_OpeningBurst.asset");
+        if (skill == null) throw new InvalidOperationException("The phase-two opening burst is missing.");
+        var flight = root.GetComponent<BossPhaseEntryFlight>() ?? root.AddComponent<BossPhaseEntryFlight>();
+        var serialized = new SerializedObject(flight);
+        serialized.FindProperty("_burstSkill").objectReferenceValue = skill;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
     }
 
     private static void EnsureFolder(string path)

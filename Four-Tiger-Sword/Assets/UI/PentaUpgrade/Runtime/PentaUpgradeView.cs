@@ -175,25 +175,34 @@ namespace Penta.Upgrade
                 node.Icon.Refresh();
                 node.Label.color = tint;
                 if (state != null && !string.IsNullOrEmpty(state.DisplayName)) node.Label.text = state.DisplayName;
-                if (node.StateLabel != null) node.StateLabel.text = state == null ? "" : AvailabilityLabel(state.Availability);
+                if (node.StateLabel != null)
+                {
+                    node.StateLabel.text = string.Empty;
+                    node.StateLabel.gameObject.SetActive(false);
+                }
             }
+            if (hosted) RefreshNodeLabelMasks();
             links.Highlight(ancestors);
             states.TryGetValue(id, out var selectedState);
             detailTitle.text = selectedState?.DisplayName ?? selected.Name;
-            detailFamily.text = selected.Family + (selectedState == null ? "  /  내용 미확정" : "  /  " + AvailabilityLabel(selectedState.Availability));
-            detailDescription.text = selectedState?.Description ?? selected.Description;
-            if (changed && descriptionScroll != null) { descriptionScroll.StopMovement(); descriptionScroll.verticalNormalizedPosition = 1f; }
+            detailFamily.text = hosted ? selected.Family : selected.Family + "  /  내용 미확정";
+            string description = selectedState?.Description ?? selected.Description;
+            if (descriptionScroll != null && (changed || detailDescription.text != description))
+            {
+                descriptionScroll.StopMovement();
+                descriptionScroll.content.anchoredPosition = Vector2.zero;
+            }
+            detailDescription.text = description;
             detailIcon.Configure(IconFor(selected), Color.white);
-            var parents = selected.ParentIds.Select(PentaUpgradeCatalog.Find).Where(n => n != null).ToArray();
-            PopulateLinks(parentButtons, parents);
-            parentHint.gameObject.SetActive(parents.Length == 0);
+            if (!hosted)
+            {
+                var parents = selected.ParentIds.Select(PentaUpgradeCatalog.Find).Where(n => n != null).ToArray();
+                PopulateLinks(parentButtons, parents);
+                parentHint.gameObject.SetActive(parents.Length == 0);
+            }
             RefreshPurchase();
             NodeSelected?.Invoke(id);
         }
-
-        static string AvailabilityLabel(PentaUpgradeAvailability value) => value == PentaUpgradeAvailability.Owned
-            ? "해금 완료" : value == PentaUpgradeAvailability.Locked ? "선행 각인 필요"
-            : value == PentaUpgradeAvailability.Unaffordable ? "강화석 부족" : "해금 가능";
 
         public void ApplyPresentation(IEnumerable<PentaUpgradeNodeState> values, string balance, string message = null)
         {
@@ -201,7 +210,7 @@ namespace Penta.Upgrade
             if (values != null) foreach (var value in values) if (value != null && value.Id != null) states[value.Id] = value;
             if (balanceLabel != null) balanceLabel.text = balance;
             Select(selectedId);
-            if (!string.IsNullOrEmpty(message) && purchaseStatus != null) purchaseStatus.text = message;
+            if (!string.IsNullOrEmpty(message)) SetPurchaseStatus(message);
         }
 
         public void SetHosted(bool value) => hosted = value;
@@ -213,10 +222,19 @@ namespace Penta.Upgrade
             states.TryGetValue(selectedId, out var state);
             if (purchaseButton != null) purchaseButton.interactable = state != null && state.CanPurchase && !purchaseBusy;
             if (purchaseCost != null) purchaseCost.text = state?.CostLabel ?? "—";
-            if (purchaseStatus != null) purchaseStatus.text = state?.StatusText ?? "";
+            SetPurchaseStatus(state?.StatusText);
             if (purchaseLabel != null) purchaseLabel.text = state == null ? "이용 불가" : state.Availability == PentaUpgradeAvailability.Owned
                 ? "해금 완료" : state.Availability == PentaUpgradeAvailability.Locked ? "선행 각인 필요"
                 : state.Availability == PentaUpgradeAvailability.Unaffordable ? "강화석 부족" : "각인 해금";
+            if (purchaseLabel != null)
+                purchaseLabel.color = purchaseButton.interactable ? White : Muted;
+        }
+
+        void SetPurchaseStatus(string value)
+        {
+            if (purchaseStatus == null) return;
+            purchaseStatus.text = value ?? "";
+            purchaseStatus.gameObject.SetActive(!string.IsNullOrEmpty(value));
         }
 
         void RequestClose()
@@ -224,47 +242,72 @@ namespace Penta.Upgrade
             if (hosted) CloseRequested?.Invoke(); else Close();
         }
 
-        /// <summary>Add purchase bindings to the delivered prefab without rebuilding its authored graph.</summary>
-        public void ConfigureGameplayUI(bool isHosted = true)
+        /// <summary>Fits the existing graph and its details inside the workshop frame.</summary>
+        public void ConfigureGameplayUI(Vector2 frameSize)
         {
-            hosted = isHosted;
-            var panel = transform.Find("UpgradeVisual/UpgradePanel");
+            hosted = true;
+            var panel = transform.Find("UpgradeVisual/UpgradePanel") as RectTransform;
             if (panel == null || !IsBuilt) throw new InvalidOperationException("Build the Penta upgrade panel before configuring gameplay UI.");
-            var subtitle = panel.Find("Subtitle")?.GetComponent<TMP_Text>();
-            if (subtitle != null) subtitle.text = "영구 각인 · 강화석을 사용해 성장 가지를 해금하세요";
-            balanceLabel = panel.Find("HubLabel")?.GetComponent<TMP_Text>();
-            var detail = panel.Find("SelectedNodePanel") as RectTransform;
-            detail.sizeDelta = new Vector2(430, 690);
-            detailTitle.rectTransform.sizeDelta = new Vector2(295, 64);
+            visual.GetComponent<PentaUpgradePanelFit>().enabled = false;
+            panel.sizeDelta = frameSize;
+            panel.localScale = Vector3.one;
+            panel.GetComponent<PentaUpgradeChrome>().enabled = false;
+            Hide(visual.transform, "GameDimmer");
+            Hide(panel, "HeaderAccent", "HeaderSeal", "Title", "Subtitle", "HubLabel", "Close", "CloseKey",
+                "HeaderRule", "HeaderSteel", "HeaderRed", "TreeHeading", "TreeHint",
+                "FooterRule", "FooterMark", "Footer", "InputHints", "BasicTab", "EngravingTab");
+            balanceLabel = null;
+
+            ResizeControl(fitButton, 64, 204, 160, 48, 22);
+            ResizeControl(zoomOutButton, 968, 204, 48, 48, 26);
+            ResizeControl(zoomInButton, 1024, 204, 48, 48, 26);
+            Resize((RectTransform)viewport.transform, 64, 266, 1008, 600);
+            Fill(viewport.viewport);
+
+            var detail = (RectTransform)panel.Find("SelectedNodePanel");
+            Resize(detail, 1104, 204, 592, 662);
+            Resize(detailFamily.rectTransform, 28, 26, 440, 34);
+            detailFamily.fontSize = 22;
+            detailFamily.color = Muted;
+            Resize(detailTitle.rectTransform, 28, 62, 438, 62);
             detailTitle.enableAutoSizing = true;
-            detailTitle.fontSizeMin = 20;
-            detailTitle.fontSizeMax = 30;
+            detailTitle.fontSizeMin = 22;
+            detailTitle.fontSizeMax = 32;
             detailTitle.textWrappingMode = TextWrappingModes.Normal;
-            var heading = detail.Find("DescriptionHeading")?.GetComponent<TMP_Text>();
-            if (heading != null) heading.text = "각인 효과";
-            var notice = detail.Find("DraftNotice");
-            if (notice != null) notice.gameObject.SetActive(false);
+            Resize((RectTransform)detail.Find("IconMedallion"), 486, 27, 78, 78);
+            Resize(detailIcon.rectTransform, 500, 41, 50, 50);
+            Resize((RectTransform)detail.Find("DetailRule"), 28, 128, 536, 1);
+            var heading = EnsureLabel(detail, "DescriptionHeading", 28, 151, 536, 36, 22, Muted);
+            heading.text = "각인 효과";
+            Hide(detail, "DraftNotice", "ConnectionsRule", "ParentsHeading", "RootHint", "ShowRoute");
+            foreach (var parent in parentButtons) parent.gameObject.SetActive(false);
+
             var scrollRoot = detail.Find("DescriptionScroll") as RectTransform;
-            if (scrollRoot == null) scrollRoot = Rect(detail, "DescriptionScroll", 28, 205, 374, 192);
+            if (scrollRoot == null) scrollRoot = Rect(detail, "DescriptionScroll", 28, 198, 536, 280);
+            Resize(scrollRoot, 28, 198, 536, 280);
             descriptionScroll = scrollRoot.GetComponent<UnityEngine.UI.ScrollRect>();
             if (descriptionScroll == null) descriptionScroll = scrollRoot.gameObject.AddComponent<UnityEngine.UI.ScrollRect>();
             var clip = scrollRoot.Find("Viewport") as RectTransform;
-            if (clip == null) clip = Rect(scrollRoot, "Viewport", 0, 0, 374, 192);
+            if (clip == null) clip = Rect(scrollRoot, "Viewport", 0, 0, 536, 280);
             Fill(clip);
             var hit = clip.GetComponent<UnityEngine.UI.Image>();
             if (hit == null) hit = clip.gameObject.AddComponent<UnityEngine.UI.Image>();
             hit.color = new Color(0, 0, 0, .001f);
             hit.raycastTarget = true;
             if (clip.GetComponent<UnityEngine.UI.RectMask2D>() == null) clip.gameObject.AddComponent<UnityEngine.UI.RectMask2D>();
-            detailDescription.transform.SetParent(clip, false);
+            // Keep the hosted label local to the workshop prefab. Reparenting a child of
+            // the delivered nested prefab does not survive saving the workshop asset.
+            Hide(detail, "Description");
+            detailDescription = EnsureLabel(clip, "DescriptionText", 0, 0, 536, 280, 24, White);
             var content = detailDescription.rectTransform;
             content.anchorMin = new Vector2(0, 1); content.anchorMax = Vector2.one;
             content.pivot = new Vector2(0, 1); content.anchoredPosition = Vector2.zero;
-            content.sizeDelta = new Vector2(0, 192);
-            detailDescription.fontSize = 19;
-            detailDescription.lineSpacing = 6;
+            content.sizeDelta = new Vector2(0, 280);
+            detailDescription.enableAutoSizing = false;
+            detailDescription.margin = new Vector4(0f, 0f, 12f, 0f);
+            detailDescription.lineSpacing = 7;
             detailDescription.overflowMode = TextOverflowModes.Overflow;
-            detailDescription.raycastTarget = true;
+            detailDescription.raycastTarget = false;
             var fit = content.GetComponent<UnityEngine.UI.ContentSizeFitter>();
             if (fit == null) fit = content.gameObject.AddComponent<UnityEngine.UI.ContentSizeFitter>();
             fit.horizontalFit = UnityEngine.UI.ContentSizeFitter.FitMode.Unconstrained;
@@ -273,45 +316,88 @@ namespace Penta.Upgrade
             descriptionScroll.horizontal = false; descriptionScroll.vertical = true;
             descriptionScroll.movementType = UnityEngine.UI.ScrollRect.MovementType.Clamped;
             descriptionScroll.inertia = false; descriptionScroll.scrollSensitivity = 30;
-            Position(detail.Find("ConnectionsRule"), 28, 455);
-            Position(detail.Find("ParentsHeading"), 28, 469);
-            foreach (var parent in parentButtons) Position(parent.transform, 28, 505);
-            Position(parentHint.transform, 28, 505);
-            Position(focusButton.transform, 28, 553);
-            purchaseStatus = EnsureLabel(detail, "PurchaseStatus", 28, 403, 374, 46, 15, Muted);
-            purchaseCost = EnsureLabel(detail, "PurchaseCost", 28, 599, 374, 28, 17, White);
+            purchaseStatus = EnsureLabel(detail, "PurchaseStatus", 28, 488, 536, 68, 22, new Color32(247, 151, 151, 255));
+            purchaseCost = EnsureLabel(detail, "PurchaseCost", 28, 558, 536, 34, 22, White);
             purchaseCost.alignment = TextAlignmentOptions.MidlineRight;
             var purchase = detail.Find("Purchase")?.GetComponent<UnityEngine.UI.Button>();
-            purchaseButton = purchase != null ? purchase : Button(detail, "Purchase", "각인 해금", 28, 638, 374, 36, true);
-            purchaseLabel = purchaseButton.GetComponentInChildren<TMP_Text>();
+            purchaseButton = purchase != null ? purchase : Button(detail, "Purchase", "각인 해금", 28, 598, 536, 52, true);
+            ResizeControl(purchaseButton, 28, 598, 536, 52, 24);
+            var unlockChrome = purchaseButton.GetComponent<PentaUpgradeChrome>();
+            unlockChrome.Configure(PentaUpgradeChrome.Style.UnlockButton);
+            purchaseLabel = purchaseButton.GetComponentInChildren<TMP_Text>(true);
+            purchaseLabel.fontStyle = FontStyles.Bold;
             foreach (var node in nodeViews)
             {
-                node.Label.rectTransform.sizeDelta = new Vector2(220, 60);
+                node.Label.rectTransform.sizeDelta = new Vector2(220, 56);
+                node.Label.alignment = TextAlignmentOptions.Midline;
                 node.Label.enableAutoSizing = true;
-                node.Label.fontSizeMin = 18;
-                node.Label.fontSizeMax = 24;
+                node.Label.fontSizeMin = 22;
+                node.Label.fontSizeMax = 26;
                 node.Label.textWrappingMode = TextWrappingModes.Normal;
-                node.StateLabel = EnsureLabel(node.Button.transform, "PurchaseState", 10, 8, 200, 24, 12, Muted);
-                node.StateLabel.alignment = TextAlignmentOptions.Center;
-            }
-            if (isHosted)
-            {
-                var dim = transform.Find("UpgradeVisual/GameDimmer");
-                if (dim != null) dim.gameObject.SetActive(false);
+                node.StateLabel = node.Button.transform.Find("PurchaseState")?.GetComponent<TMP_Text>();
+                ButtonFeedback(node.Button, node.Frame);
             }
             Wire();
             Select(selectedId);
         }
 
+        void RefreshNodeLabelMasks()
+        {
+            var masks = new List<Rect>();
+            var corners = new Vector3[4];
+            foreach (var node in nodeViews)
+            {
+                AddMask(node.Label);
+            }
+            links.SetLabelMasks(masks.ToArray());
+
+            void AddMask(TMP_Text label)
+            {
+                if (label == null || string.IsNullOrEmpty(label.text)) return;
+                var rect = label.rectTransform;
+                rect.GetWorldCorners(corners);
+                Vector2 min = links.rectTransform.InverseTransformPoint(corners[0]);
+                Vector2 max = links.rectTransform.InverseTransformPoint(corners[2]);
+                float width = Mathf.Min(rect.rect.width, label.GetPreferredValues(label.text).x + 16f);
+                float halfWidth = (max.x - min.x) * width / rect.rect.width * .5f;
+                float centerX = (min.x + max.x) * .5f;
+                // Keep the line gap centered on the same rect as the visible glyphs.
+                masks.Add(UnityEngine.Rect.MinMaxRect(centerX - halfWidth, min.y - 4f, centerX + halfWidth, max.y + 4f));
+            }
+        }
+
         TMP_Text EnsureLabel(Transform parent, string name, float x, float y, float width, float height, float size, Color tint)
         {
             var existing = parent.Find(name)?.GetComponent<TMP_Text>();
-            return existing != null ? existing : Label(parent, name, "", x, y, width, height, size, tint);
+            if (existing == null) return Label(parent, name, "", x, y, width, height, size, tint);
+            Resize(existing.rectTransform, x, y, width, height);
+            existing.fontSize = size;
+            existing.color = tint;
+            return existing;
         }
 
-        static void Position(Transform target, float x, float y)
+        static void Resize(RectTransform target, float x, float y, float width, float height)
         {
-            if (target is RectTransform rect) rect.anchoredPosition = new Vector2(x, -y);
+            target.anchoredPosition = new Vector2(x, -y);
+            target.sizeDelta = new Vector2(width, height);
+        }
+
+        static void ResizeControl(UnityEngine.UI.Button button, float x, float y, float width, float height, float size)
+        {
+            Resize((RectTransform)button.transform, x, y, width, height);
+            var label = button.GetComponentInChildren<TMP_Text>(true);
+            Resize(label.rectTransform, 8, 0, width - 16, height);
+            label.fontSize = size;
+            ButtonFeedback(button, button.targetGraphic);
+        }
+
+        static void Hide(Transform parent, params string[] names)
+        {
+            foreach (string name in names)
+            {
+                var child = parent.Find(name);
+                if (child != null) child.gameObject.SetActive(false);
+            }
         }
 
         static void CollectAncestors(string id, HashSet<string> values)
@@ -577,14 +663,17 @@ namespace Penta.Upgrade
             return button;
         }
 
-        static void ButtonFeedback(UnityEngine.UI.Button button, UnityEngine.UI.Graphic graphic)
+        public static void ButtonFeedback(UnityEngine.UI.Button button, UnityEngine.UI.Graphic graphic)
         {
             button.targetGraphic = graphic;
+            button.transition = UnityEngine.UI.Selectable.Transition.ColorTint;
             var colors = button.colors;
-            colors.normalColor = Color.white;
-            colors.highlightedColor = new Color(1.22f, 1.22f, 1.25f);
-            colors.selectedColor = new Color(1.12f, 1.12f, 1.16f);
-            colors.pressedColor = new Color(.8f, .75f, .78f);
+            colors.normalColor = new Color(.76f, .79f, .85f);
+            colors.highlightedColor = new Color(1f, .88f, .91f);
+            colors.selectedColor = new Color(.92f, .93f, 1f);
+            colors.pressedColor = new Color(.58f, .58f, .67f);
+            colors.disabledColor = new Color(.44f, .47f, .53f, .82f);
+            colors.colorMultiplier = 1f;
             colors.fadeDuration = .1f;
             button.colors = colors;
         }

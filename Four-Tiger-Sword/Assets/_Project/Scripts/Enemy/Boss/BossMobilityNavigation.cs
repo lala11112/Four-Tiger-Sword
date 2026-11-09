@@ -26,10 +26,14 @@ public static class BossMobilityNavigation
         public readonly NavMeshQueryFilter Filter;
         public readonly HashSet<Transform> Ground = new HashSet<Transform>();
         public readonly float Radius, Height, CenterY, BaseOffset;
+        private readonly Transform _ignoredParticipant;
+        private readonly int _ignoredLayers;
 
-        public Context(Boss owner, NavMeshAgent agent)
+        public Context(Boss owner, NavMeshAgent agent, Transform ignoredParticipant = null, int ignoredLayers = 0)
         {
             Owner = owner; Agent = agent;
+            _ignoredParticipant = ignoredParticipant;
+            _ignoredLayers = ignoredLayers;
             Room = owner.GetComponentInParent<BaekhoMapModule>();
             if (Room != null && Room.groundObjects != null)
                 foreach (var ground in Room.groundObjects) if (ground != null) Ground.Add(ground.transform);
@@ -49,6 +53,9 @@ public static class BossMobilityNavigation
         public bool Available => Owner != null && Agent != null && Agent.enabled && Agent.isOnNavMesh;
         public bool Own(Collider collider) => collider == null || collider.transform == Owner.transform
             || collider.transform.IsChildOf(Owner.transform);
+        private bool IgnoreParticipant(Collider collider) => (_ignoredLayers & (1 << collider.gameObject.layer)) != 0
+            || _ignoredParticipant != null && (collider.transform == _ignoredParticipant
+                || collider.transform.IsChildOf(_ignoredParticipant));
 
         private bool IsGround(Transform candidate)
         {
@@ -75,7 +82,8 @@ public static class BossMobilityNavigation
             foreach (var supportHit in Physics.RaycastAll(floor + Vector3.up * .35f, Vector3.down, .8f,
                 ~0, QueryTriggerInteraction.Ignore))
             {
-                if (Own(supportHit.collider) || supportHit.collider.GetComponentInParent<Enemy>() != null
+                if (Own(supportHit.collider) || IgnoreParticipant(supportHit.collider)
+                    || supportHit.collider.GetComponentInParent<Enemy>() != null
                     || supportHit.distance >= nearest) continue;
                 nearest = supportHit.distance; support = supportHit.collider;
             }
@@ -84,7 +92,7 @@ public static class BossMobilityNavigation
 
         private bool Blocks(Collider collider, float floorY)
         {
-            if (Own(collider) || !collider.enabled || collider.isTrigger) return false;
+            if (Own(collider) || IgnoreParticipant(collider) || !collider.enabled || collider.isTrigger) return false;
             // The intended supporting floor is not a body obstacle. Other floors/ceilings remain so.
             if (collider.bounds.max.y <= floorY + .12f
                 && (Room == null || IsGround(collider.transform))) return false;

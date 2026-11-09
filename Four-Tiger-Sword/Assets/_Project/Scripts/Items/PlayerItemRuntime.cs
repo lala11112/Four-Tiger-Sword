@@ -35,6 +35,7 @@ public sealed partial class PlayerItemRuntime : MonoBehaviour
 
     public event Action OnOwnedItemsChanged;
     public event Action<ItemDefinition> ItemAcquired;
+    public event Action<ItemSynergyState> SynergyTierActivated;
 
     public ItemCatalog Catalog
     {
@@ -103,11 +104,13 @@ public sealed partial class PlayerItemRuntime : MonoBehaviour
         _mutationInProgress = true;
         try
         {
+            var previousTiers = CaptureActiveSynergyTiers();
             _owned.Add(itemId, added);
             _ownedItems.Add(definition);
             RecalculateCommittedChange();
             NotifyOwnedItemsChanged();
             NotifyItemAcquired(definition);
+            NotifyActivatedSynergyTiers(previousTiers);
             return true;
         }
         finally { _mutationInProgress = false; }
@@ -147,6 +150,7 @@ public sealed partial class PlayerItemRuntime : MonoBehaviour
         _mutationInProgress = true;
         try
         {
+            var previousTiers = CaptureActiveSynergyTiers();
             _owned.Remove(firstId);
             _owned.Remove(secondId);
             _ownedItems.Remove(first.Definition);
@@ -156,6 +160,7 @@ public sealed partial class PlayerItemRuntime : MonoBehaviour
             RecalculateCommittedChange();
             NotifyOwnedItemsChanged();
             NotifyItemAcquired(definition);
+            NotifyActivatedSynergyTiers(previousTiers);
             return true;
         }
         finally { _mutationInProgress = false; }

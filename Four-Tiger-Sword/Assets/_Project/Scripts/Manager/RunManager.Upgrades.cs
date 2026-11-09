@@ -6,13 +6,15 @@ using UnityEngine;
 /// <summary>Permanent rewards belong to a run, independently of the temporary gold wallet.</summary>
 public sealed partial class RunManager
 {
-    private enum UpgradeRewardKind { Stage, Boss, Death }
+    private enum UpgradeRewardKind { Stage, Boss, Death, GoldConversion }
     private sealed class PendingUpgradeReward
     {
         public string Id;
         public UpgradeRewardKind Kind;
         public int Amount = -1;
         public int ClearedRooms;
+        public PlayerWallet Wallet;
+        public int Gold;
     }
 
     private readonly string _upgradeRunId = Guid.NewGuid().ToString("N");
@@ -23,6 +25,7 @@ public sealed partial class RunManager
     private GameObject _upgradeRoomRoot;
     private bool _upgradeEndRequested, _upgradeEndWon, _upgradeDeathQueued, _grantingUpgradeRewards;
     private bool _endingUpgradeRun;
+    private bool _goldConversionQueued;
     private bool _advanceAfterUpgradeSave, _upgradePlayerWasTransitioning;
     private RunState _upgradeResumeState;
     private string _upgradePreviousError;
@@ -37,6 +40,8 @@ public sealed partial class RunManager
     public bool HasPendingUpgradeRewards => _pendingUpgradeRewards.Count > 0;
     public long StageUpgradeRewardTotal { get; private set; }
     public int DeathUpgradeRewardTotal { get; private set; }
+    public int GoldBeforeConversion { get; private set; }
+    public int GoldConversionRewardTotal { get; private set; }
     public int ClearedCombatRoomCount => _upgradeRoomLedger.TotalClearedRooms;
     public RunResultSummary ResultSummary
     {
@@ -45,7 +50,8 @@ public sealed partial class RunManager
             var service = UpgradeService;
             return new RunResultSummary(ProgressLabel, StageUpgradeRewardTotal, DeathUpgradeRewardTotal,
                 ClearedCombatRoomCount, service?.Settings != null ? service.Settings.currencyName : "강화석",
-                service != null && service.IsReady ? service.Balance : (int?)null);
+                service != null && service.IsReady ? service.Balance : (int?)null,
+                GoldBeforeConversion, GoldConversionRewardTotal);
         }
     }
     public string UpgradeRewardSummary
@@ -57,6 +63,7 @@ public sealed partial class RunManager
             string balance = service != null && service.IsReady ? service.Balance.ToString("N0") : "확인 필요";
             return $"스테이지 보상  {StageUpgradeRewardTotal:N0} {currency}\n"
                 + $"사망 보상  {DeathUpgradeRewardTotal:N0} {currency} (전투 방 {ClearedCombatRoomCount}개)\n"
+                + $"금화 환전  {GoldConversionRewardTotal:N0} {currency} ({GoldBeforeConversion:N0} 금화)\n"
                 + $"보유 {currency}  {balance}";
         }
     }
@@ -86,6 +93,18 @@ public sealed partial class RunManager
     {
         _upgradeEndRequested = true;
         _upgradeEndWon = won;
+        if (!_goldConversionQueued)
+        {
+            _goldConversionQueued = true;
+            var wallet = player != null ? player.GetComponent<PlayerWallet>() : null;
+            GoldBeforeConversion = wallet != null && wallet.IsInitialized ? wallet.Gold : 0;
+            if (GoldBeforeConversion > 0)
+                _pendingUpgradeRewards.Add(new PendingUpgradeReward
+                {
+                    Id = _upgradeRunId + ":gold-conversion", Kind = UpgradeRewardKind.GoldConversion,
+                    Wallet = wallet, Gold = GoldBeforeConversion
+                });
+        }
         if (!won && !_upgradeDeathQueued)
         {
             _upgradeDeathQueued = true;
@@ -117,6 +136,7 @@ public sealed partial class RunManager
                 ? service.LastError : "강화 데이터를 불러오지 못했습니다.";
             return false;
         }
+        if (!service.Settings.Validate(out error)) return false;
         _grantingUpgradeRewards = true;
         try
         {
@@ -126,12 +146,22 @@ public sealed partial class RunManager
                 if (reward.Amount < 0)
                     reward.Amount = reward.Kind == UpgradeRewardKind.Stage ? service.Settings.stageClearReward
                         : reward.Kind == UpgradeRewardKind.Boss ? service.Settings.bossClearReward
+                        : reward.Kind == UpgradeRewardKind.GoldConversion ? reward.Gold / service.Settings.goldPerUpgradeStone
                         : (int)Math.Min(service.Settings.deathRewardCap,
                             (long)reward.ClearedRooms * service.Settings.deathRewardPerRoom);
-                if (!service.TryGrantReward(reward.Id, reward.Amount, out error)) return false;
+                if (reward.Kind == UpgradeRewardKind.GoldConversion)
+                {
+                    string saveError = null;
+                    // Keep the wallet locked through persistence and its observers. A failed write spends nothing.
+                    if (reward.Wallet == null || !reward.Wallet.TryPurchase(reward.Gold,
+                        () => service.TryGrantReward(reward.Id, reward.Amount, out saveError)))
+                    { error = saveError ?? "금화 환전을 완료하지 못했습니다. 다시 시도해 주세요."; return false; }
+                }
+                else if (!service.TryGrantReward(reward.Id, reward.Amount, out error)) return false;
                 // Publish totals only after persistence accepted this exact receipt.
                 _pendingUpgradeRewards.RemoveAt(0);
                 if (reward.Kind == UpgradeRewardKind.Death) DeathUpgradeRewardTotal += reward.Amount;
+                else if (reward.Kind == UpgradeRewardKind.GoldConversion) GoldConversionRewardTotal += reward.Amount;
                 else StageUpgradeRewardTotal += reward.Amount;
             }
             return true;
@@ -248,6 +278,7 @@ public sealed partial class RunManager
         if (_upgradeRoomRoot != result.root)
         {
             _upgradeRoomRoot = result.root;
+            _rewardChoiceReadyAt = 0f;
             _upgradeRoomLedger.BeginGeneration(CurrentChapterIndex, CurrentStageIndex);
             _itemRewardLedger.BeginGeneration(CurrentChapterIndex, CurrentStageIndex);
         }
@@ -274,11 +305,11 @@ public sealed partial class RunManager
             || !room.transform.IsChildOf(_upgradeRoomRoot.transform) || !_upgradeRooms.TryGetValue(room, out int id)) return;
         bool firstClear = _upgradeRoomLedger.RecordClearedRoom(id);
         var identity = room.GetComponent<BaekhoGeneratedRoom>();
-        if (identity != null && (identity.role & BaekhoRoomRole.Boss) == 0
-            && _itemRewardLedger.TryRecord(id, out string receipt)) _itemRewardInbox.Enqueue(receipt);
+        if (identity != null && identity.role == BaekhoRoomRole.Normal
+            && _itemRewardLedger.TryRecord(id, out string receipt))
+            DungeonRewardChest.Spawn(this, room, receipt, stageManager.Encounters?.RewardChestPrefab);
         // Reserve the receipt before healing can notify observers or change composition readiness.
         if (firstClear) player?.Engravings?.NotifyRoomCleared();
-        FlushItemRewardReceipts();
     }
 
     private void UnbindUpgradeRooms()

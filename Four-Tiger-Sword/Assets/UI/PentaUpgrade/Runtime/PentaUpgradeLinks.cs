@@ -37,6 +37,12 @@ namespace Penta.Upgrade
             SetVerticesDirty();
         }
 
+        public void SetLabelMasks(Rect[] textBounds)
+        {
+            labelMasks = textBounds ?? Array.Empty<Rect>();
+            SetVerticesDirty();
+        }
+
         protected override void OnPopulateMesh(UnityEngine.UI.VertexHelper mesh)
         {
             mesh.Clear();

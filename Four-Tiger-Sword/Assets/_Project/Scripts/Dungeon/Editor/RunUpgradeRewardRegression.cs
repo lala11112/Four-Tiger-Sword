@@ -26,6 +26,7 @@ public static class RunUpgradeRewardRegression
             RoomRetryMaxima();
             StageAndBossPayOnce();
             DeathRewardsAndCap();
+            GoldConversion();
             FailedClearResumesPendingExit();
             FailedDeathKeepsPendingReward();
             ObserverReentryCannotEvadeSettlement();
@@ -117,6 +118,45 @@ public static class RunUpgradeRewardRegression
             "Successful retry did not settle once and complete the previously requested final exit.");
         f.Run.TryRetryPendingRewards();
         Check(f.Service.Balance == 30 && f.Store.Writes == 1, "Retrying a settled reward paid twice.");
+    }
+
+    private static void GoldConversion()
+    {
+        foreach (bool won in new[] { false, true })
+        foreach (int gold in new[] { 0, 9, 10, 19, 20 })
+        {
+            using var f = new Fixture();
+            var wallet = f.Wallet(gold);
+            Call(f.Run, "EndRun", won); Call(f.Run, "EndRun", won);
+            Check(wallet.Gold == 0 && f.Service.Balance == gold / 10
+                && f.Run.GoldBeforeConversion == gold && f.Run.GoldConversionRewardTotal == gold / 10,
+                "Gold conversion must floor the balance and settle once on both outcomes.");
+            Check(f.Run.ResultSummary.GoldBeforeConversion == gold
+                && f.Run.ResultSummary.GoldConversionReward == gold / 10, "Result omitted conversion values.");
+        }
+        using (var f = new Fixture())
+        {
+            var wallet = f.Wallet(29);
+            f.Store.FailWrites = true;
+            Call(f.Run, "EndRun", false);
+            Check(wallet.Gold == 29 && f.Service.Balance == 0 && f.Run.HasPendingUpgradeRewards,
+                "A failed conversion spent gold or discarded the receipt.");
+            f.Run.TryRetryPendingRewards();
+            Check(wallet.Gold == 29 && f.Service.Balance == 0, "A failed retry spent gold.");
+            f.Store.FailWrites = false;
+            f.Run.TryRetryPendingRewards(); f.Run.TryRetryPendingRewards();
+            Check(wallet.Gold == 0 && f.Service.Balance == 2 && f.Run.GoldConversionRewardTotal == 2,
+                "Conversion retry did not settle exactly once.");
+        }
+        using (var f = new Fixture())
+        {
+            var wallet = f.Wallet(20);
+            bool reentryRejected = false;
+            f.Service.Changed += () => { reentryRejected = !wallet.AddGold(10); Call(f.Run, "EndRun", true); };
+            Call(f.Run, "EndRun", true);
+            Check(reentryRejected && wallet.Gold == 0 && f.Service.Balance == 2,
+                "Conversion observers reentered the locked wallet or settlement.");
+        }
     }
 
     private static void FailedDeathKeepsPendingReward()
@@ -253,6 +293,13 @@ public static class RunUpgradeRewardRegression
         public void BeginRooms(int chapter, int stage) => Call(Field(Run, "_upgradeRoomLedger"), "BeginGeneration", chapter, stage);
         public bool ClearRoom(int id) => (bool)Call(Field(Run, "_upgradeRoomLedger"), "RecordClearedRoom", id);
         public T Own<T>(T value) where T : Object { value.hideFlags = HideFlags.HideAndDontSave; _owned.Add(value); return value; }
+
+        public PlayerWallet Wallet(int gold)
+        {
+            var actor = Own(new GameObject("Conversion player")); actor.SetActive(false);
+            Run.player = actor.AddComponent<PlayerController>();
+            var wallet = actor.AddComponent<PlayerWallet>(); wallet.Initialize(gold); return wallet;
+        }
 
         public DungeonRoomEncounter Room(out DungeonEncounterMember member)
         {

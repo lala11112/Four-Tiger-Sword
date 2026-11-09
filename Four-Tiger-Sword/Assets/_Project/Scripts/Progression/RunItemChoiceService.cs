@@ -27,7 +27,6 @@ public sealed class RunItemChoiceService
     private readonly Queue<RunItemChoiceSession> _pending = new();
     private bool _busy;
     public int RerollsRemaining { get; private set; }
-    public int EmptyRewardGold => _snapshot.EmptyRewardGold;
     public string LastError { get; private set; }
     public event Action Changed;
     public RunItemChoiceSession Current
@@ -35,6 +34,7 @@ public sealed class RunItemChoiceService
         get { while (_pending.Count > 0 && _pending.Peek().Resolved) _pending.Dequeue(); return _pending.Count > 0 ? _pending.Peek() : null; }
     }
     public ItemCatalog Catalog => _items != null ? _items.Catalog : null;
+    public IReadOnlyList<ItemSynergyState> OwnedSynergies => _items.SynergyStates;
     public RunItemChoiceService(PlayerItemRuntime items, PlayerWallet wallet, EngravingSnapshot snapshot, int seed)
     {
         _items = items ?? throw new ArgumentNullException(nameof(items));
@@ -56,10 +56,26 @@ public sealed class RunItemChoiceService
     {
         if (!Ready || _receipts.ContainsKey(id)) return false;
         var session = new RunItemChoiceSession { Id = id, Kind = kind, NeedsSynergy = kind == RunItemChoiceKind.Starter && _snapshot.Has("starterelement") };
-        _receipts.Add(id, session); _pending.Enqueue(session);
         if (session.NeedsSynergy && StarterSynergies().Count == 0) session.NeedsSynergy = false;
         if (!session.NeedsSynergy)
             session.candidates.AddRange(Draw(Pool(kind == RunItemChoiceKind.Starter ? 1 : 0), Count(session), RandomFor(session), kind == RunItemChoiceKind.Room));
+        if (kind == RunItemChoiceKind.Room && session.candidates.Count == 0)
+        {
+            // A failed credit leaves the receipt available at the chest for a later attempt.
+            _busy = true;
+            try
+            {
+                if (!_wallet.AddGold(_snapshot.EmptyRewardGold)) return Fail("대체 골드를 받을 수 없습니다.");
+                session.Resolved = true;
+                _receipts.Add(id, session);
+            }
+            finally { _busy = false; }
+        }
+        else
+        {
+            _receipts.Add(id, session);
+            _pending.Enqueue(session);
+        }
         LastError = null; Notify();
         return true;
     }
@@ -102,15 +118,9 @@ public sealed class RunItemChoiceService
     public bool TryClaimEmptyReward(string sessionId)
     {
         var current = Current;
-        if (!Ready || current == null || current.Id != sessionId || current.NeedsSynergy || current.candidates.Count != 0) return false;
-        _busy = true;
-        try
-        {
-            if (current.Kind == RunItemChoiceKind.Room && !_wallet.AddGold(_snapshot.EmptyRewardGold)) return Fail("대체 골드를 받을 수 없습니다.");
-            current.Resolved = true; LastError = null;
-        }
-        finally { _busy = false; }
-        Notify(); return true;
+        if (!Ready || current == null || current.Id != sessionId || current.Kind != RunItemChoiceKind.Starter
+            || current.NeedsSynergy || current.candidates.Count != 0) return false;
+        return TrySkip(sessionId);
     }
     public bool TrySkip(string sessionId)
     {

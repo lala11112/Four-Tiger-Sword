@@ -19,7 +19,7 @@ public sealed class BossAdditiveHitReaction : MonoBehaviour
     public bool IsReacting => _reacting;
     public int LayerIndex => _layerIndex;
     public float MotionTime => _sampleTime;
-    public float CurrentWeight => animator != null && _layerIndex >= 0
+    public float CurrentWeight => HasActiveController && _layerIndex >= 0
         ? animator.GetLayerWeight(_layerIndex) : 0f;
 
     private Enemy _subscribedOwner;
@@ -28,6 +28,8 @@ public sealed class BossAdditiveHitReaction : MonoBehaviour
     private int _stateHash, _timeParameterHash;
     private float _elapsed, _strength, _startWeight, _sampleTime, _sampleStart;
     private bool _reacting, _hasTimeParameter;
+    private bool HasActiveController => animator != null && animator.isActiveAndEnabled
+        && animator.runtimeAnimatorController != null;
 
     private void Awake() => FindReferences();
 
@@ -74,11 +76,12 @@ public sealed class BossAdditiveHitReaction : MonoBehaviour
     private void CacheLayer()
     {
         _controller = animator != null ? animator.runtimeAnimatorController : null;
-        _layerIndex = animator != null && _controller != null ? animator.GetLayerIndex(layerName) : -1;
+        _layerIndex = -1;
         _stateHash = Animator.StringToHash(layerName + "." + stateName);
         _timeParameterHash = Animator.StringToHash(timeParameterName);
         _hasTimeParameter = false;
-        if (animator == null || _controller == null) return;
+        if (!HasActiveController) return;
+        _layerIndex = animator.GetLayerIndex(layerName);
         foreach (var parameter in animator.parameters)
             if (parameter.nameHash == _timeParameterHash && parameter.type == AnimatorControllerParameterType.Float)
                 _hasTimeParameter = true;
@@ -155,8 +158,7 @@ public sealed class BossAdditiveHitReaction : MonoBehaviour
     {
         _reacting = false;
         _elapsed = _strength = _startWeight = _sampleTime = _sampleStart = 0f;
-        if (animator != null && animator.runtimeAnimatorController != null
-            && _layerIndex >= 0 && _layerIndex < animator.layerCount)
+        if (HasActiveController && _layerIndex >= 0 && _layerIndex < animator.layerCount)
         {
             animator.SetLayerWeight(_layerIndex, 0f);
             if (_hasTimeParameter && animator.runtimeAnimatorController == _controller)

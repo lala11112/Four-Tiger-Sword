@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class EnemyGroggyState : IPlayerState
 {
-    private Enemy _enemy;
+    private static readonly int GroggyHash = Animator.StringToHash("Groggy");
+    private readonly Enemy _enemy;
     private float _remaining;
+    private float? _savedAnimationSpeed;
 
     public EnemyGroggyState(Enemy enemy)
     {
@@ -11,7 +13,19 @@ public class EnemyGroggyState : IPlayerState
     }
     public void Enter()
     {
-        _enemy.Animator.CrossFade("Groggy", 0.1f);
+        var animator = _enemy.Animator;
+        if (animator != null && animator.runtimeAnimatorController != null && animator.layerCount > 0
+            && animator.HasState(0, GroggyHash))
+        {
+            animator.CrossFade(GroggyHash, 0.1f, 0);
+        }
+        else
+        {
+            // Legacy controllers without a groggy clip hold their current pose until recovery.
+            _savedAnimationSpeed = _enemy.ActorClock != null ? _enemy.ActorClock.AnimationSpeed
+                : animator != null ? animator.speed : 1f;
+            _enemy.SetAnimationSpeed(0f);
+        }
         _enemy.LockMovement();
         _remaining = _enemy.GroggyDuration;
         _enemy.IsHurt = false;
@@ -25,6 +39,11 @@ public class EnemyGroggyState : IPlayerState
 
     public void Exit()
     {
+        if (_savedAnimationSpeed.HasValue)
+        {
+            _enemy.SetAnimationSpeed(_savedAnimationSpeed.Value);
+            _savedAnimationSpeed = null;
+        }
         _enemy.UnlockMovement();
         _enemy.IsGroggy = false;
         _enemy.IsHurt = false;

@@ -9,6 +9,7 @@ public sealed class DungeonEncounterDirector : MonoBehaviour
 {
     public DungeonEnemyCatalog catalog;
     public GameObject doorPrefab;
+    [SerializeField] private GameObject rewardChestPrefab;
     [Min(0.1f)] public float spawnRadius = 3f;
     [Min(1), Tooltip("Desired cost per wave. Individual enemy prices can exceed this target.")]
     public int targetCostPerWave = 20;
@@ -16,6 +17,7 @@ public sealed class DungeonEncounterDirector : MonoBehaviour
     public int maxEnemiesPerWave = 6;
     [SerializeField] private CharacterController player;
     public CharacterController Player => player;
+    internal GameObject RewardChestPrefab => rewardChestPrefab;
     public bool IsReady { get; private set; }
     public string Error
     {

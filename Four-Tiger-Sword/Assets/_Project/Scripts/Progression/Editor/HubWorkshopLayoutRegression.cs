@@ -74,6 +74,7 @@ public static class HubWorkshopLayoutRegression
         HubWorkshopView view = null;
         PlayerUpgradeService previousService = null;
         StatType previousSelection = default;
+        HubWorkshopView.WorkshopPage previousPage = default;
         float previousScroll = 1f;
         PlayerUpgradeSettingsSO maximumSettings = null;
         bool captured = false;
@@ -83,6 +84,7 @@ public static class HubWorkshopLayoutRegression
             view = RequireOpenView();
             previousService = (PlayerUpgradeService)typeof(HubWorkshopView).GetField("_service", Hidden).GetValue(view);
             previousSelection = view.SelectedStat;
+            previousPage = view.SelectedPage;
             previousScroll = view.UI.statusScroll != null ? view.UI.statusScroll.verticalNormalizedPosition : 1f;
             captured = true;
             var settings = previousService?.Settings ?? PlayerUpgradeService.Instance.Settings;
@@ -95,6 +97,7 @@ public static class HubWorkshopLayoutRegression
             var purchaseStore = new MemoryStore(funded);
             var fundedService = new PlayerUpgradeService(settings, purchaseStore);
             view.Bind(fundedService);
+            view.ShowBasicPage();
             foreach (var stat in stats)
             {
                 Phase("normal " + stat);
@@ -188,8 +191,13 @@ public static class HubWorkshopLayoutRegression
             await Frames(2);
             Check(scroll.verticalNormalizedPosition < .01f, "The complete save error cannot be scrolled to its final line.");
             VerifyGeometry(view);
+
+            Phase("engraving effect viewport");
+            view.ShowEngravingPage();
+            await Frames(2);
+            VerifyGeometry(view);
             result = "PASS: " + _checks + " checks at " + Screen.width + "x" + Screen.height
-                + "; all categories, cap/empty/max-int/success/error states, glyph bounds, 64-unit safe inset, independent content and real pointer/scroll targets; memory stores only.";
+                + "; all categories, cap/empty/max-int/success/error states, masked engraving effects, glyph bounds, 64-unit safe inset, independent content and real pointer/scroll targets; memory stores only.";
         }
         catch (Exception failure) { result = "FAIL during " + _phase + ": " + failure; }
         finally
@@ -199,10 +207,12 @@ public static class HubWorkshopLayoutRegression
                 try
                 {
                     view.Bind(previousService);
+                    view.ShowBasicPage();
                     view.Select(previousSelection);
                     // Consume the normal pending reset before restoring the viewer's prior scroll position.
                     typeof(HubWorkshopView).GetMethod("LateUpdate", Hidden)?.Invoke(view, null);
                     if (view.UI.statusScroll != null) view.UI.statusScroll.verticalNormalizedPosition = previousScroll;
+                    if (previousPage == HubWorkshopView.WorkshopPage.Engravings) view.ShowEngravingPage();
                 }
                 catch (Exception cleanup) { result += " Cleanup: " + cleanup.Message; }
             }
@@ -224,6 +234,8 @@ public static class HubWorkshopLayoutRegression
         Canvas.ForceUpdateCanvases();
         UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(window);
         Canvas.ForceUpdateCanvases();
+        VerifyEngravingDescription(view, window);
+        if (view.SelectedPage == HubWorkshopView.WorkshopPage.Engravings) return;
         var safe = window.rect;
         safe.xMin += 64f;
         safe.xMax -= 64f;
@@ -289,6 +301,32 @@ public static class HubWorkshopLayoutRegression
                 Check(overlapX <= Epsilon || overlapY <= Epsilon, "Independent content overlaps: "
                     + Path(left.Transform, window) + " " + left.Bounds + " and " + Path(right.Transform, window) + " " + right.Bounds);
             }
+    }
+
+    private static void VerifyEngravingDescription(HubWorkshopView view, RectTransform window)
+    {
+        var scroll = view.EngravingView?.DescriptionScroll;
+        Check(scroll != null && scroll.viewport != null && scroll.content != null && scroll.content.parent == scroll.viewport
+            && scroll.vertical && !scroll.horizontal && scroll.viewport.GetComponent<UnityEngine.UI.RectMask2D>()?.enabled == true,
+            "The engraving body must be inside its masked vertical viewport.");
+        var body = scroll.content.GetComponent<TextMeshProUGUI>();
+        Check(body != null && body.maskable && body.fontSize >= 22f
+            && scroll.content.GetComponent<UnityEngine.UI.ContentSizeFitter>()?.verticalFit == UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize,
+            "The masked engraving body must keep readable, vertically fitted text.");
+        if (view.SelectedPage != HubWorkshopView.WorkshopPage.Engravings) return;
+
+        var heading = scroll.transform.parent.Find("DescriptionHeading") as RectTransform;
+        Check(heading != null && body.isActiveAndEnabled, "The engraving heading and body must be visible.");
+        Rect headingBounds = InWindow(heading, window);
+        Rect viewportBounds = InWindow(scroll.viewport, window);
+        Rect bodyBounds = InWindow(scroll.content, window);
+        Check(Mathf.Abs(bodyBounds.xMin - headingBounds.xMin) <= Epsilon
+            && Mathf.Abs(bodyBounds.xMin - viewportBounds.xMin) <= Epsilon
+            && Mathf.Abs(bodyBounds.xMax - viewportBounds.xMax) <= Epsilon,
+            "The engraving body must align with its heading and stay inside the detail inset.");
+        body.ForceMeshUpdate();
+        Check(body.textInfo.characterInfo.Take(body.textInfo.characterCount).Any(character => character.isVisible),
+            "The engraving body has no visible glyphs.");
     }
 
     private readonly struct Element

@@ -8,7 +8,7 @@ namespace Penta.Upgrade
     [RequireComponent(typeof(CanvasRenderer))]
     public sealed class PentaUpgradeChrome : MaskableGraphic
     {
-        public enum Style { Window, Detail, Node, Diamond, Button, PrimaryButton, TreeNode }
+        public enum Style { Window, Detail, Node, Diamond, Button, PrimaryButton, TreeNode, UnlockButton }
         [SerializeField] private Style mode;
         [SerializeField] private bool selected;
         [SerializeField] private bool linked;
@@ -40,7 +40,7 @@ namespace Penta.Upgrade
                 case Style.Node: Node(); break;
                 case Style.TreeNode: TreeNode(); break;
                 case Style.Diamond: Diamond(w * .5f, h * .5f, Mathf.Min(w, h) * .38f, selected); break;
-                default: Button(mode == Style.PrimaryButton); break;
+                default: Button(); break;
             }
         }
 
@@ -95,7 +95,7 @@ namespace Penta.Upgrade
             Vector2[] p = { V(left, top), V(right-cut, top), V(right, top+cut), V(right, bottom), V(left, bottom) };
             foreach (Vector2 q in p)
             {
-                Color c = Color.Lerp(GlassTop, GlassBottom, Mathf.InverseLerp(top, bottom, q.y)); c.a = .94f;
+                Color c = Color.Lerp(GlassTop, GlassBottom, Mathf.InverseLerp(top, bottom, q.y));
                 mesh.AddVert(new Vector3(rectTransform.rect.xMin+q.x, rectTransform.rect.yMax-q.y), c*color, Vector2.zero);
             }
             for (int i=1; i<p.Length-1; i++) mesh.AddTriangle(first, first+i, first+i+1);
@@ -164,14 +164,17 @@ namespace Penta.Upgrade
             Stroke(1.6f,Steel,V(x+b-arm,y+b),V(x+b,y+b),V(x+b,y+b-arm));
             Line(x-radius*.28f,y+radius+3,x+radius*.28f,y+radius+3,2,Red);
         }
-        private void Button(bool primary)
+        private void Button()
         {
-            Poly(A(Navy,.90f),V(0,2),V(w-9,2),V(w,h*.45f),V(w-10,h-2),V(0,h-2));
-            Stroke(1,A(Steel,.48f),V(9,2),V(w-9,2),V(w,h*.45f),V(w-10,h-2),V(9,h-2));
-            if(primary)
+            bool unlock = mode == Style.UnlockButton;
+            Color fill = unlock ? new Color32(82, 19, 35, 255) : Navy;
+            Poly(A(fill,.96f),V(0,2),V(w-9,2),V(w,h*.45f),V(w-10,h-2),V(0,h-2));
+            Stroke(1,A(unlock ? Red : Steel,unlock ? 1f : .48f),V(9,2),V(w-9,2),V(w,h*.45f),V(w-10,h-2),V(9,h-2));
+            if (mode == Style.PrimaryButton || unlock)
             {
-                Line(2,7,2,h-7,4,Red);
-                Poly(Red,V(w-11,1),V(w-3,1),V(w,7),V(w-7,7));
+                Color accent = Red;
+                Line(2,7,2,h-7,4,accent);
+                Poly(accent,V(w-11,1),V(w-3,1),V(w,7),V(w-7,7));
             }
         }
     }

@@ -138,7 +138,7 @@ public sealed class StageShopService : MonoBehaviour
         CurrentStock.Changed += Refresh;
         ResetSelection();
         _tab = ShopTab.Buy;
-        _message = TabHint();
+        _message = null;
         Refresh();
     }
 
@@ -281,7 +281,7 @@ public sealed class StageShopService : MonoBehaviour
                 if (prepared == ShopFusionResult.Success)
                 {
                     _fusionChoice = choice;
-                    _message = "결과 후보 하나를 선택하세요. 확정할 때 재료 두 개를 소모합니다.";
+                    _message = null;
                     return ShopFusionResult.ChoiceRequired;
                 }
                 _message = "선택한 재료로 합성 후보를 준비할 수 없습니다.";
@@ -344,7 +344,7 @@ public sealed class StageShopService : MonoBehaviour
     private void RefreshStock() => TryRefreshStock();
     private void SelectFusionResult(string itemId) => TryCommitFusionChoice(itemId);
     private void CancelFusionChoice()
-    { if (!CanTransact || _fusionChoice == null) return; _fusionChoice = null; _message = "합성을 취소했습니다. 재료는 유지됩니다."; Refresh(); }
+    { if (!CanTransact || _fusionChoice == null) return; _fusionChoice = null; _message = "합성 취소"; Refresh(); }
 
     public void SelectTab(ShopTab tab)
     {
@@ -353,7 +353,7 @@ public sealed class StageShopService : MonoBehaviour
         _fusionChoice = null;
         _fusionFirst = _fusionSecond = null;
         _fusionResult = null;
-        _message = TabHint();
+        _message = null;
         Refresh();
     }
 
@@ -367,7 +367,7 @@ public sealed class StageShopService : MonoBehaviour
         if (_tab == ShopTab.Sell)
             _message = !_transactions.TryGetSalePrice(itemId, out int price) ? "판매할 수 없는 아이템입니다."
                 : price > int.MaxValue - Wallet.Gold ? "보유 골드 한도를 초과해 판매할 수 없습니다."
-                : "판매할 아이템과 금액을 확인하세요.";
+                : null;
         Refresh();
     }
 
@@ -397,7 +397,7 @@ public sealed class StageShopService : MonoBehaviour
         if (_fusionFirst == null) _fusionFirst = itemId;
         else _fusionSecond = itemId;
         _fusionResult = null;
-        _message = TabHint();
+        _message = null;
         Refresh();
     }
 
@@ -408,7 +408,7 @@ public sealed class StageShopService : MonoBehaviour
         else _fusionSecond = null;
         _fusionResult = null;
         _fusionChoice = null;
-        _message = TabHint();
+        _message = null;
         Refresh();
     }
 
@@ -421,13 +421,6 @@ public sealed class StageShopService : MonoBehaviour
         _fusionChoice = null;
     }
 
-    private string TabHint() => _tab switch
-    {
-        ShopTab.Sell => "보유 아이템을 선택해 판매할 수 있습니다.",
-        ShopTab.Fuse => "같은 등급 두 개를 소모합니다. 재료 아이템이 다시 나올 수 있습니다.",
-        _ => "상품과 회복은 이 상점에서 한 번씩 구매할 수 있습니다."
-    };
-
     private void ShopChanged(bool open)
     {
         _closeVersion++;
@@ -435,7 +428,7 @@ public sealed class StageShopService : MonoBehaviour
         if (!open && _view is IAnimatedModalView animated) animated.HideImmediate();
         ResetSelection();
         _tab = ShopTab.Buy;
-        _message = TabHint();
+        _message = null;
         Refresh();
     }
 
@@ -577,7 +570,6 @@ public sealed class StageShopService : MonoBehaviour
         }
         state.CanSell = state.Visible && _fusionChoice == null && state.SelectedSale != null && state.SelectedSale.CanSell;
         state.FusionResult = _fusionResult != null ? OwnedState(_fusionResult) : null;
-        state.FusionOddsText = "같은 등급 아이템을 두 개 선택하세요.";
         if (_transactions != null && _fusionFirst != null && _fusionSecond != null)
         {
             var preview = _transactions.GetFusionPreview(_fusionFirst, _fusionSecond, out int grade, out float chance);

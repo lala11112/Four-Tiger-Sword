@@ -41,9 +41,9 @@ public static class ResultSummaryLayoutRegression
             canvas.renderMode = RenderMode.WorldSpace;
             scaler.enabled = false;
             overlay.ModalRoot.SetActive(true);
-            var nominal = new RunResultSummary("1-2  |  지하 연구소", 125, 20, 4, "강화석", 1_420);
+            var nominal = new RunResultSummary("1-2  |  지하 연구소", 125, 20, 4, "강화석", 1_420, 190, 19);
             var stress = new RunResultSummary("12-34  |  경계선 외곽 지역 심층 조사와 생존자 수색 작전",
-                9_876_543_210L, 123_456_789, 12_345, "강화석", int.MaxValue);
+                9_876_543_210L, 123_456_789, 12_345, "강화석", int.MaxValue, int.MaxValue, int.MaxValue / 10);
 
             foreach (var resolution in new[] { new Vector2Int(1280, 720), new Vector2Int(1920, 1080), new Vector2Int(3440, 1440) })
             {
@@ -58,8 +58,8 @@ public static class ResultSummaryLayoutRegression
             }
 
             overlay.ShowLoading();
-            Check(!overlay.ResultSummaryRoot.activeSelf && overlay.Details.gameObject.activeSelf
-                && Mathf.Approximately(overlay.Details.fontSize, 27f), "Result rows or enlarged text leaked into loading mode.");
+            Check(!overlay.ResultSummaryRoot.activeSelf && !overlay.Details.gameObject.activeSelf
+                && overlay.Title.text == "이동 중...", "Loading retained explanatory text.");
             overlay.ShowError();
             Check(!overlay.ResultSummaryRoot.activeSelf && overlay.Details.gameObject.activeSelf
                 && Mathf.Approximately(overlay.Details.fontSize, 27f), "Result rows or enlarged text leaked into error mode.");
@@ -90,6 +90,7 @@ public static class ResultSummaryLayoutRegression
         Check(TextAt(rows, "Progress").text == summary.ProgressLabel
             && TextAt(rows, "StageRewardValue").text == Format(summary.StageReward)
             && TextAt(rows, "DeathRewardValue").text == Format(summary.DeathReward)
+            && TextAt(rows, "GoldConversionValue").text == Format(summary.GoldConversionReward)
             && TextAt(rows, "BalanceValue").text == Format(summary.Balance.GetValueOrDefault())
             && TextAt(rows, "ClearedRooms").text.Contains(Format(summary.ClearedRooms)),
             context + "The rows did not render the supplied progress and full reward values.");

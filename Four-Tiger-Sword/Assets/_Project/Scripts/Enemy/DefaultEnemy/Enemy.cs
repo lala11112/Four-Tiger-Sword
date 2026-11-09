@@ -35,6 +35,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public IEnemyBrain Brain { get; private set; }
     public bool IsDead => _isDie;
+    public bool IsSpawning => _spawnReveal != null && _spawnReveal.IsRevealing;
     [SerializeField] private EnemyRank enemyRank = EnemyRank.Normal;
     public EnemyRank Rank => this is Boss ? EnemyRank.Boss : enemyRank;
     public ItemDeathContext DeathContext { get; private set; }
@@ -112,10 +113,12 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool PendingGroggy = false;
     private bool _isDie = false;
     private EnemyHitFlash _hitFlash;
+    private EnemyDeathFade _spawnReveal;
+    private bool _spawnRevealAttempted;
 
     public bool IsSilenced => GetComponent<StatusEffectHandler>()?.Get<SilenceEffect>() is { IsExpired: false };
     internal bool IsAttackCooldownReady => _attackCooldownTimer <= 0f;
-    public bool CanAttack => !EncounterPatrolOnly && !IsKnockbacking && !IsSilenced && IsAttackCooldownReady;
+    public bool CanAttack => !IsSpawning && !EncounterPatrolOnly && !IsKnockbacking && !IsSilenced && IsAttackCooldownReady;
     public bool IsAttackFinished => CurrentAction?.IsFinished ?? true;
 
     public Animator Animator { get; private set; }
@@ -187,6 +190,7 @@ public class Enemy : MonoBehaviour, IDamageable
         // Components must be ready before a specialized brain enters its first phase.
         Brain = CreateBrain();
         Brain.Initialize();
+        if (IsSpawning) SyncMovementLock();
 
         _rigs = GetComponentsInChildren<Rigidbody>();
 
@@ -198,7 +202,20 @@ public class Enemy : MonoBehaviour, IDamageable
 
     protected virtual IEnemyBrain CreateBrain() => new NormalEnemyBrain(this);
 
-    protected virtual void OnEnable() => Brain?.Resume();
+    protected virtual void OnEnable()
+    {
+        // Reinforcements can be enabled during another object's Update and render before their Start.
+        if (!_spawnRevealAttempted)
+        {
+            _spawnRevealAttempted = true;
+            if (!IsDead && Rank != EnemyRank.Boss && TryGetComponent(out _spawnReveal))
+            {
+                _navMeshAgent = GetComponent<NavMeshAgent>();
+                _spawnReveal.BeginSpawnReveal(this);
+            }
+        }
+        Brain?.Resume();
+    }
 
     protected virtual void Update()
     {
@@ -210,6 +227,7 @@ public class Enemy : MonoBehaviour, IDamageable
             SetDirectionAnimation(0f, 0f);
             return;
         }
+        if (IsSpawning) return;
         UpdateAttackCooldown(); // World clock: local impact stops never lengthen cooldowns.
         bool canAct = ActionDeltaTime > 0f;
         if (canAct)
@@ -305,7 +323,7 @@ public class Enemy : MonoBehaviour, IDamageable
     protected bool CanReceiveDamage(float damage)
     {
         if (EnemyStat == null) EnemyStat = GetComponent<EnemyStat>();
-        return isActiveAndEnabled && !EncounterPatrolOnly && !_isDie && EnemyStat != null && EnemyStat.CurrentHp > 0f
+        return isActiveAndEnabled && !IsSpawning && !EncounterPatrolOnly && !_isDie && EnemyStat != null && EnemyStat.CurrentHp > 0f
             && damage >= 0f && !float.IsNaN(damage) && !float.IsInfinity(damage);
     }
 
@@ -343,7 +361,7 @@ public class Enemy : MonoBehaviour, IDamageable
     /// <summary>Displaces without manufacturing a damage/poise/hit event.</summary>
     public bool TryApplyExternalKnockback(Vector3 power, StaggerResistLevel attackLevel, object source = null)
     {
-        if (!isActiveAndEnabled || IsDead || EncounterPatrolOnly || IsSelfDestructing || EnemyStat == null
+        if (!isActiveAndEnabled || IsDead || IsSpawning || EncounterPatrolOnly || IsSelfDestructing || EnemyStat == null
             || EnemyStat.CurrentHp <= 0f || !CanReceiveKnockback(attackLevel)
             || !KnockbackMotion.IsFinite(power.sqrMagnitude) || power.sqrMagnitude <= 0f) return false;
         if (_navMeshAgent == null) _navMeshAgent = GetComponent<NavMeshAgent>();
@@ -430,6 +448,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private void Die()
     {
         _isDie = true;
+        if (_spawnReveal != null) _spawnReveal.EndSpawnReveal();
         ClearNormalHitChain();
         CombatHitStopService.ReleaseOwner(this);
         ActorClock?.ClearStops();
@@ -440,6 +459,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     protected virtual void OnDisable()
     {
+        if (_spawnReveal != null) _spawnReveal.EndSpawnReveal();
         ClearNormalHitChain();
         CombatHitStopService.ReleaseOwner(this);
         ActorClock?.ClearStops();

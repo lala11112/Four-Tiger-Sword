@@ -23,16 +23,24 @@ public sealed class BossPhaseVisuals : MonoBehaviour
     public BossPhaseVisualSet phaseTwo = new BossPhaseVisualSet();
     public int ActiveVisualPhase { get; private set; } = -1;
     public Animator ActiveAnimator => ActiveVisualPhase == 1 ? phaseTwo.animator : phaseOne.animator;
+    private BossPhaseEntryFlight _entryFlight;
 
     private void OnEnable()
     {
         if (owner == null) owner = GetComponent<Boss>();
-        owner.OnPhaseReviveStarted += ApplyPhase;
+        _entryFlight = GetComponent<BossPhaseEntryFlight>();
+        owner.OnPhaseReviveStarted += ApplyPhaseAtBoundary;
         owner.OnPhaseChanged += PhaseChanged;
     }
 
     private void Start() => ApplyPhase(Mathf.Max(0, owner.PhaseIndex));
-    private void PhaseChanged(int index, IBossPhase phase) => ApplyPhase(index);
+    private void PhaseChanged(int index, IBossPhase phase) => ApplyPhaseAtBoundary(index);
+
+    private void ApplyPhaseAtBoundary(int index)
+    {
+        if (_entryFlight != null && _entryFlight.DeferVisualSwap(index)) return;
+        ApplyPhase(index);
+    }
 
     public void ApplyPhase(int phaseIndex)
     {
@@ -71,7 +79,7 @@ public sealed class BossPhaseVisuals : MonoBehaviour
     {
         if (owner != null)
         {
-            owner.OnPhaseReviveStarted -= ApplyPhase;
+            owner.OnPhaseReviveStarted -= ApplyPhaseAtBoundary;
             owner.OnPhaseChanged -= PhaseChanged;
         }
         ClearTrail(phaseOne);

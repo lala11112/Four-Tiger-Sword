@@ -58,7 +58,7 @@ public static class HubReturnPlayModeRegression
         run.ReturnToHub();
         var transition = Object.FindFirstObjectByType<HubReturnTransition>();
         check(run.IsReturningToHub && HubReturnTransition.IsActive && calls == 0
-            && transition != null && transition.IsLoadingVisible && transition.LoadingHeading.text == "거점으로 이동 중"
+            && transition != null && transition.IsLoadingVisible && transition.LoadingHeading.text == "이동 중..."
             && !overlay.ActionButton.IsInteractable(), "The loading presentation or source input guard did not start immediately.");
         await wait(() => !HubReturnTransition.IsActive && overlay.ActionButton.IsInteractable(),
             "A failed Hub load did not return control to the result screen.");
@@ -121,7 +121,7 @@ public static class HubReturnPlayModeRegression
             run.ReturnToHub();
             transition = Object.FindFirstObjectByType<HubReturnTransition>();
             check(HubReturnTransition.IsActive && transition != null && transition.IsLoadingVisible && calls == 0
-                && transition.LoadingHeading.text == "거점으로 이동 중", "The result action did not show loading before requesting the Hub.");
+                && transition.LoadingHeading.text == "이동 중...", "The result action did not show loading before requesting the Hub.");
             check(transition.GetComponentInChildren<BossHealthHud>(true) == null
                 && transition.GetComponentInChildren<BoundaryZeroRunOverlay>(true) == null,
                 "The persistent loading Canvas retained unrelated result or boss HUD components.");

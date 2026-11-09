@@ -207,7 +207,7 @@ public class StageResultUI : MonoBehaviour
         _mode = DisplayMode.Loading;
         if (boundaryOverlay != null) boundaryOverlay.ShowLoading();
         SetProgress(label);
-        ShowPanel(boundaryOverlay != null ? "구역 준비 중" : "Preparing stage...", label);
+        ShowPanel("이동 중...", string.Empty);
         UpdateButtons();
         ClearPanelSelection();
     }

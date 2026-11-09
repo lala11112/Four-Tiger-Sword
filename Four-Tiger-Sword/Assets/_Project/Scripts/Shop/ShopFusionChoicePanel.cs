@@ -27,13 +27,13 @@ public sealed class ShopFusionChoicePanel : MonoBehaviour
         root.anchorMin = Vector2.zero; root.anchorMax = Vector2.one;
         root.offsetMin = root.offsetMax = Vector2.zero;
         Background(root, new Color(.01f, .02f, .035f, .92f));
-        _window = Rect("Window", root, 0, 0, 1140, 670);
+        _window = Rect("Window", root, 0, 0, 1576, 896);
         _window.anchorMin = _window.anchorMax = _window.pivot = new Vector2(.5f, .5f);
         _window.anchoredPosition = Vector2.zero;
+        _window.gameObject.AddComponent<BoundaryZeroWindowFit>().Configure(new Vector2(1576, 896), 1.08f, 24f);
         Background(_window, new Color32(18, 31, 47, 255));
-        Label("Title", _window, "합성 선별 · 결과 하나 선택", 32, 20, 1076, 50, 30);
-        Label("Guide", _window, "선택을 확정하면 재료 두 개를 소모합니다. 취소해도 후보는 바뀌지 않습니다.", 32, 76, 1076, 42, 20);
-        Button("Cancel", _window, "취소 · 재료 유지", 370, 604, 400, 48, () => _cancel?.Invoke());
+        Label("Title", _window, "합성 결과 선택", 48, 24, 1480, 56, 34);
+        Button("Cancel", _window, "취소", 628, 814, 320, 62, () => _cancel?.Invoke());
         gameObject.SetActive(false);
     }
 
@@ -49,6 +49,9 @@ public sealed class ShopFusionChoicePanel : MonoBehaviour
             if (i == _cards.Count) _cards.Add(CreateCard(i));
             var card = _cards[i]; var item = candidates[i];
             card.Root.gameObject.SetActive(true); card.Id = item.Id;
+            var position = card.Root.anchoredPosition;
+            position.x = (_window.rect.width - (count * 500 - 20)) * .5f + i * 500;
+            card.Root.anchoredPosition = position;
             card.Title.text = item.Name + "\n" + ItemDisplayText.Meta(item.Grade, item.PrimarySynergyName);
             card.Icon.sprite = item.Icon; card.Icon.enabled = item.Icon != null;
             card.Description.text = item.Description ?? string.Empty;
@@ -59,30 +62,34 @@ public sealed class ShopFusionChoicePanel : MonoBehaviour
 
     private Card CreateCard(int index)
     {
-        var card = new Card { Root = Rect("Candidate" + index, _window, 32 + index * 364, 132, 348, 448) };
+        var card = new Card { Root = Rect("Candidate" + index, _window, 48 + index * 500, 98, 480, 684) };
         Background(card.Root, new Color32(30, 46, 65, 255));
-        var icon = Rect("OriginalItemIcon", card.Root, 114, 12, 120, 120);
+        var icon = Rect("OriginalItemIcon", card.Root, 20, 16, 108, 108);
         card.Icon = icon.gameObject.AddComponent<UnityEngine.UI.Image>();
         card.Icon.preserveAspect = true; card.Icon.raycastTarget = false;
-        card.Title = Label("Title", card.Root, string.Empty, 12, 140, 324, 62, 22);
-        card.Title.alignment = TextAlignmentOptions.Center;
-        var scroll = Rect("DescriptionScroll", card.Root, 16, 210, 316, 170);
+        card.Title = Label("Title", card.Root, string.Empty, 144, 20, 316, 104, 28);
+        card.Title.richText = false;
+        card.Title.alignment = TextAlignmentOptions.MidlineLeft;
+        var scroll = Rect("DescriptionScroll", card.Root, 20, 144, 440, 452);
         card.Scroll = scroll.gameObject.AddComponent<UnityEngine.UI.ScrollRect>();
-        var viewport = Rect("Viewport", scroll, 0, 0, 316, 170);
+        var viewport = Rect("Viewport", scroll, 0, 0, 440, 452);
         Background(viewport, new Color(1f, 1f, 1f, .01f));
         viewport.gameObject.AddComponent<UnityEngine.UI.Mask>().showMaskGraphic = false;
-        var content = Rect("Content", viewport, 0, 0, 316, 170);
+        var content = Rect("Content", viewport, 0, 0, 440, 452);
         content.anchorMin = new Vector2(0, 1); content.anchorMax = Vector2.one;
-        content.sizeDelta = new Vector2(0, 170);
+        content.sizeDelta = new Vector2(0, 452);
         card.Description = content.gameObject.AddComponent<TextMeshProUGUI>();
-        Style(card.Description, 18); card.Description.textWrappingMode = TextWrappingModes.Normal;
+        Style(card.Description, 28);
+        BoundaryZero.Inventory.ItemDescriptionDivider.Attach(card.Description);
+        card.Description.lineSpacing = 8;
+        card.Description.textWrappingMode = TextWrappingModes.Normal;
         var fit = content.gameObject.AddComponent<UnityEngine.UI.ContentSizeFitter>();
         fit.verticalFit = UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
         card.Scroll.viewport = viewport; card.Scroll.content = content;
         card.Scroll.horizontal = false; card.Scroll.vertical = true;
         card.Scroll.movementType = UnityEngine.UI.ScrollRect.MovementType.Clamped;
         card.Scroll.scrollSensitivity = 32f;
-        Button("Select", card.Root, "이 결과 선택", 34, 396, 280, 40, () => _select?.Invoke(card.Id));
+        Button("Select", card.Root, "결과 선택", 80, 612, 320, 62, () => _select?.Invoke(card.Id));
         return card;
     }
 
@@ -106,7 +113,7 @@ public sealed class ShopFusionChoicePanel : MonoBehaviour
         var image = Background(rect, new Color32(65, 88, 111, 255));
         var button = rect.gameObject.AddComponent<UnityEngine.UI.Button>(); button.targetGraphic = image;
         button.onClick.AddListener(() => action());
-        Label("Label", rect, value, 0, 0, w, h, 21).alignment = TextAlignmentOptions.Center;
+        Label("Label", rect, value, 0, 0, w, h, 28).alignment = TextAlignmentOptions.Center;
         UIButtonMotion.Install(rect.gameObject);
     }
     private static RectTransform Rect(string name, Transform parent, float x, float y, float w, float h)

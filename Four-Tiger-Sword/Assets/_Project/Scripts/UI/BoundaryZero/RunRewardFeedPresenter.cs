@@ -84,9 +84,13 @@ public sealed class RunRewardFeedPresenter : MonoBehaviour
         }
         if (items != _items)
         {
-            if (_items != null) _items.ItemAcquired -= ItemAcquired;
+            UnbindItems();
             _items = items;
-            if (_items != null) _items.ItemAcquired += ItemAcquired;
+            if (_items != null)
+            {
+                _items.ItemAcquired += ItemAcquired;
+                _items.SynergyTierActivated += SynergyTierActivated;
+            }
         }
     }
 
@@ -104,6 +108,11 @@ public sealed class RunRewardFeedPresenter : MonoBehaviour
     {
         if (CanDisplay && _feed != null && item != null) _feed.ShowItemGain(item.displayName, item.icon);
     }
+    private void SynergyTierActivated(ItemSynergyState state)
+    {
+        if (CanDisplay && _feed != null && state.Definition != null && state.ActiveTier != null)
+            _feed.ShowSynergyActivation(state.Definition.displayName, state.ActiveTier.count, state.Definition.icon);
+    }
     private void StateChanged(RunState state)
     {
         if (state == RunState.Preparing || state == RunState.Error) _feed?.Clear();
@@ -118,8 +127,14 @@ public sealed class RunRewardFeedPresenter : MonoBehaviour
     {
         if (run != null) run.StateChanged -= StateChanged;
         if (_wallet != null) _wallet.GoldGained -= GoldGained;
-        if (_items != null) _items.ItemAcquired -= ItemAcquired;
+        UnbindItems();
         _wallet = null; _items = null;
+    }
+    private void UnbindItems()
+    {
+        if (_items == null) return;
+        _items.ItemAcquired -= ItemAcquired;
+        _items.SynergyTierActivated -= SynergyTierActivated;
     }
     private void OnDisable()
     {

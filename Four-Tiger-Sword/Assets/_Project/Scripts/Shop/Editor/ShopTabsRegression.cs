@@ -22,6 +22,7 @@ public static class ShopTabsRegression
             throw new InvalidOperationException("Run shop tab regression in Edit Mode.");
         _checks = 0;
         AuthoredViewWiring();
+        SharedItemDetails();
         PresenterSelectionAndTransactions();
         return $"Shop tabs: {_checks} checks passed (authored prefab, events, disabled actions, selection, stale ownership and reset).";
     }
@@ -70,6 +71,14 @@ public static class ShopTabsRegression
                 Offers = new[] { offer, heal }, OwnedItems = new[] { owned }, SelectedOffer = offer,
                 DetailSource = ShopDetailSource.Offer };
             view.Render(state);
+            var shopHeader = controls.Content.parent;
+            var coin = shopHeader.Find("GoldIcon")?.GetComponent<UnityEngine.UI.Image>();
+            Check(coin != null && coin.sprite != null && !shopHeader.Find("Health").gameObject.activeSelf,
+                "The shop header should display the coin asset and hide the HP readout.");
+            Check(controls.DetailBody.fontSize >= 28 && controls.DetailBody.richText
+                && ((RectTransform)controls.DetailBody.transform.parent.parent).sizeDelta.y >= 294
+                && controls.DetailIcon.rectTransform.sizeDelta.x < 150,
+                "The detail view should reserve readable space for effects and use compact artwork.");
             var stockRows = Field<List<ShopOfferView>>(view, "_stockRows");
             var ownedRows = Field<List<ShopOfferView>>(view, "_ownedRows");
             Canvas.ForceUpdateCanvases();
@@ -184,11 +193,35 @@ public static class ShopTabsRegression
         }
     }
 
+    private static void SharedItemDetails()
+    {
+        var item = ScriptableObject.CreateInstance<ItemDefinition>();
+        var catalog = ScriptableObject.CreateInstance<ItemCatalog>();
+        try
+        {
+            item.itemId = "details";
+            item.description = "외형 문구";
+            item.effectText = "평타 공격속도 +10%";
+            catalog.items = new[] { item };
+            catalog.synergies = new[] { new ItemSynergyDefinition { id = "set", displayName = "신속",
+                members = new[] { item.itemId }, tiers = new[] { new ItemSynergyTier { count = 2, text = "평타 피해 +4%" } } } };
+            string description = ItemDisplayText.Description(item, catalog);
+            Check(description.Contains("개별 효과</b></color>\n기본 공격 속도 +10%")
+                && description.Contains("\n\n<link=\"item-synergy-divider\">") && description.Contains("기본 공격 피해 +4%")
+                && !description.Contains(item.description), "Effect text must omit appearance, separate synergies and use 기본 공격.");
+            var inventory = ItemDisplayText.ToInventoryData(catalog);
+            Check(inventory.items[0].effect == "기본 공격 속도 +10%"
+                && inventory.synergies[0].tiers[0].text == "기본 공격 피해 +4%", "Inventory kept a different combat term.");
+        }
+        finally { Object.DestroyImmediate(item); Object.DestroyImmediate(catalog); }
+    }
+
     private static void PresenterSelectionAndTransactions()
     {
         using var f = new Fixture();
         f.Service.SelectTab(ShopTab.Sell); f.Service.SelectItem("a");
-        Check(f.View.Last.SelectedSale?.Id == "a" && f.View.Last.CanSell && f.View.Last.SelectedSale.SalePrice == 10,
+        Check(f.View.Last.SelectedSale?.Id == "a" && f.View.Last.CanSell && f.View.Last.SelectedSale.SalePrice == 10
+            && string.IsNullOrEmpty(f.View.Last.Message),
             "Presenter did not quote an eligible selected item.");
         f.Service.SelectTab(ShopTab.Fuse); f.Service.SelectItem("a");
         Check(f.View.Last.SelectedOwned?.Id == "a" && f.View.Last.FusionFirst == null

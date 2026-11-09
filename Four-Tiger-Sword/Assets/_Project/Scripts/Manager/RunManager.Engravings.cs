@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -7,14 +6,14 @@ public sealed partial class RunManager
 {
     public RunItemChoiceService ItemChoices { get; private set; }
     public bool IsRewardOpen { get; private set; }
-    public bool HasPendingItemChoice => _itemRewardInbox.Count > 0 || ItemChoices?.Current != null;
+    public bool HasPendingItemChoice => ItemChoices?.Current != null;
     private bool _engravingsInitialized;
     private EngravingSnapshot _runEngravings;
     private RunItemChoiceView _itemChoiceView;
     private CombatHitStopService.WorldScaleLease _rewardPause;
     private readonly List<CinemachineInputAxisController> _rewardCameraInputs = new();
     private readonly RunItemRewardLedger _itemRewardLedger = new();
-    private readonly RunItemRewardInbox _itemRewardInbox = new();
+    private float _rewardChoiceReadyAt;
 
     private void EnsureRunEngravings()
     {
@@ -25,7 +24,7 @@ public sealed partial class RunManager
     }
     private void EnsureRunItemChoices()
     {
-        if (ItemChoices != null) { FlushItemRewardReceipts(); return; }
+        if (ItemChoices != null) return;
         if (!_engravingsInitialized || player == null) return;
         var wallet = player.GetComponent<PlayerWallet>();
         var items = player.GetComponent<PlayerItemRuntime>();
@@ -33,26 +32,55 @@ public sealed partial class RunManager
         ItemChoices = new RunItemChoiceService(items, wallet, _runEngravings, RunSeed);
         _itemChoiceView = RunItemChoiceView.Ensure(this, ItemChoices);
         ItemChoices.BeginStarterChoice();
-        FlushItemRewardReceipts();
     }
-    private void FlushItemRewardReceipts()
+
+    private bool CanPlayItemChoices => isActiveAndEnabled && State == RunState.Playing && _transition == null && !IsUpgradeSaveBlocked
+        && player != null && player.isActiveAndEnabled && !player.IsStageTransitioning
+        && player.StatManager != null && player.StatManager.CurrentHp > 0f && stageManager != null && stageManager.IsReady;
+
+    internal bool CanPlaceRewardChest(DungeonRoomEncounter room)
+        => CanPlayItemChoices && room != null && room.WasCombatClearedByDefeat && _upgradeRoomRoot != null
+            && stageManager.Result?.root == _upgradeRoomRoot && room.transform.IsChildOf(_upgradeRoomRoot.transform);
+
+    internal bool CanUseRewardChest(DungeonRewardChest chest)
+        => chest != null && chest.IsAvailable && CanPlaceRewardChest(chest.Room) && ItemChoices != null
+            && Time.unscaledTime >= _rewardChoiceReadyAt && !HasPendingItemChoice && !IsRewardOpen
+            && !IsMapOpen && !IsInventoryOpen && !IsShopOpen && !player.IsGameplayModalPaused
+            && !player.IsFinisherSelecting && !player.IsInRoomCombat && chest.CanReach(player);
+
+    internal bool TryOpenRewardChest(DungeonRewardChest chest)
     {
-        if (ItemChoices != null) _itemRewardInbox.Flush(ItemChoices.BeginRoomReward);
+        if (!CanUseRewardChest(chest)) return false;
+        _rewardChoiceReadyAt = Time.unscaledTime + DungeonRewardChest.UseDuration;
+        if (player.Input != null) player.Input.ChainSkillBuffer.Consume();
+        bool accepted = false;
+        try
+        {
+            accepted = ItemChoices.BeginRoomReward(chest.Receipt);
+            if (!accepted) return false;
+            chest.BeginUse();
+            return true;
+        }
+        finally { if (!accepted) _rewardChoiceReadyAt = 0f; }
     }
+
     private void UpdateItemChoiceSession()
     {
-        FlushItemRewardReceipts();
+        bool playable = CanPlayItemChoices;
+        if (playable && ItemChoices == null) EnsureRunItemChoices();
         bool hasPresentableChoice = ItemChoices?.Current != null;
-        bool playable = isActiveAndEnabled && State == RunState.Playing && _transition == null && !IsUpgradeSaveBlocked
-            && player != null && player.isActiveAndEnabled && !player.IsStageTransitioning
-            && player.StatManager != null && player.StatManager.CurrentHp > 0f && stageManager != null && stageManager.IsReady;
         if (IsRewardOpen)
         {
-            if (!playable || !hasPresentableChoice || _rewardPause == null || !_rewardPause.IsValid)
+            if (!playable || _rewardPause == null || !_rewardPause.IsValid)
                 CloseItemChoiceModal();
+            else if (!hasPresentableChoice)
+            {
+                if (_itemChoiceView == null) CloseItemChoiceModal();
+                else if (!_itemChoiceView.IsClosing) _itemChoiceView.Close(CloseItemChoiceModal);
+            }
             return;
         }
-        if (!playable || !hasPresentableChoice || IsMapOpen || IsInventoryOpen || IsShopOpen
+        if (!playable || !hasPresentableChoice || Time.unscaledTime < _rewardChoiceReadyAt || IsMapOpen || IsInventoryOpen || IsShopOpen
             || player.IsGameplayModalPaused || player.IsFinisherSelecting) return;
         var pause = CombatHitStopService.AcquireWorldScale(this, 0f);
         if (!pause.IsValid) { pause.Dispose(); return; }

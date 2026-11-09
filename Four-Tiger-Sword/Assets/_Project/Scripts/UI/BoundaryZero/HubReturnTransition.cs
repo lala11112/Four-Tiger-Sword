@@ -234,12 +234,11 @@ public sealed class HubReturnTransition : MonoBehaviour
             _rotor = art.transform.Find("Seal/Rotor") as RectTransform;
             _pulse = art.transform.Find("Seal/Pulse")?.GetComponent<UnityEngine.UI.Image>();
             _activity = art.transform.Find("ProgressTrack/Activity") as RectTransform;
-            LoadingHeading = AddLabel(frameRect, "Title", "거점으로 이동 중", font, 36f, new Rect(160, 1168, 1100, 60));
-            AddLabel(frameRect, "Details", "영구 강화를 유지한 채 이동합니다.", font, 27f, new Rect(160, 1238, 1450, 84));
+            LoadingHeading = AddLabel(frameRect, "Title", "이동 중...", font, 36f, new Rect(160, 1168, 1100, 60));
         }
         else
         {
-            string text = font != null && font.HasCharacters("거점으로 이동 중") ? "거점으로 이동 중" : "Returning to base…";
+            string text = "이동 중...";
             LoadingHeading = AddLabel(frameRect, "Title", text, font, 52f, new Rect(680, 656, 1200, 128));
             LoadingHeading.alignment = TextAlignmentOptions.Center;
         }

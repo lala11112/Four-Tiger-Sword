@@ -23,8 +23,9 @@ public class StatusEffectHandler : MonoBehaviour
 
     public bool CanApply(Type effectType)
     {
-        var boss = GetComponent<Boss>();
-        return effectType != null && !_clearing && boss?.IsInvulnerable != true
+        var enemy = GetComponent<Enemy>();
+        var boss = enemy as Boss;
+        return effectType != null && !_clearing && enemy?.IsSpawning != true && boss?.IsInvulnerable != true
             && boss?.Data?.IsImmuneToStatus(effectType) != true;
     }
 

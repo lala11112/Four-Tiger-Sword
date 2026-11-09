@@ -136,8 +136,8 @@ public sealed class HubGateController : MonoBehaviour
         {
             loadingOverlay.gameObject.SetActive(true);
             loadingOverlay.ShowLoading();
-            loadingOverlay.Title.text = "탐사 준비 중";
-            loadingOverlay.Details.text = "영구 강화를 유지한 채 구역으로 이동합니다.";
+            loadingOverlay.Title.text = "이동 중...";
+            loadingOverlay.Details.text = string.Empty;
             loadingOverlay.ActionButton.gameObject.SetActive(false);
             loadingOverlay.StageLabel.gameObject.SetActive(false);
             loadingOverlay.ModalRoot.SetActive(true);

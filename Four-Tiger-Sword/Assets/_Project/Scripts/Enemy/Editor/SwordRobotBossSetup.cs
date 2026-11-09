@@ -62,6 +62,7 @@ public static class SwordRobotBossSetup
                     boss.Mobility.approachCooldown = 4.5f;
                 }
                 BossPhaseTwoVisualSetup.Configure(root, path == PrefabPath ? Folder : BossHitReactionVariantsSetup.Folder);
+                BossHitReactionVariantsSetup.ConfigurePhaseEntryFlight(root, path);
                 PrefabUtility.SaveAsPrefabAsset(root, path, out bool saved);
                 if (!saved) throw new InvalidOperationException("Could not save the upgraded boss: " + path);
             }

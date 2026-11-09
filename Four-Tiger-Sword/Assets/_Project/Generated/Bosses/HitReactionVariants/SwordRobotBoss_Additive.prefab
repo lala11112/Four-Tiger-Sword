@@ -52,6 +52,7 @@ GameObject:
   - component: {fileID: 923963782064475997}
   - component: {fileID: 283171963834667807}
   - component: {fileID: 6015268275708671553}
+  - component: {fileID: 8129950825905131074}
   m_Layer: 8
   m_Name: SwordRobotBoss_Additive
   m_TagString: Untagged
@@ -177,6 +178,7 @@ MonoBehaviour:
   EnemyStat: {fileID: 6653300524889967418}
   stateName: 
   HurtDuration: 0.35
+  enemyRank: 0
   _targetMemoryDuration: 4
   ApproachTimeout: 6
   ApproachStuckTimeout: 1.5
@@ -255,6 +257,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDeathFade
   _delay: 0.35
   _duration: 1.2
+  _spawnDuration: 1
   _targets:
   - Renderer: {fileID: 7397737450770355692}
     Materials:
@@ -343,6 +346,24 @@ MonoBehaviour:
     trail: {fileID: 1863837482754372338}
     ik: {fileID: 0}
     reaction: {fileID: 0}
+--- !u!114 &8129950825905131074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3099406880930478208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98ba71df9a6b445a9f7acf05c63005ac, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::BossPhaseEntryFlight
+  _burstSkill: {fileID: 11400000, guid: 06dbb605a1c491f41ba69069b12d5799, type: 2}
+  _ascentSeconds: 0.65
+  _hiddenSeconds: 0.8
+  _descentSeconds: 0.25
+  _minimumHeight: 12
+  _landingStandOff: 1.5
 --- !u!1 &4741396950501855152
 GameObject:
   m_ObjectHideFlags: 0

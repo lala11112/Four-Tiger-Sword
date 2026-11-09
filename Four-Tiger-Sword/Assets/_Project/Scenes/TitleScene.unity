@@ -267,6 +267,7 @@ GameObject:
   - component: {fileID: 145957127}
   - component: {fileID: 145957126}
   - component: {fileID: 145957125}
+  - component: {fileID: 145957128}
   m_Layer: 0
   m_Name: Settings
   m_TagString: Untagged
@@ -417,6 +418,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8aac4cc04d1908d4392a6f11200a6adf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButtonMotion
+--- !u!114 &145957128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 145957120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adf9e2eca4e9f7b4aaf0ea6185c11614, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TitleButtonFocus
 --- !u!1 &152945331
 GameObject:
   m_ObjectHideFlags: 0
@@ -667,6 +680,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: -7958799580173226891, guid: db0aa7e467c40b643b168acf0543dadb, type: 2}
     - target: {fileID: 3105245977973731322, guid: d71b537d888f8634796b0d01d5a9d22a, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3105245977973731322, guid: d71b537d888f8634796b0d01d5a9d22a, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
@@ -831,7 +848,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.EventSystem
-  m_FirstSelected: {fileID: 2070869729}
+  m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
 --- !u!4 &443927027
@@ -1838,6 +1855,7 @@ GameObject:
   - component: {fileID: 1166751127}
   - component: {fileID: 1166751126}
   - component: {fileID: 1166751125}
+  - component: {fileID: 1166751128}
   m_Layer: 0
   m_Name: Continue
   m_TagString: Untagged
@@ -1988,6 +2006,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8aac4cc04d1908d4392a6f11200a6adf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButtonMotion
+--- !u!114 &1166751128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1166751120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adf9e2eca4e9f7b4aaf0ea6185c11614, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TitleButtonFocus
 --- !u!114 &1221412021
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2017,6 +2047,7 @@ GameObject:
   - component: {fileID: 1263446664}
   - component: {fileID: 1263446663}
   - component: {fileID: 1263446662}
+  - component: {fileID: 1263446665}
   m_Layer: 0
   m_Name: Quit
   m_TagString: Untagged
@@ -2179,6 +2210,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8aac4cc04d1908d4392a6f11200a6adf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButtonMotion
+--- !u!114 &1263446665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1263446657}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adf9e2eca4e9f7b4aaf0ea6185c11614, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TitleButtonFocus
 --- !u!1 &1340719883
 GameObject:
   m_ObjectHideFlags: 0
@@ -2342,7 +2385,7 @@ RectTransform:
   m_GameObject: {fileID: 1363463916}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.93870765, y: 0.93870765, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1029493645}
@@ -2983,6 +3026,7 @@ GameObject:
   - component: {fileID: 2070869736}
   - component: {fileID: 2070869735}
   - component: {fileID: 2070869734}
+  - component: {fileID: 2070869737}
   m_Layer: 0
   m_Name: NewGame
   m_TagString: Untagged
@@ -3145,6 +3189,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8aac4cc04d1908d4392a6f11200a6adf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIButtonMotion
+--- !u!114 &2070869737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2070869729}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adf9e2eca4e9f7b4aaf0ea6185c11614, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::TitleButtonFocus
 --- !u!1 &2072686142
 GameObject:
   m_ObjectHideFlags: 0

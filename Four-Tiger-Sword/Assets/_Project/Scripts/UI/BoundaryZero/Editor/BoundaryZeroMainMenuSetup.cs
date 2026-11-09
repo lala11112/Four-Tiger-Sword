@@ -101,6 +101,7 @@ public static class BoundaryZeroMainMenuSetup
         var image = Picture(name, parent, "menu_selected.png", 1600, 470 + row * 130, 700, 103);
         image.raycastTarget = true;
         var button = image.gameObject.AddComponent<UnityEngine.UI.Button>();
+        image.gameObject.AddComponent<TitleButtonFocus>();
         button.targetGraphic = image;
         var colors = button.colors;
         colors.normalColor = new Color(1, 1, 1, 0);

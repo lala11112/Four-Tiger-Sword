@@ -33,7 +33,7 @@ public sealed class SwordRobotBossPresentation : MonoBehaviour
     public float BurstFillProgress { get; private set; }
     public bool BurstWarningVisible => _burst != null && warning != null && warning.enabled
         && _boss != null && _boss.CurrentAction == _burst && _burst.IsActive
-        && _burst.BossStage == BossAttackStage.Startup;
+        && _burst.WarningStarted && _burst.BossStage == BossAttackStage.Startup;
     public int BurstEffectCount { get; private set; }
 
     private void Awake()
@@ -67,7 +67,8 @@ public sealed class SwordRobotBossPresentation : MonoBehaviour
             warning.widthMultiplier = action is BossPhaseBurstAction ? .13f : _warningWidth;
             warning.enabled = attacking && (action.BossStage == BossAttackStage.Startup
                 || mobility != null && mobility.Kind == BossMobilityKind.JumpSlam
-                    && action.BossStage == BossAttackStage.Active);
+                    && action.BossStage == BossAttackStage.Active)
+                && (!(action is BossPhaseBurstAction phaseBurst) || phaseBurst.WarningStarted);
             if (warning.enabled) DrawWarning(action);
         }
         if (!active && !_boss.IsDead && !_boss.IsTransitioning && !_boss.IsHurt && !_boss.IsGroggy
@@ -163,7 +164,7 @@ public sealed class SwordRobotBossPresentation : MonoBehaviour
             BurstFillProgress = 0f;
             return;
         }
-        if (burst != null && active && burst != _burst)
+        if (burst != null && active && burst.WarningStarted && burst != _burst)
         {
             _burst = burst;
             _burstExploded = false;
@@ -172,9 +173,9 @@ public sealed class SwordRobotBossPresentation : MonoBehaviour
         }
         if (_burst == null || _burstFill == null) return;
         if (_blastRemaining > 0f) _blastRemaining = Mathf.Max(0f, _blastRemaining - _boss.ActionDeltaTime);
-        bool charging = burst == _burst && active && burst.BossStage == BossAttackStage.Startup;
+        bool charging = burst == _burst && active && burst.WarningStarted && burst.BossStage == BossAttackStage.Startup;
         BurstFillProgress = charging ? burst.ChargeProgress : 0f;
-        if (burst == _burst && active && burst.ChargeProgress >= 1f && !_burstExploded)
+        if (burst == _burst && active && burst.BurstPlayed && !_burstExploded)
         {
             _burstExploded = true;
             _blastRemaining = BlastSeconds;

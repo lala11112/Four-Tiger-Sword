@@ -148,6 +148,7 @@ public class StageManager : MonoBehaviour
     public bool TryUseExit(PlayerController player, int generation)
     {
         if (!IsReady || _exitRequested || generation != _generation || player != _player || player.IsStageTransitioning || player.IsGameplayModalPaused
+            || GetComponent<RunManager>()?.HasPendingItemChoice == true
             || Exit == null || !Exit.ContainsPlayer(player)
             || player.StatManager.CurrentHp <= 0 || _endEncounter == null || _endEncounter.State != DungeonEncounterState.Cleared
             || (_isBossStage && (_bossEncounter == null || !_bossEncounter.BossDefeated || _bossEncounter.State != DungeonEncounterState.Cleared))) return false;

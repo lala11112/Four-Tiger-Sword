@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Penta.Upgrade;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -10,6 +11,7 @@ using UnityEngine.SceneManagement;
 public static class HubWorkshopSetup
 {
     public const string PrefabPath = "Assets/_Project/Prefabs/UI/HubWorkshop.prefab";
+    internal const int FrameWidth = 1760, FrameHeight = 930;
     private const string HubPath = "Assets/_Project/Scenes/Hub Scene.unity";
     private const string Art = "Assets/_Project/Sprites/UI/BoundaryZERO/";
     private static readonly Color Ink = new Color32(231, 237, 242, 255);
@@ -21,13 +23,22 @@ public static class HubWorkshopSetup
     [MenuItem("Tools/Studio Baekho/Progression/Set Up Hub Workshop")]
     private static void SetupMenu() => Debug.Log(Setup());
 
-    public static string Setup()
+    [MenuItem("Tools/Studio Baekho/Progression/Update Workshop Layout")]
+    private static void ApplyReadabilityMenu() => Debug.Log(ApplyReadability());
+
+    public static string ApplyReadability()
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode)
-            throw new InvalidOperationException("Set up the Hub workshop in Edit Mode.");
+            throw new InvalidOperationException("Update the workshop layout in Edit Mode.");
         _font = BoundaryZeroTypography.GetFont();
         _fontMaterial = BoundaryZeroTypography.GetMaterial();
         BuildPrefab();
+        return "Updated the shared workshop frame and both upgrade pages.";
+    }
+
+    public static string Setup()
+    {
+        ApplyReadability();
         var hub = SceneManager.GetSceneByPath(HubPath);
         if (!hub.isLoaded) hub = EditorSceneManager.OpenScene(HubPath, OpenSceneMode.Additive);
         var view = Components<HubWorkshopView>(hub).SingleOrDefault();
@@ -86,8 +97,11 @@ public static class HubWorkshopSetup
             throw new InvalidOperationException("The workshop and interaction prompt must start hidden.");
         var fit = view.UI.panel.GetComponentInChildren<BoundaryZeroWindowFit>(true);
         if (fit == null) throw new InvalidOperationException("The workshop is missing its responsive window fit.");
-        if (view.UI.panel.transform.Find("Window").GetComponentsInChildren<UnityEngine.UI.Image>(true).Any(image => image.sprite == null
-            && image.name != "Modal" && image.name != "Viewport"))
+        if (view.EngravingView == null || view.BasicWindow == null || view.EngravingView.transform.parent != fit.transform
+            || view.BasicWindow.transform.parent != fit.transform)
+            throw new InvalidOperationException("Both upgrade pages must share one workshop frame.");
+        if (fit.GetComponentsInChildren<UnityEngine.UI.Image>(true).Any(image => image.sprite == null
+            && image.name != "Viewport" && !image.transform.IsChildOf(view.EngravingView.transform)))
             throw new InvalidOperationException("The workshop contains an image without an authored BoundaryZERO sprite.");
         if (view.UI.statusScroll == null || view.UI.statusScroll.viewport == null || view.UI.statusScroll.content == null
             || view.UI.statusScroll.viewport.GetComponent<UnityEngine.UI.Mask>() == null
@@ -128,18 +142,23 @@ public static class HubWorkshopSetup
             Stretch(modal);
             var dimmer = Ensure<UnityEngine.UI.Image>(modal.gameObject);
             dimmer.sprite = null;
-            dimmer.color = new Color(0f, 0f, 0f, .28f);
+            dimmer.color = new Color(0f, 0f, 0f, .52f);
             dimmer.raycastTarget = true;
             var window = Child("Window", modal);
             window.anchorMin = window.anchorMax = window.pivot = new Vector2(.5f, .5f);
             window.anchoredPosition = Vector2.zero;
-            Ensure<BoundaryZeroWindowFit>(window.gameObject).Configure(new Vector2(1536, 900), 1f, 24f);
-            Picture("Glass", window, "Frames/window_wide_glass.png", 0, 0, 1536, 900, .90f);
-            Hide(window, "Border", "PersistenceHint");
+            Ensure<BoundaryZeroWindowFit>(window.gameObject).Configure(new Vector2(FrameWidth, FrameHeight), 1f, 24f);
+            var chrome = Ensure<PentaUpgradeChrome>(window.gameObject);
+            chrome.Configure(PentaUpgradeChrome.Style.Window);
+            chrome.raycastTarget = false;
+            Hide(window, "Glass", "Border", "PersistenceHint");
+            var basic = Child("BasicPage", window);
+            Stretch(basic);
+            Move(window, basic, "Body", "Footer");
             var ui = new HubWorkshopView.References { panel = modal.gameObject };
             BuildHeader(window, ui);
-            var entries = BuildBody(window, ui);
-            BuildFooter(window, ui);
+            var entries = BuildBody(basic, ui);
+            BuildFooter(basic, ui);
 
             var prompt = Place(Child("InteractionPrompt", root.transform), 0, 0, 330, 60);
             prompt.anchorMin = prompt.anchorMax = prompt.pivot = new Vector2(.5f, 0f);
@@ -150,6 +169,7 @@ public static class HubWorkshopSetup
             Text("Label", prompt, "조율 공방 · 강화하기", 63, 8, 253, 44, 18, Ink);
 
             view.Configure(ui, entries);
+            HubEngravingSetup.ConfigureView(view);
             Canvas.ForceUpdateCanvases();
             UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(window);
             modal.gameObject.SetActive(false);
@@ -166,29 +186,29 @@ public static class HubWorkshopSetup
 
     private static void BuildHeader(RectTransform window, HubWorkshopView.References ui)
     {
-        var header = Place(Child("Header", window), 64, 64, 1408, 104);
-        var row = Place(Child("Row", header), 0, 0, 1408, 80);
+        var header = Place(Child("Header", window), 64, 64, 1632, 120);
+        var row = Place(Child("Row", header), 0, 0, 1632, 56);
         Horizontal(row, 24, TextAnchor.MiddleLeft);
-        var heading = Place(Child("Heading", row), 0, 0, 868, 80);
-        Fixed(heading, 868, 80);
-        Horizontal(heading, 24, TextAnchor.MiddleLeft);
+        var heading = Place(Child("Heading", row), 0, 0, 1100, 56);
+        Fixed(heading, 1100, 56);
+        Horizontal(heading, 16, TextAnchor.MiddleLeft);
         Move(window, heading, "HeaderIcon");
-        var icon = Picture("HeaderIcon", heading, "Icons/red_seal.png", 0, 0, 64, 64, 1f, true);
-        Fixed(icon.rectTransform, 64, 64);
-        var titles = Place(Child("Titles", heading), 0, 0, 780, 80);
-        Fixed(titles, 780, 80);
-        Vertical(titles, 2);
+        var icon = Picture("HeaderIcon", heading, "Icons/red_seal.png", 0, 0, 52, 52, 1f, true);
+        Fixed(icon.rectTransform, 52, 52);
+        var titles = Place(Child("Titles", heading), 0, 0, 1032, 56);
+        Fixed(titles, 1032, 56);
+        Vertical(titles, 0);
         Move(window, titles, "Title", "Subtitle");
-        Fixed(Text("Title", titles, "영구 강화", 0, 0, 780, 48, 32, Ink, FontStyles.Bold).rectTransform, 780, 48);
-        Fixed(Text("Subtitle", titles, "허브 단말 · 다음 도전을 위한 준비", 0, 0, 780, 30, 18, Muted).rectTransform, 780, 30);
+        Fixed(Text("Title", titles, "영구 강화", 0, 0, 1032, 56, 34, Ink, FontStyles.Bold).rectTransform, 1032, 56);
+        Hide(titles, "Subtitle");
 
-        var currency = Place(Child("Currency", row), 0, 0, 440, 80);
-        Fixed(currency, 440, 80);
+        var currency = Place(Child("Currency", row), 0, 0, 432, 56);
+        Fixed(currency, 432, 56);
         Horizontal(currency, 12, TextAnchor.MiddleRight);
         Move(window, currency, "CurrencyIcon", "Balance");
         Fixed(Picture("CurrencyIcon", currency, "Icons/stat_legacycurrency.png", 0, 0, 36, 36, .9f, true).rectTransform, 36, 36);
-        ui.balance = Text("Balance", currency, "강화석   —", 0, 0, 392, 48, 24, Ink, FontStyles.Bold);
-        Fixed(ui.balance.rectTransform, 392, 48);
+        ui.balance = Text("Balance", currency, "강화석   —", 0, 0, 384, 48, 24, Ink, FontStyles.Bold);
+        Fixed(ui.balance.rectTransform, 384, 48);
         var balanceLayout = ui.balance.GetComponent<UnityEngine.UI.LayoutElement>();
         balanceLayout.minWidth = 0f;
         balanceLayout.preferredWidth = -1f;
@@ -200,26 +220,25 @@ public static class HubWorkshopSetup
         Picture("Cross", ui.closeButton.transform, "Controls/close_cross.png", 12, 12, 28, 28, .9f, true);
         Order(row, "Heading", "Currency", "Close");
         Order(heading, "HeaderIcon", "Titles");
-        Order(titles, "Title", "Subtitle");
         Order(currency, "CurrencyIcon", "Balance");
         Move(window, header, "HeaderDivider", "HeaderAccent");
-        Picture("HeaderDivider", header, "Frames/header_divider.png", 0, 104, 1408, 2, .65f);
-        Picture("HeaderAccent", header, "Frames/header_accent.png", 0, 103, 94, 4, .7f);
+        Picture("HeaderDivider", header, "Frames/header_divider.png", 0, 120, 1632, 2, .65f);
+        Picture("HeaderAccent", header, "Frames/header_accent.png", 0, 119, 94, 4, .7f);
     }
 
     private static HubWorkshopView.Entry[] BuildBody(RectTransform window, HubWorkshopView.References ui)
     {
-        var body = Place(Child("Body", window), 64, 192, 1408, 460);
+        var body = Place(Child("Body", window), 64, 204, 1632, 548);
         Horizontal(body, 32);
-        var left = Place(Child("Entries", body), 0, 0, 536, 460);
-        Fixed(left, 536, 460);
+        var left = Place(Child("Entries", body), 0, 0, 664, 548);
+        Fixed(left, 664, 548);
         Vertical(left, 0);
         Move(window, left, "EntriesHeading");
-        Fixed(Text("EntriesHeading", left, "강화 항목", 0, 0, 536, 28, 18, Muted).rectTransform, 536, 28);
-        Spacer(left, "HeadingGap", 16);
-        var list = Place(Child("List", left), 0, 0, 536, 404);
-        Fixed(list, 536, 404);
-        Vertical(list, 16);
+        Fixed(Text("EntriesHeading", left, "강화 항목", 0, 0, 664, 34, 22, Muted).rectTransform, 664, 34);
+        Spacer(left, "HeadingGap", 10);
+        var list = Place(Child("List", left), 0, 0, 664, 504);
+        Fixed(list, 664, 504);
+        Vertical(list, 18);
         Move(window, list, "Health", "Attack", "Defense");
         var entries = new[]
         {
@@ -231,73 +250,76 @@ public static class HubWorkshopSetup
         Order(list, "Health", "Attack", "Defense");
 
         Move(window, body, "Detail");
-        var detail = Place(Child("Detail", body), 0, 0, 840, 460);
-        Fixed(detail, 840, 460);
-        Picture("Background", detail, "Frames/detail_panel.png", 0, 0, 840, 460, .44f);
-        var content = Place(Child("Content", detail), 32, 32, 776, 396);
+        var detail = Place(Child("Detail", body), 0, 0, 936, 548);
+        Fixed(detail, 936, 548);
+        var chrome = Ensure<PentaUpgradeChrome>(detail.gameObject);
+        chrome.Configure(PentaUpgradeChrome.Style.Detail);
+        chrome.raycastTarget = false;
+        Hide(detail, "Background");
+        var content = Place(Child("Content", detail), 32, 32, 872, 484);
         Vertical(content, 0);
-        var titleRow = Place(Child("Heading", content), 0, 0, 776, 96);
-        Fixed(titleRow, 776, 96);
+        var titleRow = Place(Child("Heading", content), 0, 0, 872, 100);
+        Fixed(titleRow, 872, 100);
         Horizontal(titleRow, 28);
         Move(detail, titleRow, "Icon");
         ui.selectedIcon = Picture("Icon", titleRow, "Icons/stat_health.png", 0, 0, 96, 96, 1f, true);
         Fixed(ui.selectedIcon.rectTransform, 96, 96);
-        var titles = Place(Child("Titles", titleRow), 0, 0, 652, 96);
-        Fixed(titles, 652, 96);
+        var titles = Place(Child("Titles", titleRow), 0, 0, 748, 100);
+        Fixed(titles, 748, 100);
         Vertical(titles, 8);
         Move(detail, titles, "SelectedTitle", "StatBasis");
-        ui.selectedTitle = Text("SelectedTitle", titles, "최대 체력", 0, 0, 652, 48, 32, Ink, FontStyles.Bold);
-        Fixed(ui.selectedTitle.rectTransform, 652, 48);
-        Fixed(Text("StatBasis", titles, "기본 능력치 대비", 0, 0, 652, 30, 18, Muted).rectTransform, 652, 30);
+        ui.selectedTitle = Text("SelectedTitle", titles, "최대 체력", 0, 0, 748, 52, 32, Ink, FontStyles.Bold);
+        Fixed(ui.selectedTitle.rectTransform, 748, 52);
+        Fixed(Text("StatBasis", titles, "기본 능력치 대비", 0, 0, 748, 34, 22, Muted).rectTransform, 748, 34);
         Spacer(content, "ComparisonGap", 32);
         Move(detail, content, "Comparison");
-        var comparison = Place(Child("Comparison", content), 0, 0, 776, 152);
-        Fixed(comparison, 776, 152);
-        Picture("Background", comparison, "Frames/synthesis_panel.png", 0, 0, 776, 152, .55f);
-        var columns = Place(Child("Columns", comparison), 24, 12, 728, 128);
+        var comparison = Place(Child("Comparison", content), 0, 0, 872, 190);
+        Fixed(comparison, 872, 190);
+        Picture("Background", comparison, "Frames/synthesis_panel.png", 0, 0, 872, 190, .82f);
+        var columns = Place(Child("Columns", comparison), 24, 16, 824, 158);
         Horizontal(columns, 24);
-        var current = Place(Child("Current", columns), 0, 0, 304, 128);
-        Fixed(current, 304, 128);
+        var current = Place(Child("Current", columns), 0, 0, 352, 158);
+        Fixed(current, 352, 158);
         Vertical(current, 4);
-        var next = Place(Child("Next", columns), 0, 0, 304, 128);
-        Fixed(next, 304, 128);
+        var next = Place(Child("Next", columns), 0, 0, 352, 158);
+        Fixed(next, 352, 158);
         Vertical(next, 4);
         Move(comparison, current, "CurrentCaption", "CurrentLevel", "CurrentBonus");
         Move(comparison, next, "NextCaption", "NextLevel", "NextBonus");
-        Fixed(Text("CurrentCaption", current, "현재 강화 효과", 0, 0, 304, 30, 18, Muted).rectTransform, 304, 30);
-        ui.currentLevel = Text("CurrentLevel", current, "Lv. 00", 0, 0, 304, 30, 18, Muted);
-        Fixed(ui.currentLevel.rectTransform, 304, 30);
-        ui.currentBonus = Text("CurrentBonus", current, "+0%", 0, 0, 304, 60, 36, Ink, FontStyles.Bold);
-        Fixed(ui.currentBonus.rectTransform, 304, 60);
-        Fixed(Text("NextCaption", next, "다음 강화 효과", 0, 0, 304, 30, 18, Muted).rectTransform, 304, 30);
-        ui.nextLevel = Text("NextLevel", next, "Lv. 01", 0, 0, 304, 30, 18, Muted);
-        Fixed(ui.nextLevel.rectTransform, 304, 30);
-        ui.nextBonus = Text("NextBonus", next, "+5%", 0, 0, 304, 60, 36, Pink, FontStyles.Bold);
-        Fixed(ui.nextBonus.rectTransform, 304, 60);
+        Fixed(Text("CurrentCaption", current, "현재 효과", 0, 0, 352, 36, 22, Muted).rectTransform, 352, 36);
+        ui.currentLevel = Text("CurrentLevel", current, "Lv. 00", 0, 0, 352, 36, 22, Muted);
+        Fixed(ui.currentLevel.rectTransform, 352, 36);
+        ui.currentBonus = Text("CurrentBonus", current, "+0%", 0, 0, 352, 68, 40, Ink, FontStyles.Bold);
+        Fixed(ui.currentBonus.rectTransform, 352, 68);
+        Fixed(Text("NextCaption", next, "강화 후", 0, 0, 352, 36, 22, Muted).rectTransform, 352, 36);
+        ui.nextLevel = Text("NextLevel", next, "Lv. 01", 0, 0, 352, 36, 22, Muted);
+        Fixed(ui.nextLevel.rectTransform, 352, 36);
+        ui.nextBonus = Text("NextBonus", next, "+5%", 0, 0, 352, 68, 40, Pink, FontStyles.Bold);
+        Fixed(ui.nextBonus.rectTransform, 352, 68);
         Move(comparison, columns, "Arrow");
-        var arrow = Text("Arrow", columns, "→", 0, 0, 72, 128, 32, Muted);
-        Fixed(arrow.rectTransform, 72, 128);
+        var arrow = Text("Arrow", columns, "→", 0, 0, 72, 158, 32, Muted);
+        Fixed(arrow.rectTransform, 72, 158);
         arrow.alignment = TextAlignmentOptions.Center;
         Order(columns, "Current", "Arrow", "Next");
         Order(current, "CurrentCaption", "CurrentLevel", "CurrentBonus");
         Order(next, "NextCaption", "NextLevel", "NextBonus");
-        Spacer(content, "GainGap", 26);
-        var gainRow = Place(Child("GainRow", content), 0, 0, 776, 32);
-        Fixed(gainRow, 776, 32);
+        Spacer(content, "GainGap", 32);
+        var gainRow = Place(Child("GainRow", content), 0, 0, 872, 40);
+        Fixed(gainRow, 872, 40);
         Horizontal(gainRow, 20);
         Move(detail, gainRow, "GainHeading", "Gain");
-        Fixed(Text("GainHeading", gainRow, "증가량", 0, 0, 156, 32, 20, Muted).rectTransform, 156, 32);
-        ui.gain = Text("Gain", gainRow, "단계마다 기본 능력치 +5%", 0, 0, 600, 32, 20, Ink);
-        Fixed(ui.gain.rectTransform, 600, 32);
+        Fixed(Text("GainHeading", gainRow, "단계당 증가량", 0, 0, 220, 40, 22, Muted).rectTransform, 220, 40);
+        ui.gain = Text("Gain", gainRow, "+5%", 0, 0, 632, 40, 22, Ink);
+        Fixed(ui.gain.rectTransform, 632, 40);
         ui.gain.alignment = TextAlignmentOptions.MidlineRight;
-        Spacer(content, "BalanceGap", 18);
-        var balanceRow = Place(Child("BalanceRow", content), 0, 0, 776, 32);
-        Fixed(balanceRow, 776, 32);
+        Spacer(content, "BalanceGap", 14);
+        var balanceRow = Place(Child("BalanceRow", content), 0, 0, 872, 40);
+        Fixed(balanceRow, 872, 40);
         Horizontal(balanceRow, 20);
         Move(detail, balanceRow, "BalanceAfterHeading", "BalanceAfter");
-        Fixed(Text("BalanceAfterHeading", balanceRow, "구매 후 잔액", 0, 0, 156, 32, 20, Muted).rectTransform, 156, 32);
-        ui.balanceAfter = Text("BalanceAfter", balanceRow, "강화석   —", 0, 0, 600, 32, 20, Ink);
-        Fixed(ui.balanceAfter.rectTransform, 600, 32);
+        Fixed(Text("BalanceAfterHeading", balanceRow, "강화 후 잔액", 0, 0, 220, 40, 22, Muted).rectTransform, 220, 40);
+        ui.balanceAfter = Text("BalanceAfter", balanceRow, "강화석   —", 0, 0, 632, 40, 22, Ink);
+        Fixed(ui.balanceAfter.rectTransform, 632, 40);
         ui.balanceAfter.alignment = TextAlignmentOptions.MidlineRight;
         Order(titleRow, "Icon", "Titles");
         Order(titles, "SelectedTitle", "StatBasis");
@@ -310,10 +332,10 @@ public static class HubWorkshopSetup
 
     private static void BuildFooter(RectTransform window, HubWorkshopView.References ui)
     {
-        var footer = Place(Child("Footer", window), 64, 676, 1408, 160);
+        var footer = Place(Child("Footer", window), 64, 772, 1632, 94);
         Move(window, footer, "FooterDivider");
-        Picture("FooterDivider", footer, "Frames/header_divider.png", 0, 0, 1408, 2, .65f);
-        var scrollRoot = Place(Child("StatusScroll", footer), 0, 20, 1408, 60);
+        Picture("FooterDivider", footer, "Frames/header_divider.png", 0, 0, 1632, 2, .65f);
+        var scrollRoot = Place(Child("StatusScroll", footer), 0, 12, 920, 80);
         var viewport = Child("Viewport", scrollRoot);
         Stretch(viewport);
         var maskImage = Ensure<UnityEngine.UI.Image>(viewport.gameObject);
@@ -334,11 +356,11 @@ public static class HubWorkshopSetup
         fitter.horizontalFit = UnityEngine.UI.ContentSizeFitter.FitMode.Unconstrained;
         fitter.verticalFit = UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
         Move(window, content, "Status");
-        ui.status = Text("Status", content, "강화 항목을 선택해 내용을 확인하세요.", 0, 0, 1408, 60, 20, Muted);
+        ui.status = Text("Status", content, "", 0, 0, 920, 80, 22, Muted);
         var statusLayout = Ensure<UnityEngine.UI.LayoutElement>(ui.status.gameObject);
         statusLayout.ignoreLayout = false;
         statusLayout.minWidth = statusLayout.preferredWidth = statusLayout.flexibleWidth = -1f;
-        statusLayout.minHeight = 30f;
+        statusLayout.minHeight = 34f;
         statusLayout.preferredHeight = -1f;
         statusLayout.flexibleHeight = 0f;
         ui.status.alignment = TextAlignmentOptions.TopLeft;
@@ -356,24 +378,21 @@ public static class HubWorkshopSetup
         ui.statusScroll.horizontalScrollbar = null;
         ui.statusScroll.verticalScrollbar = null;
         ui.statusScroll.verticalNormalizedPosition = 1f;
-        var actions = Place(Child("Actions", footer), 0, 96, 1408, 64);
+        var actions = Place(Child("Actions", footer), 958, 16, 674, 64);
         Horizontal(actions, 24, TextAnchor.MiddleLeft);
         Move(window, actions, "DismissHint");
-        var help = Text("DismissHint", actions, "Esc 닫기 · 항목을 선택해 강화 내용을 확인하세요.",
-            0, 0, 700, 64, 18, Muted);
-        Fixed(help.rectTransform, 700, 64);
-        help.textWrappingMode = TextWrappingModes.Normal;
-        var costRow = Place(Child("CostRow", actions), 0, 0, 420, 64);
-        Fixed(costRow, 420, 64);
+        Hide(actions, "DismissHint");
+        var costRow = Place(Child("CostRow", actions), 0, 0, 400, 64);
+        Fixed(costRow, 400, 64);
         Horizontal(costRow, 20, TextAnchor.MiddleRight);
         Move(window, costRow, "CostHeading", "Cost");
-        Fixed(Text("CostHeading", costRow, "비용", 0, 0, 52, 44, 20, Muted).rectTransform, 52, 44);
-        ui.cost = Text("Cost", costRow, "강화석   —", 0, 0, 348, 44, 24, Ink, FontStyles.Bold);
-        Fixed(ui.cost.rectTransform, 348, 44);
+        Fixed(Text("CostHeading", costRow, "비용", 0, 0, 54, 44, 22, Muted).rectTransform, 54, 44);
+        ui.cost = Text("Cost", costRow, "강화석   —", 0, 0, 326, 44, 24, Ink, FontStyles.Bold);
+        Fixed(ui.cost.rectTransform, 326, 44);
         ui.cost.alignment = TextAlignmentOptions.MidlineRight;
         Move(window, actions, "Purchase");
-        ui.purchaseButton = MakeButton("Purchase", actions, "Controls/button_primary_normal.png", 0, 0, 240, 64);
-        Fixed(ui.purchaseButton.GetComponent<RectTransform>(), 240, 64);
+        ui.purchaseButton = MakeButton("Purchase", actions, "Controls/button_primary_normal.png", 0, 0, 250, 64);
+        Fixed(ui.purchaseButton.GetComponent<RectTransform>(), 250, 64);
         ui.purchaseButton.transition = UnityEngine.UI.Selectable.Transition.SpriteSwap;
         ui.purchaseButton.spriteState = new UnityEngine.UI.SpriteState
         {
@@ -382,37 +401,37 @@ public static class HubWorkshopSetup
             pressedSprite = LoadSprite("Controls/button_primary_pressed.png"),
             disabledSprite = LoadSprite("Controls/button_primary_disabled.png")
         };
-        ui.purchaseLabel = Text("Label", ui.purchaseButton.transform, "강화하기", 16, 8, 208, 48, 24, Ink, FontStyles.Bold);
+        ui.purchaseLabel = Text("Label", ui.purchaseButton.transform, "강화하기", 16, 8, 218, 48, 24, Ink, FontStyles.Bold);
         ui.purchaseLabel.alignment = TextAlignmentOptions.Center;
-        Order(actions, "DismissHint", "CostRow", "Purchase");
+        Order(actions, "CostRow", "Purchase");
         Order(costRow, "CostHeading", "Cost");
     }
 
     private static HubWorkshopView.Entry BuildEntry(Transform parent, string name, string title, string icon,
         StatType stat, bool selected)
     {
-        var button = MakeButton(name, parent, "Cards/card_296x80_normal.png", 0, 0, 536, 124);
-        Fixed(button.GetComponent<RectTransform>(), 536, 124);
-        button.targetGraphic.color = new Color(1f, 1f, 1f, .48f);
-        var selectedImage = Picture("Selected", button.transform, "Cards/card_296x80_selected.png", 0, 0, 536, 124, .68f);
+        var button = MakeButton(name, parent, "Cards/card_296x80_normal.png", 0, 0, 664, 156);
+        Fixed(button.GetComponent<RectTransform>(), 664, 156);
+        PentaUpgradeView.ButtonFeedback(button, button.targetGraphic);
+        var selectedImage = Picture("Selected", button.transform, "Cards/card_296x80_selected.png", 0, 0, 664, 156, .96f);
         selectedImage.gameObject.SetActive(selected);
-        var row = Place(Child("Content", button.transform), 24, 20, 488, 84);
-        Horizontal(row, 22, TextAnchor.MiddleLeft);
+        var row = Place(Child("Content", button.transform), 28, 24, 608, 108);
+        Horizontal(row, 24, TextAnchor.MiddleLeft);
         Move(button.transform, row, "IconFrame", "Bonus");
-        var frame = Picture("IconFrame", row, "Controls/keycap_50.png", 0, 0, 64, 64, .72f);
-        Fixed(frame.rectTransform, 64, 64);
+        var frame = Picture("IconFrame", row, "Controls/keycap_50.png", 0, 0, 80, 80, .88f);
+        Fixed(frame.rectTransform, 80, 80);
         Move(button.transform, frame.transform, "Icon");
-        Picture("Icon", frame.transform, icon, 8, 8, 48, 48, 1f, true);
-        var names = Place(Child("Names", row), 0, 0, 220, 84);
-        Fixed(names, 220, 84);
+        Picture("Icon", frame.transform, icon, 12, 12, 56, 56, 1f, true);
+        var names = Place(Child("Names", row), 0, 0, 288, 100);
+        Fixed(names, 288, 100);
         Vertical(names, 8);
         Move(button.transform, names, "Title", "Level");
-        var label = Text("Title", names, title, 0, 0, 220, 40, 24, Ink, FontStyles.Bold);
-        Fixed(label.rectTransform, 220, 40);
-        var level = Text("Level", names, "Lv. 00 / 20", 0, 0, 220, 32, 18, Muted);
-        Fixed(level.rectTransform, 220, 32);
-        var bonus = Text("Bonus", row, "+0%", 0, 0, 160, 60, 32, Ink, FontStyles.Bold);
-        Fixed(bonus.rectTransform, 160, 60);
+        var label = Text("Title", names, title, 0, 0, 288, 54, 30, Ink, FontStyles.Bold);
+        Fixed(label.rectTransform, 288, 54);
+        var level = Text("Level", names, "Lv. 00 / 20", 0, 0, 288, 38, 22, Muted);
+        Fixed(level.rectTransform, 288, 38);
+        var bonus = Text("Bonus", row, "+0%", 0, 0, 192, 64, 36, Ink, FontStyles.Bold);
+        Fixed(bonus.rectTransform, 192, 64);
         bonus.alignment = TextAlignmentOptions.MidlineRight;
         Order(row, "IconFrame", "Names", "Bonus");
         Order(names, "Title", "Level");
@@ -559,7 +578,7 @@ public static class HubWorkshopSetup
         text.fontSize = size;
         text.fontStyle = style;
         text.color = tint;
-        text.margin = Vector4.zero;
+        text.margin = new Vector4(4f, 0f, 4f, 0f);
         text.enableAutoSizing = false;
         text.alignment = TextAlignmentOptions.MidlineLeft;
         text.textWrappingMode = TextWrappingModes.NoWrap;

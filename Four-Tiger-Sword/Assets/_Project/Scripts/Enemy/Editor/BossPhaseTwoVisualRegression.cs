@@ -15,9 +15,12 @@ public static class BossPhaseTwoVisualRegression
 {
     private const string VariantFolder = "Assets/_Project/Generated/Bosses/HitReactionVariants";
     private const string RoomPath = "Assets/_Game/RunProgression/Rooms/ChapterBossRoom.prefab";
+    private const string AirborneVariant = "Additive";
     private static readonly BindingFlags Hidden = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
     private static bool _running;
     private static Report _report = new Report { status = "idle" };
+
+    private enum FlightInterruption { BlockedLanding, TargetLost, Disabled }
 
     [Serializable] private sealed class Report
     {
@@ -210,6 +213,11 @@ public static class BossPhaseTwoVisualRegression
                 _report.currentCase = variant;
                 await VerifyVariant(fixture, variant);
             }
+            foreach (FlightInterruption interruption in Enum.GetValues(typeof(FlightInterruption)))
+            {
+                _report.currentCase = interruption.ToString();
+                await VerifyFlightInterruption(fixture, interruption);
+            }
             _report.status = "passed";
         }
         catch (Exception exception)
@@ -225,9 +233,10 @@ public static class BossPhaseTwoVisualRegression
 
     private static async Task VerifyVariant(Fixture fixture, string variant)
     {
+        bool airborne = variant == AirborneVariant;
         var result = new VariantResult { name = variant };
         _report.variants.Add(result);
-        var boss = fixture.Actor(VariantFolder + "/SwordRobotBoss_" + variant + ".prefab");
+        var boss = fixture.Actor(variant);
         var observedBursts = new HashSet<EnemyAction>();
         void Observe()
         {
@@ -239,6 +248,7 @@ public static class BossPhaseTwoVisualRegression
         var visuals = boss.GetComponent<BossPhaseVisuals>();
         var presentation = boss.GetComponent<SwordRobotBossPresentation>();
         Check(visuals != null && presentation != null, "The generated boss lacks phase visuals or attack presentation.");
+        var groundedPivot = presentation.visualPivot.localPosition;
         Check(visuals.ActiveVisualPhase == 0 && visuals.phaseOne.root.activeInHierarchy
             && !visuals.phaseTwo.root.activeInHierarchy, "The encounter did not start with only the phase-one model.");
         Check(boss.Animator == visuals.phaseOne.animator && visuals.phaseTwo.animator.avatar.isHuman
@@ -251,38 +261,77 @@ public static class BossPhaseTwoVisualRegression
         var lethal = boss.TakeDamage(10000000f, poiseDamage: 0f);
         Check(lethal.Applied && !lethal.Killed && boss.IsTransitioning, "Phase one depleted without starting revival.");
         boss.CombatLabPassive = false;
-        await Until(() => visuals.ActiveVisualPhase == 1 && boss.IsTransitioning,
-            "The new model did not appear at the start of the revival animation.", Observe);
+        await Until(() => boss.IsTransitioning && boss.ReviveProgress >= .25f,
+            "The boss did not begin to stand up.", Observe);
         await Frames(1);
-        result.animatorRebound = boss.Animator == visuals.phaseTwo.animator
-            && GetField<Animator>(boss.ActorClock, "_animator") == visuals.phaseTwo.animator;
-        Check(result.animatorRebound && !visuals.phaseOne.root.activeInHierarchy && visuals.phaseTwo.root.activeInHierarchy,
-            "The visual swap failed to rebind the combat actor and its clock to the new rig.");
-        Check(visuals.phaseTwo.weapon != null && visuals.phaseTwo.weapon.IsChildOf(
-            boss.Animator.GetBoneTransform(HumanBodyBones.RightHand)), "The new weapon is not attached to the new right hand.");
-        Capture(fixture, boss, variant + "_02_new-model-revival", false);
+        var risingRig = airborne ? visuals.phaseOne : visuals.phaseTwo;
+        Check(visuals.ActiveVisualPhase == (airborne ? 0 : 1) && boss.Animator == risingRig.animator
+            && risingRig.root.activeInHierarchy && boss.Animator.GetCurrentAnimatorStateInfo(0).IsName("PhaseRevive"),
+            "Revival did not play the get-up on the correct rig.");
+        Capture(fixture, boss, variant + "_02_revival", false);
         await Until(() => boss.CurrentAction is BossPhaseBurstAction,
             "The revived boss failed to execute its opening burst before regular patterns.", Observe);
         var burst = (BossPhaseBurstAction)boss.CurrentAction;
         result.revivedHp = boss.EnemyStat.CurrentHp;
         Check(boss.PhaseIndex == 1 && !boss.IsTransitioning && Mathf.Approximately(result.revivedHp, 6552f),
             "Phase two did not restore its actual 6552 HP pool before the burst.");
+        Check(burst.UsesAirborneEntry == airborne, "Only the Additive boss should have the airborne opener.");
+        var receiver = airborne ? await VerifyFlightPrelude(fixture, boss, visuals, presentation, burst, groundedPivot, Observe) : null;
+        result.animatorRebound = boss.Animator == visuals.phaseTwo.animator
+            && GetField<Animator>(boss.ActorClock, "_animator") == visuals.phaseTwo.animator;
+        Check(result.animatorRebound && !visuals.phaseOne.root.activeInHierarchy && visuals.phaseTwo.root.activeInHierarchy,
+            "The visual swap failed to rebind the combat actor and its clock to the new rig.");
+        Check(visuals.phaseTwo.weapon != null && visuals.phaseTwo.weapon.IsChildOf(
+            boss.Animator.GetBoneTransform(HumanBodyBones.RightHand)), "The new weapon is not attached to the new right hand.");
         await Until(() => burst.ChargeProgress >= .25f, "The burst warning did not progress.", Observe);
         await Frames(1);
         Check(presentation.BurstWarningVisible && presentation.BurstFillProgress > 0f,
             "The real phase-entry action did not display its floor warning and fill.");
         Capture(fixture, boss, variant + "_03_opening-warning", true);
         float beforeStop = burst.AttackTimeline;
+        var frozenPivot = presentation.visualPivot.localPosition;
         boss.ActorClock.Request(boss, 2f, 0f, HitStopStacking.Replace);
         await Frames(3);
-        result.clockFrozen = Mathf.Abs(burst.AttackTimeline - beforeStop) < .005f;
+        result.clockFrozen = Mathf.Abs(burst.AttackTimeline - beforeStop) < .005f
+            && presentation.visualPivot.localPosition == frozenPivot;
         Check(result.clockFrozen, "The new-rig phase opener ignored actor-local hit stop.");
         boss.ActorClock.ClearStops();
+        if (airborne)
+        {
+            var flight = boss.GetComponent<BossPhaseEntryFlight>();
+            var skill = (BossPhaseBurstSkillSO)burst.SkillData;
+            Check(Mathf.Abs(flight.DescentSeconds - .25f) < .005f, "The authored plunge should take about a quarter second.");
+            await Until(() => burst.BurstPlayed || presentation.visualPivot.localPosition.y < frozenPivot.y - .1f,
+                "Phase two did not descend before the burst impact.", Observe);
+            float descentStart = skill.chargeDuration - flight.DescentSeconds;
+            Check(!burst.BurstPlayed && burst.AttackTimeline >= descentStart - .01f
+                && presentation.BurstWarningVisible && HasVisibleMesh(visuals.phaseTwo)
+                && boss.Animator.GetCurrentAnimatorStateInfo(0).IsName(BossMobilitySetup.SlamLandState),
+                "The new rig must play the downward slam in the final quarter-second of the same warning.");
+            Capture(fixture, boss, variant + "_03_descent", true);
+            await Until(() => burst.BurstPlayed, "The downward slam never reached contact.", Observe);
+            float tolerance = Mathf.Max(.05f, 2f * boss.ActionDeltaTime * skill.attackSpeed);
+            var impact = boss.Animator.GetCurrentAnimatorStateInfo(0);
+            Check(burst.AttackTimeline >= skill.chargeDuration && burst.AttackTimeline <= skill.chargeDuration + tolerance
+                && presentation.visualPivot.localPosition == groundedPivot && receiver.Hits == 1
+                && impact.IsName(BossMobilitySetup.SlamLandState) && impact.normalizedTime >= .41f && impact.normalizedTime <= .59f,
+                "The landing pose, damage and warning deadline must coincide at the grounded impact.");
+        }
         await Until(() => presentation.BurstEffectCount == 1, "The burst never produced its impact effect.", Observe);
         await Awaitable.EndOfFrameAsync();
         Capture(fixture, boss, variant + "_04_opening-impact", true);
         await Until(() => burst.BossStage == BossAttackStage.Recovery && boss.CurrentAction == burst,
             "The burst failed to enter its punishable recovery.", Observe);
+        if (airborne)
+        {
+            Check(receiver.Hits == 1 && receiver.LastSource == burst && !receiver.LastParryable,
+                "The landing must damage a player occupying the warning center once, even with multiple colliders.");
+            Check(Vector3.Distance(boss.transform.position, burst.Center) < .1f,
+                "The burst fired away from the grounded boss and its warning center.");
+            CheckGrounded(boss, visuals, presentation, groundedPivot);
+            Object.Destroy(receiver.gameObject);
+            fixture.Target.position = boss.transform.position + Vector3.forward * 3f;
+        }
         var hit = boss.TakeDamage(1f, power: Vector3.right * 5f, poiseDamage: 0f,
             staggerResistLevel: StaggerResistLevel.HIGH);
         Check(hit.Applied && boss.CurrentAction == burst && !boss.IsHurt && !boss.IsKnockbacking,
@@ -314,6 +363,108 @@ public static class BossPhaseTwoVisualRegression
         Capture(fixture, boss, variant + "_07_final-death", false);
         fixture.Stop(boss);
         await Frames(2);
+    }
+
+    private static async Task<BossPhaseBurstDamageProbe> VerifyFlightPrelude(Fixture fixture, Boss boss,
+        BossPhaseVisuals visuals, SwordRobotBossPresentation presentation, BossPhaseBurstAction burst,
+        Vector3 groundedPivot, Action observe)
+    {
+        var launchTarget = fixture.Target.position;
+        var launch = boss.transform.position;
+        fixture.Target.position = launch - Vector3.forward * 4f;
+        await Until(() => presentation.visualPivot.localPosition.y > groundedPivot.y + .1f,
+            "The airborne opener never lifted the model.", observe);
+        Check(visuals.ActiveVisualPhase == 0 && HasVisibleMesh(visuals.phaseOne) && !burst.WarningStarted,
+            "The first model must ascend before the floor warning and before the rig swap.");
+        await Until(() => !HasVisibleMesh(visuals.phaseOne), "The boss never hid above the screen.", observe);
+        await Frames(1);
+        Check(visuals.ActiveVisualPhase == 0 && !HasVisibleMesh(visuals.phaseOne)
+            && !burst.WarningStarted && !presentation.BurstWarningVisible && presentation.BurstFillProgress == 0f
+            && !boss.GetComponent<CapsuleCollider>().enabled,
+            "The hidden wait leaked a model, warning, or blocking body collider.");
+        await Until(() => burst.WarningStarted, "The hidden wait did not lead into the floor warning.", observe);
+        Check(visuals.ActiveVisualPhase == 1 && presentation.visualPivot.localPosition.y > groundedPivot.y + .1f
+            && burst.ChargeProgress < .25f && !burst.BurstPlayed,
+            "The full warning should begin with the replacement rig still above the landing site.");
+        var center = burst.Center;
+        Check(Vector3.Distance(center, launchTarget) < 2.5f
+            && Vector3.Distance(center, fixture.Target.position) > Vector3.Distance(launchTarget, center)
+            && Vector3.Distance(center, launch) > 1f, "The landing did not lock onto the target at launch.");
+        return fixture.Receiver(center);
+    }
+
+    private static async Task VerifyFlightInterruption(Fixture fixture, FlightInterruption interruption)
+    {
+        var boss = fixture.Actor(AirborneVariant, shortRevival: true);
+        await Until(() => boss.Brain != null, "The interruption fixture did not initialize.");
+        var visuals = boss.GetComponent<BossPhaseVisuals>();
+        var presentation = boss.GetComponent<SwordRobotBossPresentation>();
+        var groundedPivot = presentation.visualPivot.localPosition;
+        var launch = boss.transform.position;
+        if (interruption == FlightInterruption.BlockedLanding)
+            fixture.Target.position = launch + Vector3.forward * .75f;
+        boss.TakeDamage(10000000f, poiseDamage: 0f);
+        boss.CombatLabPassive = false;
+        await Until(() => boss.CurrentAction is BossPhaseBurstAction, "The interruption fixture did not launch.");
+        var burst = (BossPhaseBurstAction)boss.CurrentAction;
+        Check(burst.UsesAirborneEntry, "The interruption fixture did not use the airborne opener.");
+        if (interruption == FlightInterruption.BlockedLanding)
+        {
+            await Until(() => burst.WarningStarted, "The blocked landing fixture never announced its destination.");
+            Check(Vector3.Distance(burst.Center, launch) < .1f,
+                "The close target must reserve the launch point so one blocker can invalidate both positions.");
+            var receiver = fixture.Receiver(burst.Center);
+            var obstacle = fixture.BlockLanding(burst.Center);
+            await Until(() => boss.CurrentAction != burst, "The invalid landing did not end the burst.");
+            await Frames(1);
+            var body = boss.GetComponent<CapsuleCollider>();
+            var blocker = obstacle.GetComponent<BoxCollider>();
+            bool overlapping = Physics.ComputePenetration(body, boss.transform.position, boss.transform.rotation,
+                blocker, obstacle.transform.position, obstacle.transform.rotation, out _, out _);
+            Check(receiver.Hits == 0 && presentation.BurstEffectCount == 0 && !burst.BurstPlayed && !overlapping
+                && Vector3.Distance(boss.transform.position, burst.Center) > 1f,
+                "An obstructed landing must cancel damage and return to a clear point.");
+            CheckGrounded(boss, visuals, presentation, groundedPivot);
+            Object.Destroy(receiver.gameObject);
+            Object.Destroy(obstacle);
+        }
+        else
+        {
+            await Until(() => !HasVisibleMesh(visuals.phaseOne) && !burst.WarningStarted,
+                "The interruption fixture never reached the hidden wait.");
+            if (interruption == FlightInterruption.TargetLost)
+            {
+                boss.SetCombatTarget(null);
+                await Until(() => boss.CurrentAction == null, "Losing the combat target did not end the burst.");
+            }
+            else boss.gameObject.SetActive(false);
+            Check(boss.CurrentAction == null && boss.GetComponent<CapsuleCollider>().enabled
+                && presentation.visualPivot.localPosition == groundedPivot && visuals.ActiveVisualPhase == 1
+                && visuals.phaseTwo.root.activeSelf && HasVisibleMesh(visuals.phaseTwo)
+                && !presentation.BurstWarningVisible && !burst.BurstPlayed,
+                "Interrupting a hidden boss left its action, rig, collision or warning in flight state.");
+            if (interruption == FlightInterruption.TargetLost)
+            {
+                boss.SetCombatTarget(fixture.Target);
+                await Until(() => boss.CurrentAction != null, "The boss did not resume combat after the target returned.");
+                Check(!(boss.CurrentAction is BossPhaseBurstAction), "Restoring the target replayed the consumed opener.");
+            }
+        }
+        fixture.Stop(boss);
+        await Frames(2);
+    }
+
+    private static bool HasVisibleMesh(BossPhaseVisualSet rig) => rig.root.activeSelf
+        && rig.root.GetComponentsInChildren<Renderer>(true).Any(renderer => renderer.enabled
+            && !renderer.forceRenderingOff && (renderer is MeshRenderer || renderer is SkinnedMeshRenderer));
+
+    private static void CheckGrounded(Boss boss, BossPhaseVisuals visuals,
+        SwordRobotBossPresentation presentation, Vector3 groundedPivot)
+    {
+        var agent = boss.GetComponent<NavMeshAgent>();
+        Check(boss.GetComponent<CapsuleCollider>().enabled && agent.isOnNavMesh && agent.updatePosition
+            && presentation.visualPivot.localPosition == groundedPivot && HasVisibleMesh(visuals.phaseTwo)
+            && !presentation.BurstWarningVisible, "The landing did not restore the boss body, rig or navigation.");
     }
 
     private static float GripError(Boss boss)
@@ -391,9 +542,9 @@ public static class BossPhaseTwoVisualRegression
         private readonly bool _background = Application.runInBackground;
         private readonly UnityEngine.Random.State _random = UnityEngine.Random.state;
         private readonly Vector3 _origin = new Vector3(24000f, 0f, 24000f);
-        private readonly Transform _target;
         private NavMeshDataInstance _navigation;
         public readonly Camera Camera;
+        public readonly Transform Target;
 
         public Fixture()
         {
@@ -415,8 +566,7 @@ public static class BossPhaseTwoVisualRegression
             _navigation = NavMesh.AddNavMeshData(data);
             var target = new GameObject("Assigned phase-two target");
             SceneManager.MoveGameObjectToScene(target, _scene);
-            _target = target.transform;
-            _target.position = _origin + Vector3.forward * 3f;
+            Target = target.transform;
             var cameraHost = new GameObject("Phase-two verification camera");
             SceneManager.MoveGameObjectToScene(cameraHost, _scene);
             Camera = cameraHost.AddComponent<Camera>();
@@ -434,10 +584,12 @@ public static class BossPhaseTwoVisualRegression
             light.transform.rotation = Quaternion.Euler(35f, -35f, 0f);
         }
 
-        public Boss Actor(string path)
+        public Boss Actor(string variant, bool shortRevival = false)
         {
+            string path = VariantFolder + "/SwordRobotBoss_" + variant + ".prefab";
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             if (prefab == null) throw new InvalidOperationException("The actual boss variant is missing: " + path);
+            Target.position = _origin + Vector3.forward * (variant == AirborneVariant ? 8f : 3f);
             var staging = new GameObject("Inactive phase verification staging");
             staging.SetActive(false);
             SceneManager.MoveGameObjectToScene(staging, _scene);
@@ -451,15 +603,57 @@ public static class BossPhaseTwoVisualRegression
             var data = Object.Instantiate(boss.Data);
             data.rewardGroup = null;
             data.initialShield = 0f;
+            if (shortRevival)
+            {
+                data.phaseDownSeconds = .05f;
+                data.phaseHoldSeconds = .05f;
+                data.phaseReviveSeconds = .1f;
+            }
             _owned.Add(data);
             SetField(boss, "BossData", data);
             SetField(root.GetComponent<EnemyStat>(), "baseData", data);
             boss.CombatLabPassive = true;
-            boss.SetCombatTarget(_target);
+            boss.SetCombatTarget(Target);
             foreach (var animator in root.GetComponentsInChildren<Animator>(true)) animator.fireEvents = false;
             root.SetActive(true);
             return boss;
         }
+
+        public BossPhaseBurstDamageProbe Receiver(Vector3 position)
+        {
+            if (CombatSettings.Active == null)
+            {
+                var asset = AssetDatabase.LoadAssetAtPath<ElementEffectiveManager>("Assets/_Project/CombatData/ElementEffectiveManager.asset");
+                if (asset == null) throw new InvalidOperationException("The burst verification needs the game's element table.");
+                var table = Object.Instantiate(asset);
+                _owned.Add(table);
+                var settings = new GameObject("Isolated phase verification combat settings");
+                SceneManager.MoveGameObjectToScene(settings, _scene);
+                settings.SetActive(false);
+                SetField(settings.AddComponent<CombatSettings>(), "_elementTable", table);
+                settings.SetActive(true);
+            }
+
+            var receiver = new GameObject("Player-layer landing probe");
+            SceneManager.MoveGameObjectToScene(receiver, _scene);
+            receiver.transform.position = position + Vector3.up * .5f;
+            receiver.layer = LayerMask.NameToLayer("Player");
+            receiver.AddComponent<SphereCollider>().radius = .3f;
+            receiver.AddComponent<SphereCollider>().radius = .2f;
+            Physics.SyncTransforms();
+            return receiver.AddComponent<BossPhaseBurstDamageProbe>();
+        }
+
+        public GameObject BlockLanding(Vector3 position)
+        {
+            var obstacle = new GameObject("Temporary landing obstacle");
+            SceneManager.MoveGameObjectToScene(obstacle, _scene);
+            obstacle.transform.position = position + Vector3.up * 1.5f;
+            obstacle.AddComponent<BoxCollider>().size = new Vector3(2f, 3f, 2f);
+            Physics.SyncTransforms();
+            return obstacle;
+        }
+
         public void Stop(Boss boss)
         {
             if (boss == null) return;

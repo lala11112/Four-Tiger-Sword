@@ -92,6 +92,7 @@ namespace BoundaryZero.Inventory
                 itemScroll.onValueChanged.AddListener(OnScroll);
             if (setScroll != null)
                 setScroll.onValueChanged.AddListener(OnScroll);
+            ItemDescriptionDivider.Attach(tooltipText);
             presentation.gameObject.SetActive(false);
             Refresh();
         }
@@ -257,12 +258,16 @@ namespace BoundaryZero.Inventory
                 if (!items.TryGetValue(id, out var item))
                     return;
                 AppendTitle(body, item.name);
-                body.Append("<size=16><color=#b5c1ce>").Append(item.description).Append("</color></size>\n\n")
-                    .Append("<size=15><color=#a8b9c9>개별 효과</color></size>\n").Append(item.effect)
-                    .Append("\n\n<size=15><color=#a8b9c9>시너지</color></size>\n");
-                foreach (var tag in item.synergies ?? Array.Empty<string>())
-                    if (!string.IsNullOrEmpty(tag) && synergies.TryGetValue(tag, out var set))
-                        AppendSet(body, set, false);
+                bool hasEffect = !string.IsNullOrWhiteSpace(item.effect);
+                if (hasEffect)
+                    body.Append(ItemDescriptionDivider.EffectHeading).Append(item.effect.TrimEnd());
+                if (item.synergies?.Length > 0)
+                {
+                    ItemDescriptionDivider.AppendSynergyHeading(body, hasEffect);
+                    foreach (var tag in item.synergies)
+                        if (!string.IsNullOrEmpty(tag) && synergies.TryGetValue(tag, out var set))
+                            AppendSet(body, set, false);
+                }
             }
 
             if (hover != target)

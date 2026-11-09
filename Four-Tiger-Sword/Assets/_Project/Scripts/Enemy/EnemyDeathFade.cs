@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>Plays the AllIn1 Fade effect without modifying shared materials.</summary>
+/// <summary>Plays the AllIn1 spawn and death effects without modifying shared materials.</summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Enemy))]
 public sealed class EnemyDeathFade : MonoBehaviour
 {
+    private enum FadeMode { None, Spawn, Death }
+
     [Serializable]
     private struct FadeTarget
     {
@@ -25,30 +27,93 @@ public sealed class EnemyDeathFade : MonoBehaviour
     private float _delay = 0.35f;
     [SerializeField, Min(0.01f), Tooltip("완전히 사라지는 데 걸리는 시간 (초)")]
     private float _duration = 1.2f;
-    [SerializeField, Tooltip("각 렌더러의 슬롯 순서에 맞춘 AllIn1 사망용 재질")]
+    [SerializeField, Min(0.01f), Tooltip("몬스터가 생성되는 데 걸리는 시간 (초)")]
+    private float _spawnDuration = 1f;
+    [SerializeField, Tooltip("각 렌더러의 슬롯 순서에 맞춘 AllIn1 연출용 재질")]
     private FadeTarget[] _targets = Array.Empty<FadeTarget>();
 
     private static readonly int FadeAmount = Shader.PropertyToID("_FadeAmount");
+    private static readonly int HologramColor = Shader.PropertyToID("_HologramColor");
+    private static readonly int HologramBaseAlpha = Shader.PropertyToID("_HologramBaseAlpha");
+    private static readonly int HologramAlpha = Shader.PropertyToID("_HologramAlpha");
+    private static readonly int GlitchAmount = Shader.PropertyToID("_GlitchAmount");
+    private static readonly Color SpawnRed = new(3.8f, .22f, .16f, 1f);
     private readonly List<ActiveTarget> _activeTargets = new();
     private MaterialPropertyBlock _properties;
     private float _elapsed;
-    private bool _playing;
+    private FadeMode _mode;
     private bool _materialsApplied;
     private Transform _visualRoot;
+    private Enemy _spawnOwner;
+    private Animator _spawnRootMotionAnimator;
+
+    public bool IsRevealing => _mode == FadeMode.Spawn;
 
     public void BindVisualRoot(Transform visualRoot) => _visualRoot = visualRoot;
 
-    public void BeginFade()
+    internal void BeginSpawnReveal(Enemy owner)
     {
-        if (_playing || !isActiveAndEnabled) return;
-        _elapsed = -Mathf.Max(0f, _delay);
-        _playing = true;
+        if (_mode != FadeMode.None || !isActiveAndEnabled) return;
+
+        _mode = FadeMode.Spawn;
+        ApplyFadeMaterials();
+        if (_activeTargets.Count == 0)
+        {
+            _mode = FadeMode.None;
+            _materialsApplied = false;
+            return;
+        }
+
+        _elapsed = 0f;
+        _spawnOwner = owner;
+        owner.LockMovement();
+        var animator = owner.Animator != null ? owner.Animator : owner.GetComponentInChildren<Animator>();
+        if (animator != null && animator.applyRootMotion)
+        {
+            _spawnRootMotionAnimator = animator;
+            _spawnRootMotionAnimator.applyRootMotion = false;
+        }
+        SetFadeAmount(1f);
     }
 
-    private void Update()
+    internal void EndSpawnReveal()
     {
-        if (!_playing) return;
-        _elapsed += Time.deltaTime;
+        if (!IsRevealing) return;
+        RestoreMaterials();
+        if (_spawnRootMotionAnimator != null)
+            _spawnRootMotionAnimator.applyRootMotion = true;
+        _spawnRootMotionAnimator = null;
+        _mode = FadeMode.None;
+        if (_spawnOwner != null) _spawnOwner.UnlockMovement();
+        _spawnOwner = null;
+    }
+
+    public void BeginFade()
+    {
+        if (_mode == FadeMode.Death || !isActiveAndEnabled) return;
+        EndSpawnReveal();
+        _elapsed = -Mathf.Max(0f, _delay);
+        _mode = FadeMode.Death;
+    }
+
+    private void Update() => Advance(Time.deltaTime);
+
+    private void Advance(float deltaTime)
+    {
+        if (_mode == FadeMode.None) return;
+        _elapsed += deltaTime;
+        if (IsRevealing)
+        {
+            float revealProgress = Mathf.Clamp01(_elapsed / Mathf.Max(0.01f, _spawnDuration));
+            if (revealProgress >= 1f)
+            {
+                EndSpawnReveal();
+                return;
+            }
+            float settle = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(.65f, 1f, revealProgress));
+            SetFadeAmount(1f - Mathf.SmoothStep(0f, 1f, revealProgress), settle);
+            return;
+        }
         if (_elapsed < 0f) return;
 
         if (!_materialsApplied) ApplyFadeMaterials();
@@ -56,7 +121,7 @@ public sealed class EnemyDeathFade : MonoBehaviour
         SetFadeAmount(Mathf.SmoothStep(0f, 1f, progress));
         if (progress >= 1f)
         {
-            _playing = false;
+            _mode = FadeMode.None;
             Destroy(gameObject);
         }
     }
@@ -71,6 +136,8 @@ public sealed class EnemyDeathFade : MonoBehaviour
             if (_visualRoot != null && !target.Renderer.transform.IsChildOf(_visualRoot)) continue;
             var originalMaterials = target.Renderer.sharedMaterials;
             if (target.Materials.Length != originalMaterials.Length) continue;
+            if (IsRevealing && (!target.Renderer.enabled || !target.Renderer.gameObject.activeInHierarchy
+                || !SupportsSpawnReveal(target.Materials))) continue;
 
             var originalProperties = new MaterialPropertyBlock[originalMaterials.Length];
             for (int i = 0; i < originalProperties.Length; i++)
@@ -89,7 +156,17 @@ public sealed class EnemyDeathFade : MonoBehaviour
         }
     }
 
-    private void SetFadeAmount(float amount)
+    private static bool SupportsSpawnReveal(Material[] materials)
+    {
+        if (materials.Length == 0) return false;
+        foreach (var material in materials)
+            if (material == null || !material.IsKeywordEnabled("_FADE_ON")
+                || !material.IsKeywordEnabled("_GLITCH_ON") || !material.IsKeywordEnabled("_HOLOGRAM_ON"))
+                return false;
+        return true;
+    }
+
+    private void SetFadeAmount(float amount, float settle = 0f)
     {
         foreach (var target in _activeTargets)
         {
@@ -100,12 +177,19 @@ public sealed class EnemyDeathFade : MonoBehaviour
                 // Preserve renderer-wide overrides when a slot has no overrides of its own.
                 if (_properties.isEmpty) target.Renderer.GetPropertyBlock(_properties);
                 _properties.SetFloat(FadeAmount, amount);
+                if (IsRevealing)
+                {
+                    _properties.SetColor(HologramColor, Color.Lerp(SpawnRed, Color.white, settle));
+                    _properties.SetFloat(HologramBaseAlpha, Mathf.Lerp(.2f, 1f, settle));
+                    _properties.SetFloat(HologramAlpha, 1f);
+                    _properties.SetFloat(GlitchAmount, Mathf.Lerp(.25f, 0f, settle));
+                }
                 target.Renderer.SetPropertyBlock(_properties, i);
             }
         }
     }
 
-    private void OnDisable()
+    private void RestoreMaterials()
     {
         foreach (var target in _activeTargets)
         {
@@ -118,7 +202,17 @@ public sealed class EnemyDeathFade : MonoBehaviour
             }
         }
         _activeTargets.Clear();
-        _playing = false;
         _materialsApplied = false;
+    }
+
+    private void OnDisable()
+    {
+        if (IsRevealing)
+        {
+            EndSpawnReveal();
+            return;
+        }
+        RestoreMaterials();
+        _mode = FadeMode.None;
     }
 }

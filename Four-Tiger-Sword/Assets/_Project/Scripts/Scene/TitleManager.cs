@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 
 public class TitleManager : MonoBehaviour
@@ -15,6 +16,7 @@ public class TitleManager : MonoBehaviour
     private bool _entering;
     private UIModalMotion[] _menuMotions;
     private AsyncOperation _sceneLoad;
+    private UnityEngine.UI.Button[] _buttons;
 
     public void Configure(UnityEngine.UI.Button start, UnityEngine.UI.Button quit, BoundaryZeroRunOverlay overlay)
     {
@@ -36,10 +38,16 @@ public class TitleManager : MonoBehaviour
         if (startButton == null) yield break;
         _entering = true;
         var buttons = startButton.transform.parent.GetComponentsInChildren<UnityEngine.UI.Button>(true);
+        _buttons = buttons;
+        foreach (var button in buttons)
+        {
+            var focus = button.GetComponent<TitleButtonFocus>();
+            if (focus == null) focus = button.gameObject.AddComponent<TitleButtonFocus>();
+        }
         _menuMotions = new UIModalMotion[buttons.Length];
         UIButtonMotion.Install(startButton.transform.parent.gameObject);
         SetMenuInteractable(false);
-        if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
+        ClearSelection();
         for (int i = 0; i < buttons.Length; i++)
         {
             _menuMotions[i] = UIModalMotion.Ensure(buttons[i].gameObject,
@@ -54,7 +62,7 @@ public class TitleManager : MonoBehaviour
         while (System.Array.Exists(_menuMotions, m => m != null && m.IsAnimating)) yield return null;
         _entering = false;
         SetMenuInteractable(true);
-        SelectStartButton();
+        ClearSelection();
     }
 
     public void OnStartButton()
@@ -87,8 +95,8 @@ public class TitleManager : MonoBehaviour
         if (loadingOverlay != null)
         {
             loadingOverlay.ShowLoading();
-            loadingOverlay.Title.text = "거점으로 이동 중";
-            loadingOverlay.Details.text = "영구 강화를 확인하고 다음 탐사를 준비합니다.";
+            loadingOverlay.Title.text = "이동 중...";
+            loadingOverlay.Details.text = string.Empty;
             loadingOverlay.StageLabel.gameObject.SetActive(false);
             loadingOverlay.ActionButton.gameObject.SetActive(false);
             loadingOverlay.ModalRoot.SetActive(true);
@@ -115,7 +123,7 @@ public class TitleManager : MonoBehaviour
         if (loadingOverlay != null) loadingOverlay.Hide();
         IsLoading = false;
         SetMenuInteractable(true);
-        SelectStartButton();
+        ClearSelection();
         Debug.LogWarning(reason, this);
     }
 
@@ -125,10 +133,39 @@ public class TitleManager : MonoBehaviour
         if (quitButton != null) quitButton.interactable = interactable;
     }
 
-    private void SelectStartButton()
+    private void ClearSelection()
     {
-        if (EventSystem.current != null && startButton != null && startButton.IsActive() && startButton.IsInteractable())
-            EventSystem.current.SetSelectedGameObject(startButton.gameObject);
+        if (EventSystem.current == null) return;
+        EventSystem.current.firstSelectedGameObject = null;
+        EventSystem.current.SetSelectedGameObject(null);
+    }
+
+    private void LateUpdate()
+    {
+        var events = EventSystem.current;
+        if (_entering || IsLoading || _buttons == null || events == null
+            || events.currentSelectedGameObject != null) return;
+        bool forward = Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)
+            || Input.GetKeyDown(KeyCode.Tab);
+        bool backward = Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W);
+        if (!forward && !backward)
+        {
+            var move = (events.currentInputModule as InputSystemUIInputModule)?.move?.action;
+            if (move != null && move.WasPerformedThisFrame())
+            {
+                float vertical = move.ReadValue<Vector2>().y;
+                forward = vertical < -.5f;
+                backward = vertical > .5f;
+            }
+        }
+        if (!forward && !backward) return;
+        for (int n = 0; n < _buttons.Length; n++)
+        {
+            int index = backward ? _buttons.Length - n - 1 : n;
+            var button = _buttons[index];
+            if (button.IsActive() && button.IsInteractable())
+            { events.SetSelectedGameObject(button.gameObject); break; }
+        }
     }
 
     private void OnDisable()
@@ -147,6 +184,6 @@ public class TitleManager : MonoBehaviour
         if (_menuMotions == null) return;
         IsLoading = _sceneLoad != null && !_sceneLoad.isDone;
         SetMenuInteractable(!IsLoading);
-        if (!IsLoading) SelectStartButton();
+        if (!IsLoading) ClearSelection();
     }
 }

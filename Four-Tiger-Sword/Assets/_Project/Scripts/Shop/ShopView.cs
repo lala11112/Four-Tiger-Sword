@@ -105,6 +105,7 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
         closeButton.onClick.AddListener(Close);
         Listen(true);
         ListenBoundary(true);
+        BoundaryZero.Inventory.ItemDescriptionDivider.Attach(HasBoundaryLayout ? boundary.DetailBody : tabs?.SaleDescription);
         HideImmediate();
         interactionPrompt.SetActive(false);
     }
@@ -308,8 +309,8 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
         SetVisibility(state.Visible);
         interactionPrompt.SetActive(state.ShowInteractionPrompt && !state.Visible);
         if (!state.Visible) return;
-        balance.text = "금화  " + state.Gold.ToString("N0") + " G";
-        health.text = $"체력  {Mathf.CeilToInt(state.Hp):N0} / {Mathf.CeilToInt(state.MaxHp):N0}";
+        balance.text = state.Gold.ToString("N0");
+        if (health != null && health.gameObject.activeSelf) health.gameObject.SetActive(false);
         message.text = state.Message ?? string.Empty;
         LayoutBoundary(state.Tab);
         TabArtwork(tabs.BuyTab, state.Tab == ShopTab.Buy);
@@ -501,11 +502,11 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
         if (_refreshButton != null)
         {
             float width = boundary.ServicePanel.rect.width;
-            Place(boundary.HealingButton.transform as RectTransform, 0, 90, (width - 16) / 2, 56);
-            Place(_refreshButton.transform as RectTransform, (width + 16) / 2, 90, (width - 16) / 2, 56);
+            Place(boundary.HealingButton.transform as RectTransform, 0, 86, (width - 16) / 2, 62);
+            Place(_refreshButton.transform as RectTransform, (width + 16) / 2, 86, (width - 16) / 2, 62);
             _refreshButton.interactable = state.CanRefresh;
-            _refreshLabel.text = $"상품 새로고침 · {state.RefreshCost:N0} G";
-            _refreshLabel.enableAutoSizing = true; _refreshLabel.fontSizeMin = 15; _refreshLabel.fontSizeMax = 21;
+            _refreshLabel.text = $"새로고침 · {state.RefreshCost:N0} G";
+            _refreshLabel.enableAutoSizing = true; _refreshLabel.fontSizeMin = 22; _refreshLabel.fontSizeMax = 28;
         }
         if (_fusionChoices == null && state.FusionChoiceActive && panel != null)
         {
@@ -525,7 +526,7 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
         var owned = state.SelectedOwned;
         var stock = state.SelectedOffer;
         bool any = offer ? stock != null : owned != null;
-        boundary.DetailTitle.text = any ? offer ? stock.Name : owned.Name : "아이템을 선택하세요";
+        boundary.DetailTitle.text = any ? offer ? stock.Name : owned.Name : "아이템 상세";
         string synergyName = any ? offer ? stock.PrimarySynergyName : owned.PrimarySynergyName : null;
         boundary.DetailMeta.text = !any ? string.Empty : !string.IsNullOrEmpty(synergyName)
             ? ItemDisplayText.Meta(offer ? stock.Grade : owned.Grade, synergyName)
@@ -572,7 +573,7 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
             Place(boundary.StockPanel, 0, 95, width, 540);
             Place(boundary.StockScroll.transform as RectTransform, 0, 115, width, 425);
             Place(boundary.ServicePanel, 0, 658, width, 148);
-            Place(boundary.HealingButton.transform as RectTransform, 0, 90, width, 56);
+            Place(boundary.HealingButton.transform as RectTransform, 0, 86, width, 62);
             Place(boundary.OwnedPanel, 1184, 95, 590, 714);
             Place(boundary.OwnedScroll.transform as RectTransform, 0, 118, 590, 596);
             detailWidth = expanded ? 550 : 734;
@@ -595,13 +596,12 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
             Place(boundary.FusionPanel, 1230, 95, 544, 714);
             Grid(boundary.OwnedGrid, 2, 319, 248);
         }
-        float art = buy ? expanded ? 300 : 360 : sell ? 360 : 340;
-        Place(boundary.DetailIcon.rectTransform, (detailWidth - art) * .5f, 10, art, art);
-        Place(boundary.DetailTitle.rectTransform, 28, 376, detailWidth - 56, 44);
-        Place(boundary.DetailMeta.rectTransform, 28, 420, detailWidth - 56, 32);
-        Place(boundary.DetailBody.rectTransform.parent.parent as RectTransform, 28, 486, detailWidth - 56, 98);
-        Place(boundary.DetailPrice.rectTransform, 28, 596, detailWidth - 56, 36);
-        Place(boundary.DetailAction.transform as RectTransform, (detailWidth - 260) * .5f, 650, 260, 56);
+        Place(boundary.DetailIcon.rectTransform, 28, 24, 140, 140);
+        Place(boundary.DetailTitle.rectTransform, 188, 35, detailWidth - 216, 64);
+        Place(boundary.DetailMeta.rectTransform, 188, 105, detailWidth - 216, 36);
+        Place(boundary.DetailBody.rectTransform.parent.parent as RectTransform, 28, 182, detailWidth - 56, 394);
+        Place(boundary.DetailPrice.rectTransform, 28, 584, detailWidth - 56, 42);
+        Place(boundary.DetailAction.transform as RectTransform, (detailWidth - 260) * .5f, 642, 260, 62);
     }
 
     private static void Grid(UnityEngine.UI.GridLayoutGroup grid, int columns, float width, float height)

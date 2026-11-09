@@ -98,8 +98,8 @@ public static class SwordRobotBossLiveRegression
             Check(boss != null && boss.name.StartsWith("SwordRobotBoss", StringComparison.Ordinal)
                 && boss.PhaseConfiguration.Count == 2, "The generated encounter did not use the new two-phase SwordRobotBoss.");
             _report.boss = boss.name;
-            _report.phase1Hp = boss.PhaseConfiguration[0].phaseMaxHp;
-            _report.phase2Hp = boss.PhaseConfiguration[1].phaseMaxHp;
+            _report.phase1Hp = boss.PhaseConfiguration[0].phaseMaxHp * boss.PhaseHealthMultiplier;
+            _report.phase2Hp = boss.PhaseConfiguration[1].phaseMaxHp * boss.PhaseHealthMultiplier;
             player = run.player;
             Check(ControlsEnabled(player) && !player.IsInRoomCombat && !player.IsGameplayModalPaused,
                 "The real player must be alive, outside combat and have usable controls.");
@@ -143,6 +143,7 @@ public static class SwordRobotBossLiveRegression
             CaptureFrame("phase1_strike", boss, player, hud);
             await Frames(2); // ScreenCapture writes at end of frame, before the phase-depleting hit.
             await VerifyRevival(boss, player, room, hud, wallet);
+            await VerifyEntryFlight(boss, player, room, hud);
             await Frames(2); // Keep the phase-2 capture alive before the final death mutation.
             Check(!stage.IsCleared && (end == null || !end.WasEntered),
                 "The stage exit was entered during verification; refusing to confirm final death.");
@@ -241,6 +242,41 @@ public static class SwordRobotBossLiveRegression
         await Until(() => boss.CurrentAction?.IsActive == true && boss.CombatTarget == player.transform, 15f,
             "The actual second phase did not resume attacks against the real player.");
         CaptureFrame("phase2_active", boss, player, hud);
+    }
+
+    private static async Task VerifyEntryFlight(Boss boss, PlayerController player, DungeonRoomEncounter room, BossHealthHud hud)
+    {
+        var flight = boss.GetComponent<BossPhaseEntryFlight>();
+        var visuals = boss.GetComponent<BossPhaseVisuals>();
+        var presentation = boss.GetComponent<SwordRobotBossPresentation>();
+        var burst = boss.CurrentAction as BossPhaseBurstAction;
+        Check(flight != null && burst != null && burst.UsesAirborneEntry,
+            "The current run did not start the configured airborne phase entry.");
+        Check(visuals.ActiveVisualPhase == 0 && !burst.WarningStarted,
+            "The actual boss must take off in phase one before showing a floor warning.");
+        await Until(() => flight.VisualHidden, 5f, "The actual boss never disappeared above the player camera.");
+        Check(!burst.WarningStarted && !presentation.BurstWarningVisible && boss.IsInvulnerable,
+            "The hidden wait displayed an early warning or allowed damage.");
+        CaptureFrame("phase_entry_hidden", boss, player, hud);
+        await Until(() => burst.WarningStarted, 5f, "The actual boss never published its landing warning.");
+        await Frames(1);
+        Vector3 center = burst.Center;
+        Check(visuals.ActiveVisualPhase == 1 && presentation.BurstWarningVisible,
+            "The warning did not bind the second rig and its ground presentation.");
+        CaptureFrame("phase_entry_warning", boss, player, hud);
+        await Until(() => !flight.VisualHidden, 5f, "The second rig never returned from above the screen.");
+        CaptureFrame("phase_entry_descent", boss, player, hud);
+        await Until(() => burst.BurstPlayed, 5f, "The actual phase-entry landing was cancelled on valid arena ground.");
+        await Frames(1);
+        Check(burst.Center == center && presentation.BurstEffectCount == 1
+            && Vector3.Distance(boss.transform.position, center) < .15f,
+            "The marked landing, actor and impact effect diverged in the actual boss room.");
+        CaptureFrame("phase_entry_impact", boss, player, hud);
+        await Until(() => boss.CurrentAction != burst && boss.CurrentAction?.IsActive == true, 8f,
+            "Normal phase-two combat did not resume after landing recovery.");
+        Check(!boss.IsInvulnerable && ControlsEnabled(player) && room.State == DungeonEncounterState.Fighting,
+            "The flight left invulnerability, disabled controls, or ended the encounter early.");
+        CaptureFrame("phase2_regular_combat", boss, player, hud);
     }
 
     private static bool TryLanding(BaekhoMapModule module, Boss boss, PlayerController player, out Vector3 position, out Quaternion rotation)

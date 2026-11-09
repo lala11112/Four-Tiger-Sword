@@ -22,6 +22,13 @@ public static class HubEngravingRegression
         {
             var view = root.GetComponent<HubWorkshopView>();
             var tree = view.EngravingView;
+            var frame = view.UI.panel.transform.Find("Window") as RectTransform;
+            Check(frame != null && tree != null && tree.transform.parent == frame && view.BasicWindow.transform.parent == frame,
+                "Both pages must share the same workshop frame.");
+            var basicTab = frame.Find("BasicTab")?.GetComponent<UnityEngine.UI.Button>();
+            var treeTab = frame.Find("EngravingTab")?.GetComponent<UnityEngine.UI.Button>();
+            Check(basicTab != null && treeTab != null && ((RectTransform)basicTab.transform).rect.height >= 48f
+                && ((RectTransform)treeTab.transform).rect.height >= 48f, "The shared frame needs two readable tabs.");
             Check(tree != null && tree.NodeCount == 40, "The workshop must expose all 40 delivered nodes.");
             Check(tree.GetComponentInChildren<PentaUpgradeLinks>(true).ConnectionCount == 39, "The delivered 39 connections changed.");
             Check(root.GetComponent<Canvas>() != null && root.GetComponent<UnityEngine.UI.GraphicRaycaster>() != null,
@@ -36,9 +43,18 @@ public static class HubEngravingRegression
             view.Open();
             Check(view.SelectedPage == HubWorkshopView.WorkshopPage.Basic && view.BasicWindow.activeSelf,
                 "The default workshop page must be Basic.");
-            view.ShowEngravingPage();
+            var basicSprite = basicTab.image.sprite;
+            var inactiveSprite = treeTab.image.sprite;
+            treeTab.onClick.Invoke();
             Check(tree.IsOpen && tree.gameObject.activeSelf && !view.BasicWindow.activeSelf,
                 "The engraving tab must replace the basic page inside the same modal.");
+            Check(basicSprite != inactiveSprite && basicTab.image.sprite == inactiveSprite && treeTab.image.sprite == basicSprite,
+                "The visible shared tabs must mark the active page.");
+            Check(view.UI.closeButton.isActiveAndEnabled && view.UI.balance.isActiveAndEnabled,
+                "Close and balance must remain active when the engraving page is selected.");
+            var details = tree.transform.Find("UpgradeVisual/UpgradePanel/SelectedNodePanel");
+            Check(!details.Find("ParentsHeading").gameObject.activeSelf && !details.Find("ShowRoute").gameObject.activeSelf,
+                "Redundant link and route controls must be hidden.");
             Check(tree.GetNodeState("origin").Availability == PentaUpgradeAvailability.Owned, "The free origin must be unlocked.");
             Check(tree.GetNodeState("crit").Availability == PentaUpgradeAvailability.Locked, "A child needs its parent.");
             foreach (var concept in PentaUpgradeCatalog.Nodes)
@@ -85,7 +101,10 @@ public static class HubEngravingRegression
             Check(!failing.IsNodeUnlocked("atk") && failing.Balance == 100 && !string.IsNullOrEmpty(tree.PurchaseStatus.text),
                 "Save failure must leave the node and balance unchanged and show a message.");
             Check(tree.DescriptionScroll != null && tree.DescriptionScroll.viewport != null
-                && tree.DescriptionScroll.content != null, "Numeric descriptions need a configured scroll area.");
+                && tree.DescriptionScroll.content != null
+                && tree.DescriptionScroll.viewport.GetComponent<UnityEngine.UI.RectMask2D>() != null
+                && tree.DescriptionScroll.content.GetComponent<TMPro.TMP_Text>().fontSize >= 22f,
+                "Numeric descriptions need readable text in a masked scroll area.");
             view.Close();
             return "PASS: " + checks + " engraving UI checks, all 40 selections/39 purchases, basic/tree tabs, state refresh, remembered viewport and save failure.";
         }

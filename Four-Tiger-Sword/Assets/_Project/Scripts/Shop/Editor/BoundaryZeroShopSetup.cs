@@ -145,6 +145,7 @@ public static class BoundaryZeroShopSetup
                 HealingCost = healingCost, HealingLabel = healingLabel, StockEmpty = stockEmpty, OwnedEmpty = ownedEmpty, OwnedTitle = ownedTitle,
                 TabNormal = Art("Controls/tab_normal.png"), TabSelected = Art("Controls/tab_selected.png"), Backdrop = backdrop
             });
+            UpdateReadability(generated);
             result.gameObject.SetActive(false); panel.gameObject.SetActive(false); prompt.gameObject.SetActive(false);
             EditorUtility.SetDirty(backdrop);
             var saved = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
@@ -155,6 +156,86 @@ public static class BoundaryZeroShopSetup
         }
         finally { PrefabUtility.UnloadPrefabContents(root); }
         return "BoundaryZERO shop applied: separate stock/owned grids, shared details, explicit trades and two-material fusion; original icons retained.";
+    }
+
+    // Update the live prefab in place without rebuilding its generated hierarchy or touching scene instances.
+    public static string ApplyReadability()
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Apply shop UI in Edit Mode.");
+        var root = PrefabUtility.LoadPrefabContents(PrefabPath);
+        try
+        {
+            var generated = root.transform.Find("ShopPanel/BoundaryModalContent/Window/BoundaryZERO");
+            if (generated == null) throw new InvalidOperationException("The authored shop layout is missing.");
+            UpdateReadability(generated);
+            PrefabUtility.SaveAsPrefabAsset(root, PrefabPath, out bool saved);
+            if (!saved) throw new InvalidOperationException("Could not save the shop prefab.");
+        }
+        finally { PrefabUtility.UnloadPrefabContents(root); }
+        return "Shop readability applied to the existing shop prefab.";
+    }
+
+    private static void UpdateReadability(Transform generated)
+    {
+        var backing = Rect("OpaqueBacking", generated);
+        Place(backing, 40, 40, 1840, 1040);
+        backing.SetAsFirstSibling();
+        Solid(backing, new Color32(18, 28, 42, 255), false);
+
+        var coin = Image("GoldIcon", generated, "Icons/stat_coins.png", 1514, 74, 38, 38);
+        coin.preserveAspect = true;
+        var balance = generated.Find("Gold").GetComponent<TMP_Text>();
+        Place(balance.rectTransform, 1564, 72, 224, 44);
+        balance.fontSize = 29;
+        generated.Find("Health").gameObject.SetActive(false);
+        var close = (RectTransform)generated.Find("CloseButton");
+        Place(close, 1797, 58, 62, 62);
+        Place((RectTransform)close.Find("Cross"), 19, 19, 24, 24);
+        var key = close.Find("Key");
+        if (key != null) key.gameObject.SetActive(false);
+
+        var content = generated.Find("Content");
+        SetActionSize(content.Find("BuyTab"), 0, 0, 135);
+        SetActionSize(content.Find("SellTab"), 160, 0, 135);
+        SetActionSize(content.Find("FuseTab"), 320, 0, 135);
+        SetActionSize(content.Find("InventoryToggle"), 1514, 0, 260, 24);
+        content.Find("Feedback").GetComponent<TMP_Text>().fontSize = 28;
+
+        var services = content.Find("Services");
+        SetActionSize(services.Find("HealingButton"), 0, 86, 550);
+        services.Find("HealingCost").GetComponent<TMP_Text>().fontSize = 28;
+
+        var fusion = content.Find("SynthesisResult");
+        SetActionSize(fusion.Find("FuseButton"), 122, 642, 300);
+        fusion.Find("FusionOdds").GetComponent<TMP_Text>().fontSize = 28;
+        fusion.Find("FusionResult/ResultLabel").GetComponent<TMP_Text>().fontSize = 28;
+
+        var detail = content.Find("ShopTradeDetail");
+        detail.Find("EffectTitle").gameObject.SetActive(false);
+        Place((RectTransform)detail.Find("OriginalItemIcon"), 28, 24, 140, 140);
+        var title = detail.Find("ItemName").GetComponent<TMP_Text>();
+        Place(title.rectTransform, 188, 35, 334, 64);
+        title.alignment = TextAlignmentOptions.MidlineLeft;
+        var meta = detail.Find("ItemGrade").GetComponent<TMP_Text>();
+        Place(meta.rectTransform, 188, 105, 334, 36);
+        meta.alignment = TextAlignmentOptions.MidlineLeft;
+        meta.fontSize = 24;
+        var scroll = detail.Find("EffectScroll").GetComponent<UnityEngine.UI.ScrollRect>();
+        Place((RectTransform)scroll.transform, 28, 182, 494, 394);
+        var body = scroll.content.GetComponent<TMP_Text>();
+        body.fontSize = 28;
+        body.lineSpacing = 8;
+        body.richText = true;
+        var price = detail.Find("Price").GetComponent<TMP_Text>();
+        Place(price.rectTransform, 28, 584, 494, 42);
+        price.fontSize = 28;
+        SetActionSize(detail.Find("DetailAction"), 145, 642, 260);
+    }
+
+    private static void SetActionSize(Transform action, float x, float y, float width, float fontSize = 28)
+    {
+        Place((RectTransform)action, x, y, width, 62);
+        action.Find("Label").GetComponent<TMP_Text>().fontSize = fontSize;
     }
 
     private static ShopOfferView BuildOffer()

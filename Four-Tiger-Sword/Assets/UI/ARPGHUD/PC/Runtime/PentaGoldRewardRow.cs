@@ -19,6 +19,7 @@ namespace ArpgHud.PC
         private UnityEngine.UI.Image _itemIcon;
         private Color _goldColor;
         private bool _iconsReady;
+        private int _synergyTier;
         public float Alpha => group != null ? group.alpha : 0f;
         public bool Visible => gameObject.activeSelf;
         public RectTransform Rect => cachedRect != null ? cachedRect : (cachedRect = transform as RectTransform);
@@ -35,17 +36,17 @@ namespace ArpgHud.PC
 
         internal void Show(int amount, double now, float riseDistance, float enterDuration)
         {
-            SetContent(true, null, null);
+            SetContent(true, null, null, 0);
             ShowRow(amount, now, riseDistance, enterDuration);
         }
 
-        internal void ShowItem(string name, Sprite icon, double now, float riseDistance, float enterDuration)
+        internal void ShowItem(string name, Sprite icon, double now, float riseDistance, float enterDuration, int synergyTier)
         {
-            SetContent(false, name, icon);
+            SetContent(false, name, icon, synergyTier);
             ShowRow(0, now, riseDistance, enterDuration);
         }
 
-        private void SetContent(bool gold, string name, Sprite icon)
+        private void SetContent(bool gold, string name, Sprite icon, int synergyTier)
         {
             if (!_iconsReady)
             {
@@ -64,13 +65,15 @@ namespace ArpgHud.PC
             }
             IsGold = gold;
             ItemName = name;
+            _synergyTier = synergyTier;
             if (_coin != null) _coin.SetActive(gold);
             _itemIcon.sprite = icon;
             _itemIcon.gameObject.SetActive(!gold && icon != null);
             if (label != null)
             {
                 label.richText = false;
-                label.color = gold ? _goldColor : new Color32(239, 232, 218, 255);
+                label.color = gold ? _goldColor : synergyTier > 0
+                    ? new Color32(244, 185, 118, 255) : new Color32(239, 232, 218, 255);
             }
         }
 
@@ -151,7 +154,7 @@ namespace ArpgHud.PC
         {
             if (label != null) label.text = IsGold
                 ? "골드 +" + Amount.ToString("N0", CultureInfo.InvariantCulture)
-                : ItemName + " 획득";
+                : _synergyTier > 0 ? $"{ItemName} {_synergyTier}세트 활성화" : ItemName + " 획득";
         }
     }
 }

@@ -18,6 +18,7 @@ public static class AcquisitionPresentationRegression
         if (Application.isPlaying) throw new InvalidOperationException("Run acquisition regression in Edit Mode.");
         _checks = 0;
         Transactions();
+        SynergyThresholds();
         MixedRows();
         return $"Acquisition presentation: {_checks} checks passed.";
     }
@@ -88,6 +89,55 @@ public static class AcquisitionPresentationRegression
         return item;
     }
 
+    private static void SynergyThresholds()
+    {
+        var root = new GameObject("Synergy acquisition regression");
+        root.SetActive(false);
+        var catalog = ScriptableObject.CreateInstance<ItemCatalog>();
+        var data = ScriptableObject.CreateInstance<PlayerStatData>();
+        try
+        {
+            data.baseHP = data.baseSP = 100;
+            var stats = root.AddComponent<PlayerStatManager>();
+            stats.Initialize(data);
+            catalog.projectId = "synergy-acquisition-regression";
+            var ids = new[] { "a", "b", "c", "d", "e", "f", "g" };
+            catalog.items = Array.ConvertAll(ids, id => Item(id, catalog.projectId));
+            catalog.synergies = new[]
+            {
+                new ItemSynergyDefinition { id = "first", members = new[] { "a", "b", "c", "d" },
+                    tiers = new[] { new ItemSynergyTier { count = 2 }, new ItemSynergyTier { count = 4 } } },
+                new ItemSynergyDefinition { id = "second", members = new[] { "d", "g" },
+                    tiers = new[] { new ItemSynergyTier { count = 2 } } }
+            };
+            var items = root.AddComponent<PlayerItemRuntime>();
+            items.Catalog = catalog;
+            items.Initialize(stats, () => ElementType.ELEMENT_WATER);
+            var events = new List<string>();
+            items.ItemAcquired += item => events.Add(item.itemId);
+            items.SynergyTierActivated += state => events.Add(state.Definition.id + state.ActiveTier.count);
+            foreach (string id in new[] { "a", "b", "c", "d", "e", "f" })
+                Check(items.TryAddItem(id), "Synergy threshold fixture could not acquire an item.");
+            Check(string.Join(" ", events) == "a b first2 c d first4 e f",
+                "Only newly active or raised tiers should follow the committed item notification.");
+            events.Clear();
+            Check(items.TryExchangeItems("e", "f", "g") && string.Join(" ", events) == "g second2",
+                "Atomic fusion should report only its net synergy activation.");
+            events.Clear();
+            Check(!items.TryAddItem("g") && !items.TryExchangeItems("e", "f", "g") && items.TryRemoveItem("b"),
+                "Duplicate, failed fusion and tier loss fixture failed.");
+            items.RecalculateForCurrentForm();
+            Check(events.Count == 0, "Rejected grants, tier loss and stat refresh must remain quiet.");
+        }
+        finally
+        {
+            Object.DestroyImmediate(root);
+            foreach (var item in catalog.items ?? Array.Empty<ItemDefinition>()) Object.DestroyImmediate(item);
+            Object.DestroyImmediate(catalog);
+            Object.DestroyImmediate(data);
+        }
+    }
+
     private static void MixedRows()
     {
         var prefab = Resources.Load<GameObject>("BoundaryUI/GoldHUD/GoldRewardFeed");
@@ -116,6 +166,11 @@ public static class AcquisitionPresentationRegression
             Check(feed.ActiveRowCount == 0, "Rows did not expire.");
             feed.ShowGoldGain(7); feed.Clear();
             Check(feed.ActiveRowCount == 0, "Clear retained rows.");
+            feed.ShowItemGain("유물", null);
+            feed.ShowSynergyActivation("수호", 2, null);
+            var synergy = feed.GetRow(1)?.GetComponentInChildren<TMPro.TMP_Text>(true);
+            Check(synergy != null && synergy.text == "수호 2세트 활성화" && !synergy.richText,
+                "Synergy activation must have a distinct row after the acquired item.");
         }
         finally { Object.DestroyImmediate(root); }
     }

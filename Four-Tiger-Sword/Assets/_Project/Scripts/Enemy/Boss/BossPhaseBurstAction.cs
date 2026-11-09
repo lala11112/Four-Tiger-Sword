@@ -8,10 +8,15 @@ public sealed class BossPhaseBurstAction : EnemyAction
     private readonly BossPhaseBurstSkillSO _data;
     private readonly HashSet<IDamageable> _hitTargets = new HashSet<IDamageable>();
     private bool _movementLocked, _heldPose, _released, _burstPlayed;
+    private BossPhaseEntryFlight _flight;
+    private bool _airborneEntry;
 
     public Vector3 Center { get; private set; }
     public float Radius => _data.radius;
-    public float ChargeProgress => Mathf.Clamp01(_timer / _data.chargeDuration);
+    public bool WarningStarted { get; private set; }
+    public bool BurstPlayed => _burstPlayed;
+    public bool UsesAirborneEntry => _airborneEntry;
+    public float ChargeProgress => WarningStarted ? Mathf.Clamp01(_timer / _data.chargeDuration) : 0f;
     public bool IsInvulnerable => IsActive && !IsFinished
         && (BossStage == BossAttackStage.Startup || BossStage == BossAttackStage.Active);
     public float RecoveryRemaining => IsActive && !IsFinished && BossStage == BossAttackStage.Recovery
@@ -29,6 +34,9 @@ public sealed class BossPhaseBurstAction : EnemyAction
         Center = _enemy.transform.position;
         _hitTargets.Clear();
         _heldPose = _released = _burstPlayed = false;
+        WarningStarted = false;
+        _flight = null;
+        _airborneEntry = false;
         // This fixed explosion owns its stage/armor contract even if a caller supplies no optional policy.
         ConfigureBossPolicy(new BossAttackPolicy
         {
@@ -42,17 +50,45 @@ public sealed class BossPhaseBurstAction : EnemyAction
         { navigation.ResetPath(); navigation.velocity = Vector3.zero; }
         _enemy.LockMovement();
         _movementLocked = true;
-        PlayAnimation(0f);
+        var flight = _enemy.GetComponent<BossPhaseEntryFlight>();
+        if (flight != null && flight.TryBegin(this))
+        {
+            _flight = flight;
+            _airborneEntry = true;
+            Center = flight.Center;
+        }
+        else
+        {
+            WarningStarted = true;
+            PlayAnimation(0f);
+        }
     }
 
     public override void Update()
     {
         if (!CanContinueAction) return;
+        if (_airborneEntry && (_flight == null || !_flight.IsRunning(this)))
+        { CancelFlight(); return; }
+        float delta = _enemy.ActionDeltaTime * _data.attackSpeed;
+        if (delta <= 0f) return;
+        if (!WarningStarted)
+        {
+            delta = _flight.TickPrelude(delta);
+            if (!_flight.PreludeComplete) return;
+            if (!_flight.TryBeginWarning()) { CancelFlight(); return; }
+            Center = _flight.Center;
+            WarningStarted = true;
+            _heldPose = true;
+        }
         float previousTime = _timer;
-        base.Update();
+        // This non-parryable action has no timed parry telegraph. Its charge clock starts
+        // only after the flight prelude, preserving the complete authored dodge warning.
+        _timer += delta;
         if (!CanContinueAction) return;
+        if (_flight != null && !_burstPlayed)
+            _flight.TickDescent(_timer, _data.chargeDuration);
         float activeEnd = _data.chargeDuration + _data.activeDuration;
-        if (_timer < _data.chargeDuration)
+        if (!_airborneEntry && _timer < _data.chargeDuration)
         {
             float releaseAt = _data.chargeDuration - _data.releaseHitDelay;
             if (!_released && _timer >= releaseAt)
@@ -73,12 +109,14 @@ public sealed class BossPhaseBurstAction : EnemyAction
             SetBossStage(BossAttackStage.Active);
             if (!_burstPlayed)
             {
+                if (_flight != null && !_flight.TryLand()) { CancelFlight(); return; }
                 _burstPlayed = true;
                 _enemy.SetAnimationSpeed(_data.attackSpeed);
                 PlaySwingSound();
                 PlaySound(_data.LandingAudio, Center);
             }
             ExecuteBurst();
+            if (_flight != null) _flight.FinishLanding();
             if (!CanContinueAction) return;
         }
         if (_timer >= activeEnd) SetBossStage(BossAttackStage.Recovery);
@@ -120,12 +158,21 @@ public sealed class BossPhaseBurstAction : EnemyAction
 
     public override void Exit()
     {
+        if (_flight != null) _flight.EndFlight(!_burstPlayed);
         base.Exit();
         if (_movementLocked)
         {
             _movementLocked = false;
             _enemy.UnlockMovement();
         }
+    }
+
+    private void CancelFlight()
+    {
+        // Once a warning has been published, never move its damage to another point.
+        WarningStarted = false;
+        if (_flight != null) _flight.EndFlight(true);
+        IsFinished = true;
     }
 
     public override void OnParried() { }

@@ -24,7 +24,7 @@ public class PoiseHandler : MonoBehaviour
     /// <summary>경직 데미지를 입힙니다. 자세 붕괴 중에는 무시됩니다.</summary>
     public void TakePoiseDamage(float amount)
     {
-        if (IsPoiseBreaking || IsCrowdControlled() || GetComponent<Boss>()?.IsInvulnerable == true) return;
+        if (IsPoiseBreaking || RejectsPoiseDamage()) return;
 
         _currentPoise -= amount;
         if (_currentPoise <= 0f)
@@ -34,7 +34,7 @@ public class PoiseHandler : MonoBehaviour
     //현재 경직 수치와 상관 없이 그로기에 들어가게 할때 사용용
     public void ForceBreak()
     {
-        if (IsPoiseBreaking || IsCrowdControlled() || GetComponent<Boss>()?.IsInvulnerable == true) return;
+        if (IsPoiseBreaking || RejectsPoiseDamage()) return;
         _currentPoise = 0f;
         TriggerBreak();
     }
@@ -47,10 +47,11 @@ public class PoiseHandler : MonoBehaviour
         //OnPoiseBreak?.Invoke();
     }
 
-    private bool IsCrowdControlled()
+    private bool RejectsPoiseDamage()
     {
         var enemy = GetComponent<Enemy>();
-        return enemy != null && (enemy.IsGroggy || enemy.PendingGroggy);
+        return enemy != null && (enemy.IsSpawning || enemy.IsGroggy || enemy.PendingGroggy
+            || enemy is Boss { IsInvulnerable: true });
     }
 
     public void ResetPoise()

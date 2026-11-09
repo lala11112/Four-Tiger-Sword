@@ -53,7 +53,13 @@ namespace ArpgHud.PC
             ShowGain(0, string.IsNullOrWhiteSpace(displayName) ? "아이템" : displayName, icon);
         }
 
-        private void ShowGain(int amount, string itemName, Sprite icon)
+        public void ShowSynergyActivation(string displayName, int tier, Sprite icon)
+        {
+            if (tier <= 0) return;
+            ShowGain(0, string.IsNullOrWhiteSpace(displayName) ? "시너지" : displayName, icon, tier);
+        }
+
+        private void ShowGain(int amount, string itemName, Sprite icon, int synergyTier = 0)
         {
             if (!isActiveAndEnabled) return;
             double now = Time.unscaledTimeAsDouble;
@@ -87,7 +93,7 @@ namespace ArpgHud.PC
             }
             active[ActiveRowCount++] = free;
             if (itemName == null) free.Show(amount, now, entranceRise, entranceSeconds);
-            else free.ShowItem(itemName, icon, now, entranceRise, entranceSeconds);
+            else free.ShowItem(itemName, icon, now, entranceRise, entranceSeconds, synergyTier);
         }
 
         private PentaGoldRewardRow FindFreeRow()

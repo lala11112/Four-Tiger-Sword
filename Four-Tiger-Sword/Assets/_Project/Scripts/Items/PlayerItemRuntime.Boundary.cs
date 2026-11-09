@@ -36,6 +36,35 @@ public sealed partial class PlayerItemRuntime
 
     private bool BoundaryAvailable => _initialized && !_suspended && _stats != null && _stats.CurrentHp > 0f;
 
+    private Dictionary<string, int> CaptureActiveSynergyTiers()
+    {
+        if (SynergyTierActivated == null) return null;
+        var tiers = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (var state in _synergyStates)
+            if (state.ActiveTier != null && !string.IsNullOrEmpty(state.Definition?.id))
+                tiers[state.Definition.id] = state.ActiveTier.count;
+        return tiers;
+    }
+
+    private void NotifyActivatedSynergyTiers(Dictionary<string, int> previousTiers)
+    {
+        if (previousTiers == null || SynergyTierActivated == null) return;
+        var activated = new List<ItemSynergyState>();
+        foreach (var state in _synergyStates)
+        {
+            if (state.ActiveTier == null || string.IsNullOrEmpty(state.Definition?.id)) continue;
+            previousTiers.TryGetValue(state.Definition.id, out int previous);
+            if (state.ActiveTier.count > previous) activated.Add(state);
+        }
+        var callbacks = SynergyTierActivated.GetInvocationList();
+        foreach (var state in activated)
+            foreach (Action<ItemSynergyState> callback in callbacks)
+            {
+                try { callback(state); }
+                catch (Exception error) { Debug.LogWarning("[Items] Synergy activation observer failed: " + error, this); }
+            }
+    }
+
     private void SyncBoundarySources()
     {
         var wanted = new Dictionary<string, BoundaryItemEffect>(StringComparer.Ordinal);

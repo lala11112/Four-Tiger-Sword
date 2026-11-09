@@ -18,6 +18,7 @@ public static class RunItemChoiceRegression
         StarterPoolsAndSynergy();
         RoomCandidateCounts();
         GlobalRerollsAndOneHeldCandidate();
+        OwnedSynergiesFollowClaims();
         NoChangeDoesNotConsumeReroll();
         EmptyRewardAndOverflow();
         RetryReceiptLedger();
@@ -110,6 +111,40 @@ public static class RunItemChoiceRegression
             "Exhausted global rerolls changed a later stage reward.");
     }
 
+    private static void OwnedSynergiesFollowClaims()
+    {
+        using var f = new Fixture("reroll", "hold");
+        Check(f.Service.BeginRoomReward("synergy-before") && f.Service.Current.Candidates.Count == 3,
+            "Could not open the owned-synergy reward fixture.");
+        Check(f.Service.OwnedSynergies.Count == f.Catalog.synergies.Length
+            && f.Service.OwnedSynergies.All(state => state.OwnedCount == 0 && state.ActiveTier == null),
+            "A reward candidate counted as an owned item in an empty inventory.");
+
+        var current = f.Service.Current;
+        string selected = current.Candidates[0].itemId;
+        var candidateIds = current.Candidates.Select(item => item.itemId).ToHashSet();
+        var set = f.Catalog.synergies.First(synergy => synergy.members.Contains(selected));
+        string prerequisite = set.members.First(id => !candidateIds.Contains(id));
+        Check(f.Items.TryAddItem(prerequisite), "Could not grant an owned item outside the current candidates.");
+        ItemSynergyState TargetSet() => f.Service.OwnedSynergies.Single(state => state.Definition.id == set.id);
+        Check(TargetSet() is { OwnedCount: 1, ActiveTier: null },
+            "A real owned item did not count towards its inactive synergy.");
+
+        var before = f.Service.OwnedSynergies.Select(state => (state.Definition.id, state.OwnedCount, state.ActiveTier?.count)).ToArray();
+        bool OwnershipUnchanged() => before.SequenceEqual(f.Service.OwnedSynergies
+            .Select(state => (state.Definition.id, state.OwnedCount, state.ActiveTier?.count)));
+        Check(f.Service.ToggleHeldCandidate(current.Id, selected) && current.HeldId == selected && OwnershipUnchanged(),
+            "Holding a candidate changed an owned synergy.");
+        Check(f.Service.TryReroll(current.Id) && current.Candidates.Any(item => item.itemId == selected) && OwnershipUnchanged(),
+            "Rerolling other candidates changed an owned synergy.");
+
+        Check(f.Service.TryClaim(current.Id, selected) && f.Items.Contains(selected)
+            && f.Service.BeginRoomReward("synergy-after"), "Could not claim the held item and open a later reward.");
+        Check(TargetSet() is { OwnedCount: 2, ActiveTier: { count: 2 } }
+            && f.Service.Current.Candidates.All(item => item.itemId != selected && item.itemId != prerequisite),
+            "The next reward did not expose the two-item synergy activated by the actual claim.");
+    }
+
     private static void NoChangeDoesNotConsumeReroll()
     {
         using var f = new Fixture("reroll", "hold");
@@ -127,18 +162,18 @@ public static class RunItemChoiceRegression
     {
         using var f = new Fixture();
         foreach (var item in f.Catalog.items) Check(f.Items.TryAddItem(item.itemId), "Full-catalog fixture grant failed.");
-        Check(f.Service.BeginRoomReward("empty") && f.Service.Current.Candidates.Count == 0, "A fully owned catalog produced an item candidate.");
-        string receipt = f.Service.Current.Id;
-        Check(f.Service.TryClaimEmptyReward(receipt) && f.Wallet.Gold == 10 && f.Service.Current == null,
-            "Empty reward did not pay ten gold exactly once.");
-        Check(!f.Service.TryClaimEmptyReward(receipt) && !f.Service.BeginRoomReward("empty") && f.Wallet.Gold == 10,
+        int gained = 0;
+        f.Wallet.GoldGained += amount => gained += amount;
+        Check(f.Service.BeginRoomReward("empty") && f.Wallet.Gold == 10 && gained == 10 && f.Service.Current == null,
+            "An exhausted chest did not credit ten gold through the HUD event without opening a choice.");
+        Check(!f.Service.TryClaimEmptyReward("room:empty") && !f.Service.BeginRoomReward("empty") && f.Wallet.Gold == 10,
             "An empty receipt paid again.");
         Check(f.Wallet.AddGold(int.MaxValue - 10), "Overflow fixture funding failed.");
-        f.Service.BeginRoomReward("overflow"); receipt = f.Service.Current.Id;
-        Check(!f.Service.TryClaimEmptyReward(receipt) && f.Wallet.Gold == int.MaxValue
-            && f.Service.Current != null && !f.Service.Current.Resolved, "Overflow lost a pending empty reward.");
+        Check(!f.Service.BeginRoomReward("overflow") && f.Wallet.Gold == int.MaxValue && f.Service.Current == null,
+            "Overflow unexpectedly credited gold or opened a reward choice.");
         f.Wallet.TrySpend(10);
-        Check(f.Service.TryClaimEmptyReward(receipt) && f.Wallet.Gold == int.MaxValue, "Retrying an empty reward did not settle once.");
+        Check(f.Service.BeginRoomReward("overflow") && f.Wallet.Gold == int.MaxValue && f.Service.Current == null
+            && !f.Service.BeginRoomReward("overflow"), "Retrying an empty reward did not settle once.");
     }
 
     private static void RetryReceiptLedger()
@@ -172,41 +207,14 @@ public static class RunItemChoiceRegression
 
     private static void PendingReceiptRecovery()
     {
-        using (var f = new Fixture())
-        {
-            var inbox = new RunItemRewardInbox();
-            Check(inbox.Enqueue("reserved") && !inbox.Enqueue("reserved"), "Pending receipt duplicated itself.");
-            inbox.Flush(_ => false);
-            Check(inbox.Count == 1, "Unavailable composition discarded its committed clear receipt.");
-            f.Service.BeginRoomReward("active-grant"); var current = f.Service.Current;
-            bool retainedWhileBusy = false;
-            f.Items.OnOwnedItemsChanged += () =>
-            {
-                inbox.Flush(f.Service.BeginRoomReward);
-                retainedWhileBusy = inbox.Count == 1;
-            };
-            Check(f.Service.TryClaim(current.Id, current.Candidates[0].itemId) && retainedWhileBusy
-                && inbox.Count == 1 && f.Service.Current == null, "Busy fulfillment lost the pending room clear.");
-            inbox.Flush(f.Service.BeginRoomReward);
-            Check(inbox.Count == 0 && f.Service.Current?.Id == "room:reserved"
-                && !inbox.Enqueue("reserved"), "Deferred clear did not recover exactly once after fulfillment.");
-        }
-        var queue = new RunItemRewardInbox(); queue.Enqueue("a"); queue.Enqueue("b");
-        var accepted = new List<string>(); int nestedAccepts = 0;
-        queue.Flush(receipt =>
-        {
-            queue.Flush(_ => { nestedAccepts++; return true; });
-            if (receipt == "b") return false;
-            accepted.Add(receipt); return true;
-        });
-        Check(queue.Count == 1 && accepted.SequenceEqual(new[] { "a" }) && nestedAccepts == 0,
-            "Reentrant flushing duplicated a receipt or discarded the rejected suffix.");
-        queue.Flush(receipt => { accepted.Add(receipt); return true; });
-        Check(queue.Count == 0 && accepted.SequenceEqual(new[] { "a", "b" }), "Recovery changed clear receipt order.");
-        queue.Enqueue("throwing");
-        try { queue.Flush(_ => throw new InvalidOperationException("Simulated composition failure")); }
-        catch (InvalidOperationException) { }
-        Check(queue.Count == 1, "A composition exception discarded the pending receipt.");
+        using var f = new Fixture();
+        f.Service.BeginRoomReward("active-grant"); var current = f.Service.Current;
+        bool blockedWhileBusy = false;
+        f.Items.OnOwnedItemsChanged += () => blockedWhileBusy = !f.Service.BeginRoomReward("reserved");
+        Check(f.Service.TryClaim(current.Id, current.Candidates[0].itemId) && blockedWhileBusy && f.Service.Current == null,
+            "Busy fulfillment accepted another chest.");
+        Check(f.Service.BeginRoomReward("reserved") && f.Service.Current?.Id == "room:reserved"
+            && !f.Service.BeginRoomReward("reserved"), "A rejected chest could not be retried exactly once.");
     }
 
     private static void GrantReentrancy()
@@ -223,9 +231,9 @@ public static class RunItemChoiceRegression
         using (var f = new Fixture())
         {
             foreach (var item in f.Catalog.items) f.Items.TryAddItem(item.itemId);
-            f.Service.BeginRoomReward("gold-grant"); string id = f.Service.Current.Id; bool blocked = false;
-            f.Wallet.GoldChanged += _ => blocked = !f.Service.TryClaimEmptyReward(id) && !f.Service.BeginRoomReward("nested-gold");
-            Check(f.Service.TryClaimEmptyReward(id) && blocked && f.Wallet.Gold == 10 && f.Service.Current == null,
+            bool blocked = false;
+            f.Wallet.GoldChanged += _ => blocked = !f.Service.BeginRoomReward("gold-grant") && !f.Service.BeginRoomReward("nested-gold");
+            Check(f.Service.BeginRoomReward("gold-grant") && blocked && f.Wallet.Gold == 10 && f.Service.Current == null,
                 "Gold fulfillment observers reentered an empty reward grant.");
         }
     }

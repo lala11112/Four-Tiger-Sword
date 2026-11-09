@@ -160,8 +160,7 @@ public sealed partial class HubWorkshopView : MonoBehaviour
         if (_motion != null || references?.panel == null) return;
         _interaction = references.panel.GetComponent<CanvasGroup>();
         if (_interaction == null) _interaction = references.panel.AddComponent<CanvasGroup>();
-        var visual = engravingView != null ? references.panel.transform as RectTransform
-            : references.panel.transform.Find("Window") as RectTransform;
+        var visual = references.panel.transform.Find("Window") as RectTransform;
         if (visual == null) visual = references.panel.transform as RectTransform;
         Canvas.ForceUpdateCanvases();
         _motion = UIModalMotion.Ensure(references.panel, visual);
@@ -221,22 +220,23 @@ public sealed partial class HubWorkshopView : MonoBehaviour
         Set(references.nextLevel, !ready ? "—" : capped ? "최대 단계" : $"Lv. {level + 1:00}");
         Set(references.currentBonus, ready ? Bonus(_service.GetBonusRatio(SelectedStat)) : "—");
         Set(references.nextBonus, ready && !capped ? Bonus((level + 1) * gain) : "—");
-        Set(references.gain, ready ? $"단계마다 기본 능력치 {Bonus(gain)}" : "강화 정보를 불러올 수 없습니다.");
+        Set(references.gain, ready ? Bonus(gain) : "—");
         Set(references.balanceAfter, affordable ? $"{currency}  {_service.Balance - cost:N0}" : "—");
         Set(references.cost, !ready ? "—" : capped ? "강화 완료" : $"{currency}  {cost:N0}");
         if (references.purchaseButton != null) references.purchaseButton.interactable = affordable && !_purchasing;
         if (references.closeButton != null) references.closeButton.interactable = !_purchasing;
         Set(references.purchaseLabel, !ready ? "이용 불가" : capped ? "최대 단계" : !affordable ? currency + " 부족" : "강화하기");
         string status = !ready ? validationError ?? _service?.LastError ?? "강화 데이터를 불러올 수 없습니다."
-            : _message ?? _service.LastError ?? (capped ? "최대 강화 단계에 도달했습니다."
-                : !affordable ? "보유한 강화 재화가 부족합니다." : "강화는 확정 적용되며 자동으로 저장됩니다.");
-        if (references.status != null && !string.Equals(references.status.text, status, StringComparison.Ordinal))
-            _resetStatusScrollPending = true;
-        Set(references.status, status);
+            : _message ?? _service.LastError ?? "";
         if (references.status != null)
+        {
+            if (!string.Equals(references.status.text, status, StringComparison.Ordinal))
+                _resetStatusScrollPending = true;
+            references.status.text = status;
+            references.status.gameObject.SetActive(status.Length > 0);
             references.status.color = !ready || (_message != null ? _messageIsError : !string.IsNullOrEmpty(_service.LastError))
-                ? new Color32(247, 151, 151, 255) : _message != null ? new Color32(159, 215, 194, 255)
-                : new Color32(143, 163, 183, 255);
+                ? new Color32(247, 151, 151, 255) : new Color32(159, 215, 194, 255);
+        }
         RefreshEngraving();
     }
 
@@ -264,7 +264,7 @@ public sealed partial class HubWorkshopView : MonoBehaviour
         {
             bool success = _service.TryUpgrade(SelectedStat, out string error);
             _messageIsError = !success;
-            _message = success ? $"{Title(SelectedStat)} 강화 완료 · Lv. {_service.GetLevel(SelectedStat):00} · 저장되었습니다."
+            _message = success ? $"{Title(SelectedStat)} 강화 완료 · Lv. {_service.GetLevel(SelectedStat):00}"
                 : error ?? "강화를 저장하지 못했습니다.";
         }
         finally { _purchasing = false; Refresh(); }

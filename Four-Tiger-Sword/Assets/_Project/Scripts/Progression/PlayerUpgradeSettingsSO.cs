@@ -14,6 +14,7 @@ public sealed class PlayerUpgradeSettingsSO : ScriptableObject
     [Min(0)] public int bossClearReward = 30;
     [Min(0)] public int deathRewardPerRoom = 2;
     [Min(0)] public int deathRewardCap = 10;
+    [Min(1)] public int goldPerUpgradeStone = 10;
     [Tooltip("실제 플레이어에 연결된 기본 능력치 에셋을 지정합니다.")]
     public PlayerStatData basePlayerStats;
 
@@ -30,7 +31,7 @@ public sealed class PlayerUpgradeSettingsSO : ScriptableObject
             || !ValidRatio(defensePerLevel * maxLevel)) error = "강화 증가율은 유효한 양수 또는 0이어야 합니다.";
         else if (!ValidBase(basePlayerStats.baseHP) || !ValidBase(basePlayerStats.baseATK)
             || !ValidBase(basePlayerStats.baseDEF)) error = "강화에 사용되는 기본 능력치가 유효하지 않습니다.";
-        else if (stageClearReward < 0 || bossClearReward < 0 || deathRewardPerRoom < 0 || deathRewardCap < 0)
+        else if (stageClearReward < 0 || bossClearReward < 0 || deathRewardPerRoom < 0 || deathRewardCap < 0 || goldPerUpgradeStone < 1)
             error = "강화 재화 보상은 음수일 수 없습니다.";
         return error == null;
     }

@@ -2,7 +2,7 @@
 public readonly struct RunResultSummary
 {
     public RunResultSummary(string progressLabel, long stageReward, int deathReward, int clearedRooms,
-        string currencyName, int? balance)
+        string currencyName, int? balance, int goldBeforeConversion = 0, int goldConversionReward = 0)
     {
         ProgressLabel = progressLabel;
         StageReward = stageReward;
@@ -10,6 +10,8 @@ public readonly struct RunResultSummary
         ClearedRooms = clearedRooms;
         CurrencyName = currencyName;
         Balance = balance;
+        GoldBeforeConversion = goldBeforeConversion;
+        GoldConversionReward = goldConversionReward;
     }
 
     public string ProgressLabel { get; }
@@ -18,4 +20,6 @@ public readonly struct RunResultSummary
     public int ClearedRooms { get; }
     public string CurrencyName { get; }
     public int? Balance { get; }
+    public int GoldBeforeConversion { get; }
+    public int GoldConversionReward { get; }
 }
