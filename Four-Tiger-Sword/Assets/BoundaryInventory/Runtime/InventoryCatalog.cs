@@ -52,6 +52,7 @@ namespace BoundaryZero.Inventory
         public string name;
         public string description;
         public string effect;
+        public int grade;
         public string[] synergies = Array.Empty<string>();
         public string primarySynergy;
     }
@@ -78,17 +79,18 @@ namespace BoundaryZero.Inventory
         public string Id { get; }
         public int Count { get; }
         public int OwnedCount => Count;
-        public int RequiredCount => 6;
+        public int RequiredCount { get; }
         public int DisplayCount => Math.Min(RequiredCount, Count);
         public int ActiveTier { get; }
         public int NextTier { get; }
         public string ActiveEffect { get; }
         public bool IsActive => ActiveTier > 0;
 
-        internal SynergyState(string id, int count, int activeTier, int nextTier, string activeEffect)
+        internal SynergyState(string id, int count, int requiredCount, int activeTier, int nextTier, string activeEffect)
         {
             Id = id;
             Count = count;
+            RequiredCount = requiredCount;
             ActiveTier = activeTier;
             NextTier = nextTier;
             ActiveEffect = activeEffect;

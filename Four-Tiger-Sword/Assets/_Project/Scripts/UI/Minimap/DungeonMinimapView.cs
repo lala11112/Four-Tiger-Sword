@@ -218,8 +218,11 @@ public sealed class DungeonMinimapView : MonoBehaviour
     }
 
     public void AddMarker(int ownerAreaIndex, Vector2 localXZ, DungeonMinimapIconGraphic.Symbol symbol)
+        => AddTrackedMarker(ownerAreaIndex, localXZ, symbol);
+
+    internal DungeonMinimapIconGraphic AddTrackedMarker(int ownerAreaIndex, Vector2 localXZ, DungeonMinimapIconGraphic.Symbol symbol)
     {
-        if (_model == null || markerLayer == null || ownerAreaIndex < 0 || ownerAreaIndex >= _model.Areas.Count) return;
+        if (_model == null || markerLayer == null || ownerAreaIndex < 0 || ownerAreaIndex >= _model.Areas.Count) return null;
         var instance = new GameObject(symbol + "Marker", typeof(RectTransform), typeof(CanvasRenderer), typeof(DungeonMinimapIconGraphic));
         var rect = (RectTransform)instance.transform;
         rect.SetParent(markerLayer, false);
@@ -227,10 +230,41 @@ public sealed class DungeonMinimapView : MonoBehaviour
         var graphic = instance.GetComponent<DungeonMinimapIconGraphic>();
         graphic.SetSymbol(symbol);
         StyleMarker(graphic);
+        if (symbol == DungeonMinimapIconGraphic.Symbol.Boss) AddBossLabel(rect, graphic.color);
         var marker = new MarkerVisual { OwnerAreaIndex = ownerAreaIndex, LocalPosition = localXZ, Rect = rect, Graphic = graphic };
         _markers.Add(marker);
         UpdateMarker(marker);
         if (playerArrow != null) playerArrow.transform.SetAsLastSibling();
+        return graphic;
+    }
+
+    private static void AddBossLabel(RectTransform icon, Color color)
+    {
+        var label = new GameObject("BossLabel", typeof(RectTransform), typeof(TextMeshProUGUI))
+            .GetComponent<TextMeshProUGUI>();
+        var rect = label.rectTransform;
+        rect.SetParent(icon, false);
+        rect.anchorMin = rect.anchorMax = new Vector2(.5f, 0f);
+        rect.pivot = new Vector2(.5f, 1f);
+        rect.anchoredPosition = new Vector2(0f, -2f);
+        rect.sizeDelta = new Vector2(68f, 28f);
+        label.font = Resources.Load<TMP_FontAsset>("BoundaryUI/Fonts/BoundaryFont") ?? TMP_Settings.defaultFontAsset;
+        label.text = "보스";
+        label.fontSize = 22f;
+        label.fontStyle = FontStyles.Bold;
+        label.alignment = TextAlignmentOptions.Center;
+        label.color = color;
+        label.raycastTarget = false;
+    }
+
+    internal void RemoveMarker(DungeonMinimapIconGraphic graphic)
+    {
+        if (graphic == null) return;
+        int index = _markers.FindIndex(marker => marker.Graphic == graphic);
+        if (index < 0) return;
+        _markers.RemoveAt(index);
+        graphic.gameObject.SetActive(false);
+        Destroy(graphic.gameObject);
     }
 
     public void RefreshExploration(DungeonMinimapModel model)
@@ -609,10 +643,30 @@ public sealed class DungeonMinimapView : MonoBehaviour
 
     private void StyleMarker(DungeonMinimapIconGraphic graphic)
     {
-        bool shop = graphic.Kind == DungeonMinimapIconGraphic.Symbol.Shop;
-        graphic.IconSprite = shop ? shopSprite : exitSprite;
-        graphic.color = shop ? shopColor : exitColor;
-        graphic.rectTransform.sizeDelta = PositiveSize(markerIconSize);
+        switch (graphic.Kind)
+        {
+            case DungeonMinimapIconGraphic.Symbol.Shop:
+                graphic.IconSprite = shopSprite;
+                graphic.color = shopColor;
+                break;
+            case DungeonMinimapIconGraphic.Symbol.RewardChest:
+                graphic.color = new Color32(255, 207, 100, 255);
+                break;
+            case DungeonMinimapIconGraphic.Symbol.Boss:
+                graphic.color = new Color32(255, 111, 125, 255);
+                break;
+            default:
+                graphic.IconSprite = exitSprite;
+                graphic.color = exitColor;
+                break;
+        }
+        graphic.rectTransform.sizeDelta = graphic.Kind switch
+        {
+            DungeonMinimapIconGraphic.Symbol.Boss => new Vector2(40f, 40f),
+            DungeonMinimapIconGraphic.Symbol.RewardChest => PositiveSize(markerIconSize)
+                * (mode == MapMode.FollowPlayer ? 1f : 1.35f),
+            _ => PositiveSize(markerIconSize)
+        };
     }
 
     private static Vector2 PositiveSize(Vector2 size) => new Vector2(Mathf.Max(1f, size.x), Mathf.Max(1f, size.y));

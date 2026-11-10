@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BoundaryZero.Inventory;
 using TMPro;
 using UnityEngine;
 
@@ -53,6 +54,7 @@ public sealed class ShopFusionChoicePanel : MonoBehaviour
             position.x = (_window.rect.width - (count * 500 - 20)) * .5f + i * 500;
             card.Root.anchoredPosition = position;
             card.Title.text = item.Name + "\n" + ItemDisplayText.Meta(item.Grade, item.PrimarySynergyName);
+            ItemRarityFrame.Show(card.Root, item.Grade);
             card.Icon.sprite = item.Icon; card.Icon.enabled = item.Icon != null;
             card.Description.text = item.Description ?? string.Empty;
             if (opening) { card.Scroll.StopMovement(); card.Scroll.verticalNormalizedPosition = 1f; }

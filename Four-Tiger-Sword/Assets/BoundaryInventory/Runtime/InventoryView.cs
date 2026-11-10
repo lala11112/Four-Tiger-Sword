@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -60,6 +61,7 @@ namespace BoundaryZero.Inventory
         private InventoryData displayData;
         private InventoryHoverTarget hover;
         private bool initialized;
+        private bool codex;
 
         public InventoryCatalog Catalog => catalog;
         public bool IsOpen => presentation != null && presentation.gameObject.activeSelf;
@@ -109,6 +111,12 @@ namespace BoundaryZero.Inventory
                 if (set != null && !string.IsNullOrEmpty(set.id))
                     synergies[set.id] = set;
             owned.RemoveWhere(id => !items.ContainsKey(id));
+            if (!codex) AddMissingItemCells();
+            foreach (var cell in itemCells)
+            {
+                if (cell.root != null && cell.root.transform is RectTransform rect)
+                    ItemRarityFrame.Show(rect, items.TryGetValue(cell.id, out var item) ? item.grade : 0);
+            }
             foreach (var row in setRows)
             {
                 var name = row.root != null ? row.root.transform.Find("Name") : null;
@@ -117,7 +125,27 @@ namespace BoundaryZero.Inventory
             }
         }
 
-        /// <summary>Uses host-owned display copy for the existing authored IDs. Null restores the standalone catalog.</summary>
+        private void AddMissingItemCells()
+        {
+            if (itemScroll == null || itemScroll.content == null) return;
+            var known = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var cell in itemCells)
+                if (cell?.root != null) known.Add(cell.id);
+
+            List<ItemCell> expanded = null;
+            foreach (var item in items.Values)
+            {
+                if (!known.Add(item.id)) continue;
+                expanded ??= new List<ItemCell>(itemCells);
+                expanded.Add(BuildItemCell(item, itemScroll.content));
+            }
+            if (expanded == null) return;
+            itemCells = expanded.ToArray();
+            foreach (var placeholder in placeholders)
+                if (placeholder != null) placeholder.transform.SetAsLastSibling();
+        }
+
+        /// <summary>Uses the host catalog's display data. Null restores the standalone catalog.</summary>
         public void SetDisplayData(InventoryData source)
         {
             displayData = source;
@@ -203,42 +231,51 @@ namespace BoundaryZero.Inventory
                 counts.TryGetValue(set.id, out var count);
                 SynergyTier active = null;
                 var next = 0;
+                var requiredCount = 0;
                 foreach (var tier in set.tiers ?? Array.Empty<SynergyTier>())
                 {
-                    if (tier == null || (tier.count != 2 && tier.count != 4 && tier.count != 6))
+                    if (tier == null || tier.count <= 0)
                         continue;
+                    requiredCount = Math.Max(requiredCount, tier.count);
                     if (tier.count <= count && (active == null || tier.count > active.count))
                         active = tier;
                     if (tier.count > count && (next == 0 || tier.count < next))
                         next = tier.count;
                 }
-                var state = new SynergyState(set.id, count, active?.count ?? 0, next, active?.text);
+                var state = new SynergyState(set.id, count, requiredCount, active?.count ?? 0, next, active?.text);
                 list.Add(state);
                 statesById.Add(set.id, state);
             }
             states = list.AsReadOnly();
 
-            ownedCount.text = owned.Count + "종";
+            ownedCount.text = (codex ? items.Count : owned.Count) + "종";
             foreach (var cell in itemCells)
-                cell.root.SetActive(owned.Contains(cell.id));
+                cell.root.SetActive(codex ? items.ContainsKey(cell.id) : owned.Contains(cell.id));
 
             var slots = Mathf.Max(MinimumSlots, Mathf.CeilToInt(owned.Count / (float)Columns) * Columns);
             var emptySlots = slots - owned.Count;
             for (var i = 0; i < placeholders.Length; i++)
                 placeholders[i].SetActive(i < emptySlots);
 
-            bool anyActive = false;
+            bool anyVisible = false;
             foreach (var row in setRows)
             {
                 var active = statesById.TryGetValue(row.id, out var state) && state.IsActive;
-                row.root.SetActive(active);
+                bool visible = active || codex && synergies.ContainsKey(row.id);
+                row.root.SetActive(visible);
+                anyVisible |= visible;
+                if (codex)
+                {
+                    row.status.text = "세트 효과 보기";
+                    row.count.text = string.Empty;
+                    continue;
+                }
                 if (!active)
                     continue;
-                anyActive = true;
                 row.status.text = state.ActiveTier + "세트 적용";
-                row.count.text = state.DisplayCount + "/6";
+                row.count.text = $"{state.DisplayCount}/{state.RequiredCount}";
             }
-            emptySets.SetActive(!anyActive);
+            emptySets.SetActive(!anyVisible);
         }
 
         internal void ShowTooltip(InventoryHoverTarget target, string id, bool isSet)
@@ -258,6 +295,10 @@ namespace BoundaryZero.Inventory
                 if (!items.TryGetValue(id, out var item))
                     return;
                 AppendTitle(body, item.name);
+                var rarity = ItemRarityFrame.ColorFor(item.grade);
+                if (rarity.a > 0f)
+                    body.Append("<size=16><color=#").Append(ColorUtility.ToHtmlStringRGB(rarity)).Append("><b>")
+                        .Append(item.grade).Append("등급</b></color></size>\n");
                 bool hasEffect = !string.IsNullOrWhiteSpace(item.effect);
                 if (hasEffect)
                     body.Append(ItemDescriptionDivider.EffectHeading).Append(item.effect.TrimEnd());
@@ -286,10 +327,27 @@ namespace BoundaryZero.Inventory
         {
             if (!statesById.TryGetValue(set.id, out var state))
                 return;
+            if (codex)
+            {
+                if (!allTiers)
+                    body.Append("<b>").Append(set.name).Append("</b>\n");
+                foreach (var tier in set.tiers ?? Array.Empty<SynergyTier>())
+                {
+                    if (tier == null) continue;
+                    body.Append("<color=#bbc9d6>").Append(tier.count).Append("세트</color> · ")
+                        .Append(tier.text).Append('\n');
+                }
+                if (allTiers && !string.IsNullOrEmpty(set.effect))
+                    body.Append("\n<size=15><color=#bbc9d6>").Append(set.effect).Append("</color></size>");
+                body.Append('\n');
+                return;
+            }
             if (!allTiers)
                 body.Append("<b>").Append(set.name).Append("</b>   ");
-            body.Append("<size=15><color=#bbc9d6>").Append(state.DisplayCount).Append("/6 · ")
-                .Append(state.Count).Append("종 보유</color></size>\n");
+            body.Append("<size=15><color=#bbc9d6>");
+            if (state.RequiredCount > 0)
+                body.Append(state.DisplayCount).Append('/').Append(state.RequiredCount).Append(" · ");
+            body.Append(state.Count).Append("종 보유</color></size>\n");
             if (allTiers)
             {
                 body.Append('\n');
@@ -356,8 +414,16 @@ namespace BoundaryZero.Inventory
             const float margin = 12f, gap = 11f;
             var rect = presentation.rect;
             var scale = window.localScale.x;
-            var logicalWidth = Mathf.Max(1, Mathf.Min(458f, (rect.width - margin * 2) / scale));
-            var logicalHeight = tooltipText.GetPreferredValues(tooltipText.text, logicalWidth - 36f, 0).y + 30f;
+            float availableWidth = Mathf.Max(1f, rect.width - margin * 2);
+            float availableHeight = Mathf.Max(1f, rect.height - margin * 2);
+            var logicalWidth = Mathf.Min(458f, availableWidth / scale);
+            var logicalHeight = tooltipText.GetPreferredValues(tooltipText.text, Mathf.Max(1f, logicalWidth - 36f), 0).y + 30f;
+            if (logicalHeight * scale > availableHeight)
+            {
+                logicalWidth = Mathf.Min(560f, availableWidth / scale);
+                logicalHeight = tooltipText.GetPreferredValues(tooltipText.text, Mathf.Max(1f, logicalWidth - 36f), 0).y + 30f;
+                scale = Mathf.Min(scale, availableHeight / logicalHeight);
+            }
             tooltip.sizeDelta = new Vector2(logicalWidth, logicalHeight);
             tooltip.localScale = Vector3.one * scale;
 
@@ -374,20 +440,31 @@ namespace BoundaryZero.Inventory
         }
 
         /// <summary>Creates the native uGUI hierarchy for a new view. Call once before using the view.</summary>
-        public void BuildView(InventoryCatalog source)
+        public void BuildView(InventoryCatalog source) => BuildView(source, null);
+
+        /// <summary>Builds a read-only catalog using gameplay display data and the package artwork.</summary>
+        public void BuildCodex(InventoryCatalog artwork, InventoryData entries)
+        {
+            if (entries == null) throw new ArgumentNullException(nameof(entries));
+            BuildView(artwork, entries);
+        }
+
+        private void BuildView(InventoryCatalog source, InventoryData codexEntries)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
             if (presentation != null)
             {
-                if (source != catalog)
+                if (source != catalog || codex != (codexEntries != null))
                     throw new InvalidOperationException("Build a new InventoryView to change the catalog.");
                 Initialize();
                 return;
             }
 
             catalog = source;
-            var definitions = catalog.ReadData();
+            codex = codexEntries != null;
+            displayData = codexEntries;
+            var definitions = codexEntries ?? catalog.ReadData();
             presentation = Node("InventoryPresentation", (RectTransform)transform);
             Fill(presentation);
             Graphic(presentation, new Color32(5, 16, 28, 217), true);
@@ -400,7 +477,9 @@ namespace BoundaryZero.Inventory
 
             Plate("TitleAccent", window, 70, 48, 3, 34, Red);
             Icon("Seal", window, catalog.seal, 82, 43, 38, 38);
-            Label("Title", window, "인벤토리", 133, 37, 500, 54, 39, Steel).fontStyle = FontStyles.Bold;
+            Label("Title", window, codex ? "아이템 도감" : "인벤토리", 133, 37, 500, 54, 39, Steel).fontStyle = FontStyles.Bold;
+            if (codex)
+                Label("Hint", window, "아이템과 시너지에 마우스를 올려 효과를 확인하세요.", 70, 684, 790, 30, 18, Muted);
             Plate("HeaderRule", window, 70, 101, 1224, 1, Line);
             Plate("HeaderRuleLight", window, 70, 100, 80, 2, Steel);
             Plate("HeaderRuleRed", window, 157, 100, 44, 2, Red);
@@ -417,39 +496,32 @@ namespace BoundaryZero.Inventory
             closeText.alignment = TextAlignmentOptions.Center;
 
             var left = Place("OwnedItems", window, 70, 141, 740, 533);
-            Label("Heading", left, "보유 아이템", 0, 0, 135, 32, 25, Steel).fontStyle = FontStyles.Bold;
+            Label("Heading", left, codex ? "전체 아이템" : "보유 아이템", 0, 0, 135, 32, 25, Steel).fontStyle = FontStyles.Bold;
             ownedCount = Label("Count", left, "0종", 141, 2, 78, 30, 18, Muted);
             Plate("SectionRule", left, 0, 42, 740, 1, Line);
             itemScroll = Scroll("ItemScroll", left, 0, 57, 740, 476, out var grid);
-            var layout = grid.gameObject.AddComponent<UnityEngine.UI.GridLayoutGroup>();
-            layout.padding = new RectOffset(1, 1, 1, 1);
-            layout.cellSize = new Vector2(112, 112);
-            layout.spacing = new Vector2(10, 10);
-            layout.constraint = UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount;
-            layout.constraintCount = Columns;
-            AddFitter(grid);
 
             var cells = new List<ItemCell>();
             var knownItems = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var item in definitions.items ?? Array.Empty<ItemDefinition>())
+            var uniqueItems = (definitions.items ?? Array.Empty<ItemDefinition>())
+                .Where(item => item != null && !string.IsNullOrEmpty(item.id) && knownItems.Add(item.id)).ToArray();
+            if (codex)
             {
-                if (item == null || string.IsNullOrEmpty(item.id) || !knownItems.Add(item.id))
-                    continue;
-                var cell = Slot("Item_" + item.id, grid, true, out var fill);
-                Icon("Icon", cell, catalog.ItemIcon(item.id), 14, 14, 84, 84);
-                var accent = Plate("HoverAccent", cell, 0, 0, 34, 2, Red);
-                accent.enabled = false;
-                cell.gameObject.AddComponent<InventoryHoverTarget>().Configure(this, item.id, false,
-                    fill, accent, fill.color, new Color32(37, 54, 71, 255));
-                cells.Add(new ItemCell { id = item.id, root = cell.gameObject });
+                BuildCodexItems(grid, definitions.synergies, uniqueItems, cells);
+            }
+            else
+            {
+                AddItemGrid(grid);
+                AddFitter(grid);
+                foreach (var item in uniqueItems) cells.Add(BuildItemCell(item, grid));
             }
             itemCells = cells.ToArray();
-            placeholders = new GameObject[MinimumSlots];
+            placeholders = new GameObject[codex ? 0 : MinimumSlots];
             for (var i = 0; i < placeholders.Length; i++)
                 placeholders[i] = Slot("EmptySlot_" + (i + 1), grid, false, out _).gameObject;
 
             var right = Place("Synergies", window, 875, 141, 419, 533);
-            Label("Heading", right, "활성 시너지", 0, 0, 320, 32, 25, Steel).fontStyle = FontStyles.Bold;
+            Label("Heading", right, codex ? "시너지 도감" : "활성 시너지", 0, 0, 320, 32, 25, Steel).fontStyle = FontStyles.Bold;
             Plate("SectionRule", right, 0, 42, 419, 1, Line);
             setScroll = Scroll("SynergyScroll", right, 0, 57, 419, 476, out var setList);
             var rowsLayout = setList.gameObject.AddComponent<UnityEngine.UI.VerticalLayoutGroup>();
@@ -478,7 +550,7 @@ namespace BoundaryZero.Inventory
                 rows.Add(new SetRow { id = set.id, root = row.gameObject, status = status, count = count });
             }
             setRows = rows.ToArray();
-            emptySets = Label("EmptyMessage", setList, "같은 시너지 아이템 2종부터 활성화됩니다.", 0, 0,
+            emptySets = Label("EmptyMessage", setList, codex ? "등록된 시너지가 없습니다." : "같은 시너지 아이템 2종부터 활성화됩니다.", 0, 0,
                 405, 42, 17, Muted).gameObject;
 
             tooltip = Place("Tooltip", presentation, 0, 0, 458, 200);
@@ -501,6 +573,117 @@ namespace BoundaryZero.Inventory
             tooltipBorder.raycastTarget = false;
 
             Initialize();
+        }
+
+        private void BuildCodexItems(RectTransform content, SynergyDefinition[] definitions, ItemDefinition[] entries,
+            List<ItemCell> cells)
+        {
+            var layout = content.gameObject.AddComponent<UnityEngine.UI.VerticalLayoutGroup>();
+            layout.spacing = 18;
+            layout.childControlHeight = false;
+            layout.childControlWidth = true;
+            layout.childForceExpandHeight = false;
+            layout.childForceExpandWidth = true;
+            AddFitter(content);
+
+            var sections = new Dictionary<string, List<ItemDefinition>>(StringComparer.Ordinal);
+            var orderedSets = new List<SynergyDefinition>();
+            foreach (var set in definitions ?? Array.Empty<SynergyDefinition>())
+            {
+                if (set == null || string.IsNullOrEmpty(set.id) || sections.ContainsKey(set.id)) continue;
+                sections.Add(set.id, new List<ItemDefinition>());
+                orderedSets.Add(set);
+            }
+            var unclassified = new List<ItemDefinition>();
+            foreach (var item in entries)
+            {
+                bool grouped = false;
+                foreach (var tag in (item.synergies ?? Array.Empty<string>()).Distinct(StringComparer.Ordinal))
+                {
+                    if (string.IsNullOrEmpty(tag) || !sections.TryGetValue(tag, out var members)) continue;
+                    members.Add(item);
+                    grouped = true;
+                }
+                if (!grouped) unclassified.Add(item);
+            }
+
+            foreach (var set in orderedSets)
+            {
+                var members = sections[set.id];
+                if (members.Count > 0)
+                    AddCodexSection(content, "Set_" + set.id, set.name, catalog.SynergyIcon(set.id), members, cells);
+            }
+            if (unclassified.Count > 0)
+                AddCodexSection(content, "Unclassified", "시너지 미분류", null, unclassified, cells);
+        }
+
+        private void AddCodexSection(RectTransform parent, string id, string title, Sprite icon,
+            List<ItemDefinition> members, List<ItemCell> cells)
+        {
+            const float width = 728;
+            var section = Node(id, parent);
+            Plate("Header", section, 0, 0, width, 40, new Color32(31, 49, 67, 255));
+            Plate("Accent", section, 0, 0, 3, 40, Red);
+            if (icon != null) Icon("Mark", section, icon, 12, 7, 26, 26);
+            float titleLeft = icon != null ? 48 : 14;
+            var name = Label("Name", section, title, titleLeft, 0, 650 - titleLeft, 40, 21, Steel);
+            name.fontStyle = FontStyles.Bold;
+            name.alignment = TextAlignmentOptions.MidlineLeft;
+            Label("Count", section, $"{members.Count}종", 650, 0, 64, 40, 18, Muted).alignment =
+                TextAlignmentOptions.MidlineRight;
+
+            float y = 46;
+            var gradeGroups = members.GroupBy(item => item.grade is >= 1 and <= 4 ? item.grade : 0)
+                .OrderByDescending(group => group.Key);
+            foreach (var grade in gradeGroups)
+            {
+                var rarity = ItemRarityFrame.ColorFor(grade.Key);
+                string heading = grade.Key > 0 ? $"{grade.Key}등급" : "등급 미지정";
+                var gradeName = Label("Grade", section, heading, 8, y, 150, 26, 16, rarity.a > 0 ? rarity : Muted);
+                gradeName.alignment = TextAlignmentOptions.MidlineLeft;
+                Plate("GradeRule", section, 148, y + 13, width - 148, 1, Line);
+                y += 28;
+                int rows = (grade.Count() + Columns - 1) / Columns;
+                float height = rows * 112 + (rows - 1) * 10 + 2;
+                var grid = Place("Grade_" + grade.Key, section, 0, y, width, height);
+                AddItemGrid(grid);
+                foreach (var item in grade) cells.Add(BuildItemCell(item, grid));
+                y += height + 6;
+            }
+            section.sizeDelta = new Vector2(width, y);
+        }
+
+        private ItemCell BuildItemCell(ItemDefinition item, RectTransform grid)
+        {
+            var cell = Slot("Item_" + item.id, grid, true, out var fill);
+            var icon = catalog.ItemIcon(item.id);
+            if (codex)
+            {
+                Icon("Icon", cell, icon, 25, 7, 62, 62);
+                var name = Label("Name", cell, item.name, 6, 70, 100, 35, 15, Steel);
+                name.alignment = TextAlignmentOptions.Center;
+                name.textWrappingMode = TextWrappingModes.Normal;
+                name.overflowMode = TextOverflowModes.Ellipsis;
+                name.enableAutoSizing = true;
+                name.fontSizeMin = 12;
+                name.fontSizeMax = 15;
+            }
+            else Icon("Icon", cell, icon, 14, 14, 84, 84);
+            var accent = Plate("HoverAccent", cell, 0, 0, 34, 2, Red);
+            accent.enabled = false;
+            cell.gameObject.AddComponent<InventoryHoverTarget>().Configure(this, item.id, false,
+                fill, accent, fill.color, new Color32(37, 54, 71, 255));
+            return new ItemCell { id = item.id, root = cell.gameObject };
+        }
+
+        private static void AddItemGrid(RectTransform grid)
+        {
+            var layout = grid.gameObject.AddComponent<UnityEngine.UI.GridLayoutGroup>();
+            layout.padding = new RectOffset(1, 1, 1, 1);
+            layout.cellSize = new Vector2(112, 112);
+            layout.spacing = new Vector2(10, 10);
+            layout.constraint = UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount;
+            layout.constraintCount = Columns;
         }
 
         private static RectTransform Slot(string name, RectTransform grid, bool occupied, out UnityEngine.UI.Image fill)

@@ -13,7 +13,7 @@ public static class ChainSkillHudRegression
     private static int _checks;
 
     /// <summary>Renders the saved HUD in an isolated preview scene without changing open scenes.</summary>
-    public static string CapturePreview(string outputPath)
+    public static string CapturePreview(string outputPath, bool formLocks = false)
     {
         if (Application.isPlaying) throw new InvalidOperationException("Capture chain HUD in Edit Mode.");
         if (string.IsNullOrWhiteSpace(outputPath)) throw new ArgumentException("A PNG output path is required.", nameof(outputPath));
@@ -61,9 +61,10 @@ public static class ChainSkillHudRegression
                 Hp = new MeterState(4200, 5000),
                 Auxiliary = new MeterState(75, 100),
                 UltimateCharge = new MeterState(65, 100),
-                ActiveFormIndex = 3,
-                FireChain = new ChainSkillState(4.2f, false),
-                WaterChain = new ChainSkillState(2.6f, true)
+                ActiveFormIndex = formLocks ? 1 : 3,
+                LockedFormsMask = formLocks ? 30 : 0,
+                FireChain = formLocks ? default : new ChainSkillState(4.2f, false),
+                WaterChain = formLocks ? default : new ChainSkillState(2.6f, true)
             });
             Canvas.ForceUpdateCanvases();
             foreach (var label in root.GetComponentsInChildren<TMP_Text>(true)) label.ForceMeshUpdate(true, true);
@@ -154,6 +155,38 @@ public static class ChainSkillHudRegression
                 && HudMath.ChainRemaining(new ChainSkillState(-1f, true)) == 0f,
                 "Invalid readiness values must not produce a ready display.");
 
+            var locked = new HudState { ActiveFormIndex = 1, LockedFormsMask = 30,
+                WaterChain = new ChainSkillState(3f, true) };
+            view.Render(locked);
+            var forms = root.transform.Find("BoundaryZeroHUD/Forms");
+            for (int i = 0; i < 5; i++)
+            {
+                bool isLocked = i > 0;
+                var label = forms.Find("Locked" + i)?.GetComponent<TMP_Text>();
+                Check(label != null && label.text == "잠금" && !label.raycastTarget,
+                    "Every form slot requires a nonblocking lock label.");
+                Check(label.gameObject.activeSelf == isLocked
+                    && forms.Find("Key" + i).gameObject.activeSelf == !isLocked,
+                    "Only the fire slot may advertise a key when other elements are locked.");
+                var artwork = forms.Find("Element" + i).GetComponent<UnityEngine.UI.Image>();
+                Check(isLocked ? artwork.color.r < .4f : artwork.color == Color.white,
+                    "Locked artwork must be dimmed while the active fire icon stays bright.");
+                Check(forms.Find("Selected" + i).gameObject.activeSelf == !isLocked,
+                    "Locked slots must never display a selection highlight.");
+            }
+            Check(!group.gameObject.activeSelf, "Even stale locked water readiness must not advertise F.");
+            locked.ActiveFormIndex = 2;
+            view.Render(locked);
+            Check(!forms.Find("Selected1").gameObject.activeSelf,
+                "A stale active-form snapshot must not highlight a locked form.");
+            view.Render(new HudState { ActiveFormIndex = 2 });
+            for (int i = 0; i < 5; i++)
+                Check(!forms.Find("Locked" + i).gameObject.activeSelf
+                    && forms.Find("Key" + i).gameObject.activeSelf,
+                    "Unrestricted snapshots must restore the original form labels.");
+            Check(forms.Find("Element1").GetComponent<UnityEngine.UI.Image>().color == Color.white,
+                "Unlocked artwork must recover its original selected appearance.");
+
             view.Render(state);
             Canvas.ForceUpdateCanvases();
             foreach (var label in group.GetComponentsInChildren<TMP_Text>(true))
@@ -170,7 +203,7 @@ public static class ChainSkillHudRegression
             if (root != null) UnityEngine.Object.DestroyImmediate(root);
             EditorSceneManager.ClosePreviewScene(preview);
         }
-        return "Chain skill HUD: " + _checks + " checks passed (saved bindings, both timers, F selection, expiration, passive rendering).";
+        return "Chain skill HUD: " + _checks + " checks passed (saved bindings, timers, F selection, form locks, restoration, passive rendering).";
     }
 
     private static void Check(bool condition, string message)

@@ -13,6 +13,17 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
 
     private readonly DungeonMinimapModel _model = new DungeonMinimapModel();
     private readonly List<Vector2> _enemyPositions = new List<Vector2>(16);
+    private readonly Dictionary<DungeonRewardChest, ChestMarkers> _chestMarkers = new();
+    private readonly List<DungeonRewardChest> _expiredChests = new();
+    private float _nextChestRefresh;
+    private DungeonRewardNotice _rewardNotice;
+
+    private struct ChestMarkers
+    {
+        public DungeonMinimapIconGraphic Minimap;
+        public DungeonMinimapIconGraphic FullMap;
+    }
+
     private DungeonRoomEncounter _enemyRoom;
     private int _enemyRoomId = -1;
     private RunManager _subscribedRun;
@@ -38,6 +49,7 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
     {
         CloseFullMap();
         Unsubscribe();
+        ClearChestMarkers();
         if (view != null) { view.SetVisible(false); view.Clear(); }
         if (fullMapView != null) { fullMapView.SetVisible(false); fullMapView.Clear(); }
         run = targetRun;
@@ -103,6 +115,7 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
 
     private void HideMaps()
     {
+        if (_rewardNotice != null) _rewardNotice.Hide();
         _stageLabel = null;
         if (view != null) view.SetStageLabel(string.Empty);
         _enemyRoom = null;
@@ -129,6 +142,11 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
         _tracking = false;
         _model.ResetMotionHistory();
         HideMaps();
+    }
+
+    private void OnDestroy()
+    {
+        if (_rewardNotice != null) Destroy(_rewardNotice.gameObject);
     }
 
     private void Subscribe()
@@ -273,6 +291,7 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
             _result = result;
             _enemyRoom = null;
             _enemyRoomId = -1;
+            ClearChestMarkers();
             _model.Reset(result.plan);
             _travel ??= new DungeonFastTravelService(run, _model);
             _travel.Bind(result);
@@ -281,6 +300,7 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
             if (fullMapView != null) fullMapView.Build(_model);
             AddMarker(result.shopRoom, result.plan.shopMapId, DungeonMinimapIconGraphic.Symbol.Shop);
             AddMarker(result.endRoom, result.plan.endMapId, DungeonMinimapIconGraphic.Symbol.Exit);
+            AddBossMarker(result.plan.bossMapId, result.bossRoom);
             _tracking = false;
         }
 
@@ -300,6 +320,7 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
         UpdateStageLabel();
         RefreshVisibility();
         UpdateEnemies(stage, root);
+        UpdateChestMarkers(stage.Encounters, root);
         _tracking = true;
     }
 
@@ -361,6 +382,68 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
             }
         }
         view.SetEnemyPositions(_enemyPositions);
+    }
+
+    private void AddBossMarker(int roomId, BaekhoMapModule room)
+    {
+        if (room == null) return;
+        int area = _model.GetRoomAreaIndex(roomId);
+        if (area < 0) return;
+        Vector2 center = _model.Areas[area].Center;
+        view.AddMarker(area, center, DungeonMinimapIconGraphic.Symbol.Boss);
+        if (fullMapView != null) fullMapView.AddMarker(area, center, DungeonMinimapIconGraphic.Symbol.Boss);
+    }
+
+    private void UpdateChestMarkers(DungeonEncounterDirector director, Transform root)
+    {
+        // The chest is an immediate child of its generated encounter room.
+        // Only poll cleared rooms, so regular movement never scans the scene hierarchy.
+        foreach (var entry in _chestMarkers)
+        {
+            if (entry.Key != null && entry.Key.IsAvailable) continue;
+            if (view != null) view.RemoveMarker(entry.Value.Minimap);
+            if (fullMapView != null) fullMapView.RemoveMarker(entry.Value.FullMap);
+            _expiredChests.Add(entry.Key);
+        }
+        foreach (var chest in _expiredChests) _chestMarkers.Remove(chest);
+        _expiredChests.Clear();
+
+        if (director == null || !director.IsReady || Time.unscaledTime < _nextChestRefresh) return;
+        _nextChestRefresh = Time.unscaledTime + .2f;
+        foreach (var room in director.Rooms)
+        {
+            if (room == null || !room.WasCombatClearedByDefeat || !room.transform.IsChildOf(root)) continue;
+            var chestObject = room.transform.Find("CombatRewardChest");
+            if (chestObject == null || !chestObject.TryGetComponent<DungeonRewardChest>(out var chest)
+                || !chest.IsAvailable || _chestMarkers.ContainsKey(chest)) continue;
+            var identity = room.GetComponent<BaekhoGeneratedRoom>();
+            if (identity == null) continue;
+            int area = _model.GetRoomAreaIndex(identity.instanceId);
+            if (area < 0) continue;
+            Vector3 local = root.InverseTransformPoint(chest.transform.position);
+            var position = new Vector2(local.x, local.z);
+            _chestMarkers.Add(chest, new ChestMarkers
+            {
+                Minimap = view.AddTrackedMarker(area, position, DungeonMinimapIconGraphic.Symbol.RewardChest),
+                FullMap = fullMapView != null
+                    ? fullMapView.AddTrackedMarker(area, position, DungeonMinimapIconGraphic.Symbol.RewardChest) : null
+            });
+            if (_rewardNotice == null) _rewardNotice = DungeonRewardNotice.Create();
+            _rewardNotice.Show();
+        }
+    }
+
+    private void ClearChestMarkers()
+    {
+        foreach (var markers in _chestMarkers.Values)
+        {
+            if (view != null) view.RemoveMarker(markers.Minimap);
+            if (fullMapView != null) fullMapView.RemoveMarker(markers.FullMap);
+        }
+        _chestMarkers.Clear();
+        _expiredChests.Clear();
+        _nextChestRefresh = 0f;
+        if (_rewardNotice != null) _rewardNotice.Hide();
     }
 
     private void AddMarker(BaekhoMapModule room, int roomId, DungeonMinimapIconGraphic.Symbol symbol)

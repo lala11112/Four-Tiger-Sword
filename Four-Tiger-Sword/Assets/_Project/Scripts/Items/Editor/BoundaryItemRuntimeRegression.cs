@@ -21,7 +21,7 @@ public static class BoundaryItemRuntimeRegression
         VerifyGoldAndCombatLifetime();
         VerifyFirstRewardRequiresCapturedCombat();
         VerifyReacquisitionAndMidCombatAcquisition();
-        string result = $"Boundary inventory runtime: all 59 item mappings; {_checks} checks passed.";
+        string result = $"Boundary inventory runtime: all {BoundaryInventoryContent.Grades.Count} item mappings; {_checks} checks passed.";
         Debug.Log(result);
         return result;
     }
@@ -112,6 +112,11 @@ public static class BoundaryItemRuntimeRegression
                     if (effect.maximumBaseGold > 0)
                         Near(fixture.Items.ProcessKill(Kill(fixture, 4, family, effect.maximumBaseGold + 1)), 0f, id + " gold upper bound");
                     break;
+                case BoundaryItemStat.GoldFraction:
+                    Near(fixture.Items.ProcessKill(Kill(fixture, 2, family, 10)), 0f, id + " fractional first kill");
+                    Near(fixture.Items.ProcessKill(Kill(fixture, 3, family, 10)), 1f, id + " fractional second kill");
+                    Near((float)fixture.Items.GoldFractionRemainder, .6f, id + " fractional carry");
+                    break;
             }
         }
         Check(fixture.Items.TryRemoveItem(id), id + " removal");
@@ -179,22 +184,43 @@ public static class BoundaryItemRuntimeRegression
     {
         using var fixture = new Fixture();
         var definitions = new List<ItemDefinition>();
-        for (int i = 0; i < 7; i++) definitions.Add(fixture.Definition("member" + i));
+        for (int i = 0; i < 9; i++) definitions.Add(fixture.Definition("member" + i));
         fixture.Catalog.items = definitions.ToArray();
         fixture.Catalog.synergies = new[] { new ItemSynergyDefinition { id = "test",
             members = definitions.ConvertAll(item => item.itemId).ToArray(), tiers = new[] {
-                Tier(2, .05f), Tier(4, .10f), Tier(6, .18f) } } };
-        for (int i = 0; i < 7; i++)
+                Tier(2, .05f), Tier(4, .10f), Tier(6, .18f), Tier(8, .26f) } } };
+        var activations = new List<int>();
+        fixture.Items.SynergyTierActivated += state => activations.Add(state.ActiveTier.count);
+        var incoming = new ItemIncomingContext(true, false, 1000f, 1000f);
+        for (int i = 0; i < definitions.Count; i++)
         {
-            fixture.Items.TryAddItem(definitions[i].itemId);
-            float ratio = i + 1 >= 6 ? .18f : i + 1 >= 4 ? .10f : i + 1 >= 2 ? .05f : 0f;
+            Check(fixture.Items.TryAddItem(definitions[i].itemId), "synergy member grant " + i);
+            float ratio = i + 1 >= 8 ? .26f : i + 1 >= 6 ? .18f : i + 1 >= 4 ? .10f : i + 1 >= 2 ? .05f : 0f;
             Near(fixture.Stats.GetStat(StatType.ST_ATK), 100f * (1f + ratio), "highest tier replacement " + (i + 1));
             Check(fixture.Items.SynergyStates[0].OwnedCount == i + 1, "synergy unique count " + i);
+            if (i == 5)
+            {
+                fixture.Items.CommitIncoming(incoming, 10f, 0f);
+                Near(fixture.Stats.Shield, 50f, "six-piece shield amount");
+            }
         }
+        Check(string.Join(",", activations) == "2,4,6,8", "each newly reached tier notified once");
+        fixture.Items.CommitIncoming(incoming, 10f, 0f);
+        Near(fixture.Stats.Shield, 50f, "eight-piece promotion preserves the existing shield cooldown");
+        fixture.Items.Tick(10f);
+        fixture.Items.CommitIncoming(incoming, 10f, 0f);
+        Near(fixture.Stats.Shield, 60f, "eight-piece shield amount after cooldown");
+        Check(fixture.Items.TryRemoveItem("member8") && fixture.Items.TryRemoveItem("member7")
+            && fixture.Items.SynergyStates[0].ActiveTier.count == 6, "losing the eighth piece restores the six-piece tier");
+        Near(fixture.Stats.GetStat(StatType.ST_ATK), 118f, "eight-piece bonus is replaced on downgrade");
         fixture.Items.TryRemoveItem("member6"); fixture.Items.TryRemoveItem("member5");
         Near(fixture.Stats.GetStat(StatType.ST_ATK), 110f, "tier downgrade");
         static ItemSynergyTier Tier(int count, float amount) => new ItemSynergyTier { count = count,
-            effects = new[] { new BoundaryItemEffect { stat = BoundaryItemStat.AttackRatio, amount = amount } } };
+            effects = new[] {
+                new BoundaryItemEffect { stat = BoundaryItemStat.AttackRatio, amount = amount },
+                new BoundaryItemEffect { stat = BoundaryItemStat.ShieldMaxHpRatio, amount = .02f + .005f * count,
+                    trigger = BoundaryItemTrigger.DamageTaken, durationSeconds = 4, cooldownSeconds = 10 }
+            } };
     }
 
     private static void VerifyShieldAndIncomingOrdering()

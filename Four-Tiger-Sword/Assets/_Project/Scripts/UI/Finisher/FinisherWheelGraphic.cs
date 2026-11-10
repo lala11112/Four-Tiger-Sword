@@ -36,13 +36,15 @@ public sealed class FinisherWheelGraphic : UnityEngine.UI.MaskableGraphic
 
     private int _selection = -1;
     private int _current = -1;
+    private int _lockedSectorMask;
 
-    public void SetSelection(int selection, int current)
+    public void SetSelection(int selection, int current, int lockedSectorMask = 0)
     {
-        if (_selection == selection && _current == current)
+        if (_selection == selection && _current == current && _lockedSectorMask == lockedSectorMask)
             return;
         _selection = selection;
         _current = current;
+        _lockedSectorMask = lockedSectorMask;
         SetVerticesDirty();
     }
 
@@ -82,7 +84,8 @@ public sealed class FinisherWheelGraphic : UnityEngine.UI.MaskableGraphic
 
         for (int i = 0; i < 5; i++)
         {
-            Color accent = GetElementColor(i);
+            bool locked = (_lockedSectorMask & (1 << i)) != 0;
+            Color accent = locked ? _inactiveCenterRimColor : GetElementColor(i);
             bool selected = _selection == i;
             float halfGap = _sectorGapDegrees * 0.5f;
             float start = i * FinisherWheelSelection.SectorAngle - FinisherWheelSelection.SectorAngle * 0.5f + halfGap;
@@ -97,7 +100,7 @@ public sealed class FinisherWheelGraphic : UnityEngine.UI.MaskableGraphic
         }
 
         Arc(mesh, inner - _centerRimWidth, inner, 0f, 360f,
-            _selection < 0 ? GetElementColor(_current) : _inactiveCenterRimColor, 64);
+            _selection < 0 && _current >= 0 ? GetElementColor(_current) : _inactiveCenterRimColor, 64);
         Arc(mesh, 0f, inner - _centerInset, 0f, 360f, _centerColor, 64);
     }
 

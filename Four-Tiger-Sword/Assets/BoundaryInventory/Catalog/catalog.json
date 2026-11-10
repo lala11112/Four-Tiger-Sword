@@ -1,10 +1,10 @@
 {
   "version": 1,
-  "revision": "2026-11-08",
-  "title": "경계 ZERO · 인벤토리 아이템 59종",
+  "revision": "2026-11-10",
+  "title": "경계 ZERO · 인벤토리 아이템 81종",
   "rules": [
     "수치는 전투 테스트용 기획값이다.",
-    "같은 시너지의 서로 다른 아이템 2·4·6종을 보유하면 해당 단계가 적용된다. 상위 단계가 하위 단계를 대체하며, 6종 이상에서는 6단계 효과가 적용된다.",
+    "같은 시너지의 서로 다른 아이템 2·4·6·8종을 보유하면 해당 단계가 적용된다. 상위 단계가 하위 단계를 대체하며, 8종 이상에서는 8세트 효과가 적용된다.",
     "두 시너지에 속한 아이템은 양쪽에서 각각 1종으로 센다. 같은 아이템의 중복 획득은 종류 수를 늘리지 않는다.",
     "추가 타격은 별도의 적중·처치 효과나 추가 타격을 다시 발동하지 않는다. 아이템 효과의 재발동은 명시된 경우를 제외하고 지속시간만 갱신한다."
   ],
@@ -776,6 +776,270 @@
       "designIntent": "별도 조건 없이 평타 피해를 늘린다.",
       "origin": "revised",
       "image": "Art/Items/I95.png"
+    },
+    {
+      "id": "I101",
+      "name": "쌍날 침",
+      "description": "금속 자루 끝에서 나란히 뻗은 두 침이 빛을 받는다.",
+      "effect": "스킬의 치명타 확률이 4%p 증가한다.",
+      "synergies": [
+        "S01"
+      ],
+      "primarySynergy": "S01",
+      "image": "Art/Items/I101.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I102",
+      "name": "낙뢰 고리",
+      "description": "둥근 금속 안쪽을 푸른 빛이 한 바퀴 돈다.",
+      "effect": "치명타 피해 배율이 12%p 증가한다.",
+      "synergies": [
+        "S01"
+      ],
+      "primarySynergy": "S01",
+      "image": "Art/Items/I102.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I103",
+      "name": "삼끈 매듭",
+      "description": "삼끈을 짧은 막대 둘레에 단단히 묶었다.",
+      "effect": "공격력이 3% 증가한다.",
+      "synergies": [
+        "S02"
+      ],
+      "primarySynergy": "S02",
+      "image": "Art/Items/I103.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I104",
+      "name": "돌격 날붙이",
+      "description": "굽은 두 날이 한 손잡이에 맞물려 있다.",
+      "effect": "기본 공격 속도가 4% 증가한다.",
+      "synergies": [
+        "S02"
+      ],
+      "primarySynergy": "S02",
+      "image": "Art/Items/I104.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I105",
+      "name": "석문 패편",
+      "description": "오래 닫힌 돌문에서 떼어낸 구멍 난 작은 조각이다.",
+      "effect": "방어력이 5% 증가한다.",
+      "synergies": [
+        "S03"
+      ],
+      "primarySynergy": "S03",
+      "image": "Art/Items/I105.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I106",
+      "name": "겹비늘 철편",
+      "description": "검은 철편 세 장을 비늘처럼 겹쳐 묶었다.",
+      "effect": "최대 HP가 4%, 방어력이 4% 증가한다.",
+      "synergies": [
+        "S03"
+      ],
+      "primarySynergy": "S03",
+      "image": "Art/Items/I106.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I107",
+      "name": "물안개 매듭",
+      "description": "물기가 밴 끈이 푸른 고리 둘레를 감싼다.",
+      "effect": "수 속성 기본 공격과 스킬 피해가 6% 증가한다.",
+      "synergies": [
+        "S04"
+      ],
+      "primarySynergy": "S04",
+      "image": "Art/Items/I107.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I108",
+      "name": "굽이물 병",
+      "description": "유리관 속 물줄기가 기울일 때마다 방향을 바꾼다.",
+      "effect": "HP가 80% 이상인 적에게 주는 수 속성 피해가 11% 증가한다.",
+      "synergies": [
+        "S04"
+      ],
+      "primarySynergy": "S04",
+      "image": "Art/Items/I108.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I109",
+      "name": "잔불 고리",
+      "description": "회색 고리 가장자리에 뜨거운 붉은 철편이 박혀 있다.",
+      "effect": "화 속성 피해가 5% 증가한다.",
+      "synergies": [
+        "S05"
+      ],
+      "primarySynergy": "S05",
+      "image": "Art/Items/I109.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I110",
+      "name": "홍염 봉인",
+      "description": "봉인판 홈을 따라 붉은 빛이 선명하게 이어진다.",
+      "effect": "HP가 30% 이하인 적에게 주는 화 속성 피해가 11% 증가한다.",
+      "synergies": [
+        "S05"
+      ],
+      "primarySynergy": "S05",
+      "image": "Art/Items/I110.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I111",
+      "name": "응급 호패",
+      "description": "접어 포갠 호패 두 장에 짧은 수호문이 새겨져 있다.",
+      "effect": "전투 진입 시 4초간 최대 HP의 4%만큼 보호막을 얻는다. 재사용 대기시간 12초.",
+      "synergies": [
+        "S08"
+      ],
+      "primarySynergy": "S08",
+      "image": "Art/Items/I111.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I112",
+      "name": "회청 결계추",
+      "description": "삼각 결계추 가장자리를 은빛 선이 두른다.",
+      "effect": "보호막 획득량이 14% 증가한다.",
+      "synergies": [
+        "S08"
+      ],
+      "primarySynergy": "S08",
+      "image": "Art/Items/I112.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I113",
+      "name": "파단 송곳",
+      "description": "갈라진 틈을 겨냥해 끝을 좁고 단단하게 벼린 송곳이다.",
+      "effect": "HP가 25% 이하인 적에게 주는 기본 공격 피해가 10% 증가한다.",
+      "synergies": [
+        "S10"
+      ],
+      "primarySynergy": "S10",
+      "image": "Art/Items/I113.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I114",
+      "name": "종결 인장",
+      "description": "긴 몸통 아래 붉은 인영이 새겨진 인장이다.",
+      "effect": "HP가 20% 이하인 적에게 주는 기본 공격과 스킬 피해가 11% 증가한다.",
+      "synergies": [
+        "S10"
+      ],
+      "primarySynergy": "S10",
+      "image": "Art/Items/I114.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I115",
+      "name": "양날 장식",
+      "description": "두 갈래로 벼린 장식 끝에 금속 술이 매달려 있다.",
+      "effect": "기본 공격이 대상의 양수 유효 방어력을 8% 무시한다.",
+      "synergies": [
+        "S14"
+      ],
+      "primarySynergy": "S14",
+      "image": "Art/Items/I115.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I116",
+      "name": "결절 파쇄편",
+      "description": "겹갑옷의 이음매를 뜯어낼 때 쓰던 갈고리다.",
+      "effect": "HP가 40% 이하인 적에게 기본 공격이나 스킬로 피해를 줄 때, 양수 유효 방어력을 18% 무시한다.",
+      "synergies": [
+        "S14"
+      ],
+      "primarySynergy": "S14",
+      "image": "Art/Items/I116.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I117",
+      "name": "추적 표식",
+      "description": "사냥감을 놓치지 않도록 푸른 선을 새긴 표식이다.",
+      "effect": "정예와 보스에게 주는 기본 공격과 스킬 피해가 6% 증가한다.",
+      "synergies": [
+        "S15"
+      ],
+      "primarySynergy": "S15",
+      "image": "Art/Items/I117.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I118",
+      "name": "맹수 엄니틀",
+      "description": "엄니처럼 굽은 흰 철편이 금속 틀을 감싼다.",
+      "effect": "정예와 보스의 공격으로 받는 피해가 8% 감소한다.",
+      "synergies": [
+        "S15"
+      ],
+      "primarySynergy": "S15",
+      "image": "Art/Items/I118.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I119",
+      "name": "연습 장치",
+      "description": "몇 번이고 풀고 조일 수 있게 만든 연습용 장치다.",
+      "effect": "직접 사용하는 공격 스킬 피해가 3% 증가한다.",
+      "synergies": [
+        "S16"
+      ],
+      "primarySynergy": "S16",
+      "image": "Art/Items/I119.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I120",
+      "name": "응수 틀",
+      "description": "응수 동작마다 다른 위치를 짚도록 홈 여섯 개를 뚫었다.",
+      "effect": "HP가 70% 이상인 적에게 주는 스킬 피해가 9% 증가한다.",
+      "synergies": [
+        "S16"
+      ],
+      "primarySynergy": "S16",
+      "image": "Art/Items/I120.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I121",
+      "name": "엽전 걸쇠",
+      "description": "엽전 꾸러미가 풀리지 않도록 입구를 걸어 잠그는 쇠다.",
+      "effect": "기본 보상 골드가 있는 적을 처치하면 기본 보상의 8%를 추가로 얻는다. 소수 부분은 다음 처치로 이월된다.",
+      "synergies": [
+        "S19"
+      ],
+      "primarySynergy": "S19",
+      "image": "Art/Items/I121.png",
+      "origin": "expansion"
+    },
+    {
+      "id": "I122",
+      "name": "수금 계수기",
+      "description": "들어온 엽전 수만큼 바늘이 한 칸씩 움직인다.",
+      "effect": "기본 보상 골드가 8 이상인 적을 처치하면 골드를 2 더 얻는다.",
+      "synergies": [
+        "S19"
+      ],
+      "primarySynergy": "S19",
+      "image": "Art/Items/I122.png",
+      "origin": "expansion"
     }
   ],
   "synergies": [
@@ -806,6 +1070,14 @@
             "critChanceBonusPoints": 15,
             "critDamageMultiplierBonusPoints": 35
           }
+        },
+        {
+          "count": 8,
+          "text": "치명타 확률 +20%p · 치명타 피해 배율 +50%p",
+          "values": {
+            "critChanceBonusPoints": 20,
+            "critDamageMultiplierBonusPoints": 50
+          }
         }
       ],
       "effect": "치명타 피해 배율은 %p로 더한다. 예를 들어 150%에서 2세트 적용 시 160%가 된다. 치명타 확률은 100%를 넘지 않는다.",
@@ -816,7 +1088,9 @@
         "I13",
         "I15",
         "I57",
-        "I100"
+        "I100",
+        "I101",
+        "I102"
       ],
       "icon": "Art/Synergies/S01.svg",
       "iconPng": "Art/Synergies/S01.png"
@@ -848,6 +1122,14 @@
             "attackPowerBonusPct": 18,
             "normalAttackRateBonusPct": 15
           }
+        },
+        {
+          "count": 8,
+          "text": "공격력 +26% · 공격속도 +22%",
+          "values": {
+            "attackPowerBonusPct": 26,
+            "normalAttackRateBonusPct": 22
+          }
         }
       ],
       "effect": "공격속도는 평타의 공격 빈도를 뜻한다.",
@@ -858,7 +1140,9 @@
         "I46",
         "I48",
         "I56",
-        "I95"
+        "I95",
+        "I103",
+        "I104"
       ],
       "icon": "Art/Synergies/S02.svg",
       "iconPng": "Art/Synergies/S02.png"
@@ -890,6 +1174,14 @@
             "maxHpBonusPct": 25,
             "defenseBonusPct": 30
           }
+        },
+        {
+          "count": 8,
+          "text": "최대 HP +34% · 방어력 +40%",
+          "values": {
+            "maxHpBonusPct": 34,
+            "defenseBonusPct": 40
+          }
         }
       ],
       "effect": "최대 HP 증가는 즉시 회복을 주지 않는다. 최대 HP가 줄어 현재 HP보다 낮아지면 현재 HP를 새 최대치까지 낮춘다.",
@@ -900,7 +1192,9 @@
         "I51",
         "I77",
         "I78",
-        "I81"
+        "I81",
+        "I105",
+        "I106"
       ],
       "icon": "Art/Synergies/S03.svg",
       "iconPng": "Art/Synergies/S03.png"
@@ -929,6 +1223,13 @@
           "values": {
             "waterDamageBonusPct": 15
           }
+        },
+        {
+          "count": 8,
+          "text": "수 속성 피해 +20%",
+          "values": {
+            "waterDamageBonusPct": 20
+          }
         }
       ],
       "effect": "수 속성으로 주는 피해가 현재 세트 단계의 비율만큼 증가한다.",
@@ -939,7 +1240,9 @@
         "I18",
         "I19",
         "I20",
-        "I21"
+        "I21",
+        "I107",
+        "I108"
       ],
       "icon": "Art/Synergies/S04.svg",
       "iconPng": "Art/Synergies/S04.png"
@@ -968,6 +1271,13 @@
           "values": {
             "fireDamageBonusPct": 15
           }
+        },
+        {
+          "count": 8,
+          "text": "화 속성 피해 +20%",
+          "values": {
+            "fireDamageBonusPct": 20
+          }
         }
       ],
       "effect": "화 속성으로 주는 피해가 현재 세트 단계의 비율만큼 증가한다.",
@@ -978,7 +1288,9 @@
         "I07",
         "I08",
         "I16",
-        "I22"
+        "I22",
+        "I109",
+        "I110"
       ],
       "icon": "Art/Synergies/S05.svg",
       "iconPng": "Art/Synergies/S05.png"
@@ -1009,6 +1321,13 @@
           "values": {
             "shieldMaxHpPct": 5
           }
+        },
+        {
+          "count": 8,
+          "text": "HP를 잃은 직후 4초간 최대 HP의 6% 보호막, 재사용 대기시간 10초",
+          "values": {
+            "shieldMaxHpPct": 6
+          }
         }
       ],
       "members": [
@@ -1017,7 +1336,9 @@
         "I32",
         "I33",
         "I34",
-        "I50"
+        "I50",
+        "I111",
+        "I112"
       ],
       "icon": "Art/Synergies/S08.svg",
       "iconPng": "Art/Synergies/S08.png"
@@ -1048,6 +1369,13 @@
           "values": {
             "damagePct": 8
           }
+        },
+        {
+          "count": 8,
+          "text": "HP 30% 이하인 적에게 평타·스킬 피해 +10%",
+          "values": {
+            "damagePct": 10
+          }
         }
       ],
       "members": [
@@ -1056,7 +1384,9 @@
         "I42",
         "I43",
         "I44",
-        "I100"
+        "I100",
+        "I113",
+        "I114"
       ],
       "icon": "Art/Synergies/S10.svg",
       "iconPng": "Art/Synergies/S10.png"
@@ -1087,6 +1417,13 @@
           "values": {
             "ignoreDefensePct": 12
           }
+        },
+        {
+          "count": 8,
+          "text": "평타·스킬 피해 계산 시 양수 유효 방어력의 15% 무시",
+          "values": {
+            "ignoreDefensePct": 15
+          }
         }
       ],
       "members": [
@@ -1095,7 +1432,9 @@
         "I62",
         "I63",
         "I64",
-        "I65"
+        "I65",
+        "I115",
+        "I116"
       ],
       "icon": "Art/Synergies/S14.svg",
       "iconPng": "Art/Synergies/S14.png"
@@ -1126,6 +1465,13 @@
           "values": {
             "damagePct": 8
           }
+        },
+        {
+          "count": 8,
+          "text": "정예·보스에게 평타·스킬 피해 +10%",
+          "values": {
+            "damagePct": 10
+          }
         }
       ],
       "members": [
@@ -1134,7 +1480,9 @@
         "I67",
         "I68",
         "I69",
-        "I92"
+        "I92",
+        "I117",
+        "I118"
       ],
       "icon": "Art/Synergies/S15.svg",
       "iconPng": "Art/Synergies/S15.png"
@@ -1165,6 +1513,13 @@
           "values": {
             "percent": 12
           }
+        },
+        {
+          "count": 8,
+          "text": "스킬 피해 +16%",
+          "values": {
+            "percent": 16
+          }
         }
       ],
       "members": [
@@ -1174,7 +1529,9 @@
         "I71",
         "I72",
         "I73",
-        "I75"
+        "I75",
+        "I119",
+        "I120"
       ],
       "icon": "Art/Synergies/S16.svg",
       "iconPng": "Art/Synergies/S16.png"
@@ -1205,6 +1562,13 @@
           "values": {
             "percent": 18
           }
+        },
+        {
+          "count": 8,
+          "text": "적 처치 기본 골드 보너스 24%",
+          "values": {
+            "percent": 24
+          }
         }
       ],
       "members": [
@@ -1213,7 +1577,9 @@
         "I91",
         "I92",
         "I93",
-        "I94"
+        "I94",
+        "I121",
+        "I122"
       ],
       "icon": "Art/Synergies/S19.svg",
       "iconPng": "Art/Synergies/S19.png"

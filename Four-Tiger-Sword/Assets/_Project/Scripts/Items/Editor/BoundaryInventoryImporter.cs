@@ -10,7 +10,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-/// <summary>Imports the reviewed 59-item Boundary ZERO handoff into the game's authoritative catalog.</summary>
+/// <summary>Imports a reviewed Boundary ZERO handoff into the game's authoritative catalog.</summary>
 public static class BoundaryInventoryImporter
 {
     public const string OutputRoot = "Assets/_Project/Generated/BoundaryInventory";
@@ -32,17 +32,18 @@ public static class BoundaryInventoryImporter
     private sealed class Package
     {
         internal string json;
+        internal bool expanded;
         internal Entry[] items;
         internal ItemSynergyDefinition[] synergies;
     }
 
-    [MenuItem("Tools/Boundary Zero/Inventory/Import Installed 59 Items")]
+    [MenuItem("Tools/Boundary Zero/Inventory/Import Installed Catalog")]
     private static void ImportMenu()
     {
         ItemCatalog catalog = ImportDefault();
         Selection.activeObject = catalog;
         EditorGUIUtility.PingObject(catalog);
-        Debug.Log("[Boundary Inventory] 59 items / 11 synergies imported: " + CatalogPath, catalog);
+        Debug.Log($"[Boundary Inventory] {catalog.items.Length} items / {catalog.synergies.Length} synergies imported: {CatalogPath}", catalog);
     }
 
     public static ItemCatalog ImportDefault() => ImportPackage(PresentationJsonPath);
@@ -102,7 +103,8 @@ public static class BoundaryInventoryImporter
                 definition.boundaryEffects = entry.effects;
                 definition.icon = entry.icon;
                 definition.contentStatus = "draft";
-                definition.contentRevision = BoundaryInventoryContent.Revision;
+                definition.contentRevision = BoundaryInventoryContent.LegacyGrades.ContainsKey(entry.id)
+                    ? BoundaryInventoryContent.LegacyRevision : BoundaryInventoryContent.ExpandedRevision;
                 definition.sourceJson = entry.sourceJson;
                 EditorUtility.SetDirty(definition);
                 AssetDatabase.SaveAssetIfDirty(definition);
@@ -118,14 +120,14 @@ public static class BoundaryInventoryImporter
             }
             catalog.name = "Boundary ZERO Items";
             catalog.projectId = BoundaryInventoryContent.ProjectId;
-            catalog.contentRevision = BoundaryInventoryContent.Revision;
+            catalog.contentRevision = package.expanded ? BoundaryInventoryContent.ExpandedRevision : BoundaryInventoryContent.LegacyRevision;
             catalog.contentStatus = "draft";
             catalog.items = definitions.ToArray();
             catalog.synergies = package.synergies;
             catalog.policy = new ItemPolicy();
             catalog.sourceJson = package.json;
             catalog.catalogSha256 = Hash(Utf8.GetBytes(package.json));
-            catalog.manifestJson = BalanceManifest();
+            catalog.manifestJson = BalanceManifest(package);
             catalog.manifestSha256 = Hash(Utf8.GetBytes(catalog.manifestJson));
             EditorUtility.SetDirty(catalog);
             AssetDatabase.SaveAssetIfDirty(catalog);
@@ -157,12 +159,16 @@ public static class BoundaryInventoryImporter
         if (!File.Exists(path) || new FileInfo(path).Length > 4 * 1024 * 1024)
             throw new InvalidDataException("카탈로그가 없거나 너무 큽니다.");
         JObject json = JObject.Parse(File.ReadAllText(path, Utf8));
-        if ((int?)json["version"] != 1 || (string)json["revision"] != "2026-11-08")
+        string sourceRevision = (string)json["revision"];
+        bool expanded = sourceRevision == BoundaryInventoryContent.ExpandedSourceRevision;
+        if ((int?)json["version"] != 1 || (!expanded && sourceRevision != BoundaryInventoryContent.LegacySourceRevision))
             throw new InvalidDataException("지원하지 않는 Boundary Inventory 버전입니다.");
+        var expectedGrades = expanded ? BoundaryInventoryContent.Grades : BoundaryInventoryContent.LegacyGrades;
+        int[] expectedTiers = expanded ? new[] { 2, 4, 6, 8 } : new[] { 2, 4, 6 };
         var items = json["items"] as JArray;
         var synergies = json["synergies"] as JArray;
-        if (items == null || items.Count != 59 || synergies == null || synergies.Count != 11)
-            throw new InvalidDataException("59개 아이템과 11개 시너지가 필요합니다.");
+        if (items == null || items.Count != expectedGrades.Count || synergies == null || synergies.Count != 11)
+            throw new InvalidDataException($"{expectedGrades.Count}개 아이템과 11개 시너지가 필요합니다.");
 
         // The only deliberate source-text override approved for this game.
         JObject i89 = items.OfType<JObject>().FirstOrDefault(i => (string)i["id"] == "I89");
@@ -181,7 +187,8 @@ public static class BoundaryInventoryImporter
             if (description != BoundaryInventorySourceText.SynergyRules[id])
                 throw new InvalidDataException("시너지 규칙이 변경됐습니다. typed mapping을 먼저 갱신하세요: " + id);
             var tiers = set["tiers"] as JArray;
-            if (tiers == null || tiers.Count != 3) throw new InvalidDataException("시너지에 2/4/6 세 단계가 필요합니다.");
+            if (tiers == null || tiers.Count != expectedTiers.Length)
+                throw new InvalidDataException($"시너지에 {string.Join("/", expectedTiers)} 단계가 필요합니다.");
             var counts = new HashSet<int>();
             var tierDefinitions = new List<ItemSynergyTier>();
             foreach (JToken tierValue in tiers)
@@ -189,7 +196,8 @@ public static class BoundaryInventoryImporter
                 JObject tier = tierValue as JObject ?? throw new InvalidDataException("시너지 단계 객체가 필요합니다.");
                 int count = (int?)tier["count"] ?? 0;
                 string text = Text(tier, "text");
-                if (!counts.Add(count) || !BoundaryInventorySourceText.SynergyRules.TryGetValue(id + ":" + count, out string expected) || text != expected)
+                if (!expectedTiers.Contains(count) || !counts.Add(count)
+                    || !BoundaryInventorySourceText.SynergyRules.TryGetValue(id + ":" + count, out string expected) || text != expected)
                     throw new InvalidDataException("지원하지 않거나 변경된 시너지 단계: " + id + "/" + count);
                 BoundaryItemEffect[] effects = BoundaryInventoryContent.SynergyEffects(id, count, tier["values"] as JObject);
                 ValidateEffects(effects, id);
@@ -207,7 +215,7 @@ public static class BoundaryInventoryImporter
         {
             JObject item = value as JObject ?? throw new InvalidDataException("아이템 객체가 필요합니다.");
             string id = Text(item, "id");
-            if (!itemIds.Add(id) || !BoundaryInventoryContent.Grades.TryGetValue(id, out int grade))
+            if (!itemIds.Add(id) || !expectedGrades.TryGetValue(id, out int grade))
                 throw new InvalidDataException("중복되거나 검토되지 않은 아이템 ID: " + id);
             string effect = Text(item, "effect");
             if (effect != BoundaryInventorySourceText.Effects[id])
@@ -226,12 +234,14 @@ public static class BoundaryInventoryImporter
         foreach (ItemSynergyDefinition set in setDefinitions)
         {
             string[] actual = entries.Where(e => e.tags.Contains(set.id)).Select(e => e.id).OrderBy(s => s).ToArray();
-            if (set.members.Length != (set.id == "S16" ? 7 : 6)
+            if (set.members.Length != expectedTiers[expectedTiers.Length - 1] + (set.id == "S16" ? 1 : 0)
+                || expanded && set.members.Count(id => !BoundaryInventoryContent.LegacyGrades.ContainsKey(id)) != 2
                 || set.members.Distinct(StringComparer.Ordinal).Count() != set.members.Length
                 || !actual.SequenceEqual(set.members.OrderBy(s => s)))
                 throw new InvalidDataException("시너지 멤버 목록이 일치하지 않습니다: " + set.id);
         }
-        return new Package { json = json.ToString(Formatting.Indented), items = entries.ToArray(), synergies = setDefinitions.ToArray() };
+        return new Package { json = json.ToString(Formatting.Indented), expanded = expanded,
+            items = entries.ToArray(), synergies = setDefinitions.ToArray() };
     }
 
     private static void ValidateEffects(BoundaryItemEffect[] effects, string id)
@@ -263,11 +273,12 @@ public static class BoundaryInventoryImporter
         return sprite;
     }
 
-    private static string BalanceManifest()
+    private static string BalanceManifest(Package package)
     {
         var grades = new JObject();
-        foreach (var item in BoundaryInventoryContent.Grades.OrderBy(i => i.Key)) grades[item.Key] = item.Value;
-        return new JObject { ["balanceRevision"] = 1, ["sourceRevision"] = "2026-11-08",
+        foreach (var item in package.items.OrderBy(i => i.id)) grades[item.id] = item.grade;
+        return new JObject { ["balanceRevision"] = package.expanded ? 2 : 1,
+            ["sourceRevision"] = package.expanded ? BoundaryInventoryContent.ExpandedSourceRevision : BoundaryInventoryContent.LegacySourceRevision,
             ["prices"] = new JArray(20, 40, 80, 160), ["i89MaximumBaseGold"] = 10,
             ["ordinaryEnemyBaseGoldMin"] = 5, ["ordinaryEnemyBaseGoldMax"] = 15,
             ["grades"] = grades }.ToString(Formatting.Indented);

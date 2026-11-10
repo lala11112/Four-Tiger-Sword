@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I110
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I110
+  itemId: I110
+  displayName: "\uD64D\uC5FC \uBD09\uC778"
+  description: "\uBD09\uC778\uD310 \uD648\uC744 \uB530\uB77C \uBD89\uC740 \uBE5B\uC774
+    \uC120\uBA85\uD558\uAC8C \uC774\uC5B4\uC9C4\uB2E4."
+  effectText: "HP\uAC00 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294 \uD654
+    \uC18D\uC131 \uD53C\uD574\uAC00 11% \uC99D\uAC00\uD55C\uB2E4."
+  synergyIds:
+  - S05
+  synergyNames:
+  - "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+  primarySynergyId: S05
+  primarySynergyName: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+  primarySynergyIcon: {fileID: 21300000, guid: 6b4f687bf95b86c4e93ee4be174e5361, type: 3}
+  element: 0
+  grade: 3
+  purchasePrice: 80
+  effects: []
+  boundaryEffects:
+  - effectId: I110
+    stat: 6
+    amount: 0.11
+    trigger: 0
+    family: 0
+    element: 2
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: 0.3
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 0
+    maximumBaseGold: 0
+    durationSeconds: 0
+    cooldownSeconds: 0
+  icon: {fileID: 21300000, guid: f1a1b4f86d9ec4943b3a532ac7407314, type: 3}
+  contentStatus: draft
+  contentRevision: 20261110
+  sourceJson: "{\"id\":\"I110\",\"name\":\"\uD64D\uC5FC \uBD09\uC778\",\"description\":\"\uBD09\uC778\uD310
+    \uD648\uC744 \uB530\uB77C \uBD89\uC740 \uBE5B\uC774 \uC120\uBA85\uD558\uAC8C
+    \uC774\uC5B4\uC9C4\uB2E4.\",\"effect\":\"HP\uAC00 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C
+    \uC8FC\uB294 \uD654 \uC18D\uC131 \uD53C\uD574\uAC00 11% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S05\"],\"primarySynergy\":\"S05\",\"image\":\"Art/Items/I110.png\",\"origin\":\"expansion\"}"

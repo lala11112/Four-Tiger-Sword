@@ -32,11 +32,16 @@ public static class BoundaryInventoryImporterRegression
         {
             Directory.CreateDirectory(scratch);
             ItemCatalog catalog = BoundaryInventoryImporter.ImportForRegression(sourcePath, output);
-            Check(catalog.items.Length == 59 && catalog.synergies.Length == 11, "59 items / 11 synergies");
-            Check(catalog.items.Select(i => i.itemId).Distinct().Count() == 59, "unique IDs");
-            Check(catalog.items.SelectMany(i => i.synergyIds).Count() == 67, "67 tag memberships");
-            Check(catalog.items.Count(i => i.grade == 1) == 13 && catalog.items.Count(i => i.grade == 2) == 26
-                && catalog.items.Count(i => i.grade == 3) == 14 && catalog.items.Count(i => i.grade == 4) == 6, "approved grades");
+            bool expanded = catalog.contentRevision == BoundaryInventoryContent.ExpandedRevision;
+            int itemCount = expanded ? 81 : 59;
+            int maxTier = expanded ? 8 : 6;
+            int[] thresholds = expanded ? new[] { 2, 4, 6, 8 } : new[] { 2, 4, 6 };
+            int[] gradeCounts = expanded ? new[] { 19, 31, 22, 9 } : new[] { 13, 26, 14, 6 };
+            Check(catalog.items.Length == itemCount && catalog.synergies.Length == 11, "expected items / 11 synergies");
+            Check(catalog.items.Select(i => i.itemId).Distinct().Count() == itemCount, "unique IDs");
+            Check(catalog.items.SelectMany(i => i.synergyIds).Count() == (expanded ? 89 : 67), "approved tag memberships");
+            Check(Enumerable.Range(1, 4).All(grade => catalog.items.Count(i => i.grade == grade) == gradeCounts[grade - 1]),
+                "approved grades");
             foreach (ItemDefinition item in catalog.items)
             {
                 Check(item.grade >= 1 && item.grade <= 4 && item.purchasePrice == (20 << (item.grade - 1)), "price: " + item.itemId);
@@ -48,10 +53,16 @@ public static class BoundaryInventoryImporterRegression
             }
             foreach (ItemSynergyDefinition set in catalog.synergies)
             {
-                Check(set.tiers.Select(t => t.count).SequenceEqual(new[] { 2, 4, 6 }), "tiers: " + set.id);
+                Check(set.tiers.Select(t => t.count).SequenceEqual(thresholds), "tiers: " + set.id);
                 Check(set.tiers.All(t => t.effects.Length > 0 && t.effects.All(e => e.IsValid())), "typed tiers: " + set.id);
-                Check(set.members.Length == (set.id == "S16" ? 7 : 6) && set.members.All(id => catalog.Find(id) != null), "members: " + set.id);
-                Check(set.tiers.Select(t => t.effects[0].effectId).Distinct().Count() == 1, "stable tier source: " + set.id);
+                Check(set.members.Length == maxTier + (set.id == "S16" ? 1 : 0)
+                    && set.members.All(id => catalog.Find(id) != null), "members: " + set.id);
+                if (expanded)
+                    Check(set.members.Count(id => !BoundaryInventoryContent.LegacyGrades.ContainsKey(id)) == 2,
+                        "two added items: " + set.id);
+                var sourceIds = set.tiers[0].effects.Select(effect => effect.effectId).ToArray();
+                Check(set.tiers.All(tier => tier.effects.Select(effect => effect.effectId).SequenceEqual(sourceIds)),
+                    "stable tier sources: " + set.id);
             }
             ItemDefinition i89 = catalog.Find("I89");
             Check(i89.effectText.Contains("1~10") && i89.boundaryEffects[0].minimumBaseGold == 1
@@ -68,10 +79,10 @@ public static class BoundaryInventoryImporterRegression
             string catalogGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(catalog));
             ItemCatalog repeated = BoundaryInventoryImporter.ImportForRegression(sourcePath, output);
             Check(repeated == catalog && AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(repeated)) == catalogGuid, "catalog GUID retained");
-            Check(repeated.items.All(i => identities[i.itemId] == AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(i))), "all 59 item GUIDs retained");
+            Check(repeated.items.All(i => identities[i.itemId] == AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(i))), "all item GUIDs retained");
 
             JObject valid = JObject.Parse(catalog.sourceJson);
-            var invalid = new Action<JObject>[] {
+            var invalid = new List<Action<JObject>> {
                 j => j["version"] = 2,
                 j => j["revision"] = "2026-11-09",
                 j => ((JArray)j["items"]).RemoveAt(0),
@@ -85,6 +96,8 @@ public static class BoundaryInventoryImporterRegression
                 j => j["synergies"][0]["tiers"][0]["values"]["unsupported"] = 1,
                 j => ((JArray)j["synergies"][0]["members"]).RemoveAt(0)
             };
+            if (expanded)
+                invalid.Add(j => j["synergies"][0]["tiers"][3]["values"]["critChanceBonusPoints"] = 21);
             Dictionary<string, string> baseline = Snapshot(output);
             foreach (Action<JObject> mutate in invalid)
             {
@@ -117,7 +130,7 @@ public static class BoundaryInventoryImporterRegression
             Check(rolledBack && !Directory.Exists(failedOutput), "failed first import removes newly generated assets");
             BoundaryInventoryImporter.AfterItemImported = priorHook;
 
-            return new JObject { ["success"] = true, ["checks"] = checks, ["items"] = 59,
+            return new JObject { ["success"] = true, ["checks"] = checks, ["items"] = itemCount,
                 ["synergies"] = 11, ["guidReimport"] = true, ["invalidInputRejection"] = true,
                 ["rollback"] = true }.ToString(Formatting.None);
         }

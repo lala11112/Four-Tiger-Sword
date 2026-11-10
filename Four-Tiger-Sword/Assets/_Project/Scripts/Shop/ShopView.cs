@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BoundaryZero.Inventory;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -8,6 +9,7 @@ using UnityEngine.EventSystems;
 public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnimatedModalView, IShopProgressionView
 {
     public const int CurrentTabsLayoutVersion = 2;
+    private Color? _normalDetailMetaColor;
     [SerializeField] private GameObject panel;
     [SerializeField] private GameObject interactionPrompt;
     [SerializeField] private TMP_Text balance;
@@ -528,9 +530,13 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
         bool any = offer ? stock != null : owned != null;
         boundary.DetailTitle.text = any ? offer ? stock.Name : owned.Name : "아이템 상세";
         string synergyName = any ? offer ? stock.PrimarySynergyName : owned.PrimarySynergyName : null;
+        int grade = !any ? 0 : offer ? stock.Grade : owned.Grade;
         boundary.DetailMeta.text = !any ? string.Empty : !string.IsNullOrEmpty(synergyName)
-            ? ItemDisplayText.Meta(offer ? stock.Grade : owned.Grade, synergyName)
-            : $"{(offer ? stock.Grade : owned.Grade)}등급 · {ShopOfferView.ElementName(offer ? stock.Element : owned.Element)}";
+            ? ItemDisplayText.Meta(grade, synergyName)
+            : $"{grade}등급 · {ShopOfferView.ElementName(offer ? stock.Element : owned.Element)}";
+        var rarity = ItemRarityFrame.ColorFor(grade);
+        _normalDetailMetaColor ??= boundary.DetailMeta.color;
+        boundary.DetailMeta.color = rarity.a > 0f ? rarity : _normalDetailMetaColor.Value;
         boundary.DetailBody.text = any ? (offer ? stock.Description : owned.Description) ?? string.Empty : string.Empty;
         string detailId = any ? (offer ? "offer:" + stock.Id : "owned:" + owned.Id) : string.Empty;
         if (_detailId != detailId)
@@ -642,6 +648,7 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
     {
         button.interactable = item != null;
         label.text = item != null ? ItemLabel(item) + "\n선택 해제" : empty;
+        ItemRarityFrame.Show((RectTransform)button.transform, item?.Grade ?? 0);
         Icon(icon, item?.Icon);
     }
     private static void Icon(UnityEngine.UI.Image image, Sprite sprite)

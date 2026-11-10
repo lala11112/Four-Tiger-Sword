@@ -65,7 +65,7 @@ public partial class PlayerController
                     axis.enabled = false;
                 }
             }
-            _finisherWheel.Show(source.Element);
+            _finisherWheel.Show(source.Element, FormManager.IsElementAvailable);
             return true;
         }
         catch (System.Exception error)
@@ -110,7 +110,9 @@ public partial class PlayerController
         _finisherResolving = true;
         try
         {
-            var target = FormManager.GetForm(_finisherWheel.SelectedElement) as BaseForm;
+            ElementType selected = _finisherWheel.SelectedElement;
+            if (selected == ElementType.ELEMENT_NONE || !FormManager.IsElementAvailable(selected)) return false;
+            var target = FormManager.GetForm(selected);
             return _finisherAttack.CommitFinisher(target, _finisherForward);
         }
         finally

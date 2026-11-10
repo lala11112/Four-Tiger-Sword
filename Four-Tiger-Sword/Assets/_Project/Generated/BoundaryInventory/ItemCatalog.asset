@@ -13,16 +13,16 @@ MonoBehaviour:
   m_Name: Boundary ZERO Items
   m_EditorClassIdentifier: Assembly-CSharp::ItemCatalog
   projectId: boundaryzero-inventory-2026-11-08
-  contentRevision: 20261108
+  contentRevision: 20261110
   contentStatus: draft
-  sourceJson: "{\r\n  \"version\": 1,\r\n  \"revision\": \"2026-11-08\",\r\n  \"title\":
-    \"\uACBD\uACC4 ZERO \xB7 \uC778\uBCA4\uD1A0\uB9AC \uC544\uC774\uD15C 59\uC885\",\r\n 
+  sourceJson: "{\r\n  \"version\": 1,\r\n  \"revision\": \"2026-11-10\",\r\n  \"title\":
+    \"\uACBD\uACC4 ZERO \xB7 \uC778\uBCA4\uD1A0\uB9AC \uC544\uC774\uD15C 81\uC885\",\r\n 
     \"rules\": [\r\n    \"\uC218\uCE58\uB294 \uC804\uD22C \uD14C\uC2A4\uD2B8\uC6A9
     \uAE30\uD68D\uAC12\uC774\uB2E4.\",\r\n    \"\uAC19\uC740 \uC2DC\uB108\uC9C0\uC758
-    \uC11C\uB85C \uB2E4\uB978 \uC544\uC774\uD15C 2\xB74\xB76\uC885\uC744 \uBCF4\uC720\uD558\uBA74
+    \uC11C\uB85C \uB2E4\uB978 \uC544\uC774\uD15C 2\xB74\xB76\xB78\uC885\uC744 \uBCF4\uC720\uD558\uBA74
     \uD574\uB2F9 \uB2E8\uACC4\uAC00 \uC801\uC6A9\uB41C\uB2E4. \uC0C1\uC704 \uB2E8\uACC4\uAC00
-    \uD558\uC704 \uB2E8\uACC4\uB97C \uB300\uCCB4\uD558\uBA70, 6\uC885 \uC774\uC0C1\uC5D0\uC11C\uB294
-    6\uB2E8\uACC4 \uD6A8\uACFC\uAC00 \uC801\uC6A9\uB41C\uB2E4.\",\r\n    \"\uB450
+    \uD558\uC704 \uB2E8\uACC4\uB97C \uB300\uCCB4\uD558\uBA70, 8\uC885 \uC774\uC0C1\uC5D0\uC11C\uB294
+    8\uC138\uD2B8 \uD6A8\uACFC\uAC00 \uC801\uC6A9\uB41C\uB2E4.\",\r\n    \"\uB450
     \uC2DC\uB108\uC9C0\uC5D0 \uC18D\uD55C \uC544\uC774\uD15C\uC740 \uC591\uCABD\uC5D0\uC11C
     \uAC01\uAC01 1\uC885\uC73C\uB85C \uC13C\uB2E4. \uAC19\uC740 \uC544\uC774\uD15C\uC758
     \uC911\uBCF5 \uD68D\uB4DD\uC740 \uC885\uB958 \uC218\uB97C \uB298\uB9AC\uC9C0
@@ -519,8 +519,154 @@ MonoBehaviour:
     \uD53C\uD574\uAC00 7% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n       
     \"S02\"\r\n      ],\r\n      \"primarySynergy\": \"S02\",\r\n      \"designIntent\":
     \"\uBCC4\uB3C4 \uC870\uAC74 \uC5C6\uC774 \uD3C9\uD0C0 \uD53C\uD574\uB97C \uB298\uB9B0\uB2E4.\",\r\n     
-    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I95.png\"\r\n    }\r\n 
-    ],\r\n  \"synergies\": [\r\n    {\r\n      \"id\": \"S01\",\r\n      \"name\":
+    \"origin\": \"revised\",\r\n      \"image\": \"Art/Items/I95.png\"\r\n    },\r\n   
+    {\r\n      \"id\": \"I101\",\r\n      \"name\": \"\uC30D\uB0A0 \uCE68\",\r\n     
+    \"description\": \"\uAE08\uC18D \uC790\uB8E8 \uB05D\uC5D0\uC11C \uB098\uB780\uD788
+    \uBED7\uC740 \uB450 \uCE68\uC774 \uBE5B\uC744 \uBC1B\uB294\uB2E4.\",\r\n     
+    \"effect\": \"\uC2A4\uD0AC\uC758 \uCE58\uBA85\uD0C0 \uD655\uB960\uC774 4%p \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S01\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S01\",\r\n      \"image\": \"Art/Items/I101.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I102\",\r\n      \"name\": \"\uB099\uB8B0 \uACE0\uB9AC\",\r\n     
+    \"description\": \"\uB465\uADFC \uAE08\uC18D \uC548\uCABD\uC744 \uD478\uB978
+    \uBE5B\uC774 \uD55C \uBC14\uD034 \uB3C8\uB2E4.\",\r\n      \"effect\": \"\uCE58\uBA85\uD0C0
+    \uD53C\uD574 \uBC30\uC728\uC774 12%p \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S01\"\r\n      ],\r\n      \"primarySynergy\": \"S01\",\r\n     
+    \"image\": \"Art/Items/I102.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I103\",\r\n      \"name\": \"\uC0BC\uB048 \uB9E4\uB4ED\",\r\n     
+    \"description\": \"\uC0BC\uB048\uC744 \uC9E7\uC740 \uB9C9\uB300 \uB458\uB808\uC5D0
+    \uB2E8\uB2E8\uD788 \uBB36\uC5C8\uB2E4.\",\r\n      \"effect\": \"\uACF5\uACA9\uB825\uC774
+    3% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S02\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S02\",\r\n      \"image\": \"Art/Items/I103.png\",\r\n     
+    \"origin\": \"expansion\"\r\n    },\r\n    {\r\n      \"id\": \"I104\",\r\n     
+    \"name\": \"\uB3CC\uACA9 \uB0A0\uBD99\uC774\",\r\n      \"description\": \"\uAD7D\uC740
+    \uB450 \uB0A0\uC774 \uD55C \uC190\uC7A1\uC774\uC5D0 \uB9DE\uBB3C\uB824 \uC788\uB2E4.\",\r\n     
+    \"effect\": \"\uAE30\uBCF8 \uACF5\uACA9 \uC18D\uB3C4\uAC00 4% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S02\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S02\",\r\n      \"image\": \"Art/Items/I104.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I105\",\r\n      \"name\": \"\uC11D\uBB38 \uD328\uD3B8\",\r\n     
+    \"description\": \"\uC624\uB798 \uB2EB\uD78C \uB3CC\uBB38\uC5D0\uC11C \uB5BC\uC5B4\uB0B8
+    \uAD6C\uBA4D \uB09C \uC791\uC740 \uC870\uAC01\uC774\uB2E4.\",\r\n      \"effect\":
+    \"\uBC29\uC5B4\uB825\uC774 5% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S03\"\r\n      ],\r\n      \"primarySynergy\": \"S03\",\r\n     
+    \"image\": \"Art/Items/I105.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I106\",\r\n      \"name\": \"\uACB9\uBE44\uB298
+    \uCCA0\uD3B8\",\r\n      \"description\": \"\uAC80\uC740 \uCCA0\uD3B8 \uC138
+    \uC7A5\uC744 \uBE44\uB298\uCC98\uB7FC \uACB9\uCCD0 \uBB36\uC5C8\uB2E4.\",\r\n     
+    \"effect\": \"\uCD5C\uB300 HP\uAC00 4%, \uBC29\uC5B4\uB825\uC774 4% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S03\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S03\",\r\n      \"image\": \"Art/Items/I106.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I107\",\r\n      \"name\": \"\uBB3C\uC548\uAC1C
+    \uB9E4\uB4ED\",\r\n      \"description\": \"\uBB3C\uAE30\uAC00 \uBC34 \uB048\uC774
+    \uD478\uB978 \uACE0\uB9AC \uB458\uB808\uB97C \uAC10\uC2FC\uB2E4.\",\r\n     
+    \"effect\": \"\uC218 \uC18D\uC131 \uAE30\uBCF8 \uACF5\uACA9\uACFC \uC2A4\uD0AC
+    \uD53C\uD574\uAC00 6% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n       
+    \"S04\"\r\n      ],\r\n      \"primarySynergy\": \"S04\",\r\n      \"image\":
+    \"Art/Items/I107.png\",\r\n      \"origin\": \"expansion\"\r\n    },\r\n    {\r\n     
+    \"id\": \"I108\",\r\n      \"name\": \"\uAD7D\uC774\uBB3C \uBCD1\",\r\n     
+    \"description\": \"\uC720\uB9AC\uAD00 \uC18D \uBB3C\uC904\uAE30\uAC00 \uAE30\uC6B8\uC77C
+    \uB54C\uB9C8\uB2E4 \uBC29\uD5A5\uC744 \uBC14\uAFBC\uB2E4.\",\r\n      \"effect\":
+    \"HP\uAC00 80% \uC774\uC0C1\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294 \uC218 \uC18D\uC131
+    \uD53C\uD574\uAC00 11% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n       
+    \"S04\"\r\n      ],\r\n      \"primarySynergy\": \"S04\",\r\n      \"image\":
+    \"Art/Items/I108.png\",\r\n      \"origin\": \"expansion\"\r\n    },\r\n    {\r\n     
+    \"id\": \"I109\",\r\n      \"name\": \"\uC794\uBD88 \uACE0\uB9AC\",\r\n     
+    \"description\": \"\uD68C\uC0C9 \uACE0\uB9AC \uAC00\uC7A5\uC790\uB9AC\uC5D0 \uB728\uAC70\uC6B4
+    \uBD89\uC740 \uCCA0\uD3B8\uC774 \uBC15\uD600 \uC788\uB2E4.\",\r\n      \"effect\":
+    \"\uD654 \uC18D\uC131 \uD53C\uD574\uAC00 5% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S05\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S05\",\r\n      \"image\": \"Art/Items/I109.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I110\",\r\n      \"name\": \"\uD64D\uC5FC \uBD09\uC778\",\r\n     
+    \"description\": \"\uBD09\uC778\uD310 \uD648\uC744 \uB530\uB77C \uBD89\uC740
+    \uBE5B\uC774 \uC120\uBA85\uD558\uAC8C \uC774\uC5B4\uC9C4\uB2E4.\",\r\n      \"effect\":
+    \"HP\uAC00 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294 \uD654 \uC18D\uC131
+    \uD53C\uD574\uAC00 11% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n       
+    \"S05\"\r\n      ],\r\n      \"primarySynergy\": \"S05\",\r\n      \"image\":
+    \"Art/Items/I110.png\",\r\n      \"origin\": \"expansion\"\r\n    },\r\n    {\r\n     
+    \"id\": \"I111\",\r\n      \"name\": \"\uC751\uAE09 \uD638\uD328\",\r\n     
+    \"description\": \"\uC811\uC5B4 \uD3EC\uAC20 \uD638\uD328 \uB450 \uC7A5\uC5D0
+    \uC9E7\uC740 \uC218\uD638\uBB38\uC774 \uC0C8\uACA8\uC838 \uC788\uB2E4.\",\r\n     
+    \"effect\": \"\uC804\uD22C \uC9C4\uC785 \uC2DC 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758
+    4%\uB9CC\uD07C \uBCF4\uD638\uB9C9\uC744 \uC5BB\uB294\uB2E4. \uC7AC\uC0AC\uC6A9
+    \uB300\uAE30\uC2DC\uAC04 12\uCD08.\",\r\n      \"synergies\": [\r\n        \"S08\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S08\",\r\n      \"image\": \"Art/Items/I111.png\",\r\n     
+    \"origin\": \"expansion\"\r\n    },\r\n    {\r\n      \"id\": \"I112\",\r\n     
+    \"name\": \"\uD68C\uCCAD \uACB0\uACC4\uCD94\",\r\n      \"description\": \"\uC0BC\uAC01
+    \uACB0\uACC4\uCD94 \uAC00\uC7A5\uC790\uB9AC\uB97C \uC740\uBE5B \uC120\uC774 \uB450\uB978\uB2E4.\",\r\n     
+    \"effect\": \"\uBCF4\uD638\uB9C9 \uD68D\uB4DD\uB7C9\uC774 14% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S08\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S08\",\r\n      \"image\": \"Art/Items/I112.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I113\",\r\n      \"name\": \"\uD30C\uB2E8 \uC1A1\uACF3\",\r\n     
+    \"description\": \"\uAC08\uB77C\uC9C4 \uD2C8\uC744 \uACA8\uB0E5\uD574 \uB05D\uC744
+    \uC881\uACE0 \uB2E8\uB2E8\uD558\uAC8C \uBCBC\uB9B0 \uC1A1\uACF3\uC774\uB2E4.\",\r\n     
+    \"effect\": \"HP\uAC00 25% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294
+    \uAE30\uBCF8 \uACF5\uACA9 \uD53C\uD574\uAC00 10% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S10\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S10\",\r\n      \"image\": \"Art/Items/I113.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I114\",\r\n      \"name\": \"\uC885\uACB0 \uC778\uC7A5\",\r\n     
+    \"description\": \"\uAE34 \uBAB8\uD1B5 \uC544\uB798 \uBD89\uC740 \uC778\uC601\uC774
+    \uC0C8\uACA8\uC9C4 \uC778\uC7A5\uC774\uB2E4.\",\r\n      \"effect\": \"HP\uAC00
+    20% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294 \uAE30\uBCF8 \uACF5\uACA9\uACFC
+    \uC2A4\uD0AC \uD53C\uD574\uAC00 11% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S10\"\r\n      ],\r\n      \"primarySynergy\": \"S10\",\r\n     
+    \"image\": \"Art/Items/I114.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I115\",\r\n      \"name\": \"\uC591\uB0A0 \uC7A5\uC2DD\",\r\n     
+    \"description\": \"\uB450 \uAC08\uB798\uB85C \uBCBC\uB9B0 \uC7A5\uC2DD \uB05D\uC5D0
+    \uAE08\uC18D \uC220\uC774 \uB9E4\uB2EC\uB824 \uC788\uB2E4.\",\r\n      \"effect\":
+    \"\uAE30\uBCF8 \uACF5\uACA9\uC774 \uB300\uC0C1\uC758 \uC591\uC218 \uC720\uD6A8
+    \uBC29\uC5B4\uB825\uC744 8% \uBB34\uC2DC\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S14\"\r\n      ],\r\n      \"primarySynergy\": \"S14\",\r\n     
+    \"image\": \"Art/Items/I115.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I116\",\r\n      \"name\": \"\uACB0\uC808 \uD30C\uC1C4\uD3B8\",\r\n     
+    \"description\": \"\uACB9\uAC11\uC637\uC758 \uC774\uC74C\uB9E4\uB97C \uB72F\uC5B4\uB0BC
+    \uB54C \uC4F0\uB358 \uAC08\uACE0\uB9AC\uB2E4.\",\r\n      \"effect\": \"HP\uAC00
+    40% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9\uC774\uB098
+    \uC2A4\uD0AC\uB85C \uD53C\uD574\uB97C \uC904 \uB54C, \uC591\uC218 \uC720\uD6A8
+    \uBC29\uC5B4\uB825\uC744 18% \uBB34\uC2DC\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S14\"\r\n      ],\r\n      \"primarySynergy\": \"S14\",\r\n     
+    \"image\": \"Art/Items/I116.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I117\",\r\n      \"name\": \"\uCD94\uC801 \uD45C\uC2DD\",\r\n     
+    \"description\": \"\uC0AC\uB0E5\uAC10\uC744 \uB193\uCE58\uC9C0 \uC54A\uB3C4\uB85D
+    \uD478\uB978 \uC120\uC744 \uC0C8\uAE34 \uD45C\uC2DD\uC774\uB2E4.\",\r\n     
+    \"effect\": \"\uC815\uC608\uC640 \uBCF4\uC2A4\uC5D0\uAC8C \uC8FC\uB294 \uAE30\uBCF8
+    \uACF5\uACA9\uACFC \uC2A4\uD0AC \uD53C\uD574\uAC00 6% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S15\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S15\",\r\n      \"image\": \"Art/Items/I117.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I118\",\r\n      \"name\": \"\uB9F9\uC218 \uC5C4\uB2C8\uD2C0\",\r\n     
+    \"description\": \"\uC5C4\uB2C8\uCC98\uB7FC \uAD7D\uC740 \uD770 \uCCA0\uD3B8\uC774
+    \uAE08\uC18D \uD2C0\uC744 \uAC10\uC2FC\uB2E4.\",\r\n      \"effect\": \"\uC815\uC608\uC640
+    \uBCF4\uC2A4\uC758 \uACF5\uACA9\uC73C\uB85C \uBC1B\uB294 \uD53C\uD574\uAC00 8%
+    \uAC10\uC18C\uD55C\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S15\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S15\",\r\n      \"image\": \"Art/Items/I118.png\",\r\n     
+    \"origin\": \"expansion\"\r\n    },\r\n    {\r\n      \"id\": \"I119\",\r\n     
+    \"name\": \"\uC5F0\uC2B5 \uC7A5\uCE58\",\r\n      \"description\": \"\uBA87 \uBC88\uC774\uACE0
+    \uD480\uACE0 \uC870\uC77C \uC218 \uC788\uAC8C \uB9CC\uB4E0 \uC5F0\uC2B5\uC6A9
+    \uC7A5\uCE58\uB2E4.\",\r\n      \"effect\": \"\uC9C1\uC811 \uC0AC\uC6A9\uD558\uB294
+    \uACF5\uACA9 \uC2A4\uD0AC \uD53C\uD574\uAC00 3% \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S16\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S16\",\r\n      \"image\": \"Art/Items/I119.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I120\",\r\n      \"name\": \"\uC751\uC218 \uD2C0\",\r\n     
+    \"description\": \"\uC751\uC218 \uB3D9\uC791\uB9C8\uB2E4 \uB2E4\uB978 \uC704\uCE58\uB97C
+    \uC9DA\uB3C4\uB85D \uD648 \uC5EC\uC12F \uAC1C\uB97C \uB6AB\uC5C8\uB2E4.\",\r\n     
+    \"effect\": \"HP\uAC00 70% \uC774\uC0C1\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294
+    \uC2A4\uD0AC \uD53C\uD574\uAC00 9% \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"synergies\":
+    [\r\n        \"S16\"\r\n      ],\r\n      \"primarySynergy\": \"S16\",\r\n     
+    \"image\": \"Art/Items/I120.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    },\r\n    {\r\n      \"id\": \"I121\",\r\n      \"name\": \"\uC5FD\uC804 \uAC78\uC1E0\",\r\n     
+    \"description\": \"\uC5FD\uC804 \uAFB8\uB7EC\uBBF8\uAC00 \uD480\uB9AC\uC9C0 \uC54A\uB3C4\uB85D
+    \uC785\uAD6C\uB97C \uAC78\uC5B4 \uC7A0\uADF8\uB294 \uC1E0\uB2E4.\",\r\n     
+    \"effect\": \"\uAE30\uBCF8 \uBCF4\uC0C1 \uACE8\uB4DC\uAC00 \uC788\uB294 \uC801\uC744
+    \uCC98\uCE58\uD558\uBA74 \uAE30\uBCF8 \uBCF4\uC0C1\uC758 8%\uB97C \uCD94\uAC00\uB85C
+    \uC5BB\uB294\uB2E4. \uC18C\uC218 \uBD80\uBD84\uC740 \uB2E4\uC74C \uCC98\uCE58\uB85C
+    \uC774\uC6D4\uB41C\uB2E4.\",\r\n      \"synergies\": [\r\n        \"S19\"\r\n     
+    ],\r\n      \"primarySynergy\": \"S19\",\r\n      \"image\": \"Art/Items/I121.png\",\r\n     
+    \"origin\": \"expansion\"\r\n    },\r\n    {\r\n      \"id\": \"I122\",\r\n     
+    \"name\": \"\uC218\uAE08 \uACC4\uC218\uAE30\",\r\n      \"description\": \"\uB4E4\uC5B4\uC628
+    \uC5FD\uC804 \uC218\uB9CC\uD07C \uBC14\uB298\uC774 \uD55C \uCE78\uC529 \uC6C0\uC9C1\uC778\uB2E4.\",\r\n     
+    \"effect\": \"\uAE30\uBCF8 \uBCF4\uC0C1 \uACE8\uB4DC\uAC00 8 \uC774\uC0C1\uC778
+    \uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uACE8\uB4DC\uB97C 2 \uB354 \uC5BB\uB294\uB2E4.\",\r\n     
+    \"synergies\": [\r\n        \"S19\"\r\n      ],\r\n      \"primarySynergy\":
+    \"S19\",\r\n      \"image\": \"Art/Items/I122.png\",\r\n      \"origin\": \"expansion\"\r\n   
+    }\r\n  ],\r\n  \"synergies\": [\r\n    {\r\n      \"id\": \"S01\",\r\n      \"name\":
     \"\uCE58\uBA85\",\r\n      \"tiers\": [\r\n        {\r\n          \"count\":
     2,\r\n          \"text\": \"\uCE58\uBA85\uD0C0 \uD655\uB960 +5%p \xB7 \uCE58\uBA85\uD0C0
     \uD53C\uD574 \uBC30\uC728 +10%p\",\r\n          \"values\": {\r\n           
@@ -532,14 +678,18 @@ MonoBehaviour:
     },\r\n        {\r\n          \"count\": 6,\r\n          \"text\": \"\uCE58\uBA85\uD0C0
     \uD655\uB960 +15%p \xB7 \uCE58\uBA85\uD0C0 \uD53C\uD574 \uBC30\uC728 +35%p\",\r\n         
     \"values\": {\r\n            \"critChanceBonusPoints\": 15,\r\n            \"critDamageMultiplierBonusPoints\":
-    35\r\n          }\r\n        }\r\n      ],\r\n      \"effect\": \"\uCE58\uBA85\uD0C0
-    \uD53C\uD574 \uBC30\uC728\uC740 %p\uB85C \uB354\uD55C\uB2E4. \uC608\uB97C \uB4E4\uC5B4
-    150%\uC5D0\uC11C 2\uC138\uD2B8 \uC801\uC6A9 \uC2DC 160%\uAC00 \uB41C\uB2E4. \uCE58\uBA85\uD0C0
-    \uD655\uB960\uC740 100%\uB97C \uB118\uC9C0 \uC54A\uB294\uB2E4.\",\r\n      \"summary\":
-    \"\uCE58\uBA85\uD0C0 \uD655\uB960\uACFC \uCE58\uBA85\uD0C0 \uD53C\uD574\uB97C
-    \uD568\uAED8 \uB192\uC778\uB2E4.\",\r\n      \"members\": [\r\n        \"I02\",\r\n       
-    \"I06\",\r\n        \"I13\",\r\n        \"I15\",\r\n        \"I57\",\r\n       
-    \"I100\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S01.svg\",\r\n      \"iconPng\":
+    35\r\n          }\r\n        },\r\n        {\r\n          \"count\": 8,\r\n         
+    \"text\": \"\uCE58\uBA85\uD0C0 \uD655\uB960 +20%p \xB7 \uCE58\uBA85\uD0C0 \uD53C\uD574
+    \uBC30\uC728 +50%p\",\r\n          \"values\": {\r\n            \"critChanceBonusPoints\":
+    20,\r\n            \"critDamageMultiplierBonusPoints\": 50\r\n          }\r\n       
+    }\r\n      ],\r\n      \"effect\": \"\uCE58\uBA85\uD0C0 \uD53C\uD574 \uBC30\uC728\uC740
+    %p\uB85C \uB354\uD55C\uB2E4. \uC608\uB97C \uB4E4\uC5B4 150%\uC5D0\uC11C 2\uC138\uD2B8
+    \uC801\uC6A9 \uC2DC 160%\uAC00 \uB41C\uB2E4. \uCE58\uBA85\uD0C0 \uD655\uB960\uC740
+    100%\uB97C \uB118\uC9C0 \uC54A\uB294\uB2E4.\",\r\n      \"summary\": \"\uCE58\uBA85\uD0C0
+    \uD655\uB960\uACFC \uCE58\uBA85\uD0C0 \uD53C\uD574\uB97C \uD568\uAED8 \uB192\uC778\uB2E4.\",\r\n     
+    \"members\": [\r\n        \"I02\",\r\n        \"I06\",\r\n        \"I13\",\r\n       
+    \"I15\",\r\n        \"I57\",\r\n        \"I100\",\r\n        \"I101\",\r\n       
+    \"I102\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S01.svg\",\r\n      \"iconPng\":
     \"Art/Synergies/S01.png\"\r\n    },\r\n    {\r\n      \"id\": \"S02\",\r\n     
     \"name\": \"\uB9F9\uACF5\",\r\n      \"tiers\": [\r\n        {\r\n          \"count\":
     2,\r\n          \"text\": \"\uACF5\uACA9\uB825 +5% \xB7 \uACF5\uACA9\uC18D\uB3C4
@@ -550,46 +700,55 @@ MonoBehaviour:
     \"normalAttackRateBonusPct\": 8\r\n          }\r\n        },\r\n        {\r\n         
     \"count\": 6,\r\n          \"text\": \"\uACF5\uACA9\uB825 +18% \xB7 \uACF5\uACA9\uC18D\uB3C4
     +15%\",\r\n          \"values\": {\r\n            \"attackPowerBonusPct\": 18,\r\n           
-    \"normalAttackRateBonusPct\": 15\r\n          }\r\n        }\r\n      ],\r\n     
+    \"normalAttackRateBonusPct\": 15\r\n          }\r\n        },\r\n        {\r\n         
+    \"count\": 8,\r\n          \"text\": \"\uACF5\uACA9\uB825 +26% \xB7 \uACF5\uACA9\uC18D\uB3C4
+    +22%\",\r\n          \"values\": {\r\n            \"attackPowerBonusPct\": 26,\r\n           
+    \"normalAttackRateBonusPct\": 22\r\n          }\r\n        }\r\n      ],\r\n     
     \"effect\": \"\uACF5\uACA9\uC18D\uB3C4\uB294 \uD3C9\uD0C0\uC758 \uACF5\uACA9
     \uBE48\uB3C4\uB97C \uB73B\uD55C\uB2E4.\",\r\n      \"summary\": \"\uACF5\uACA9\uB825\uACFC
     \uD3C9\uD0C0 \uACF5\uACA9\uC18D\uB3C4\uB97C \uD568\uAED8 \uB192\uC778\uB2E4.\",\r\n     
     \"members\": [\r\n        \"I05\",\r\n        \"I14\",\r\n        \"I46\",\r\n       
-    \"I48\",\r\n        \"I56\",\r\n        \"I95\"\r\n      ],\r\n      \"icon\":
-    \"Art/Synergies/S02.svg\",\r\n      \"iconPng\": \"Art/Synergies/S02.png\"\r\n   
-    },\r\n    {\r\n      \"id\": \"S03\",\r\n      \"name\": \"\uCCA0\uBCBD\",\r\n     
-    \"tiers\": [\r\n        {\r\n          \"count\": 2,\r\n          \"text\": \"\uCD5C\uB300
-    HP +8% \xB7 \uBC29\uC5B4\uB825 +10%\",\r\n          \"values\": {\r\n           
-    \"maxHpBonusPct\": 8,\r\n            \"defenseBonusPct\": 10\r\n          }\r\n       
-    },\r\n        {\r\n          \"count\": 4,\r\n          \"text\": \"\uCD5C\uB300
-    HP +16% \xB7 \uBC29\uC5B4\uB825 +20%\",\r\n          \"values\": {\r\n           
-    \"maxHpBonusPct\": 16,\r\n            \"defenseBonusPct\": 20\r\n          }\r\n       
-    },\r\n        {\r\n          \"count\": 6,\r\n          \"text\": \"\uCD5C\uB300
-    HP +25% \xB7 \uBC29\uC5B4\uB825 +30%\",\r\n          \"values\": {\r\n           
-    \"maxHpBonusPct\": 25,\r\n            \"defenseBonusPct\": 30\r\n          }\r\n       
-    }\r\n      ],\r\n      \"effect\": \"\uCD5C\uB300 HP \uC99D\uAC00\uB294 \uC989\uC2DC
-    \uD68C\uBCF5\uC744 \uC8FC\uC9C0 \uC54A\uB294\uB2E4. \uCD5C\uB300 HP\uAC00 \uC904\uC5B4
-    \uD604\uC7AC HP\uBCF4\uB2E4 \uB0AE\uC544\uC9C0\uBA74 \uD604\uC7AC HP\uB97C \uC0C8
-    \uCD5C\uB300\uCE58\uAE4C\uC9C0 \uB0AE\uCD98\uB2E4.\",\r\n      \"summary\": \"\uCD5C\uB300
-    HP\uC640 \uBC29\uC5B4\uB825\uC744 \uD568\uAED8 \uB192\uC778\uB2E4.\",\r\n     
+    \"I48\",\r\n        \"I56\",\r\n        \"I95\",\r\n        \"I103\",\r\n       
+    \"I104\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S02.svg\",\r\n      \"iconPng\":
+    \"Art/Synergies/S02.png\"\r\n    },\r\n    {\r\n      \"id\": \"S03\",\r\n     
+    \"name\": \"\uCCA0\uBCBD\",\r\n      \"tiers\": [\r\n        {\r\n          \"count\":
+    2,\r\n          \"text\": \"\uCD5C\uB300 HP +8% \xB7 \uBC29\uC5B4\uB825 +10%\",\r\n         
+    \"values\": {\r\n            \"maxHpBonusPct\": 8,\r\n            \"defenseBonusPct\":
+    10\r\n          }\r\n        },\r\n        {\r\n          \"count\": 4,\r\n         
+    \"text\": \"\uCD5C\uB300 HP +16% \xB7 \uBC29\uC5B4\uB825 +20%\",\r\n         
+    \"values\": {\r\n            \"maxHpBonusPct\": 16,\r\n            \"defenseBonusPct\":
+    20\r\n          }\r\n        },\r\n        {\r\n          \"count\": 6,\r\n         
+    \"text\": \"\uCD5C\uB300 HP +25% \xB7 \uBC29\uC5B4\uB825 +30%\",\r\n         
+    \"values\": {\r\n            \"maxHpBonusPct\": 25,\r\n            \"defenseBonusPct\":
+    30\r\n          }\r\n        },\r\n        {\r\n          \"count\": 8,\r\n         
+    \"text\": \"\uCD5C\uB300 HP +34% \xB7 \uBC29\uC5B4\uB825 +40%\",\r\n         
+    \"values\": {\r\n            \"maxHpBonusPct\": 34,\r\n            \"defenseBonusPct\":
+    40\r\n          }\r\n        }\r\n      ],\r\n      \"effect\": \"\uCD5C\uB300
+    HP \uC99D\uAC00\uB294 \uC989\uC2DC \uD68C\uBCF5\uC744 \uC8FC\uC9C0 \uC54A\uB294\uB2E4.
+    \uCD5C\uB300 HP\uAC00 \uC904\uC5B4 \uD604\uC7AC HP\uBCF4\uB2E4 \uB0AE\uC544\uC9C0\uBA74
+    \uD604\uC7AC HP\uB97C \uC0C8 \uCD5C\uB300\uCE58\uAE4C\uC9C0 \uB0AE\uCD98\uB2E4.\",\r\n     
+    \"summary\": \"\uCD5C\uB300 HP\uC640 \uBC29\uC5B4\uB825\uC744 \uD568\uAED8 \uB192\uC778\uB2E4.\",\r\n     
     \"members\": [\r\n        \"I01\",\r\n        \"I09\",\r\n        \"I51\",\r\n       
-    \"I77\",\r\n        \"I78\",\r\n        \"I81\"\r\n      ],\r\n      \"icon\":
-    \"Art/Synergies/S03.svg\",\r\n      \"iconPng\": \"Art/Synergies/S03.png\"\r\n   
-    },\r\n    {\r\n      \"id\": \"S04\",\r\n      \"name\": \"\uC1C4\uB3C4\uD558\uB294
-    \uBB3C\uACB0\",\r\n      \"tiers\": [\r\n        {\r\n          \"count\": 2,\r\n         
-    \"text\": \"\uC218 \uC18D\uC131 \uD53C\uD574 +5%\",\r\n          \"values\":
-    {\r\n            \"waterDamageBonusPct\": 5\r\n          }\r\n        },\r\n       
-    {\r\n          \"count\": 4,\r\n          \"text\": \"\uC218 \uC18D\uC131 \uD53C\uD574
-    +10%\",\r\n          \"values\": {\r\n            \"waterDamageBonusPct\": 10\r\n         
-    }\r\n        },\r\n        {\r\n          \"count\": 6,\r\n          \"text\":
-    \"\uC218 \uC18D\uC131 \uD53C\uD574 +15%\",\r\n          \"values\": {\r\n           
-    \"waterDamageBonusPct\": 15\r\n          }\r\n        }\r\n      ],\r\n     
-    \"effect\": \"\uC218 \uC18D\uC131\uC73C\uB85C \uC8FC\uB294 \uD53C\uD574\uAC00
-    \uD604\uC7AC \uC138\uD2B8 \uB2E8\uACC4\uC758 \uBE44\uC728\uB9CC\uD07C \uC99D\uAC00\uD55C\uB2E4.\",\r\n     
-    \"summary\": \"\uC218 \uC18D\uC131\uC73C\uB85C \uC8FC\uB294 \uD53C\uD574\uB97C
-    \uB192\uC778\uB2E4.\",\r\n      \"members\": [\r\n        \"I16\",\r\n       
-    \"I17\",\r\n        \"I18\",\r\n        \"I19\",\r\n        \"I20\",\r\n       
-    \"I21\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S04.svg\",\r\n      \"iconPng\":
+    \"I77\",\r\n        \"I78\",\r\n        \"I81\",\r\n        \"I105\",\r\n       
+    \"I106\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S03.svg\",\r\n      \"iconPng\":
+    \"Art/Synergies/S03.png\"\r\n    },\r\n    {\r\n      \"id\": \"S04\",\r\n     
+    \"name\": \"\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0\",\r\n      \"tiers\": [\r\n       
+    {\r\n          \"count\": 2,\r\n          \"text\": \"\uC218 \uC18D\uC131 \uD53C\uD574
+    +5%\",\r\n          \"values\": {\r\n            \"waterDamageBonusPct\": 5\r\n         
+    }\r\n        },\r\n        {\r\n          \"count\": 4,\r\n          \"text\":
+    \"\uC218 \uC18D\uC131 \uD53C\uD574 +10%\",\r\n          \"values\": {\r\n           
+    \"waterDamageBonusPct\": 10\r\n          }\r\n        },\r\n        {\r\n         
+    \"count\": 6,\r\n          \"text\": \"\uC218 \uC18D\uC131 \uD53C\uD574 +15%\",\r\n         
+    \"values\": {\r\n            \"waterDamageBonusPct\": 15\r\n          }\r\n       
+    },\r\n        {\r\n          \"count\": 8,\r\n          \"text\": \"\uC218 \uC18D\uC131
+    \uD53C\uD574 +20%\",\r\n          \"values\": {\r\n            \"waterDamageBonusPct\":
+    20\r\n          }\r\n        }\r\n      ],\r\n      \"effect\": \"\uC218 \uC18D\uC131\uC73C\uB85C
+    \uC8FC\uB294 \uD53C\uD574\uAC00 \uD604\uC7AC \uC138\uD2B8 \uB2E8\uACC4\uC758
+    \uBE44\uC728\uB9CC\uD07C \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"summary\": \"\uC218
+    \uC18D\uC131\uC73C\uB85C \uC8FC\uB294 \uD53C\uD574\uB97C \uB192\uC778\uB2E4.\",\r\n     
+    \"members\": [\r\n        \"I16\",\r\n        \"I17\",\r\n        \"I18\",\r\n       
+    \"I19\",\r\n        \"I20\",\r\n        \"I21\",\r\n        \"I107\",\r\n       
+    \"I108\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S04.svg\",\r\n      \"iconPng\":
     \"Art/Synergies/S04.png\"\r\n    },\r\n    {\r\n      \"id\": \"S05\",\r\n     
     \"name\": \"\uD0C0\uC624\uB974\uB294 \uBD88\uC528\",\r\n      \"tiers\": [\r\n       
     {\r\n          \"count\": 2,\r\n          \"text\": \"\uD654 \uC18D\uC131 \uD53C\uD574
@@ -599,13 +758,16 @@ MonoBehaviour:
     \"fireDamageBonusPct\": 10\r\n          }\r\n        },\r\n        {\r\n         
     \"count\": 6,\r\n          \"text\": \"\uD654 \uC18D\uC131 \uD53C\uD574 +15%\",\r\n         
     \"values\": {\r\n            \"fireDamageBonusPct\": 15\r\n          }\r\n       
-    }\r\n      ],\r\n      \"effect\": \"\uD654 \uC18D\uC131\uC73C\uB85C \uC8FC\uB294
-    \uD53C\uD574\uAC00 \uD604\uC7AC \uC138\uD2B8 \uB2E8\uACC4\uC758 \uBE44\uC728\uB9CC\uD07C
-    \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"summary\": \"\uD654 \uC18D\uC131\uC73C\uB85C
-    \uC8FC\uB294 \uD53C\uD574\uB97C \uB192\uC778\uB2E4.\",\r\n      \"members\":
-    [\r\n        \"I04\",\r\n        \"I05\",\r\n        \"I07\",\r\n        \"I08\",\r\n       
-    \"I16\",\r\n        \"I22\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S05.svg\",\r\n     
-    \"iconPng\": \"Art/Synergies/S05.png\"\r\n    },\r\n    {\r\n      \"id\": \"S08\",\r\n     
+    },\r\n        {\r\n          \"count\": 8,\r\n          \"text\": \"\uD654 \uC18D\uC131
+    \uD53C\uD574 +20%\",\r\n          \"values\": {\r\n            \"fireDamageBonusPct\":
+    20\r\n          }\r\n        }\r\n      ],\r\n      \"effect\": \"\uD654 \uC18D\uC131\uC73C\uB85C
+    \uC8FC\uB294 \uD53C\uD574\uAC00 \uD604\uC7AC \uC138\uD2B8 \uB2E8\uACC4\uC758
+    \uBE44\uC728\uB9CC\uD07C \uC99D\uAC00\uD55C\uB2E4.\",\r\n      \"summary\": \"\uD654
+    \uC18D\uC131\uC73C\uB85C \uC8FC\uB294 \uD53C\uD574\uB97C \uB192\uC778\uB2E4.\",\r\n     
+    \"members\": [\r\n        \"I04\",\r\n        \"I05\",\r\n        \"I07\",\r\n       
+    \"I08\",\r\n        \"I16\",\r\n        \"I22\",\r\n        \"I109\",\r\n       
+    \"I110\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S05.svg\",\r\n      \"iconPng\":
+    \"Art/Synergies/S05.png\"\r\n    },\r\n    {\r\n      \"id\": \"S08\",\r\n     
     \"name\": \"\uC218\uD638\",\r\n      \"summary\": \"\uD53C\uACA9 \uD6C4 \uB2E4\uC74C
     \uD53C\uD574\uB97C \uB9C9\uB294 \uBCF4\uD638\uB9C9\",\r\n      \"effect\": \"\uC801
     \uACF5\uACA9\uC73C\uB85C HP\uAC00 \uC2E4\uC81C \uAC10\uC18C\uD55C \uC9C1\uD6C4
@@ -622,10 +784,14 @@ MonoBehaviour:
     }\r\n        },\r\n        {\r\n          \"count\": 6,\r\n          \"text\":
     \"HP\uB97C \uC783\uC740 \uC9C1\uD6C4 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 5% \uBCF4\uD638\uB9C9,
     \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 10\uCD08\",\r\n          \"values\":
-    {\r\n            \"shieldMaxHpPct\": 5\r\n          }\r\n        }\r\n      ],\r\n     
-    \"members\": [\r\n        \"I30\",\r\n        \"I31\",\r\n        \"I32\",\r\n       
-    \"I33\",\r\n        \"I34\",\r\n        \"I50\"\r\n      ],\r\n      \"icon\":
-    \"Art/Synergies/S08.svg\",\r\n      \"iconPng\": \"Art/Synergies/S08.png\"\r\n   
+    {\r\n            \"shieldMaxHpPct\": 5\r\n          }\r\n        },\r\n       
+    {\r\n          \"count\": 8,\r\n          \"text\": \"HP\uB97C \uC783\uC740 \uC9C1\uD6C4
+    4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 6% \uBCF4\uD638\uB9C9, \uC7AC\uC0AC\uC6A9
+    \uB300\uAE30\uC2DC\uAC04 10\uCD08\",\r\n          \"values\": {\r\n           
+    \"shieldMaxHpPct\": 6\r\n          }\r\n        }\r\n      ],\r\n      \"members\":
+    [\r\n        \"I30\",\r\n        \"I31\",\r\n        \"I32\",\r\n        \"I33\",\r\n       
+    \"I34\",\r\n        \"I50\",\r\n        \"I111\",\r\n        \"I112\"\r\n     
+    ],\r\n      \"icon\": \"Art/Synergies/S08.svg\",\r\n      \"iconPng\": \"Art/Synergies/S08.png\"\r\n   
     },\r\n    {\r\n      \"id\": \"S10\",\r\n      \"name\": \"\uB9C8\uBB34\uB9AC\",\r\n     
     \"summary\": \"HP\uAC00 \uB0AE\uC740 \uC801\uC5D0\uAC8C \uD53C\uD574 \uC99D\uAC00\",\r\n     
     \"effect\": \"\uD53C\uD574 \uC801\uC6A9 \uC9C1\uC804 HP\uAC00 \uCD5C\uB300 HP\uC758
@@ -641,17 +807,21 @@ MonoBehaviour:
     }\r\n        },\r\n        {\r\n          \"count\": 6,\r\n          \"text\":
     \"HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574
     +8%\",\r\n          \"values\": {\r\n            \"damagePct\": 8\r\n         
+    }\r\n        },\r\n        {\r\n          \"count\": 8,\r\n          \"text\":
+    \"HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574
+    +10%\",\r\n          \"values\": {\r\n            \"damagePct\": 10\r\n         
     }\r\n        }\r\n      ],\r\n      \"members\": [\r\n        \"I02\",\r\n       
     \"I41\",\r\n        \"I42\",\r\n        \"I43\",\r\n        \"I44\",\r\n       
-    \"I100\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S10.svg\",\r\n      \"iconPng\":
-    \"Art/Synergies/S10.png\"\r\n    },\r\n    {\r\n      \"id\": \"S14\",\r\n     
-    \"name\": \"\uAD00\uD1B5\",\r\n      \"summary\": \"\uD3C9\uD0C0\uC640 \uC2A4\uD0AC\uC774
-    \uB300\uC0C1 \uBC29\uC5B4\uB825 \uC77C\uBD80 \uBB34\uC2DC\",\r\n      \"effect\":
-    \"\uD3C9\uD0C0\uC640 \uC2A4\uD0AC \uD53C\uD574\uB97C \uACC4\uC0B0\uD560 \uB54C
-    \uB300\uC0C1\uC758 \uC720\uD6A8 \uBC29\uC5B4\uB825 \uC911 \uC591\uC218\uC778
-    \uBD80\uBD84\uC744 \uC77C\uC815 \uBE44\uC728 \uBB34\uC2DC\uD55C\uB2E4. \uB2EC\uC131\uD55C
-    \uCD5C\uACE0 \uB2E8\uACC4\uC758 \uC218\uCE58\uB9CC \uC801\uC6A9\uD55C\uB2E4.\",\r\n     
-    \"tiers\": [\r\n        {\r\n          \"count\": 2,\r\n          \"text\": \"\uD3C9\uD0C0\xB7\uC2A4\uD0AC
+    \"I100\",\r\n        \"I113\",\r\n        \"I114\"\r\n      ],\r\n      \"icon\":
+    \"Art/Synergies/S10.svg\",\r\n      \"iconPng\": \"Art/Synergies/S10.png\"\r\n   
+    },\r\n    {\r\n      \"id\": \"S14\",\r\n      \"name\": \"\uAD00\uD1B5\",\r\n     
+    \"summary\": \"\uD3C9\uD0C0\uC640 \uC2A4\uD0AC\uC774 \uB300\uC0C1 \uBC29\uC5B4\uB825
+    \uC77C\uBD80 \uBB34\uC2DC\",\r\n      \"effect\": \"\uD3C9\uD0C0\uC640 \uC2A4\uD0AC
+    \uD53C\uD574\uB97C \uACC4\uC0B0\uD560 \uB54C \uB300\uC0C1\uC758 \uC720\uD6A8
+    \uBC29\uC5B4\uB825 \uC911 \uC591\uC218\uC778 \uBD80\uBD84\uC744 \uC77C\uC815
+    \uBE44\uC728 \uBB34\uC2DC\uD55C\uB2E4. \uB2EC\uC131\uD55C \uCD5C\uACE0 \uB2E8\uACC4\uC758
+    \uC218\uCE58\uB9CC \uC801\uC6A9\uD55C\uB2E4.\",\r\n      \"tiers\": [\r\n       
+    {\r\n          \"count\": 2,\r\n          \"text\": \"\uD3C9\uD0C0\xB7\uC2A4\uD0AC
     \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uC591\uC218 \uC720\uD6A8 \uBC29\uC5B4\uB825\uC758
     6% \uBB34\uC2DC\",\r\n          \"values\": {\r\n            \"ignoreDefensePct\":
     6\r\n          }\r\n        },\r\n        {\r\n          \"count\": 4,\r\n         
@@ -661,9 +831,13 @@ MonoBehaviour:
     {\r\n          \"count\": 6,\r\n          \"text\": \"\uD3C9\uD0C0\xB7\uC2A4\uD0AC
     \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uC591\uC218 \uC720\uD6A8 \uBC29\uC5B4\uB825\uC758
     12% \uBB34\uC2DC\",\r\n          \"values\": {\r\n            \"ignoreDefensePct\":
-    12\r\n          }\r\n        }\r\n      ],\r\n      \"members\": [\r\n       
-    \"I60\",\r\n        \"I61\",\r\n        \"I62\",\r\n        \"I63\",\r\n       
-    \"I64\",\r\n        \"I65\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S14.svg\",\r\n     
+    12\r\n          }\r\n        },\r\n        {\r\n          \"count\": 8,\r\n         
+    \"text\": \"\uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uC591\uC218
+    \uC720\uD6A8 \uBC29\uC5B4\uB825\uC758 15% \uBB34\uC2DC\",\r\n          \"values\":
+    {\r\n            \"ignoreDefensePct\": 15\r\n          }\r\n        }\r\n     
+    ],\r\n      \"members\": [\r\n        \"I60\",\r\n        \"I61\",\r\n       
+    \"I62\",\r\n        \"I63\",\r\n        \"I64\",\r\n        \"I65\",\r\n       
+    \"I115\",\r\n        \"I116\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S14.svg\",\r\n     
     \"iconPng\": \"Art/Synergies/S14.png\"\r\n    },\r\n    {\r\n      \"id\": \"S15\",\r\n     
     \"name\": \"\uAC70\uBB3C\uC0AC\uB0E5\",\r\n      \"summary\": \"\uC815\uC608\uC640
     \uBCF4\uC2A4\uC5D0\uAC8C \uD53C\uD574 \uC99D\uAC00\",\r\n      \"effect\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
@@ -677,35 +851,41 @@ MonoBehaviour:
     6\r\n          }\r\n        },\r\n        {\r\n          \"count\": 6,\r\n         
     \"text\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
     \uD53C\uD574 +8%\",\r\n          \"values\": {\r\n            \"damagePct\":
-    8\r\n          }\r\n        }\r\n      ],\r\n      \"members\": [\r\n       
+    8\r\n          }\r\n        },\r\n        {\r\n          \"count\": 8,\r\n         
+    \"text\": \"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
+    \uD53C\uD574 +10%\",\r\n          \"values\": {\r\n            \"damagePct\":
+    10\r\n          }\r\n        }\r\n      ],\r\n      \"members\": [\r\n       
     \"I65\",\r\n        \"I66\",\r\n        \"I67\",\r\n        \"I68\",\r\n       
-    \"I69\",\r\n        \"I92\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S15.svg\",\r\n     
-    \"iconPng\": \"Art/Synergies/S15.png\"\r\n    },\r\n    {\r\n      \"id\": \"S16\",\r\n     
-    \"name\": \"\uC219\uB828\",\r\n      \"summary\": \"\uC9C1\uC811 \uC0AC\uC6A9\uD558\uB294
-    \uACF5\uACA9 \uC2A4\uD0AC\uC758 \uD53C\uD574\uB97C \uB192\uC778\uB2E4.\",\r\n     
-    \"effect\": \"\uC9C1\uC811 \uC0AC\uC6A9\uD558\uB294 \uACF5\uACA9 \uC2A4\uD0AC\uC758
-    \uC6D0\uB798 \uD0C0\uACA9\uC5D0 \uC2A4\uD0AC \uD53C\uD574 \uC99D\uAC00\uC728\uC744
-    \uC801\uC6A9\uD55C\uB2E4. \uC7A5\uBE44\uB098 \uC2DC\uB108\uC9C0\uAC00 \uBCC4\uB3C4\uB85C
-    \uBC1C\uC0DD\uC2DC\uD0A8 \uCD94\uAC00 \uD0C0\uACA9\uC5D0\uB294 \uC801\uC6A9\uD558\uC9C0
-    \uC54A\uB294\uB2E4.\",\r\n      \"tiers\": [\r\n        {\r\n          \"count\":
-    2,\r\n          \"text\": \"\uC2A4\uD0AC \uD53C\uD574 +4%\",\r\n          \"values\":
-    {\r\n            \"percent\": 4\r\n          }\r\n        },\r\n        {\r\n         
-    \"count\": 4,\r\n          \"text\": \"\uC2A4\uD0AC \uD53C\uD574 +8%\",\r\n         
-    \"values\": {\r\n            \"percent\": 8\r\n          }\r\n        },\r\n       
-    {\r\n          \"count\": 6,\r\n          \"text\": \"\uC2A4\uD0AC \uD53C\uD574
-    +12%\",\r\n          \"values\": {\r\n            \"percent\": 12\r\n         
-    }\r\n        }\r\n      ],\r\n      \"members\": [\r\n        \"I34\",\r\n       
-    \"I47\",\r\n        \"I62\",\r\n        \"I71\",\r\n        \"I72\",\r\n       
-    \"I73\",\r\n        \"I75\"\r\n      ],\r\n      \"icon\": \"Art/Synergies/S16.svg\",\r\n     
-    \"iconPng\": \"Art/Synergies/S16.png\"\r\n    },\r\n    {\r\n      \"id\": \"S19\",\r\n     
-    \"name\": \"\uC218\uD655\",\r\n      \"summary\": \"\uC801 \uCC98\uCE58 \uBCF4\uC0C1
-    \uACE8\uB4DC\uC758 \uC77C\uBD80\uB97C \uB354 \uC5BB\uB294\uB2E4.\",\r\n     
-    \"effect\": \"\uC801\uC744 \uCC98\uCE58\uD560 \uB54C\uB9C8\uB2E4 \uAE30\uBCF8
-    \uBCF4\uC0C1 \uACE8\uB4DC\uC5D0 \uD45C\uC2DC \uBE44\uC728\uC744 \uACF1\uD574
-    \uB204\uC801\uD55C\uB2E4. \uB204\uC801\uAC12\uC758 \uC815\uC218 \uBD80\uBD84\uC744
-    \uCD94\uAC00 \uACE8\uB4DC\uB85C \uC9C0\uAE09\uD558\uACE0 \uC18C\uC218 \uBD80\uBD84\uC740
-    \uB2E4\uC74C \uCC98\uCE58\uAE4C\uC9C0 \uC774\uC6D4\uD55C\uB2E4. \uCD94\uAC00
-    \uACE8\uB4DC\uB294 \uB204\uC801 \uB300\uC0C1\uC5D0\uC11C \uC81C\uC678\uD558\uBA70,
+    \"I69\",\r\n        \"I92\",\r\n        \"I117\",\r\n        \"I118\"\r\n     
+    ],\r\n      \"icon\": \"Art/Synergies/S15.svg\",\r\n      \"iconPng\": \"Art/Synergies/S15.png\"\r\n   
+    },\r\n    {\r\n      \"id\": \"S16\",\r\n      \"name\": \"\uC219\uB828\",\r\n     
+    \"summary\": \"\uC9C1\uC811 \uC0AC\uC6A9\uD558\uB294 \uACF5\uACA9 \uC2A4\uD0AC\uC758
+    \uD53C\uD574\uB97C \uB192\uC778\uB2E4.\",\r\n      \"effect\": \"\uC9C1\uC811
+    \uC0AC\uC6A9\uD558\uB294 \uACF5\uACA9 \uC2A4\uD0AC\uC758 \uC6D0\uB798 \uD0C0\uACA9\uC5D0
+    \uC2A4\uD0AC \uD53C\uD574 \uC99D\uAC00\uC728\uC744 \uC801\uC6A9\uD55C\uB2E4.
+    \uC7A5\uBE44\uB098 \uC2DC\uB108\uC9C0\uAC00 \uBCC4\uB3C4\uB85C \uBC1C\uC0DD\uC2DC\uD0A8
+    \uCD94\uAC00 \uD0C0\uACA9\uC5D0\uB294 \uC801\uC6A9\uD558\uC9C0 \uC54A\uB294\uB2E4.\",\r\n     
+    \"tiers\": [\r\n        {\r\n          \"count\": 2,\r\n          \"text\": \"\uC2A4\uD0AC
+    \uD53C\uD574 +4%\",\r\n          \"values\": {\r\n            \"percent\": 4\r\n         
+    }\r\n        },\r\n        {\r\n          \"count\": 4,\r\n          \"text\":
+    \"\uC2A4\uD0AC \uD53C\uD574 +8%\",\r\n          \"values\": {\r\n           
+    \"percent\": 8\r\n          }\r\n        },\r\n        {\r\n          \"count\":
+    6,\r\n          \"text\": \"\uC2A4\uD0AC \uD53C\uD574 +12%\",\r\n          \"values\":
+    {\r\n            \"percent\": 12\r\n          }\r\n        },\r\n        {\r\n         
+    \"count\": 8,\r\n          \"text\": \"\uC2A4\uD0AC \uD53C\uD574 +16%\",\r\n         
+    \"values\": {\r\n            \"percent\": 16\r\n          }\r\n        }\r\n     
+    ],\r\n      \"members\": [\r\n        \"I34\",\r\n        \"I47\",\r\n       
+    \"I62\",\r\n        \"I71\",\r\n        \"I72\",\r\n        \"I73\",\r\n       
+    \"I75\",\r\n        \"I119\",\r\n        \"I120\"\r\n      ],\r\n      \"icon\":
+    \"Art/Synergies/S16.svg\",\r\n      \"iconPng\": \"Art/Synergies/S16.png\"\r\n   
+    },\r\n    {\r\n      \"id\": \"S19\",\r\n      \"name\": \"\uC218\uD655\",\r\n     
+    \"summary\": \"\uC801 \uCC98\uCE58 \uBCF4\uC0C1 \uACE8\uB4DC\uC758 \uC77C\uBD80\uB97C
+    \uB354 \uC5BB\uB294\uB2E4.\",\r\n      \"effect\": \"\uC801\uC744 \uCC98\uCE58\uD560
+    \uB54C\uB9C8\uB2E4 \uAE30\uBCF8 \uBCF4\uC0C1 \uACE8\uB4DC\uC5D0 \uD45C\uC2DC
+    \uBE44\uC728\uC744 \uACF1\uD574 \uB204\uC801\uD55C\uB2E4. \uB204\uC801\uAC12\uC758
+    \uC815\uC218 \uBD80\uBD84\uC744 \uCD94\uAC00 \uACE8\uB4DC\uB85C \uC9C0\uAE09\uD558\uACE0
+    \uC18C\uC218 \uBD80\uBD84\uC740 \uB2E4\uC74C \uCC98\uCE58\uAE4C\uC9C0 \uC774\uC6D4\uD55C\uB2E4.
+    \uCD94\uAC00 \uACE8\uB4DC\uB294 \uB204\uC801 \uB300\uC0C1\uC5D0\uC11C \uC81C\uC678\uD558\uBA70,
     \uB204\uC801\uAC12\uC740 \uC0C8 \uD50C\uB808\uC774\uB97C \uC2DC\uC791\uD560 \uB54C
     \uCD08\uAE30\uD654\uD55C\uB2E4.\",\r\n      \"tiers\": [\r\n        {\r\n         
     \"count\": 2,\r\n          \"text\": \"\uC801 \uCC98\uCE58 \uAE30\uBCF8 \uACE8\uB4DC
@@ -715,30 +895,39 @@ MonoBehaviour:
     12%\",\r\n          \"values\": {\r\n            \"percent\": 12\r\n         
     }\r\n        },\r\n        {\r\n          \"count\": 6,\r\n          \"text\":
     \"\uC801 \uCC98\uCE58 \uAE30\uBCF8 \uACE8\uB4DC \uBCF4\uB108\uC2A4 18%\",\r\n         
-    \"values\": {\r\n            \"percent\": 18\r\n          }\r\n        }\r\n     
-    ],\r\n      \"members\": [\r\n        \"I89\",\r\n        \"I90\",\r\n       
-    \"I91\",\r\n        \"I92\",\r\n        \"I93\",\r\n        \"I94\"\r\n     
+    \"values\": {\r\n            \"percent\": 18\r\n          }\r\n        },\r\n       
+    {\r\n          \"count\": 8,\r\n          \"text\": \"\uC801 \uCC98\uCE58 \uAE30\uBCF8
+    \uACE8\uB4DC \uBCF4\uB108\uC2A4 24%\",\r\n          \"values\": {\r\n           
+    \"percent\": 24\r\n          }\r\n        }\r\n      ],\r\n      \"members\":
+    [\r\n        \"I89\",\r\n        \"I90\",\r\n        \"I91\",\r\n        \"I92\",\r\n       
+    \"I93\",\r\n        \"I94\",\r\n        \"I121\",\r\n        \"I122\"\r\n     
     ],\r\n      \"icon\": \"Art/Synergies/S19.svg\",\r\n      \"iconPng\": \"Art/Synergies/S19.png\"\r\n   
     }\r\n  ]\r\n}"
-  manifestJson: "{\r\n  \"balanceRevision\": 1,\r\n  \"sourceRevision\": \"2026-11-08\",\r\n 
+  manifestJson: "{\r\n  \"balanceRevision\": 2,\r\n  \"sourceRevision\": \"2026-11-10\",\r\n 
     \"prices\": [\r\n    20,\r\n    40,\r\n    80,\r\n    160\r\n  ],\r\n  \"i89MaximumBaseGold\":
     10,\r\n  \"ordinaryEnemyBaseGoldMin\": 5,\r\n  \"ordinaryEnemyBaseGoldMax\":
     15,\r\n  \"grades\": {\r\n    \"I01\": 2,\r\n    \"I02\": 3,\r\n    \"I04\":
     2,\r\n    \"I05\": 3,\r\n    \"I06\": 2,\r\n    \"I07\": 2,\r\n    \"I08\": 2,\r\n   
-    \"I09\": 4,\r\n    \"I100\": 3,\r\n    \"I13\": 1,\r\n    \"I14\": 4,\r\n   
-    \"I15\": 2,\r\n    \"I16\": 3,\r\n    \"I17\": 2,\r\n    \"I18\": 2,\r\n    \"I19\":
-    2,\r\n    \"I20\": 2,\r\n    \"I21\": 2,\r\n    \"I22\": 2,\r\n    \"I30\": 3,\r\n   
-    \"I31\": 2,\r\n    \"I32\": 2,\r\n    \"I33\": 3,\r\n    \"I34\": 4,\r\n    \"I41\":
-    1,\r\n    \"I42\": 2,\r\n    \"I43\": 3,\r\n    \"I44\": 2,\r\n    \"I46\": 2,\r\n   
-    \"I47\": 1,\r\n    \"I48\": 2,\r\n    \"I50\": 3,\r\n    \"I51\": 1,\r\n    \"I56\":
-    4,\r\n    \"I57\": 2,\r\n    \"I60\": 2,\r\n    \"I61\": 3,\r\n    \"I62\": 3,\r\n   
-    \"I63\": 2,\r\n    \"I64\": 3,\r\n    \"I65\": 3,\r\n    \"I66\": 1,\r\n    \"I67\":
-    2,\r\n    \"I68\": 1,\r\n    \"I69\": 2,\r\n    \"I71\": 1,\r\n    \"I72\": 3,\r\n   
-    \"I73\": 2,\r\n    \"I75\": 1,\r\n    \"I77\": 1,\r\n    \"I78\": 2,\r\n    \"I81\":
-    4,\r\n    \"I89\": 1,\r\n    \"I90\": 2,\r\n    \"I91\": 1,\r\n    \"I92\": 3,\r\n   
-    \"I93\": 1,\r\n    \"I94\": 1,\r\n    \"I95\": 4\r\n  }\r\n}"
-  catalogSha256: e32b2b0374e0e359d4a6374a9449ed402c5bbb35d28c9c11126de204e9bb72ab
-  manifestSha256: 54b7f2a4a70fd2fae8a9329405eead4171ed7162e7d5cc3f0e505601401426ac
+    \"I09\": 4,\r\n    \"I100\": 3,\r\n    \"I101\": 1,\r\n    \"I102\": 3,\r\n   
+    \"I103\": 1,\r\n    \"I104\": 3,\r\n    \"I105\": 1,\r\n    \"I106\": 3,\r\n   
+    \"I107\": 2,\r\n    \"I108\": 3,\r\n    \"I109\": 2,\r\n    \"I110\": 3,\r\n   
+    \"I111\": 2,\r\n    \"I112\": 4,\r\n    \"I113\": 1,\r\n    \"I114\": 3,\r\n   
+    \"I115\": 2,\r\n    \"I116\": 4,\r\n    \"I117\": 2,\r\n    \"I118\": 4,\r\n   
+    \"I119\": 1,\r\n    \"I120\": 3,\r\n    \"I121\": 1,\r\n    \"I122\": 3,\r\n   
+    \"I13\": 1,\r\n    \"I14\": 4,\r\n    \"I15\": 2,\r\n    \"I16\": 3,\r\n    \"I17\":
+    2,\r\n    \"I18\": 2,\r\n    \"I19\": 2,\r\n    \"I20\": 2,\r\n    \"I21\": 2,\r\n   
+    \"I22\": 2,\r\n    \"I30\": 3,\r\n    \"I31\": 2,\r\n    \"I32\": 2,\r\n    \"I33\":
+    3,\r\n    \"I34\": 4,\r\n    \"I41\": 1,\r\n    \"I42\": 2,\r\n    \"I43\": 3,\r\n   
+    \"I44\": 2,\r\n    \"I46\": 2,\r\n    \"I47\": 1,\r\n    \"I48\": 2,\r\n    \"I50\":
+    3,\r\n    \"I51\": 1,\r\n    \"I56\": 4,\r\n    \"I57\": 2,\r\n    \"I60\": 2,\r\n   
+    \"I61\": 3,\r\n    \"I62\": 3,\r\n    \"I63\": 2,\r\n    \"I64\": 3,\r\n    \"I65\":
+    3,\r\n    \"I66\": 1,\r\n    \"I67\": 2,\r\n    \"I68\": 1,\r\n    \"I69\": 2,\r\n   
+    \"I71\": 1,\r\n    \"I72\": 3,\r\n    \"I73\": 2,\r\n    \"I75\": 1,\r\n    \"I77\":
+    1,\r\n    \"I78\": 2,\r\n    \"I81\": 4,\r\n    \"I89\": 1,\r\n    \"I90\": 2,\r\n   
+    \"I91\": 1,\r\n    \"I92\": 3,\r\n    \"I93\": 1,\r\n    \"I94\": 1,\r\n    \"I95\":
+    4\r\n  }\r\n}"
+  catalogSha256: d1968ce77898cb6506bcfebf9c8ed4ead5b25efa4747f1b988706e5e0b1e1be5
+  manifestSha256: 23e82ab3869c610c4b199095e9abd6fedc49974f369320e0514f1a456dab1327
   items:
   - {fileID: 11400000, guid: 62e63ead92085cd4785896fe5174eaa3, type: 2}
   - {fileID: 11400000, guid: bceac72669f38ed4587bcdb40cb2b3f7, type: 2}
@@ -799,6 +988,28 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0bf5b359091578c42b705ba47526e18e, type: 2}
   - {fileID: 11400000, guid: 4d6b5c66ab68afb4db5dc334ddaf2372, type: 2}
   - {fileID: 11400000, guid: 021abbda56ea0ad46a20284cfbd3c404, type: 2}
+  - {fileID: 11400000, guid: 30a150684ddda464291aae825213a858, type: 2}
+  - {fileID: 11400000, guid: f04bf76ee1ace1c40bc121bae0ba22c1, type: 2}
+  - {fileID: 11400000, guid: 6c8907cba69afb84a806a003351633bf, type: 2}
+  - {fileID: 11400000, guid: abdd6a66ccfae0945ac64d6d38e61b40, type: 2}
+  - {fileID: 11400000, guid: 9aee4a26a7356154891ea6cb346d912e, type: 2}
+  - {fileID: 11400000, guid: 968b2c7eb7553904592df6fd3364be88, type: 2}
+  - {fileID: 11400000, guid: 139c8868a38d4074988597a2f4d9a613, type: 2}
+  - {fileID: 11400000, guid: 7875ff18e09341f4a92a2a7dd958cb29, type: 2}
+  - {fileID: 11400000, guid: 9d7c8f1dcc0c4d24391cce50415f636b, type: 2}
+  - {fileID: 11400000, guid: 8b4a1cb06f9e6924a9bd5740980e2dd5, type: 2}
+  - {fileID: 11400000, guid: 2ba4a606b8ae95b4584632d6b4b298f1, type: 2}
+  - {fileID: 11400000, guid: e85ca11ef5a9d274b91fd94f69eed003, type: 2}
+  - {fileID: 11400000, guid: 72d8fcaa404d2c443aa6e8aa91a34d45, type: 2}
+  - {fileID: 11400000, guid: dff1c59a9fd727a46bb3290e3889fc23, type: 2}
+  - {fileID: 11400000, guid: b58c6093ee34fc2489f7aa54ed18f7bb, type: 2}
+  - {fileID: 11400000, guid: 2a504582d0838284d9569d7dc41564e3, type: 2}
+  - {fileID: 11400000, guid: 52d61c8c20741d649a5b9544b1f61063, type: 2}
+  - {fileID: 11400000, guid: 9ffe7d9c41cb8f14282cee77675d888b, type: 2}
+  - {fileID: 11400000, guid: 7c87c2ec0160516409c8074939347671, type: 2}
+  - {fileID: 11400000, guid: 930999469bf7ee04ca570c0d40e7d864, type: 2}
+  - {fileID: 11400000, guid: f52ad70d4e0b96a45857ac0ddb6538ad, type: 2}
+  - {fileID: 11400000, guid: ef2927bd30a04204f903e8130d4d3ef6, type: 2}
   synergies:
   - id: S01
     displayName: "\uCE58\uBA85"
@@ -816,6 +1027,8 @@ MonoBehaviour:
     - I15
     - I57
     - I100
+    - I101
+    - I102
     tiers:
     - count: 2
       text: "\uCE58\uBA85\uD0C0 \uD655\uB960 +5%p \xB7 \uCE58\uBA85\uD0C0 \uD53C\uD574
@@ -955,6 +1168,52 @@ MonoBehaviour:
         maximumBaseGold: 0
         durationSeconds: 0
         cooldownSeconds: 0
+    - count: 8
+      text: "\uCE58\uBA85\uD0C0 \uD655\uB960 +20%p \xB7 \uCE58\uBA85\uD0C0 \uD53C\uD574
+        \uBC30\uC728 +50%p"
+      effects:
+      - effectId: S01:chance
+        stat: 3
+        amount: 20
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+      - effectId: S01:damage
+        stat: 4
+        amount: 50
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
   - id: S02
     displayName: "\uB9F9\uACF5"
     summary: "\uACF5\uACA9\uB825\uACFC \uD3C9\uD0C0 \uACF5\uACA9\uC18D\uB3C4\uB97C
@@ -969,6 +1228,8 @@ MonoBehaviour:
     - I48
     - I56
     - I95
+    - I103
+    - I104
     tiers:
     - count: 2
       text: "\uACF5\uACA9\uB825 +5% \xB7 \uACF5\uACA9\uC18D\uB3C4 +4%"
@@ -1105,6 +1366,51 @@ MonoBehaviour:
         maximumBaseGold: 0
         durationSeconds: 0
         cooldownSeconds: 0
+    - count: 8
+      text: "\uACF5\uACA9\uB825 +26% \xB7 \uACF5\uACA9\uC18D\uB3C4 +22%"
+      effects:
+      - effectId: S02:attack
+        stat: 1
+        amount: 0.26
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+      - effectId: S02:rate
+        stat: 5
+        amount: 0.22
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
   - id: S03
     displayName: "\uCCA0\uBCBD"
     summary: "\uCD5C\uB300 HP\uC640 \uBC29\uC5B4\uB825\uC744 \uD568\uAED8 \uB192\uC778\uB2E4."
@@ -1120,6 +1426,8 @@ MonoBehaviour:
     - I77
     - I78
     - I81
+    - I105
+    - I106
     tiers:
     - count: 2
       text: "\uCD5C\uB300 HP +8% \xB7 \uBC29\uC5B4\uB825 +10%"
@@ -1256,6 +1564,51 @@ MonoBehaviour:
         maximumBaseGold: 0
         durationSeconds: 0
         cooldownSeconds: 0
+    - count: 8
+      text: "\uCD5C\uB300 HP +34% \xB7 \uBC29\uC5B4\uB825 +40%"
+      effects:
+      - effectId: S03:hp
+        stat: 0
+        amount: 0.34
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+      - effectId: S03:defense
+        stat: 2
+        amount: 0.4
+        trigger: 0
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
   - id: S04
     displayName: "\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0"
     summary: "\uC218 \uC18D\uC131\uC73C\uB85C \uC8FC\uB294 \uD53C\uD574\uB97C \uB192\uC778\uB2E4."
@@ -1269,6 +1622,8 @@ MonoBehaviour:
     - I19
     - I20
     - I21
+    - I107
+    - I108
     tiers:
     - count: 2
       text: "\uC218 \uC18D\uC131 \uD53C\uD574 +5%"
@@ -1342,6 +1697,30 @@ MonoBehaviour:
         maximumBaseGold: 0
         durationSeconds: 0
         cooldownSeconds: 0
+    - count: 8
+      text: "\uC218 \uC18D\uC131 \uD53C\uD574 +20%"
+      effects:
+      - effectId: S04
+        stat: 6
+        amount: 0.2
+        trigger: 0
+        family: 0
+        element: 5
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
   - id: S05
     displayName: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
     summary: "\uD654 \uC18D\uC131\uC73C\uB85C \uC8FC\uB294 \uD53C\uD574\uB97C \uB192\uC778\uB2E4."
@@ -1355,6 +1734,8 @@ MonoBehaviour:
     - I08
     - I16
     - I22
+    - I109
+    - I110
     tiers:
     - count: 2
       text: "\uD654 \uC18D\uC131 \uD53C\uD574 +5%"
@@ -1428,6 +1809,30 @@ MonoBehaviour:
         maximumBaseGold: 0
         durationSeconds: 0
         cooldownSeconds: 0
+    - count: 8
+      text: "\uD654 \uC18D\uC131 \uD53C\uD574 +20%"
+      effects:
+      - effectId: S05
+        stat: 6
+        amount: 0.2
+        trigger: 0
+        family: 0
+        element: 2
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
   - id: S08
     displayName: "\uC218\uD638"
     summary: "\uD53C\uACA9 \uD6C4 \uB2E4\uC74C \uD53C\uD574\uB97C \uB9C9\uB294 \uBCF4\uD638\uB9C9"
@@ -1443,6 +1848,8 @@ MonoBehaviour:
     - I33
     - I34
     - I50
+    - I111
+    - I112
     tiers:
     - count: 2
       text: "HP\uB97C \uC783\uC740 \uC9C1\uD6C4 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758
@@ -1519,6 +1926,31 @@ MonoBehaviour:
         maximumBaseGold: 0
         durationSeconds: 4
         cooldownSeconds: 10
+    - count: 8
+      text: "HP\uB97C \uC783\uC740 \uC9C1\uD6C4 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758
+        6% \uBCF4\uD638\uB9C9, \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 10\uCD08"
+      effects:
+      - effectId: S08
+        stat: 8
+        amount: 0.06
+        trigger: 2
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 4
+        cooldownSeconds: 10
   - id: S10
     displayName: "\uB9C8\uBB34\uB9AC"
     summary: "HP\uAC00 \uB0AE\uC740 \uC801\uC5D0\uAC8C \uD53C\uD574 \uC99D\uAC00"
@@ -1534,6 +1966,8 @@ MonoBehaviour:
     - I43
     - I44
     - I100
+    - I113
+    - I114
     tiers:
     - count: 2
       text: "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
@@ -1610,6 +2044,31 @@ MonoBehaviour:
         maximumBaseGold: 0
         durationSeconds: 0
         cooldownSeconds: 0
+    - count: 8
+      text: "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +10%"
+      effects:
+      - effectId: S10
+        stat: 6
+        amount: 0.1
+        trigger: 0
+        family: 3
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: 0.3
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
   - id: S14
     displayName: "\uAD00\uD1B5"
     summary: "\uD3C9\uD0C0\uC640 \uC2A4\uD0AC\uC774 \uB300\uC0C1 \uBC29\uC5B4\uB825
@@ -1626,6 +2085,8 @@ MonoBehaviour:
     - I63
     - I64
     - I65
+    - I115
+    - I116
     tiers:
     - count: 2
       text: "\uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uC591\uC218
@@ -1702,6 +2163,31 @@ MonoBehaviour:
         maximumBaseGold: 0
         durationSeconds: 0
         cooldownSeconds: 0
+    - count: 8
+      text: "\uD3C9\uD0C0\xB7\uC2A4\uD0AC \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uC591\uC218
+        \uC720\uD6A8 \uBC29\uC5B4\uB825\uC758 15% \uBB34\uC2DC"
+      effects:
+      - effectId: S14
+        stat: 7
+        amount: 0.15
+        trigger: 0
+        family: 3
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
   - id: S15
     displayName: "\uAC70\uBB3C\uC0AC\uB0E5"
     summary: "\uC815\uC608\uC640 \uBCF4\uC2A4\uC5D0\uAC8C \uD53C\uD574 \uC99D\uAC00"
@@ -1716,6 +2202,8 @@ MonoBehaviour:
     - I68
     - I69
     - I92
+    - I117
+    - I118
     tiers:
     - count: 2
       text: "\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
@@ -1792,6 +2280,31 @@ MonoBehaviour:
         maximumBaseGold: 0
         durationSeconds: 0
         cooldownSeconds: 0
+    - count: 8
+      text: "\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD3C9\uD0C0\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +10%"
+      effects:
+      - effectId: S15
+        stat: 6
+        amount: 0.1
+        trigger: 0
+        family: 3
+        element: 0
+        eliteOrBossOnly: 1
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
   - id: S16
     displayName: "\uC219\uB828"
     summary: "\uC9C1\uC811 \uC0AC\uC6A9\uD558\uB294 \uACF5\uACA9 \uC2A4\uD0AC\uC758
@@ -1810,6 +2323,8 @@ MonoBehaviour:
     - I72
     - I73
     - I75
+    - I119
+    - I120
     tiers:
     - count: 2
       text: "\uC2A4\uD0AC \uD53C\uD574 +4%"
@@ -1883,6 +2398,30 @@ MonoBehaviour:
         maximumBaseGold: 0
         durationSeconds: 0
         cooldownSeconds: 0
+    - count: 8
+      text: "\uC2A4\uD0AC \uD53C\uD574 +16%"
+      effects:
+      - effectId: S16
+        stat: 6
+        amount: 0.16
+        trigger: 0
+        family: 2
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 0
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
   - id: S19
     displayName: "\uC218\uD655"
     summary: "\uC801 \uCC98\uCE58 \uBCF4\uC0C1 \uACE8\uB4DC\uC758 \uC77C\uBD80\uB97C
@@ -1903,6 +2442,8 @@ MonoBehaviour:
     - I92
     - I93
     - I94
+    - I121
+    - I122
     tiers:
     - count: 2
       text: "\uC801 \uCC98\uCE58 \uAE30\uBCF8 \uACE8\uB4DC \uBCF4\uB108\uC2A4 6%"
@@ -1958,6 +2499,30 @@ MonoBehaviour:
       - effectId: S19
         stat: 13
         amount: 0.18
+        trigger: 1
+        family: 0
+        element: 0
+        eliteOrBossOnly: 0
+        targetHpMin: -1
+        targetHpMax: -1
+        selfHpMin: -1
+        selfHpMax: -1
+        firstTargetHit: 0
+        firstSkillHit: 0
+        firstIncomingAttack: 0
+        firstRewardKill: 0
+        requiresFullHealth: 0
+        minimumHealthLossRatio: 0
+        minimumBaseGold: 1
+        maximumBaseGold: 0
+        durationSeconds: 0
+        cooldownSeconds: 0
+    - count: 8
+      text: "\uC801 \uCC98\uCE58 \uAE30\uBCF8 \uACE8\uB4DC \uBCF4\uB108\uC2A4 24%"
+      effects:
+      - effectId: S19
+        stat: 13
+        amount: 0.24
         trigger: 1
         family: 0
         element: 0

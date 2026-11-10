@@ -36,6 +36,15 @@ public static class BoundaryZeroHudSetup
         return "Fire/water chain readiness and F target are bound on PlayerHUD.";
     }
 
+    /// <summary>Updates only the existing HUD and wheel's form-lock bindings.</summary>
+    public static string ApplyFormLocks()
+    {
+        if (Application.isPlaying) throw new InvalidOperationException("Apply form locks in Edit Mode.");
+        Edit(HudPath, StyleFormLocks);
+        Edit(WheelPath, BindWheelArtwork);
+        return "Form lock labels and finisher artwork are bound on the existing prefabs.";
+    }
+
     /// <summary>Places and styles the minimap stage label without restyling the other HUD prefabs.</summary>
     public static string ApplyMinimapStageLabel()
     {
@@ -119,8 +128,45 @@ public static class BoundaryZeroHudSetup
         view.ConfigureUltimateCharge(null, charge);
         view.ConfigureVitalsText(hpLabel, spLabel);
         StyleChainSkills(root);
+        StyleFormLocks(root);
         root.GetComponent<HudController>()?.Configure(view);
         foreach (var graphic in design.GetComponentsInChildren<UnityEngine.UI.Graphic>(true)) graphic.raycastTarget = false;
+    }
+
+    private static void StyleFormLocks(GameObject root)
+    {
+        var view = root.GetComponent<HudView>();
+        if (view == null) throw new InvalidOperationException("The live PlayerHUD has no HudView.");
+        var forms = RequiredRect(root.transform, "BoundaryZeroHUD/Forms");
+        var locks = new GameObject[5];
+        var keys = new GameObject[5];
+        for (int i = 0; i < 5; i++)
+        {
+            keys[i] = RequiredRect(forms, "Key" + i).gameObject;
+            var label = Text("Locked" + i, forms, 24 + i * 126f, 129, 78, 34.5f, "잠금", 20);
+            label.alignment = TextAlignmentOptions.Center;
+            label.color = new Color(.72f, .76f, .8f, 1f);
+            label.raycastTarget = false;
+            locks[i] = label.gameObject;
+            locks[i].SetActive(false);
+        }
+        view.ConfigureFormLocks(locks, keys);
+    }
+
+    private static void BindWheelArtwork(GameObject root)
+    {
+        var view = root.GetComponent<FinisherWheelView>();
+        if (view == null) throw new InvalidOperationException("Finisher wheel view is missing.");
+        var serialized = new SerializedObject(view);
+        var sectors = serialized.FindProperty("sectors");
+        for (int i = 0; i < sectors.arraySize; i++)
+        {
+            var icon = RequiredRect(root.transform, "BoundaryZeroContent/BoundaryZeroWheel/Sector" + i + "/Icon")
+                .GetComponent<UnityEngine.UI.Image>();
+            if (icon == null) throw new InvalidOperationException("Finisher sector artwork is missing.");
+            sectors.GetArrayElementAtIndex(i).FindPropertyRelative("Artwork").objectReferenceValue = icon;
+        }
+        serialized.ApplyModifiedPropertiesWithoutUndo();
     }
 
     private static void StyleChainSkills(GameObject root)
@@ -319,7 +365,7 @@ public static class BoundaryZeroHudSetup
             var sector = Rect("Sector" + i, ring, 0, 0, 170, 170);
             Center(sector, position, new Vector2(170, 170));
             var hover = Image("Selected", sector, 0, 0, 170, 170, "Wheel/hover.png");
-            Image("Icon", sector, 43, 25, 84, 84, "Icons/element_" + ElementFile(element) + ".png");
+            var artwork = Image("Icon", sector, 43, 25, 84, 84, "Icons/element_" + ElementFile(element) + ".png");
             var elementLabel = Text("Element", sector, 0, 109, 170, 30, ElementName(element), 23);
             elementLabel.alignment = TextAlignmentOptions.Center;
             elementLabel.color = FinisherWheelGraphic.ElementColor(i);
@@ -331,6 +377,7 @@ public static class BoundaryZeroHudSetup
             binding.FindPropertyRelative("ElementLabel").objectReferenceValue = elementLabel;
             binding.FindPropertyRelative("RoleLabel").objectReferenceValue = role;
             binding.FindPropertyRelative("SelectedVisual").objectReferenceValue = hover.gameObject;
+            binding.FindPropertyRelative("Artwork").objectReferenceValue = artwork;
             hover.gameObject.SetActive(false);
         }
         var cursor = Image("VirtualCursor", content, 0, 0, 14, 14, "HUD/crosshair.png");

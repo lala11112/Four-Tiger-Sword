@@ -4,6 +4,7 @@ public partial class FormManager
 {
     public enum SwitchReason { Direct, Parry }
     private PlayerController _playerController;
+    private readonly Func<ElementType, bool> _elementAvailability;
     public IForm CurrentForm{ get; private set; }
     private List<FormTransition> _transitions = new List<FormTransition>();
     private readonly HashSet<IForm> _registeredForms = new();
@@ -14,10 +15,13 @@ public partial class FormManager
     public event Action<IForm> OnFormChanged;
     public event Action<IForm, IForm> OnFormSwitchSucceeded;
 
-    public FormManager(PlayerController playerController)
+    public FormManager(PlayerController playerController, Func<ElementType, bool> elementAvailability = null)
     {
         _playerController = playerController;
+        _elementAvailability = elementAvailability;
     }
+
+    public bool IsElementAvailable(ElementType element) => _elementAvailability?.Invoke(element) ?? true;
 
     /// <summary>World resource time runs before actions; switching never resets a form's resource.</summary>
     public void UpdateFormSp(float deltaTime)
@@ -90,6 +94,7 @@ public partial class FormManager
         transitions.Add(new FormTransition(toForm, condition));
     }
 
+    /// <summary>Force an assignment for initial setup or editor tools without a gameplay switch.</summary>
     public void ChangeForm(IForm form) => AssignForm(form, true);
 
     public BaseForm GetForm(ElementType element)
@@ -102,7 +107,8 @@ public partial class FormManager
     /// <summary>A committed combo finisher changes form once without switch costs or an E-style attack.</summary>
     public bool TrySwitchForFinisher(BaseForm target)
     {
-        if (target == null || target == CurrentForm || CurrentForm == null || !target.CanBeginFinisher
+        if (target == null || target == CurrentForm || CurrentForm == null || !IsElementAvailable(target.Element)
+            || !target.CanBeginFinisher
             || !_registeredForms.Contains(target) || !_playerController.isActiveAndEnabled
             || _playerController.IsStageTransitioning || _playerController.IsShopPaused
             || _playerController.StatManager == null || _playerController.StatManager.CurrentHp <= 0f
@@ -139,6 +145,7 @@ public partial class FormManager
     public bool CanSwitchForm(IForm target)
         => target is BaseForm
             && CurrentForm != null && target != CurrentForm && _registeredForms.Contains(target)
+            && IsElementAvailable(target.Element)
             && _playerController.isActiveAndEnabled && _playerController.StatManager != null
             && _playerController.StatManager.CurrentHp > 0f && _playerController.CanChangeForm
             && _playerController.StatManager.HasEnoughSp(_playerController.SwitchSpCost);
@@ -171,7 +178,7 @@ public partial class FormManager
     {
         foreach(var transition in _transitions)
         {
-            if(transition.Condition.Invoke())
+            if (IsElementAvailable(transition.TargetForm.Element) && transition.Condition.Invoke())
             {
                 return transition;
             }
@@ -189,7 +196,7 @@ public partial class FormManager
         {
             foreach(var transition in currentTransitions)
             {
-                if(transition.Condition.Invoke())
+                if (IsElementAvailable(transition.TargetForm.Element) && transition.Condition.Invoke())
                 {
                     return transition;
                 }

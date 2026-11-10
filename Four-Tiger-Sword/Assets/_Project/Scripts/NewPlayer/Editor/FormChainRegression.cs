@@ -168,7 +168,24 @@ public static class FormChainRegression
             forms.CleanupTransientEffects();
             Check(forms.ReadyChainSkill == null && !input.ChainSkillBuffer.IsActive,
                 "Transient cleanup clears ready tokens and buffered F.");
-            return $"PASS: {_checks} form chain readiness and commit assertions.";
+
+            var ironData = Asset<IronFormActionDataSO>();
+            var earthData = Asset<EarthFormActionDataSO>();
+            fireData.ComboSteps = new List<WeaponActionData> { Step() };
+            waterData.FinisherStep = Step();
+            var savedUi = PlayerUIManager.Instance;
+            try
+            {
+                PlayerUIManager.Instance = null;
+                var gameplay = new FormManagerSetup(player).Build(fireData, waterData, woodData, ironData, earthData);
+                Property(player, "FormManager", gameplay);
+                VerifyFireOnlyGameplay(player, statsData);
+            }
+            finally
+            {
+                PlayerUIManager.Instance = savedUi;
+            }
+            return $"PASS: {_checks} form switching, chain readiness and commit assertions.";
         }
         finally
         {
@@ -177,6 +194,71 @@ public static class FormChainRegression
                 if (assets[i] != null) Object.DestroyImmediate(assets[i]);
             EditorSceneManager.ClosePreviewScene(scene);
         }
+    }
+
+    private static void VerifyFireOnlyGameplay(PlayerController player, PlayerStatData statsData)
+    {
+        var forms = player.FormManager;
+        var input = player.Input;
+        var stats = player.StatManager;
+        var machine = player.StateMachine;
+        var fire = forms.CurrentForm;
+        Check(fire is FireForm && forms.IsElementAvailable(ElementType.ELEMENT_FIRE),
+            "Gameplay starts with Fire equipped and available.");
+        Check(!forms.IsElementAvailable(ElementType.ELEMENT_NONE), "The neutral element is not a playable form.");
+
+        var idle = new PlayerIdleState(player);
+        machine.ChangeState(idle);
+        stats.Initialize(statsData);
+        Field(player, "_formChangeCooldownTimer", 0f);
+        float sp = stats.CurrentSp;
+        Check(player.CanChangeForm && stats.HasEnoughSp(player.SwitchSpCost),
+            "The test player has enough SP and no switch cooldown.");
+        int changes = 0, switches = 0;
+        forms.OnFormChanged += _ => changes++;
+        forms.OnFormSwitchSucceeded += (_, __) => switches++;
+
+        var lockedElements = new[]
+        {
+            ElementType.ELEMENT_WATER, ElementType.ELEMENT_WOOD, ElementType.ELEMENT_GOLD, ElementType.ELEMENT_EARTH
+        };
+        for (int i = 0; i < lockedElements.Length; i++)
+        {
+            var element = lockedElements[i];
+            var target = forms.GetForm(element);
+            Check(target != null && !forms.IsElementAvailable(element), $"{element} is authored but locked.");
+            Property(input, $"IsForm{i + 2}Pressed", true);
+            Check(forms.GetRequestedForm() == null, $"Numeric input does not request {element}.");
+            input.ConsumeFormInput();
+            Check(!forms.CanSwitchForm(target) && !forms.TrySwitchForm(target), $"Direct switch cannot equip {element}.");
+        }
+
+        Property(input, nameof(PlayerInputHandler.IsFastFormPressed), true);
+        var getTransition = typeof(FormManager).GetMethod("GetTransition", Hidden);
+        Check(getTransition.Invoke(forms, null) == null, "Quick switch has no available destination from Fire.");
+        input.ConsumeFormInput();
+
+        var water = forms.GetForm(ElementType.ELEMENT_WATER);
+        Check(water.CanSwitchAttack && water.CanBeginFinisher, "Locked Water has valid chain and finisher attacks.");
+        forms.NotifySuccessfulDodge();
+        Check(forms.GetChainReadyRemaining(water.Element) == 0f && forms.ReadyChainSkill == null,
+            "A successful dodge never exposes a locked chain target.");
+        var chain = new PlayerSwitchAttackState(player);
+        machine.ChangeState(chain);
+        Check(chain.IsComplete && forms.CurrentForm == fire, "Even entering the F switch state cannot equip locked Water.");
+
+        machine.ChangeState(new PlayerAttackState(player));
+        Check(!forms.TrySwitchForFinisher(water) && forms.CurrentForm == fire,
+            "A finisher cannot equip a locked, otherwise valid destination.");
+        machine.ChangeState(idle);
+        Check(changes == 0 && switches == 0 && player.CanChangeForm,
+            "Denied switches emit no events and never start the switch cooldown.");
+        Near(stats.CurrentSp, sp, "Denied switches spend no SP.");
+
+        forms.ChangeForm(water);
+        Check(forms.CurrentForm == water && !forms.IsElementAvailable(water.Element),
+            "An explicit editor assignment can inspect a locked form without unlocking it.");
+        forms.ChangeForm(fire);
     }
 
     private static WeaponActionData Step() => new WeaponActionData { Duration = 1, AnimationName = "", HitDuration = .1f };

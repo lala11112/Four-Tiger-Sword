@@ -17,7 +17,7 @@ public partial class FormManager
         && !_playerController.IsStageTransitioning && !_playerController.IsGameplayModalPaused
         && _playerController.StatManager != null && _playerController.StatManager.CurrentHp > 0f;
 
-    /// <summary>Newest authored, ready destination; current form and empty attack slots are excluded.</summary>
+    /// <summary>Newest available, ready destination with an authored attack, excluding the current form.</summary>
     public BaseForm ReadyChainSkill
     {
         get
@@ -29,7 +29,8 @@ public partial class FormManager
             {
                 BaseForm form = pair.Key;
                 if (pair.Value.Remaining <= 0f || form == CurrentForm
-                    || !_registeredForms.Contains(form) || form.ChainSettings?.Enabled != true
+                    || !_registeredForms.Contains(form) || !IsElementAvailable(form.Element)
+                    || form.ChainSettings?.Enabled != true
                     || !form.CanSwitchAttack) continue;
                 if (selected == null || pair.Value.Sequence > sequence)
                 {
@@ -48,6 +49,7 @@ public partial class FormManager
 
     public float GetChainReadyRemaining(ElementType element)
     {
+        if (!IsElementAvailable(element)) return 0f;
         var form = GetForm(element);
         return form != null && form.ChainSettings?.Enabled == true
             && _chainReadiness.TryGetValue(form, out var ready) ? Mathf.Max(0f, ready.Remaining) : 0f;
@@ -77,7 +79,7 @@ public partial class FormManager
     {
         foreach (var registered in _registeredForms)
         {
-            if (!(registered is BaseForm form)) continue;
+            if (!(registered is BaseForm form) || !IsElementAvailable(form.Element)) continue;
             var settings = form.ChainSettings;
             if (settings?.Enabled != true || settings.Trigger != trigger
                 || !IsFinitePositive(settings.ReadyDuration)

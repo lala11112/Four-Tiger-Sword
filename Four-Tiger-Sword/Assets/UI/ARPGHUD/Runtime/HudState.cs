@@ -37,8 +37,13 @@ namespace ArpgHud
     {
         public MeterState Hp, Auxiliary, UltimateCharge;
         public int ActiveFormIndex;
+        // Bits 0..4 follow HUD order: Fire, Water, Wood, Metal, Earth. Zero preserves unrestricted previews.
+        public int LockedFormsMask;
         public SkillState E, R;
         public ChainSkillState FireChain, WaterChain;
+
+        public bool IsFormLocked(int oneBasedIndex) => oneBasedIndex >= 1 && oneBasedIndex <= 5
+            && (LockedFormsMask & (1 << (oneBasedIndex - 1))) != 0;
     }
 
     /// <summary>The game owns all state and cooldown timing. Publish after accepted changes.</summary>

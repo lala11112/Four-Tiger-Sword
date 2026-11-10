@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(CanvasRenderer))]
 public sealed class DungeonMinimapIconGraphic : UnityEngine.UI.MaskableGraphic
 {
-    public enum Symbol { Player, Shop, Exit, Enemy }
+    public enum Symbol { Player, Shop, Exit, Enemy, RewardChest, Boss }
 
     [SerializeField] private Symbol symbol;
     [SerializeField] private Sprite iconSprite;
@@ -67,6 +67,17 @@ public sealed class DungeonMinimapIconGraphic : UnityEngine.UI.MaskableGraphic
                 Quad(vertices, bounds, .25f, -.4f, .36f, .08f);
                 Quad(vertices, bounds, -.43f, -.4f, .43f, -.27f);
                 Quad(vertices, bounds, -.28f, -.08f, .28f, .06f);
+                break;
+            case Symbol.RewardChest:
+                Quad(vertices, bounds, -.46f, -.02f, .46f, .31f);
+                Quad(vertices, bounds, -.42f, -.35f, .42f, -.11f);
+                Quad(vertices, bounds, -.09f, -.19f, .09f, .12f);
+                break;
+            case Symbol.Boss:
+                Triangle(vertices, bounds, new Vector2(-.45f, .47f), new Vector2(-.30f, -.01f), new Vector2(.04f, .16f));
+                Triangle(vertices, bounds, new Vector2(.45f, .47f), new Vector2(.30f, -.01f), new Vector2(-.04f, .16f));
+                Quad(vertices, bounds, -.31f, -.16f, .31f, .12f);
+                Triangle(vertices, bounds, new Vector2(-.30f, -.16f), new Vector2(0f, -.48f), new Vector2(.30f, -.16f));
                 break;
             case Symbol.Exit:
                 Quad(vertices, bounds, -.43f, -.45f, -.3f, .45f);

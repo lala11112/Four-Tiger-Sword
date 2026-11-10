@@ -17,6 +17,8 @@ namespace ArpgHud
         [SerializeField] HudEnergyImage ultimateEnergy;
         [SerializeField] GameObject[] selectedOverlays = new GameObject[5];
         [SerializeField] UnityEngine.UI.Image[] formArtwork;
+        [SerializeField] GameObject[] formLockLabels;
+        [SerializeField] GameObject[] formKeyLabels;
         [SerializeField] HudSkillView skillE;
         [SerializeField] HudSkillView skillR;
         [SerializeField] HudElementTheme elementTheme;
@@ -43,6 +45,8 @@ namespace ArpgHud
         { hpFill = hp; auxiliaryFill = aux; selectedOverlays = overlays; skillE = e; skillR = r; }
 
         public void ConfigureFormArtwork(UnityEngine.UI.Image[] images) { formArtwork=images; }
+        public void ConfigureFormLocks(GameObject[] locks, GameObject[] keys)
+        { formLockLabels = locks; formKeyLabels = keys; }
         public void ConfigureElementTheme(HudElementTheme theme) { elementTheme=theme; }
         public void ConfigureUltimateCharge(UnityEngine.UI.Image fill, TMP_Text text)
         { ultimateChargeFill = fill; ultimateChargeText = text; previousChargePercent = -1; }
@@ -119,12 +123,20 @@ namespace ArpgHud
                 for (int i = 0; i < selectedOverlays.Length; i++)
                     if (selectedOverlays[i] != null)
                     {
-                        bool selected = value.ActiveFormIndex == i + 1;
+                        bool selected = value.ActiveFormIndex == i + 1 && !value.IsFormLocked(i + 1);
                         if (selectedOverlays[i].activeSelf != selected) selectedOverlays[i].SetActive(selected);
                     }
             if (formArtwork != null)
                 for (int i=0;i<formArtwork.Length;i++)
-                    if (formArtwork[i] != null) formArtwork[i].color=value.ActiveFormIndex==i+1 ? Color.white : new Color(.66f,.66f,.66f,1);
+                    if (formArtwork[i] != null)
+                        formArtwork[i].color = value.IsFormLocked(i + 1) ? new Color(.28f, .28f, .28f, 1f)
+                            : value.ActiveFormIndex == i + 1 ? Color.white : new Color(.66f, .66f, .66f, 1f);
+            if (formLockLabels != null)
+                for (int i = 0; i < formLockLabels.Length; i++)
+                    SetActive(formLockLabels[i], value.IsFormLocked(i + 1));
+            if (formKeyLabels != null)
+                for (int i = 0; i < formKeyLabels.Length; i++)
+                    SetActive(formKeyLabels[i], !value.IsFormLocked(i + 1));
             Color skillColor=Color.red;
             // Resolve presentation only: switching forms never changes the supplied timing.
             if(elementTheme!=null && elementTheme.TryGet(value.ActiveFormIndex,out var element)) {
@@ -137,7 +149,8 @@ namespace ArpgHud
             if (ultimateEnergy != null) ultimateEnergy.SetCharge(chargeRatio, skillColor);
             if (ultimateChargeFill != null) ultimateChargeFill.color = skillColor;
             if (ultimateChargeText != null) ultimateChargeText.color = skillColor;
-            RenderChainSkills(value.FireChain, value.WaterChain);
+            RenderChainSkills(value.IsFormLocked(1) ? default : value.FireChain,
+                value.IsFormLocked(2) ? default : value.WaterChain);
         }
 
         private void RenderChainSkills(ChainSkillState fire, ChainSkillState water)

@@ -71,6 +71,35 @@ public static class FinisherWheelPrefabRegression
             view.Show(ElementType.ELEMENT_WOOD);
             Check(hidden && view.IsVisible && view.SelectedElement == ElementType.ELEMENT_WOOD,
                 "Hide followed by Show failed to reopen the same instance.");
+
+            var sectors = Field<FinisherWheelView.SectorBinding[]>(view, "sectors");
+            var water = Array.Find(sectors, sector => sector.Element == ElementType.ELEMENT_WATER);
+            Color waterLabelColor = water.ElementLabel.color;
+            Color waterArtworkColor = water.Artwork != null ? water.Artwork.color : default;
+            view.Show(ElementType.ELEMENT_FIRE, element => element == ElementType.ELEMENT_FIRE);
+            Check(view.SelectedElement == ElementType.ELEMENT_FIRE, "A restricted wheel must start with Fire selected.");
+            foreach (var sector in sectors)
+            {
+                int index = FinisherWheelSelection.IndexOf(sector.Element);
+                view.UpdateSelection(Point(index * FinisherWheelSelection.SectorAngle, 180f));
+                if (sector.Element == ElementType.ELEMENT_FIRE)
+                {
+                    Check(view.SelectedElement == sector.Element, "The allowed Fire sector remains selectable.");
+                    continue;
+                }
+                Check(view.SelectedElement == ElementType.ELEMENT_NONE && sector.RoleLabel.text == "잠금"
+                    && (sector.SelectedVisual == null || !sector.SelectedVisual.activeSelf),
+                    "A locked sector must show its lock state without becoming selected: " + sector.Element + ".");
+            }
+            Check(water.ElementLabel.color != waterLabelColor
+                && (water.Artwork == null || water.Artwork.color.grayscale < waterArtworkColor.grayscale),
+                "The locked Water label and bound icon must appear dimmed.");
+            view.Hide();
+            view.Show(ElementType.ELEMENT_WATER);
+            Check(view.SelectedElement == ElementType.ELEMENT_WATER && water.RoleLabel.text != "잠금"
+                && water.ElementLabel.color == waterLabelColor
+                && (water.Artwork == null || water.Artwork.color == waterArtworkColor),
+                "Reopening without restrictions must restore authored colors and selection.");
             Check(AuthoredHierarchyCount(view) == hierarchyCount,
                 "Repeated Show/UpdateSelection/Hide constructed duplicate hierarchy objects.");
 

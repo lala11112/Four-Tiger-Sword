@@ -165,7 +165,8 @@ public static class FinisherSelectionRegression
             sourceData.FinisherStep = new WeaponActionData { AnimationName = "", Duration = 1f, Damage = 3f };
             var source = new FireProbe(sourceData);
             var target = new EarthProbe(targetData);
-            var forms = new FormManager(player);
+            bool fireOnly = false;
+            var forms = new FormManager(player, element => !fireOnly || element == ElementType.ELEMENT_FIRE);
             var machine = new StateMachine();
             var neutral = new NeutralState();
             Property(player, "FormManager", forms);
@@ -331,6 +332,33 @@ public static class FinisherSelectionRegression
                 && ((FormTransition)Invoke(forms, "GetTransition")).TargetForm == source,
                 "Q retains the existing fast transition and remains separate from numeric parry requests.");
 
+            fireOnly = true;
+            Ready(); Open();
+            float lockedReleaseSp = stats.CurrentSp;
+            Field(player, "_finisherCursor", new Vector2(Mathf.Sin(theta), Mathf.Cos(theta)) * 180f);
+            Invoke(player, "LateUpdate");
+            Check(Wheel().SelectedElement == ElementType.ELEMENT_NONE,
+                "Hovering a locked, authored destination clears the finisher selection.");
+            Release();
+            Check(!Wheel().IsVisible && !(bool)GetField(player, "_finisherOwnsCursor")
+                && forms.CurrentForm == source && source.CurrentComboStage == 1 && changes == 0 && successes == 0,
+                "Releasing over a locked sector closes the modal without committing a hit or a switch.");
+            Near(stats.CurrentSp, lockedReleaseSp, "Releasing over a locked sector consumes no SP.");
+            Near((float)GetField(player, "_formChangeCooldownTimer"), .75f,
+                "Releasing over a locked sector preserves the existing switch cooldown.");
+
+            foreach (Vector2 cursor in new[] { Vector2.zero, Vector2.up * 180f })
+            {
+                Ready(); Open();
+                Field(player, "_finisherCursor", cursor);
+                Release();
+                Check(forms.CurrentForm == source && source.CurrentComboStage == 2
+                    && ReferenceEquals(source.CurrentNormalAttackStep, sourceData.ComboSteps[2])
+                    && changes == 0 && successes == 0,
+                    "Both center and outer Fire select its normal third hit when all other forms are locked.");
+            }
+            fireOnly = false;
+
             state = Ready(); Open();
             elapsed = source.Elapsed;
             player.CancelFinisherSelection();
@@ -379,7 +407,7 @@ public static class FinisherSelectionRegression
             Invoke(player, "OnDisable");
             Check(!player.IsFinisherSelecting, "Player shutdown releases the session.");
             Near(Time.timeScale, savedScale, "All shutdown paths restore world speed.");
-            return $"PASS: finisher selection integration ({checks} checks: authored Player/FinisherSelect input, RMB opening immediately after the last hit before normal combo transition, input priority and preheld release, live attack timer, normal/transformed third hit, cooldown/SP independence, one-shot rewards, suppression, numeric/Q coexistence, timeout and cancellation precedence).";
+            return $"PASS: finisher selection integration ({checks} checks: authored Player/FinisherSelect input, RMB opening immediately after the last hit before normal combo transition, input priority and preheld release, live attack timer, normal/transformed third hit, locked release and Fire-only selection, cooldown/SP independence, one-shot rewards, suppression, numeric/Q coexistence, timeout and cancellation precedence).";
         }
         finally
         {

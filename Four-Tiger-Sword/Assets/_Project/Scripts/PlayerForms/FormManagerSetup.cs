@@ -6,7 +6,7 @@ public class FormManagerSetup
 
     public FormManager Build(FireFormActionDataSO FireFormActionData, WaterFormActionDataSO WaterFormActionData, WoodFormActionDataSO WoodFormActionData, IronFormActionDataSO IronFormActionData, EarthFormActionDataSO EarthFormActionData)
     {
-        var formManager = new FormManager(_playerController);
+        var formManager = new FormManager(_playerController, element => element == ElementType.ELEMENT_FIRE);
         var fireForm  = new FireForm(FireFormActionData);
         var waterForm = new WaterForm(WaterFormActionData);
         var woodForm  = new WoodForm(WoodFormActionData);
@@ -29,7 +29,7 @@ public class FormManagerSetup
         formManager.AddFastTransition(ironForm, earthForm, () => _playerController.Input.IsFastFormPressed);
         formManager.AddFastTransition(earthForm, fireForm, () => _playerController.Input.IsFastFormPressed);
 
-        formManager.ChangeForm(waterForm);
+        formManager.ChangeForm(fireForm);
         return formManager;
     }
 }

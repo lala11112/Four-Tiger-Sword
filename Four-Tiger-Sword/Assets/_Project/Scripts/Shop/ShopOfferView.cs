@@ -1,4 +1,5 @@
 using System;
+using BoundaryZero.Inventory;
 using TMPro;
 using UnityEngine;
 
@@ -16,6 +17,7 @@ public sealed class ShopOfferView : MonoBehaviour
     [SerializeField] private Sprite[] elementIcons;
     private string _id;
     private Action<string> _purchase;
+    private Color? _normalGradeColor;
 
     public void Configure(UnityEngine.UI.Image image, TMP_Text nameText, TMP_Text body,
         TMP_Text cost, TMP_Text actionText, UnityEngine.UI.Button button)
@@ -62,8 +64,15 @@ public sealed class ShopOfferView : MonoBehaviour
     private void Card(bool selected, ElementType element, int grade, bool material, string synergyName, Sprite synergyIcon)
     {
         if (cardBackground != null) cardBackground.sprite = selected ? selectedBackground : normalBackground;
-        if (gradeLabel != null) gradeLabel.text = (!string.IsNullOrEmpty(synergyName)
-            ? ItemDisplayText.Meta(grade, synergyName) : $"{grade}등급 · {ElementName(element)}") + (material ? " · 재료" : string.Empty);
+        if (transform is RectTransform card) ItemRarityFrame.Show(card, grade);
+        if (gradeLabel != null)
+        {
+            gradeLabel.text = (!string.IsNullOrEmpty(synergyName)
+                ? ItemDisplayText.Meta(grade, synergyName) : $"{grade}등급 · {ElementName(element)}") + (material ? " · 재료" : string.Empty);
+            _normalGradeColor ??= gradeLabel.color;
+            var rarity = ItemRarityFrame.ColorFor(grade);
+            gradeLabel.color = rarity.a > 0f ? rarity : _normalGradeColor.Value;
+        }
         int index = element switch { ElementType.ELEMENT_FIRE => 0, ElementType.ELEMENT_WATER => 1,
             ElementType.ELEMENT_WOOD => 2, ElementType.ELEMENT_GOLD => 3, ElementType.ELEMENT_EARTH => 4, _ => -1 };
         if (elementBadge != null)

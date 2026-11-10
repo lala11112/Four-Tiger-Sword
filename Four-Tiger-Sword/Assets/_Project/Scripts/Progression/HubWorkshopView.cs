@@ -165,6 +165,10 @@ public sealed partial class HubWorkshopView : MonoBehaviour
         Canvas.ForceUpdateCanvases();
         _motion = UIModalMotion.Ensure(references.panel, visual);
         UIButtonMotion.Install(references.panel);
+        // Keep 12 units inside the border above the selected diamond and below two-line labels.
+        if (engravingView != null && engravingView.NodeContent != null)
+            foreach (var motion in engravingView.NodeContent.GetComponentsInChildren<UIButtonMotion>(true))
+                motion.SetFocusOffsets(new Vector2(2, -31), new Vector2(-2, 10));
     }
 
     private void SetInteraction(bool enabled)

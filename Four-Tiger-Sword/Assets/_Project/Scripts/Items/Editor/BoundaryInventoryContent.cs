@@ -9,16 +9,27 @@ using UnityEngine;
 internal static class BoundaryInventoryContent
 {
     internal const string ProjectId = "boundaryzero-inventory-2026-11-08";
-    internal const int Revision = 20261108;
-    internal static readonly Dictionary<string, int> Grades = CreateGrades();
+    internal const string LegacySourceRevision = "2026-11-08";
+    internal const string ExpandedSourceRevision = "2026-11-10";
+    internal const int LegacyRevision = 20261108;
+    internal const int ExpandedRevision = 20261110;
+    internal static readonly Dictionary<string, int> LegacyGrades = CreateGrades(false);
+    internal static readonly Dictionary<string, int> Grades = CreateGrades(true);
 
-    private static Dictionary<string, int> CreateGrades()
+    private static Dictionary<string, int> CreateGrades(bool expanded)
     {
         var result = new Dictionary<string, int>(StringComparer.Ordinal);
         Add(1, "I13 I41 I47 I51 I66 I68 I71 I75 I77 I89 I91 I93 I94");
         Add(2, "I01 I04 I06 I07 I08 I15 I17 I18 I19 I20 I21 I22 I31 I32 I42 I44 I46 I48 I57 I60 I63 I67 I69 I73 I78 I90");
         Add(3, "I02 I05 I16 I30 I33 I43 I50 I61 I62 I64 I65 I72 I92 I100");
         Add(4, "I09 I14 I34 I56 I81 I95");
+        if (expanded)
+        {
+            Add(1, "I101 I103 I105 I113 I119 I121");
+            Add(2, "I107 I109 I111 I115 I117");
+            Add(3, "I102 I104 I106 I108 I110 I114 I120 I122");
+            Add(4, "I112 I116 I118");
+        }
         return result;
         void Add(int grade, string ids)
         {
@@ -91,6 +102,30 @@ internal static class BoundaryInventoryContent
             case "I93": return One(id, BoundaryItemStat.GoldFlat, 1, BoundaryAttackFamily.Skill, trigger: BoundaryItemTrigger.Kill, minimumGold: 1);
             case "I94": return One(id, BoundaryItemStat.GoldFlat, 1, BoundaryAttackFamily.Normal, trigger: BoundaryItemTrigger.Kill, minimumGold: 1);
             case "I95": return One(id, BoundaryItemStat.DamageRatio, .07f, BoundaryAttackFamily.Normal);
+            case "I101": return One(id, BoundaryItemStat.CriticalChancePoints, 4, family: BoundaryAttackFamily.Skill);
+            case "I102": return One(id, BoundaryItemStat.CriticalDamagePoints, 12);
+            case "I103": return One(id, BoundaryItemStat.AttackRatio, .03f);
+            case "I104": return One(id, BoundaryItemStat.NormalAttackRateRatio, .04f);
+            case "I105": return One(id, BoundaryItemStat.DefenseRatio, .05f);
+            case "I106": return new[] {
+                E(id + ":hp", BoundaryItemStat.MaxHpRatio, .04f),
+                E(id + ":defense", BoundaryItemStat.DefenseRatio, .04f) };
+            case "I107": return One(id, BoundaryItemStat.DamageRatio, .06f, family: BoundaryAttackFamily.NormalOrSkill, element: ElementType.ELEMENT_WATER);
+            case "I108": return One(id, BoundaryItemStat.DamageRatio, .11f, element: ElementType.ELEMENT_WATER, targetMin: .8f);
+            case "I109": return One(id, BoundaryItemStat.DamageRatio, .05f, element: ElementType.ELEMENT_FIRE);
+            case "I110": return One(id, BoundaryItemStat.DamageRatio, .11f, element: ElementType.ELEMENT_FIRE, targetMax: .3f);
+            case "I111": return One(id, BoundaryItemStat.ShieldMaxHpRatio, .04f, trigger: BoundaryItemTrigger.CombatEntered, duration: 4, cooldown: 12);
+            case "I112": return One(id, BoundaryItemStat.ShieldGainRatio, .14f);
+            case "I113": return One(id, BoundaryItemStat.DamageRatio, .1f, family: BoundaryAttackFamily.Normal, targetMax: .25f);
+            case "I114": return One(id, BoundaryItemStat.DamageRatio, .11f, family: BoundaryAttackFamily.NormalOrSkill, targetMax: .2f);
+            case "I115": return One(id, BoundaryItemStat.IgnoreDefenseRatio, .08f, family: BoundaryAttackFamily.Normal);
+            case "I116": return One(id, BoundaryItemStat.IgnoreDefenseRatio, .18f, family: BoundaryAttackFamily.NormalOrSkill, targetMax: .4f);
+            case "I117": return One(id, BoundaryItemStat.DamageRatio, .06f, family: BoundaryAttackFamily.NormalOrSkill, elite: true);
+            case "I118": return One(id, BoundaryItemStat.IncomingDamageReductionRatio, .08f, elite: true);
+            case "I119": return One(id, BoundaryItemStat.DamageRatio, .03f, family: BoundaryAttackFamily.Skill);
+            case "I120": return One(id, BoundaryItemStat.DamageRatio, .09f, family: BoundaryAttackFamily.Skill, targetMin: .7f);
+            case "I121": return One(id, BoundaryItemStat.GoldFraction, .08f, trigger: BoundaryItemTrigger.Kill, minimumGold: 1);
+            case "I122": return One(id, BoundaryItemStat.GoldFlat, 2, trigger: BoundaryItemTrigger.Kill, minimumGold: 8);
             default: throw new InvalidDataException("검토되지 않은 아이템 ID: " + id);
         }
     }
@@ -120,8 +155,8 @@ internal static class BoundaryInventoryContent
 
     internal static BoundaryItemEffect[] SynergyEffects(string id, int count, JObject values)
     {
-        int index = count == 2 ? 0 : count == 4 ? 1 : count == 6 ? 2 : -1;
-        if (index < 0) throw new InvalidDataException("시너지 단계는 2/4/6입니다.");
+        if (count is not (2 or 4 or 6 or 8)) throw new InvalidDataException("시너지 단계는 2/4/6/8입니다.");
+        int index = count / 2 - 1;
         // Keep source identity across tier changes so a promotion cannot reset a cooldown.
         string key = id;
         switch (id)
@@ -129,24 +164,24 @@ internal static class BoundaryInventoryContent
             case "S01":
                 Keys(values, "critChanceBonusPoints", "critDamageMultiplierBonusPoints");
                 return new[] {
-                    E(key + ":chance", BoundaryItemStat.CriticalChancePoints, V("critChanceBonusPoints", 5, 10, 15)),
-                    E(key + ":damage", BoundaryItemStat.CriticalDamagePoints, V("critDamageMultiplierBonusPoints", 10, 20, 35)) };
+                    E(key + ":chance", BoundaryItemStat.CriticalChancePoints, V("critChanceBonusPoints", 5, 10, 15, 20)),
+                    E(key + ":damage", BoundaryItemStat.CriticalDamagePoints, V("critDamageMultiplierBonusPoints", 10, 20, 35, 50)) };
             case "S02":
                 Keys(values, "attackPowerBonusPct", "normalAttackRateBonusPct");
-                return new[] { E(key + ":attack", BoundaryItemStat.AttackRatio, V("attackPowerBonusPct", 5, 10, 18) / 100),
-                    E(key + ":rate", BoundaryItemStat.NormalAttackRateRatio, V("normalAttackRateBonusPct", 4, 8, 15) / 100) };
+                return new[] { E(key + ":attack", BoundaryItemStat.AttackRatio, V("attackPowerBonusPct", 5, 10, 18, 26) / 100),
+                    E(key + ":rate", BoundaryItemStat.NormalAttackRateRatio, V("normalAttackRateBonusPct", 4, 8, 15, 22) / 100) };
             case "S03":
                 Keys(values, "maxHpBonusPct", "defenseBonusPct");
-                return new[] { E(key + ":hp", BoundaryItemStat.MaxHpRatio, V("maxHpBonusPct", 8, 16, 25) / 100),
-                    E(key + ":defense", BoundaryItemStat.DefenseRatio, V("defenseBonusPct", 10, 20, 30) / 100) };
-            case "S04": Keys(values, "waterDamageBonusPct"); return One(key, BoundaryItemStat.DamageRatio, V("waterDamageBonusPct", 5, 10, 15) / 100, element: ElementType.ELEMENT_WATER);
-            case "S05": Keys(values, "fireDamageBonusPct"); return One(key, BoundaryItemStat.DamageRatio, V("fireDamageBonusPct", 5, 10, 15) / 100, element: ElementType.ELEMENT_FIRE);
-            case "S08": Keys(values, "shieldMaxHpPct"); return One(key, BoundaryItemStat.ShieldMaxHpRatio, V("shieldMaxHpPct", 3, 4, 5) / 100, trigger: BoundaryItemTrigger.DamageTaken, duration: 4, cooldown: 10);
-            case "S10": Keys(values, "damagePct"); return One(key, BoundaryItemStat.DamageRatio, V("damagePct", 4, 6, 8) / 100, BoundaryAttackFamily.NormalOrSkill, targetMax: .30f);
-            case "S14": Keys(values, "ignoreDefensePct"); return One(key, BoundaryItemStat.IgnoreDefenseRatio, V("ignoreDefensePct", 6, 9, 12) / 100, BoundaryAttackFamily.NormalOrSkill);
-            case "S15": Keys(values, "damagePct"); return One(key, BoundaryItemStat.DamageRatio, V("damagePct", 4, 6, 8) / 100, BoundaryAttackFamily.NormalOrSkill, elite: true);
-            case "S16": Keys(values, "percent"); return One(key, BoundaryItemStat.DamageRatio, V("percent", 4, 8, 12) / 100, BoundaryAttackFamily.Skill);
-            case "S19": Keys(values, "percent"); return One(key, BoundaryItemStat.GoldFraction, V("percent", 6, 12, 18) / 100, trigger: BoundaryItemTrigger.Kill, minimumGold: 1);
+                return new[] { E(key + ":hp", BoundaryItemStat.MaxHpRatio, V("maxHpBonusPct", 8, 16, 25, 34) / 100),
+                    E(key + ":defense", BoundaryItemStat.DefenseRatio, V("defenseBonusPct", 10, 20, 30, 40) / 100) };
+            case "S04": Keys(values, "waterDamageBonusPct"); return One(key, BoundaryItemStat.DamageRatio, V("waterDamageBonusPct", 5, 10, 15, 20) / 100, element: ElementType.ELEMENT_WATER);
+            case "S05": Keys(values, "fireDamageBonusPct"); return One(key, BoundaryItemStat.DamageRatio, V("fireDamageBonusPct", 5, 10, 15, 20) / 100, element: ElementType.ELEMENT_FIRE);
+            case "S08": Keys(values, "shieldMaxHpPct"); return One(key, BoundaryItemStat.ShieldMaxHpRatio, V("shieldMaxHpPct", 3, 4, 5, 6) / 100, trigger: BoundaryItemTrigger.DamageTaken, duration: 4, cooldown: 10);
+            case "S10": Keys(values, "damagePct"); return One(key, BoundaryItemStat.DamageRatio, V("damagePct", 4, 6, 8, 10) / 100, BoundaryAttackFamily.NormalOrSkill, targetMax: .30f);
+            case "S14": Keys(values, "ignoreDefensePct"); return One(key, BoundaryItemStat.IgnoreDefenseRatio, V("ignoreDefensePct", 6, 9, 12, 15) / 100, BoundaryAttackFamily.NormalOrSkill);
+            case "S15": Keys(values, "damagePct"); return One(key, BoundaryItemStat.DamageRatio, V("damagePct", 4, 6, 8, 10) / 100, BoundaryAttackFamily.NormalOrSkill, elite: true);
+            case "S16": Keys(values, "percent"); return One(key, BoundaryItemStat.DamageRatio, V("percent", 4, 8, 12, 16) / 100, BoundaryAttackFamily.Skill);
+            case "S19": Keys(values, "percent"); return One(key, BoundaryItemStat.GoldFraction, V("percent", 6, 12, 18, 24) / 100, trigger: BoundaryItemTrigger.Kill, minimumGold: 1);
             default: throw new InvalidDataException("검토되지 않은 시너지 ID: " + id);
         }
 

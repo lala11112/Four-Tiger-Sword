@@ -17,6 +17,10 @@ namespace ArpgHud.PC
         public string ItemName { get; private set; }
         private GameObject _coin;
         private UnityEngine.UI.Image _itemIcon;
+        private RectTransform _background;
+        private float _backgroundWidth = 288f;
+        private bool _backgroundLayoutDirty;
+        private bool _compactLayout;
         private Color _goldColor;
         private bool _iconsReady;
         private int _synergyTier;
@@ -25,6 +29,74 @@ namespace ArpgHud.PC
         public RectTransform Rect => cachedRect != null ? cachedRect : (cachedRect = transform as RectTransform);
         internal double StartedAt;
         internal double LastMergedAt;
+
+        private void OnEnable()
+        {
+            if (label != null) label.OnPreRenderText += AlignIconToText;
+        }
+
+        private void OnDisable()
+        {
+            if (label != null) label.OnPreRenderText -= AlignIconToText;
+        }
+
+        private void LateUpdate() => FitBackground();
+
+        public void ConfigureCompactLayout()
+        {
+            _compactLayout = true;
+            if (label != null) label.horizontalAlignment = HorizontalAlignmentOptions.Left;
+        }
+
+        private void AlignIconToText(TMP_TextInfo textInfo)
+        {
+            if (label == null || !_compactLayout) return;
+            var icon = IsGold ? _coin?.transform as RectTransform : _itemIcon?.rectTransform;
+            float left = float.PositiveInfinity, right = float.NegativeInfinity;
+            for (int i = 0; i < textInfo.characterCount; i++)
+                if (textInfo.characterInfo[i].isVisible)
+                {
+                    left = Mathf.Min(left, textInfo.characterInfo[i].bottomLeft.x);
+                    right = Mathf.Max(right, textInfo.characterInfo[i].topRight.x);
+                }
+            if (float.IsPositiveInfinity(left)) return;
+            var textLeft = Rect.InverseTransformPoint(
+                label.rectTransform.TransformPoint(new Vector3(left, 0f, 0f)));
+            var textRight = Rect.InverseTransformPoint(
+                label.rectTransform.TransformPoint(new Vector3(right, 0f, 0f)));
+            bool hasIcon = icon != null && icon.gameObject.activeSelf;
+            float iconSpace = hasIcon ? icon.rect.width * icon.localScale.x + 8f : 0f;
+            // Keep the icon and text together at the left edge of the compact, right-anchored panel.
+            float width = Mathf.Max(288f, 18f + iconSpace + textRight.x - textLeft.x + 41f);
+            float contentLeft = Rect.rect.xMax - width + 18f;
+            var labelPosition = label.rectTransform.localPosition;
+            labelPosition.x += contentLeft + iconSpace - textLeft.x;
+            label.rectTransform.localPosition = labelPosition;
+            if (hasIcon)
+            {
+                var position = icon.localPosition;
+                position.x = contentLeft - icon.rect.xMin * icon.localScale.x;
+                icon.localPosition = position;
+            }
+            if (Mathf.Abs(width - _backgroundWidth) > .01f)
+            {
+                _backgroundWidth = width;
+                _backgroundLayoutDirty = true;
+            }
+            // TMP can invoke this during a Canvas rebuild; resize the separate graphic outside it.
+            if (!UnityEngine.UI.CanvasUpdateRegistry.IsRebuildingGraphics()) FitBackground();
+        }
+
+        private void FitBackground()
+        {
+            if (!_backgroundLayoutDirty) return;
+            _backgroundLayoutDirty = false;
+            if (_background == null) _background = transform.Find("LightSilverRails") as RectTransform;
+            if (_background == null) return;
+            _background.anchorMin = _background.anchorMax = _background.pivot = new Vector2(1f, 1f);
+            _background.anchoredPosition = Vector2.zero;
+            _background.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, _backgroundWidth);
+        }
 
         public void Configure(TMP_Text value, CanvasGroup canvasGroup)
         {
@@ -48,6 +120,12 @@ namespace ArpgHud.PC
 
         private void SetContent(bool gold, string name, Sprite icon, int synergyTier)
         {
+            if (_compactLayout)
+            {
+                _backgroundWidth = 288f;
+                _backgroundLayoutDirty = true;
+                FitBackground();
+            }
             if (!_iconsReady)
             {
                 _iconsReady = true;

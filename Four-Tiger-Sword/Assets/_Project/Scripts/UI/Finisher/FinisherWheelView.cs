@@ -14,11 +14,15 @@ public sealed class FinisherWheelView : MonoBehaviour
         public string DisplayName;
         public TMP_Text ElementLabel;
         public TMP_Text RoleLabel;
+        [Tooltip("Optional element icon. Dimmed while this sector is locked.")]
+        public UnityEngine.UI.Image Artwork;
         [Tooltip("Optional custom highlight. Shown only while this sector is selected.")]
         public GameObject SelectedVisual;
 
         [NonSerialized] internal FontStyles NormalFontStyle;
+        [NonSerialized] internal Color NormalElementColor;
         [NonSerialized] internal Color NormalRoleColor;
+        [NonSerialized] internal Color NormalArtworkColor;
     }
 
     [Header("Prefab bindings")]
@@ -44,9 +48,14 @@ public sealed class FinisherWheelView : MonoBehaviour
     [Tooltip("Maps the unchanged logical cursor radius into the authored wheel artwork.")]
     [SerializeField, Min(0.01f)] private float cursorPresentationScale = 1f;
 
+    private const string LockedRoleText = "잠금";
+    private static readonly Color LockedTextColor = new Color(.58f, .62f, .68f);
+    private static readonly Color LockedArtworkTint = new Color(.46f, .46f, .46f);
+
     private bool _initialized;
     private Color _normalCenterColor;
     private ElementType _current;
+    private int _lockedSectorMask;
 
     public ElementType SelectedElement { get; private set; }
     public bool IsVisible { get; private set; }
@@ -84,8 +93,13 @@ public sealed class FinisherWheelView : MonoBehaviour
             throw new InvalidOperationException("FinisherWheel bindings: " + error);
         foreach (var sector in sectors)
         {
-            if (sector.ElementLabel != null) sector.NormalFontStyle = sector.ElementLabel.fontStyle;
+            if (sector.ElementLabel != null)
+            {
+                sector.NormalFontStyle = sector.ElementLabel.fontStyle;
+                sector.NormalElementColor = sector.ElementLabel.color;
+            }
             if (sector.RoleLabel != null) sector.NormalRoleColor = sector.RoleLabel.color;
+            if (sector.Artwork != null) sector.NormalArtworkColor = sector.Artwork.color;
         }
         if (centerName != null) _normalCenterColor = centerName.color;
         _initialized = true;
@@ -114,9 +128,10 @@ public sealed class FinisherWheelView : MonoBehaviour
                     break;
                 }
                 if (!BelongsToContent(sector.ElementLabel) || !BelongsToContent(sector.RoleLabel)
+                    || !BelongsToContent(sector.Artwork)
                     || (sector.SelectedVisual != null && !sector.SelectedVisual.transform.IsChildOf(content)))
                 {
-                    error = "Sector labels and highlights must be inside Content.";
+                    error = "Sector labels, artwork and highlights must be inside Content.";
                     break;
                 }
                 found |= 1 << index;
@@ -131,10 +146,23 @@ public sealed class FinisherWheelView : MonoBehaviour
     private bool BelongsToContent(Component component)
         => component == null || component.transform.IsChildOf(content);
 
-    public void Show(ElementType current)
+    public void Show(ElementType current, Func<ElementType, bool> isElementAvailable = null)
     {
         EnsureInitialized();
         _current = current;
+        _lockedSectorMask = 0;
+        foreach (var sector in sectors)
+        {
+            bool locked = isElementAvailable != null && !isElementAvailable(sector.Element);
+            if (locked) _lockedSectorMask |= 1 << FinisherWheelSelection.IndexOf(sector.Element);
+            if (sector.ElementLabel != null)
+                sector.ElementLabel.color = locked ? LockedTextColor : sector.NormalElementColor;
+            if (sector.Artwork != null)
+                sector.Artwork.color = locked ? sector.NormalArtworkColor * LockedArtworkTint : sector.NormalArtworkColor;
+            if (sector.RoleLabel != null)
+                sector.RoleLabel.text = locked ? LockedRoleText
+                    : sector.Element == _current ? currentRoleText : otherRoleText;
+        }
         IsVisible = true;
         canvas.enabled = true;
         content.gameObject.SetActive(true);
@@ -146,31 +174,32 @@ public sealed class FinisherWheelView : MonoBehaviour
     public void UpdateSelection(Vector2 logicalCursor)
     {
         if (!IsVisible) return;
-        ElementType resolved = FinisherWheelSelection.Resolve(logicalCursor);
-        SelectedElement = resolved == ElementType.ELEMENT_NONE ? _current : resolved;
-        int selected = FinisherWheelSelection.IndexOf(resolved);
-        int current = FinisherWheelSelection.IndexOf(_current);
-        if (wheel != null) wheel.SetSelection(selected, current);
+        ElementType hovered = FinisherWheelSelection.Resolve(logicalCursor);
+        bool center = hovered == ElementType.ELEMENT_NONE;
+        ElementType candidate = center ? _current : hovered;
+        bool locked = IsLocked(candidate);
+        SelectedElement = locked ? ElementType.ELEMENT_NONE : candidate;
+        int selected = locked ? -1 : FinisherWheelSelection.IndexOf(hovered);
+        int current = locked ? -1 : FinisherWheelSelection.IndexOf(_current);
+        if (wheel != null) wheel.SetSelection(selected, current, _lockedSectorMask);
         virtualCursor.anchoredPosition = Vector2.ClampMagnitude(logicalCursor, FinisherWheelSelection.OuterRadius)
             * cursorPresentationScale;
         if (centerName != null && tintCenterByElement)
-            centerName.color = selected < 0 ? ElementColor(_current) : _normalCenterColor;
+            centerName.color = center && !locked ? ElementColor(_current) : _normalCenterColor;
         if (selectionLabel != null)
         {
-            selectionLabel.text = ElementName(SelectedElement) + selectionSuffix;
-            if (tintSelectionByElement) selectionLabel.color = ElementColor(SelectedElement);
+            selectionLabel.text = ElementName(candidate) + (locked ? "  ·  " + LockedRoleText : selectionSuffix);
+            if (tintSelectionByElement) selectionLabel.color = locked ? LockedTextColor : ElementColor(candidate);
         }
         foreach (var sector in sectors)
         {
-            bool isSelected = sector.Element == resolved;
+            bool isSelected = !locked && sector.Element == hovered;
             if (sector.ElementLabel != null)
                 sector.ElementLabel.fontStyle = sector.NormalFontStyle
                     | (isSelected && boldSelectedElement ? FontStyles.Bold : FontStyles.Normal);
             if (sector.RoleLabel != null)
-            {
-                sector.RoleLabel.text = sector.Element == _current ? currentRoleText : otherRoleText;
-                sector.RoleLabel.color = isSelected ? selectedRoleColor : sector.NormalRoleColor;
-            }
+                sector.RoleLabel.color = isSelected ? selectedRoleColor
+                    : IsLocked(sector.Element) ? LockedTextColor : sector.NormalRoleColor;
             if (sector.SelectedVisual != null) sector.SelectedVisual.SetActive(isSelected);
         }
     }
@@ -183,6 +212,12 @@ public sealed class FinisherWheelView : MonoBehaviour
     }
 
     private void OnDisable() => Hide();
+
+    private bool IsLocked(ElementType element)
+    {
+        int index = FinisherWheelSelection.IndexOf(element);
+        return index >= 0 && (_lockedSectorMask & (1 << index)) != 0;
+    }
 
     private SectorBinding Sector(ElementType element)
     {

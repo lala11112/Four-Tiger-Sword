@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-/// <summary>Reward behavior against the installed 59-item catalog, using isolated run inventories.</summary>
+/// <summary>Reward behavior against the installed item catalog, using isolated run inventories.</summary>
 public static class RunItemChoiceRegression
 {
     private static int _checks;
@@ -25,25 +25,32 @@ public static class RunItemChoiceRegression
         PendingReceiptRecovery();
         NextTierWeights();
         GrantReentrancy();
-        return $"PASS: item reward choices ({_checks} checks: installed 59 items, starter pools, 3/4 choices, global rerolls, held candidate, empty reward, retries, synergy and reentry).";
+        return $"PASS: item reward choices ({_checks} checks: installed catalog, starter pools, 3/4 choices, global rerolls, held candidate, empty reward, retries, synergy and reentry).";
     }
 
     private static void StarterPoolsAndSynergy()
     {
         using (var f = new Fixture("heirloom", "starterelement", "reroll"))
         {
-            Check(f.Catalog.items.Length == 59 && f.Catalog.items.Count(i => i.grade == 1) == 13,
-                "Installed source is not the agreed 59-item/13-starter catalog.");
-            Check(f.Service.StarterSynergies().Select(s => s.id).SequenceEqual(new[] { "S01", "S03", "S10", "S15", "S16", "S19" }),
-                "Starter categories must contain exactly the six synergies with eligible grade-one items.");
+            bool expanded = f.Catalog.Find("I103") != null;
+            Check(f.Catalog.items.Length == (expanded ? 81 : 59)
+                && f.Catalog.items.Count(i => i.grade == 1) == (expanded ? 19 : 13),
+                "Installed source has an unexpected item or starter count.");
+            var categories = expanded
+                ? new[] { "S01", "S02", "S03", "S10", "S15", "S16", "S19" }
+                : new[] { "S01", "S03", "S10", "S15", "S16", "S19" };
+            Check(f.Service.StarterSynergies().Select(s => s.id).SequenceEqual(categories),
+                "Starter categories must match the synergies with eligible grade-one items.");
             Check(f.Service.BeginStarterChoice() && f.Service.Current.NeedsSynergy, "Starter did not request a category.");
             string receipt = f.Service.Current.Id;
             Check(!f.Service.TryReroll(receipt) && f.Service.RerollsRemaining == 3, "Starter consumed a normal-reward reroll.");
             Check(!f.Service.TryChooseStarterSynergy(receipt, "S04") && f.Service.Current.NeedsSynergy,
                 "An empty grade-one category was accepted.");
-            Check(f.Service.TryChooseStarterSynergy(receipt, "S01") && f.Items.Contains("I13")
+            string singleCategory = expanded ? "S02" : "S01";
+            string singleItem = expanded ? "I103" : "I13";
+            Check(f.Service.TryChooseStarterSynergy(receipt, singleCategory) && f.Items.Contains(singleItem)
                 && f.Service.Current == null && f.Items.OwnedItems.Count == 1, "Single-candidate starter did not resolve once.");
-            Check(!f.Service.BeginStarterChoice() && !f.Service.TryClaim(receipt, "I13"), "Starter receipt paid twice.");
+            Check(!f.Service.BeginStarterChoice() && !f.Service.TryClaim(receipt, singleItem), "Starter receipt paid twice.");
         }
         using (var f = new Fixture("heirloom", "starterelement"))
         {
@@ -196,11 +203,11 @@ public static class RunItemChoiceRegression
         var set = f.Catalog.synergies.First(s => s.id == "S01");
         var members = set.members.Select(f.Catalog.Find).ToArray();
         Check(f.Service.RewardWeight(members[0]) == 1f, "An unstarted synergy was weighted as a completion.");
-        for (int count = 1; count <= 5; count++)
+        for (int count = 1; count < members.Length; count++)
         {
             Check(f.Items.TryAddItem(members[count - 1].itemId), "Synergy fixture grant failed.");
             float expected = count % 2 == 1 ? 3f : 1f;
-            Check(f.Service.RewardWeight(members[count]) == expected, "Completion weight does not follow the next 2/4/6 threshold.");
+            Check(f.Service.RewardWeight(members[count]) == expected, "Completion weight does not follow the next set threshold.");
         }
         Check(f.Service.RewardWeight(f.Catalog.Find("I89")) == 1f, "Completion weighting affected an unrelated item.");
     }
@@ -258,7 +265,7 @@ public static class RunItemChoiceRegression
         public Fixture(params string[] nodes)
         {
             Catalog = AssetDatabase.LoadAssetAtPath<ItemCatalog>("Assets/_Project/Generated/BoundaryInventory/ItemCatalog.asset");
-            if (Catalog == null) throw new InvalidOperationException("Install the BoundaryInventory 59-item catalog before running reward checks.");
+            if (Catalog == null) throw new InvalidOperationException("Install the BoundaryInventory catalog before running reward checks.");
             _root = new GameObject("Run item choice fixture"); _root.SetActive(false);
             _statsData = ScriptableObject.CreateInstance<PlayerStatData>(); _statsData.baseHP = 1000;
             var stats = _root.AddComponent<PlayerStatManager>(); stats.Initialize(_statsData);

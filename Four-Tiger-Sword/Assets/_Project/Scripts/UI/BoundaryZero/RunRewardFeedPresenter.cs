@@ -52,6 +52,10 @@ public sealed class RunRewardFeedPresenter : MonoBehaviour
         design.transform.SetParent(root.transform, false);
         design.AddComponent<BoundaryDesignViewport>().Configure();
         _feed = Instantiate(prefab, design.transform, false).GetComponent<PentaGoldRewardFeed>();
+        // Scale the complete authored feed so text, icons, row spacing and entrance motion stay consistent.
+        _feed.transform.localScale = Vector3.one * 1.4f;
+        foreach (var row in _feed.GetComponentsInChildren<PentaGoldRewardRow>(true))
+            row.ConfigureCompactLayout();
         foreach (var graphic in root.GetComponentsInChildren<UnityEngine.UI.Graphic>(true)) graphic.raycastTarget = false;
         RefreshVisibility();
     }

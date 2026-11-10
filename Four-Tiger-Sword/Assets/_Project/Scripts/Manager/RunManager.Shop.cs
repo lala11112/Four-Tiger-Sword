@@ -22,9 +22,10 @@ public sealed partial class RunManager
     public bool TryOpenShop(UnityEngine.Object owner)
     {
         if (IsShopOpen) return owner != null && owner == _shopOwner && ShopContextIsCurrent();
-        if (!isActiveAndEnabled || !OwnerIsAvailable(owner) || State != RunState.Playing || _transition != null || IsMapOpen || IsInventoryOpen || IsRewardOpen || HasPendingItemChoice
+        if (!isActiveAndEnabled || !OwnerIsAvailable(owner) || State != RunState.Playing || _transition != null
+            || IsMapOpen || IsInventoryOpen || IsRewardOpen || HasPendingItemChoice || IsPauseMenuOpen
             || player == null || !player.isActiveAndEnabled || player.IsStageTransitioning
-            || player.IsMapPaused || player.IsInventoryPaused
+            || player.IsMapPaused || player.IsInventoryPaused || player.IsPauseMenuPaused
             || player.StatManager == null || player.StatManager.CurrentHp <= 0f
             || stageManager == null || !stageManager.IsReady || stageManager.Result == null
             || stageManager.Result.root == null) return false;
@@ -150,12 +151,14 @@ public sealed partial class RunManager
         if (mapWasOpen) ClearMapSession(_mapPlayer != null && !_mapPlayer.IsStageTransitioning, false);
         if (inventoryWasOpen) ClearInventorySession(_inventoryPlayer != null && !_inventoryPlayer.IsStageTransitioning, false);
         if (wasOpen) ClearShopSession(_shopPlayer != null && !_shopPlayer.IsStageTransitioning);
+        var menuPause = _pauseMenu != null ? _pauseMenu.PrepareForTransition() : null;
         try
         {
             if (player != null) player.BeginStageTransition();
         }
         finally
         {
+            menuPause?.Dispose();
             ReleaseMapWorldPause();
             ReleaseInventoryWorldPause();
             ReleaseShopWorldPause();
@@ -168,7 +171,8 @@ public sealed partial class RunManager
     private void RefreshRunCursor()
     {
         if (player != null && player.IsFinisherSelecting) return;
-        bool playing = isActiveAndEnabled && State == RunState.Playing && !IsShopOpen && !IsMapOpen && !IsInventoryOpen && !IsRewardOpen;
+        bool playing = isActiveAndEnabled && State == RunState.Playing
+            && !IsShopOpen && !IsMapOpen && !IsInventoryOpen && !IsRewardOpen && !IsPauseMenuOpen;
         Cursor.visible = !playing;
         Cursor.lockState = playing ? CursorLockMode.Locked : CursorLockMode.None;
     }
@@ -200,6 +204,7 @@ public sealed partial class RunManager
     }
     private void OnDisable()
     {
+        if (_pauseMenu != null) _pauseMenu.CloseForHostShutdown();
         CloseItemChoiceModal();
         CancelStagePresentation();
         ReleaseUpgradeSavePause();

@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I103
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I103
+  itemId: I103
+  displayName: "\uC0BC\uB048 \uB9E4\uB4ED"
+  description: "\uC0BC\uB048\uC744 \uC9E7\uC740 \uB9C9\uB300 \uB458\uB808\uC5D0 \uB2E8\uB2E8\uD788
+    \uBB36\uC5C8\uB2E4."
+  effectText: "\uACF5\uACA9\uB825\uC774 3% \uC99D\uAC00\uD55C\uB2E4."
+  synergyIds:
+  - S02
+  synergyNames:
+  - "\uB9F9\uACF5"
+  primarySynergyId: S02
+  primarySynergyName: "\uB9F9\uACF5"
+  primarySynergyIcon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+  element: 0
+  grade: 1
+  purchasePrice: 20
+  effects: []
+  boundaryEffects:
+  - effectId: I103
+    stat: 1
+    amount: 0.03
+    trigger: 0
+    family: 0
+    element: 0
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: -1
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 0
+    maximumBaseGold: 0
+    durationSeconds: 0
+    cooldownSeconds: 0
+  icon: {fileID: 21300000, guid: 6d8931777af9bd84aa9af03994a639c6, type: 3}
+  contentStatus: draft
+  contentRevision: 20261110
+  sourceJson: "{\"id\":\"I103\",\"name\":\"\uC0BC\uB048 \uB9E4\uB4ED\",\"description\":\"\uC0BC\uB048\uC744
+    \uC9E7\uC740 \uB9C9\uB300 \uB458\uB808\uC5D0 \uB2E8\uB2E8\uD788 \uBB36\uC5C8\uB2E4.\",\"effect\":\"\uACF5\uACA9\uB825\uC774
+    3% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S02\"],\"primarySynergy\":\"S02\",\"image\":\"Art/Items/I103.png\",\"origin\":\"expansion\"}"

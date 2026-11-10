@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e77e0658a8ac74f8a6ca54ca1aa6a3, type: 3}
+  m_Name: I104
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  projectId: boundaryzero-inventory-2026-11-08
+  candidateKey: I104
+  itemId: I104
+  displayName: "\uB3CC\uACA9 \uB0A0\uBD99\uC774"
+  description: "\uAD7D\uC740 \uB450 \uB0A0\uC774 \uD55C \uC190\uC7A1\uC774\uC5D0
+    \uB9DE\uBB3C\uB824 \uC788\uB2E4."
+  effectText: "\uAE30\uBCF8 \uACF5\uACA9 \uC18D\uB3C4\uAC00 4% \uC99D\uAC00\uD55C\uB2E4."
+  synergyIds:
+  - S02
+  synergyNames:
+  - "\uB9F9\uACF5"
+  primarySynergyId: S02
+  primarySynergyName: "\uB9F9\uACF5"
+  primarySynergyIcon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+  element: 0
+  grade: 3
+  purchasePrice: 80
+  effects: []
+  boundaryEffects:
+  - effectId: I104
+    stat: 5
+    amount: 0.04
+    trigger: 0
+    family: 0
+    element: 0
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: -1
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 0
+    maximumBaseGold: 0
+    durationSeconds: 0
+    cooldownSeconds: 0
+  icon: {fileID: 21300000, guid: 6b1cc66aff67d1f4d90a678a2253ff24, type: 3}
+  contentStatus: draft
+  contentRevision: 20261110
+  sourceJson: "{\"id\":\"I104\",\"name\":\"\uB3CC\uACA9 \uB0A0\uBD99\uC774\",\"description\":\"\uAD7D\uC740
+    \uB450 \uB0A0\uC774 \uD55C \uC190\uC7A1\uC774\uC5D0 \uB9DE\uBB3C\uB824 \uC788\uB2E4.\",\"effect\":\"\uAE30\uBCF8
+    \uACF5\uACA9 \uC18D\uB3C4\uAC00 4% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S02\"],\"primarySynergy\":\"S02\",\"image\":\"Art/Items/I104.png\",\"origin\":\"expansion\"}"

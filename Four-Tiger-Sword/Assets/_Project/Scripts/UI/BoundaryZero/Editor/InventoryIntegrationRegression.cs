@@ -4,6 +4,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using InventoryView = BoundaryZero.Inventory.InventoryView;
+using ItemRarityFrame = BoundaryZero.Inventory.ItemRarityFrame;
 using Object = UnityEngine.Object;
 
 /// <summary>Exercises the shipped inventory view and the current run's presentation binding.</summary>
@@ -26,7 +27,7 @@ public static class InventoryIntegrationRegression
             var view = root.GetComponent<InventoryView>();
             Check(view != null && view.Catalog != null, "The prefab is not bound to its presentation catalog.");
             var data = view.Catalog.ReadData();
-            Check(data.items.Length == 59 && data.synergies.Length == 11, "The shipped content count changed.");
+            Check(data.items.Length == 81 && data.synergies.Length == 11, "The shipped content count changed.");
             var ids = new List<string>();
             var distinct = new HashSet<string>(StringComparer.Ordinal);
             foreach (var item in data.items)
@@ -36,18 +37,23 @@ public static class InventoryIntegrationRegression
             view.SetOwnedItems(new[] { "I16", "I16", "missing", null });
             Check(view.OwnedItemCount == 1, "Duplicates or unknown IDs became owned slots.");
             view.SetOwnedItems(ids);
-            Check(view.OwnedItemCount == 59, "The view dropped a real catalog ID.");
+            Check(view.OwnedItemCount == 81, "The view dropped a real catalog ID.");
             var states = view.GetSynergyStates();
             Check(states.Count == 11, "The view omitted an inactive/active synergy state.");
             foreach (var state in states)
-                Check(state.IsActive && state.ActiveTier == 6 && state.DisplayCount == 6,
+                Check(state.IsActive && state.ActiveTier == 8 && state.DisplayCount == 8 && state.RequiredCount == 8,
                     "The full catalog did not produce the highest exclusive synergy tier: " + state.Id);
+            var renderedIds = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var target in root.GetComponentsInChildren<BoundaryZero.Inventory.InventoryHoverTarget>(true))
+                if (target.name.StartsWith("Item_", StringComparison.Ordinal) && target.gameObject.activeSelf)
+                    renderedIds.Add(target.name.Substring("Item_".Length));
+            Check(renderedIds.SetEquals(ids), "The shipped owned grid did not render every catalog ID.");
             int opens = 0, closes = 0;
             view.VisibilityChanged += open => { if (open) opens++; else closes++; };
             view.Open(); view.Open();
             Check(view.IsOpen && opens == 1, "Repeated open published duplicate events.");
             view.Close(); view.Close();
-            Check(!view.IsOpen && closes == 1 && view.OwnedItemCount == 59, "Close erased ownership or published duplicate events.");
+            Check(!view.IsOpen && closes == 1 && view.OwnedItemCount == 81, "Close erased ownership or published duplicate events.");
             view.SetOwnedItems(null);
             foreach (var state in view.GetSynergyStates())
                 Check(state.ActiveTier == 0 && state.Count == 0, "Removing items retained a synergy.");
@@ -55,6 +61,7 @@ public static class InventoryIntegrationRegression
                 Check(scroll.content != null && scroll.viewport != null && scroll.vertical,
                     "A shipped scroll view lost its content/viewport binding.");
             SharedRuntimeDisplay(root, view, Check);
+            CatalogPreview(view, Check);
             return $"PASS: inventory presentation ({checks} checks).";
         }
         finally { Object.DestroyImmediate(root); }
@@ -69,8 +76,8 @@ public static class InventoryIntegrationRegression
         var original = view.Catalog.ReadData();
         bool cursorVisible = Cursor.visible;
         var cursorLock = Cursor.lockState;
-        string fallbackDescription = null;
-        foreach (var item in original.items) if (item.id == "I01") fallbackDescription = item.description;
+        BoundaryZero.Inventory.ItemDefinition fallback = null;
+        foreach (var item in original.items) if (item.id == "I01") fallback = item;
         PlayerInventoryPresenter presenter = null;
         try
         {
@@ -104,6 +111,7 @@ public static class InventoryIntegrationRegression
             // Swapping an empty inventory's catalog does not publish an ownership event; Bind must still detect it.
             var replacement = Object.Instantiate(catalog); created.Add(replacement);
             var changedItem = Object.Instantiate(item); created.Add(changedItem);
+            changedItem.grade = item.grade == 4 ? 1 : 4;
             changedItem.description = "Replacement runtime description";
             changedItem.effectText = "Replacement runtime effect";
             for (int i = 0; i < replacement.items.Length; i++)
@@ -125,9 +133,17 @@ public static class InventoryIntegrationRegression
             typeof(InventoryView).GetMethod("ShowTooltip", hidden).Invoke(view, new object[] { target, "I01", false });
             var tooltip = (TMPro.TMP_Text)typeof(InventoryView).GetField("tooltipText", hidden).GetValue(view);
             string shopText = ItemDisplayText.Description(changedItem, replacement);
-            foreach (var expected in new[] { changedItem.description, changedItem.effectText, "Runtime synergy name", "Runtime two-set effect" })
+            foreach (var expected in new[] { changedItem.effectText, "Runtime synergy name", "Runtime two-set effect" })
                 check(tooltip.text.Contains(expected) && shopText.Contains(expected),
                     "Inventory and shop did not share runtime display copy: " + expected);
+            check(!tooltip.text.Contains(item.effectText) && !shopText.Contains(item.effectText),
+                "A catalog replacement retained the previous effect.");
+            check(!tooltip.text.Contains(changedItem.description) && !shopText.Contains(changedItem.description),
+                "Item flavor text appeared in an effect-only tooltip.");
+            var frame = target.GetComponentInChildren<ItemRarityFrame>();
+            check(tooltip.text.Contains(changedItem.grade + "등급") && frame != null && frame.enabled
+                && !frame.raycastTarget && frame.color == ItemRarityFrame.ColorFor(changedItem.grade),
+                "The replacement runtime grade did not update the tooltip and passive border.");
             bool matchedTier = false;
             foreach (var state in view.GetSynergyStates())
                 if (state.Id == "S03") matchedTier = state.Count == 2 && state.ActiveTier == 2 && state.ActiveEffect == "Runtime two-set effect";
@@ -139,9 +155,12 @@ public static class InventoryIntegrationRegression
             var restored = (BoundaryZero.Inventory.InventoryData)dataField.GetValue(view);
             bool fallbackRestored = false;
             foreach (var definition in restored.items)
-                if (definition.id == "I01") fallbackRestored = definition.description == fallbackDescription;
+                if (definition.id == "I01") fallbackRestored = definition.description == fallback?.description;
             check(fallbackRestored, "Clearing the host override did not restore standalone package display data.");
-            check(source.Find("I01").description != changedItem.description,
+            var fallbackColor = ItemRarityFrame.ColorFor(fallback?.grade ?? 0);
+            check(frame.enabled == (fallbackColor.a > 0f) && (!frame.enabled || frame.color == fallbackColor),
+                "The rarity border did not restore the fallback grade.");
+            check(source.Find("I01").description != changedItem.description && source.Find("I01").grade == item.grade,
                 "The shared display fixture modified the authoritative source asset.");
         }
         finally
@@ -154,6 +173,58 @@ public static class InventoryIntegrationRegression
             Cursor.visible = cursorVisible;
             Cursor.lockState = cursorLock;
         }
+    }
+
+    private static void CatalogPreview(InventoryView inventory, Action<bool, string> check)
+    {
+        var source = AssetDatabase.LoadAssetAtPath<ItemCatalog>("Assets/_Project/Generated/BoundaryInventory/ItemCatalog.asset");
+        var data = ItemDisplayText.ToInventoryData(source);
+        var palette = new HashSet<Color>();
+        for (int grade = 1; grade <= 4; grade++)
+            check(ItemRarityFrame.ColorFor(grade).a > 0f && palette.Add(ItemRarityFrame.ColorFor(grade)),
+                "A supported item grade lacks a distinct border color.");
+        check(ItemRarityFrame.ColorFor(0).a == 0f && ItemRarityFrame.ColorFor(5).a == 0f,
+            "An unknown grade received a rarity color.");
+        foreach (var item in data.items)
+            check(item.grade == source.Find(item.id).grade, "The display adapter changed grade for " + item.id);
+
+        var host = new GameObject("Inventory codex fixture", typeof(RectTransform), typeof(Canvas));
+        try
+        {
+            var codex = host.AddComponent<InventoryView>();
+            codex.BuildCodex(inventory.Catalog, data);
+            codex.Open();
+            Canvas.ForceUpdateCanvases();
+            var visibleItems = new HashSet<string>(StringComparer.Ordinal);
+            int visibleSets = 0;
+            BoundaryZero.Inventory.InventoryHoverTarget sample = null;
+            foreach (var target in host.GetComponentsInChildren<BoundaryZero.Inventory.InventoryHoverTarget>())
+            {
+                if (target.name.StartsWith("Item_", StringComparison.Ordinal))
+                {
+                    visibleItems.Add(target.name.Substring("Item_".Length));
+                    if (target.name == "Item_I01") sample = target;
+                }
+                else visibleSets++;
+            }
+            check(visibleItems.SetEquals(Array.ConvertAll(data.items, item => item.id)) && visibleSets == data.synergies.Length,
+                "The codex did not show the complete catalog.");
+            check(sample != null && sample.GetComponentInChildren<UnityEngine.UI.Button>() == null,
+                "The codex item lost its passive hover target.");
+            sample.OnPointerEnter(null);
+            var tooltip = (TMPro.TMP_Text)typeof(InventoryView)
+                .GetField("tooltipText", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(codex);
+            check(tooltip.gameObject.activeInHierarchy && tooltip.text.Contains("2세트")
+                && tooltip.text.Contains("4세트") && tooltip.text.Contains("6세트") && tooltip.text.Contains("8세트"),
+                "The codex did not expose the authored set tiers on hover.");
+            check(codex.OwnedItemCount == 0 && inventory.OwnedItemCount == 0,
+                "Browsing the codex changed item ownership.");
+            foreach (var state in codex.GetSynergyStates())
+                check(state.Count == 0 && !state.IsActive, "Browsing the codex activated " + state.Id);
+            sample.OnPointerExit(null);
+            check(!tooltip.gameObject.activeInHierarchy, "Leaving a codex item left its tooltip open.");
+        }
+        finally { Object.DestroyImmediate(host); }
     }
 
     public static string RunPlayMode()

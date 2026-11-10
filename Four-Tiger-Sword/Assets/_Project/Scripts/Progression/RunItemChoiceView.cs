@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Penta.Upgrade;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>Presentation for run-owned item receipts. The RunManager owns pause, input and cursor.</summary>
 public sealed class RunItemChoiceView : MonoBehaviour
@@ -11,7 +12,8 @@ public sealed class RunItemChoiceView : MonoBehaviour
     {
         public RectTransform Root;
         public UnityEngine.UI.Image Icon;
-        public TMP_Text Title, Meta, Description, HoldLabel;
+        public TMP_Text Title, Grade, Meta, Description, HoldLabel;
+        public UnityEngine.UI.Image[] RarityBorder;
         public UnityEngine.UI.Button Choose, Hold;
         public UnityEngine.UI.ScrollRect Scroll;
         public string Id, SessionId;
@@ -31,6 +33,8 @@ public sealed class RunItemChoiceView : MonoBehaviour
         public RectTransform Root;
         public UnityEngine.UI.Image Icon, Accent;
         public TMP_Text Name, Progress;
+        public OwnedSynergyRowInteraction Interaction;
+        public ItemSynergyState State;
     }
 
     private RunItemChoiceService _service;
@@ -40,6 +44,9 @@ public sealed class RunItemChoiceView : MonoBehaviour
     private UnityEngine.UI.ScrollRect _ownedSynergiesScroll;
     private TMP_Text _noOwnedSynergies;
     private readonly List<OwnedSynergy> _ownedSynergies = new();
+    private RectTransform _synergyTooltip;
+    private TMP_Text _synergyTooltipTitle, _synergyTooltipBody;
+    private OwnedSynergy _hoveredSynergy, _focusedSynergy;
     private TMP_Text _title, _guide, _status, _empty, _emptyLabel, _rerollLabel;
     private UnityEngine.UI.Button _emptyClaim, _reroll, _skip;
     private readonly List<Card> _cards = new();
@@ -97,12 +104,22 @@ public sealed class RunItemChoiceView : MonoBehaviour
         transform.SetAsLastSibling();
         Refresh();
         _windowGroup.interactable = false;
-        _motion.PlayShow(() => { if (_shown) _windowGroup.interactable = true; });
+        _motion.PlayShow(() =>
+        {
+            if (!_shown) return;
+            _windowGroup.interactable = true;
+            var events = EventSystem.current;
+            if (events == null || events.currentSelectedGameObject != null) return;
+            var initial = VisibleCardCount > 0 ? _cards[0].Choose : _skip;
+            events.SetSelectedGameObject(initial.gameObject);
+        });
     }
 
     public void Hide()
     {
         _shown = false;
+        ClearSynergyTooltip();
+        ClearRewardSelection();
         _motion?.HideImmediate();
         gameObject.SetActive(false);
     }
@@ -111,6 +128,7 @@ public sealed class RunItemChoiceView : MonoBehaviour
     {
         if (IsClosing) return;
         if (!_shown || _motion == null) { Hide(); completed?.Invoke(); return; }
+        ClearSynergyTooltip();
         _windowGroup.interactable = false;
         _motion.PlayClose(() => { Hide(); completed?.Invoke(); });
     }
@@ -119,7 +137,12 @@ public sealed class RunItemChoiceView : MonoBehaviour
     {
         if (!_shown || _window == null) return;
         var session = _service?.Current;
-        if (session == null) { if (_windowGroup != null) _windowGroup.interactable = false; return; }
+        if (session == null)
+        {
+            ClearSynergyTooltip();
+            if (_windowGroup != null) _windowGroup.interactable = false;
+            return;
+        }
         bool newSession = _sessionId != session.Id;
         if (newSession) { _sessionId = session.Id; _localError = null; }
         bool starter = session.Kind == RunItemChoiceKind.Starter;
@@ -136,11 +159,13 @@ public sealed class RunItemChoiceView : MonoBehaviour
         {
             var options = _service.StarterSynergies();
             visibleSynergies = options.Count;
+            int columns = Mathf.Max(3, (visibleSynergies + 1) / 2);
             for (int i = 0; i < visibleSynergies; i++)
             {
                 if (i == _synergies.Count) _synergies.Add(CreateSynergy(i));
                 var option = _synergies[i]; var definition = options[i];
                 option.Root.gameObject.SetActive(true); option.Id = definition.id; option.SessionId = session.Id;
+                LayoutStarterSynergy(option, i, visibleSynergies, columns);
                 option.Title.text = definition.displayName;
                 option.Summary.text = definition.summary ?? definition.description ?? "이 계통의 유품 후보 보기";
                 option.Icon.sprite = definition.icon; option.Icon.enabled = definition.icon != null;
@@ -162,9 +187,15 @@ public sealed class RunItemChoiceView : MonoBehaviour
                 card.Root.gameObject.SetActive(true); card.Id = item.itemId; card.SessionId = session.Id;
                 card.Root.anchoredPosition = new Vector2(64 + (cardAreaWidth - total) * .5f + i * (width + 24), -126);
                 LayoutCard(card, width, _service.CanHold);
-                card.Title.text = item.displayName; card.Meta.text = ItemDisplayText.Meta(item);
+                card.Title.text = item.displayName;
+                Color rarity = BoundaryZero.Inventory.ItemRarityFrame.ColorFor(item.grade);
+                if (rarity.a == 0f) rarity = Muted;
+                card.Grade.text = ItemDisplayText.Meta(item.grade, null);
+                card.Grade.color = rarity;
+                card.Meta.text = item.primarySynergyName;
+                foreach (var edge in card.RarityBorder) edge.color = rarity;
                 card.Icon.sprite = item.icon; card.Icon.enabled = item.icon != null;
-                card.Description.text = ItemDisplayText.Description(item, _service.Catalog);
+                card.Description.text = ItemDisplayText.RewardDescription(item, _service.Catalog);
                 card.Choose.interactable = !_busy;
                 card.Hold.gameObject.SetActive(_service.CanHold);
                 card.Hold.interactable = !_busy;
@@ -196,6 +227,7 @@ public sealed class RunItemChoiceView : MonoBehaviour
         _status.text = _localError ?? _service.LastError ?? string.Empty;
         _status.gameObject.SetActive(!string.IsNullOrWhiteSpace(_status.text));
         Canvas.ForceUpdateCanvases();
+        RefreshSynergyTooltip();
     }
 
     private void Execute(Func<bool> action)
@@ -240,6 +272,7 @@ public sealed class RunItemChoiceView : MonoBehaviour
         _rerollLabel = _reroll.GetComponentInChildren<TMP_Text>();
         _skip = Button("Skip", _window, "보상 건너뛰기", 720, 842, 304, 56,
             () => Execute(() => _service.TrySkip(_sessionId)));
+        BuildSynergyTooltip();
         _motion = UIModalMotion.Ensure(gameObject, _window, .24f, .16f, 18f);
         _windowGroup = _window.GetComponent<CanvasGroup>();
     }
@@ -248,9 +281,15 @@ public sealed class RunItemChoiceView : MonoBehaviour
     {
         var card = new Card { Root = Rect("Candidate" + index, _cardsRoot, 64 + index * 414, 126, 390, 660) };
         Chrome(card.Root, PentaUpgradeChrome.Style.Detail);
+        card.RarityBorder = new UnityEngine.UI.Image[6];
+        string[] edges = { "Top", "TopCorner", "Right", "BottomCorner", "Bottom", "Left" };
+        for (int i = 0; i < edges.Length; i++)
+            card.RarityBorder[i] = Image(Rect("Rarity" + edges[i], card.Root, 0, 0, 0, 0), Color.white, false);
         card.Icon = Image(Rect("OriginalItemIcon", card.Root, 147, 18, 96, 96), Color.white, false);
         card.Icon.preserveAspect = true;
         card.Title = Label("Name", card.Root, "", 18, 128, 354, 62, 24); card.Title.alignment = TextAlignmentOptions.Center;
+        card.Grade = Label("Grade", card.Root, "", 18, 192, 92, 30, 19);
+        card.Grade.fontStyle = FontStyles.Bold;
         card.Meta = Label("Meta", card.Root, "", 18, 192, 354, 30, 16); card.Meta.color = Muted;
         card.Meta.alignment = TextAlignmentOptions.Center;
         var scroll = Rect("DescriptionScroll", card.Root, 18, 232, 354, 230);
@@ -260,7 +299,6 @@ public sealed class RunItemChoiceView : MonoBehaviour
         viewport.gameObject.AddComponent<UnityEngine.UI.RectMask2D>();
         card.Description = Label("Content", viewport, "", 0, 0, 354, 230, 22);
         card.Description.richText = true;
-        BoundaryZero.Inventory.ItemDescriptionDivider.Attach(card.Description);
         card.Description.lineSpacing = 4;
         var content = card.Description.rectTransform;
         content.anchorMin = new Vector2(0, 1); content.anchorMax = Vector2.one; content.sizeDelta = new Vector2(0, 230);
@@ -283,13 +321,29 @@ public sealed class RunItemChoiceView : MonoBehaviour
         const float height = 660;
         bool narrow = width < 360;
         card.Root.sizeDelta = new Vector2(width, height);
+        var corners = new[]
+        {
+            new Vector2(2, 2), new Vector2(width - 28, 2), new Vector2(width - 2, 28),
+            new Vector2(width - 2, height - 29), new Vector2(width - 29, height - 2),
+            new Vector2(2, height - 2)
+        };
+        for (int i = 0; i < corners.Length; i++)
+        {
+            Vector2 start = corners[i], end = corners[(i + 1) % corners.Length];
+            Vector2 center = (start + end) * .5f, direction = end - start;
+            var edge = card.RarityBorder[i].rectTransform;
+            edge.pivot = new Vector2(.5f, .5f);
+            Place(edge, center.x, center.y, direction.magnitude + 1f, 2f);
+            edge.localRotation = Quaternion.Euler(0, 0, -Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
+        }
         float iconSize = narrow ? 64 : 72;
         float titleLeft = narrow ? 100 : 112;
         Place(card.Icon.rectTransform, 24, 22, iconSize, iconSize);
         Place(card.Title.rectTransform, titleLeft, 22, width - titleLeft - 24, 76);
         card.Title.fontSize = 26; card.Title.alignment = TextAlignmentOptions.MidlineLeft;
-        Place(card.Meta.rectTransform, 24, 108, width - 48, narrow ? 48 : 32);
-        card.Meta.fontSize = 20; card.Meta.alignment = TextAlignmentOptions.Left;
+        Place(card.Grade.rectTransform, 24, 108, 74, 32);
+        Place(card.Meta.rectTransform, 102, 108, width - 126, narrow ? 48 : 32);
+        card.Meta.fontSize = 19; card.Meta.alignment = TextAlignmentOptions.TopLeft;
         float descriptionTop = narrow ? 174 : 158;
         float descriptionHeight = height - (hold ? 136 : 80) - descriptionTop;
         Place((RectTransform)card.Scroll.transform, 24, descriptionTop, width - 48, descriptionHeight);
@@ -309,7 +363,8 @@ public sealed class RunItemChoiceView : MonoBehaviour
         Image(_ownedSynergiesRoot, new Color32(12, 21, 34, 255), false);
         Image(Rect("HeaderBand", _ownedSynergiesRoot, 0, 0, 320, 64), new Color32(27, 42, 60, 255), false);
         Image(Rect("LeftRule", _ownedSynergiesRoot, 0, 0, 1, 660), new Color32(91, 115, 141, 180), false);
-        Label("Heading", _ownedSynergiesRoot, "보유 시너지", 20, 20, 280, 32, 24);
+        Label("Heading", _ownedSynergiesRoot, "보유 시너지", 20, 20, 156, 32, 24);
+        Label("TooltipHint", _ownedSynergiesRoot, "효과 보기", 180, 24, 120, 26, 17).color = Muted;
         Image(Rect("Divider", _ownedSynergiesRoot, 20, 64, 280, 1), new Color32(89, 109, 132, 150), false);
         _noOwnedSynergies = Label("Empty", _ownedSynergiesRoot, "보유 시너지 없음", 20, 84, 280, 64, 22);
         _noOwnedSynergies.color = Muted;
@@ -360,6 +415,29 @@ public sealed class RunItemChoiceView : MonoBehaviour
             {
                 var root = Rect("OwnedSynergy" + i, _ownedSynergiesScroll.content, 0, 0, 260, 80);
                 var row = new OwnedSynergy { Root = root };
+                var hitArea = Image(root, new Color32(99, 127, 157, 24), true);
+                row.Interaction = root.gameObject.AddComponent<OwnedSynergyRowInteraction>();
+                row.Interaction.targetGraphic = hitArea;
+                var colors = row.Interaction.colors;
+                colors.normalColor = new Color(1f, 1f, 1f, .25f);
+                colors.highlightedColor = colors.selectedColor = Color.white;
+                row.Interaction.colors = colors;
+                row.Interaction.PointerChanged = inside =>
+                {
+                    if (inside) _hoveredSynergy = row;
+                    else if (_hoveredSynergy == row) _hoveredSynergy = null;
+                    RefreshSynergyTooltip();
+                };
+                row.Interaction.FocusChanged = selected =>
+                {
+                    if (selected)
+                    {
+                        _focusedSynergy = row;
+                        RevealOwnedSynergy(row);
+                    }
+                    else if (_focusedSynergy == row) _focusedSynergy = null;
+                    RefreshSynergyTooltip();
+                };
                 row.Accent = Image(Rect("Active", root, 0, 4, 3, 68), ActiveSynergy, false);
                 row.Icon = Image(Rect("Icon", root, 12, 4, 32, 32), Color.white, false);
                 row.Icon.preserveAspect = true;
@@ -369,6 +447,7 @@ public sealed class RunItemChoiceView : MonoBehaviour
                 _ownedSynergies.Add(row);
             }
             var current = _ownedSynergies[i]; var state = states[i];
+            current.State = state;
             current.Root.gameObject.SetActive(true);
             current.Name.text = state.Definition.displayName;
             current.Icon.sprite = state.Definition.icon; current.Icon.enabled = current.Icon.sprite != null;
@@ -376,10 +455,8 @@ public sealed class RunItemChoiceView : MonoBehaviour
             current.Accent.enabled = active;
             current.Name.color = active ? ActiveSynergy : Ink;
             current.Progress.color = active ? Ink : Muted;
-            int next = int.MaxValue;
-            foreach (var tier in state.Definition.tiers ?? Array.Empty<ItemSynergyTier>())
-                if (tier != null && tier.count > state.OwnedCount) next = Mathf.Min(next, tier.count);
-            string progress = next == int.MaxValue ? $"{state.OwnedCount}개 보유" : $"{state.OwnedCount}/{next}";
+            var next = NextSynergyTier(state);
+            string progress = next == null ? $"{state.OwnedCount}개 보유" : $"{state.OwnedCount}/{next.count}";
             current.Progress.text = active ? $"{state.ActiveTier.count}세트 활성 · {progress}" : $"미활성 · {progress}";
         }
         for (int i = states.Count; i < _ownedSynergies.Count; i++) _ownedSynergies[i].Root.gameObject.SetActive(false);
@@ -390,13 +467,111 @@ public sealed class RunItemChoiceView : MonoBehaviour
         }
     }
 
+    private static ItemSynergyTier NextSynergyTier(ItemSynergyState state)
+    {
+        ItemSynergyTier next = null;
+        foreach (var tier in state.Definition.tiers ?? Array.Empty<ItemSynergyTier>())
+            if (tier != null && tier.count > state.OwnedCount && (next == null || tier.count < next.count))
+                next = tier;
+        return next;
+    }
+
+    private void BuildSynergyTooltip()
+    {
+        _synergyTooltip = Rect("OwnedSynergyTooltip", _window, 0, 0, 460, 120);
+        var chrome = Chrome(_synergyTooltip, PentaUpgradeChrome.Style.Detail);
+        chrome.raycastTarget = false;
+        _synergyTooltipTitle = Label("Title", _synergyTooltip, "", 20, 18, 420, 36, 24);
+        _synergyTooltipTitle.fontStyle = FontStyles.Bold;
+        _synergyTooltipBody = Label("Effects", _synergyTooltip, "", 20, 62, 420, 100, 20);
+        _synergyTooltipBody.overflowMode = TextOverflowModes.Overflow;
+        _synergyTooltipBody.lineSpacing = 4;
+        _synergyTooltip.gameObject.SetActive(false);
+    }
+
+    private void RefreshSynergyTooltip()
+    {
+        if (_synergyTooltip == null) return;
+        var row = _hoveredSynergy ?? _focusedSynergy;
+        if (!_shown || IsClosing || row == null || !row.Root.gameObject.activeInHierarchy)
+        {
+            _synergyTooltip.gameObject.SetActive(false);
+            return;
+        }
+
+        var state = row.State;
+        var next = NextSynergyTier(state);
+        _synergyTooltipTitle.text = ItemDisplayText.LiteralEffect(state.Definition.displayName);
+        _synergyTooltipTitle.color = state.ActiveTier != null ? ActiveSynergy : Ink;
+        string body = state.ActiveTier != null
+            ? $"<color=#EB7479><b>현재 활성 · {state.ActiveTier.count}세트</b></color>\n{ItemDisplayText.LiteralEffect(state.ActiveTier.text)}"
+            : $"<color=#BCCEE0><b>미활성 · {state.OwnedCount}개 보유</b></color>";
+        if (next != null)
+            body += $"\n\n<color=#F9C48A><b>다음 단계 · {state.OwnedCount}/{next.count}</b></color>\n{ItemDisplayText.LiteralEffect(next.text)}";
+        _synergyTooltipBody.text = body;
+        const float width = 460f, inset = 32f, gap = 12f;
+        float bodyHeight = _synergyTooltipBody.GetPreferredValues(body, width - 40, 0).y;
+        float height = 82f + bodyHeight;
+        _synergyTooltipBody.rectTransform.sizeDelta = new Vector2(width - 40, bodyHeight);
+        Vector3 rowTop = _window.InverseTransformPoint(row.Root.TransformPoint(new Vector3(row.Root.rect.xMin, row.Root.rect.yMax)));
+        float x = Mathf.Clamp(rowTop.x - _window.rect.xMin - width - gap, inset, _window.rect.width - width - inset);
+        float y = Mathf.Clamp(_window.rect.yMax - rowTop.y, inset, _window.rect.height - height - inset);
+        Place(_synergyTooltip, x, y, width, height);
+        _synergyTooltip.gameObject.SetActive(true);
+    }
+
+    private void ClearSynergyTooltip()
+    {
+        if (_focusedSynergy != null && EventSystem.current != null &&
+            EventSystem.current.currentSelectedGameObject == _focusedSynergy.Root.gameObject)
+            EventSystem.current.SetSelectedGameObject(null);
+        _hoveredSynergy = _focusedSynergy = null;
+        if (_synergyTooltip != null) _synergyTooltip.gameObject.SetActive(false);
+    }
+
+    private void ClearRewardSelection()
+    {
+        var events = EventSystem.current;
+        var selected = events != null ? events.currentSelectedGameObject : null;
+        if (selected != null && selected.transform.IsChildOf(_window))
+            events.SetSelectedGameObject(null);
+    }
+
+    private void RevealOwnedSynergy(OwnedSynergy row)
+    {
+        var scroll = _ownedSynergiesScroll;
+        float contentHeight = scroll.content.rect.height, viewportHeight = scroll.viewport.rect.height;
+        if (contentHeight <= viewportHeight) return;
+        var top = scroll.content.InverseTransformPoint(row.Root.position);
+        float rowTop = scroll.content.rect.yMax - top.y, rowBottom = rowTop + row.Root.rect.height;
+        float offset = (1f - scroll.verticalNormalizedPosition) * (contentHeight - viewportHeight);
+        float target = Mathf.Clamp(offset, rowBottom - viewportHeight, rowTop);
+        scroll.StopMovement();
+        scroll.verticalNormalizedPosition = 1f - Mathf.Clamp01(target / (contentHeight - viewportHeight));
+    }
+
     private static void Place(RectTransform rect, float x, float y, float w, float h)
     { rect.anchoredPosition = new Vector2(x, -y); rect.sizeDelta = new Vector2(w, h); }
 
+    private static void LayoutStarterSynergy(SynergyOption option, int index, int count, int columns)
+    {
+        const float areaWidth = 1632f, gap = 24f, left = 64f;
+        int row = index / columns;
+        bool compact = columns > 3;
+        float width = (areaWidth - (columns - 1) * gap) / columns;
+        int itemsInRow = Mathf.Min(columns, count - row * columns);
+        float rowInset = compact ? (columns - itemsInRow) * (width + gap) * .5f : 0f;
+        Place(option.Root, left + rowInset + index % columns * (width + gap), 208 + row * 236, width, 212);
+        float titleLeft = compact ? 86f : 108f;
+        Place(option.Icon.rectTransform, compact ? 18f : 24f, 22, compact ? 52f : 64f, compact ? 52f : 64f);
+        Place(option.Title.rectTransform, titleLeft, 28, width - titleLeft - (compact ? 18f : 28f), 48);
+        Place(option.Summary.rectTransform, compact ? 18f : 24f, compact ? 94f : 108f,
+            width - (compact ? 36f : 48f), compact ? 96f : 78f);
+    }
+
     private SynergyOption CreateSynergy(int index)
     {
-        var option = new SynergyOption { Root = Rect("Synergy" + index, _synergiesRoot,
-            64 + (index % 3) * 552, 208 + (index / 3) * 236, 528, 212) };
+        var option = new SynergyOption { Root = Rect("Synergy" + index, _synergiesRoot, 0, 0, 528, 212) };
         Chrome(option.Root, PentaUpgradeChrome.Style.Detail);
         option.Button = option.Root.gameObject.AddComponent<UnityEngine.UI.Button>();
         option.Button.targetGraphic = option.Root.GetComponent<PentaUpgradeChrome>();

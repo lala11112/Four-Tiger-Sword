@@ -402,10 +402,20 @@ public sealed class BoundaryZeroRunOverlay : MonoBehaviour
         SetCanvasOrder(100);
     }
 
+    private Color? _nonLoadingBackground;
+
     private void SetMode(bool loading, bool clear, bool death)
     {
         CancelResultReveal();
         SetCanvasOrder(200);
+        var background = modalRoot != null ? modalRoot.GetComponent<UnityEngine.UI.Image>() : null;
+        if (background != null)
+        {
+            if (!_nonLoadingBackground.HasValue) _nonLoadingBackground = background.color;
+            Color tint = _nonLoadingBackground.Value;
+            if (loading) tint.a = 1f;
+            background.color = tint;
+        }
         loadingRoot.SetActive(loading);
         clearArt.SetActive(clear);
         deathArt.SetActive(death);

@@ -10,10 +10,17 @@ public sealed class PlayerHudPresenter : MonoBehaviour
     [SerializeField] private CanvasGroup visibility;
 
     private bool _warnedMissingDependencies;
+    private PlayerHealthEdgeFeedback _healthFeedback;
+    private static readonly ElementType[] HudElements =
+    {
+        ElementType.ELEMENT_FIRE, ElementType.ELEMENT_WATER, ElementType.ELEMENT_WOOD,
+        ElementType.ELEMENT_GOLD, ElementType.ELEMENT_EARTH
+    };
 
     public void Configure(PlayerController targetPlayer, HudController targetHud, CanvasGroup targetVisibility)
     {
         SetVisible(false);
+        if (_healthFeedback != null) _healthFeedback.SetStats(null);
         player = targetPlayer;
         hud = targetHud;
         visibility = targetVisibility;
@@ -21,12 +28,29 @@ public sealed class PlayerHudPresenter : MonoBehaviour
     }
 
     private void OnEnable() => SetVisible(false);
-    private void OnDisable() => SetVisible(false);
+    private void OnDisable()
+    {
+        SetVisible(false);
+        if (_healthFeedback != null) _healthFeedback.SetStats(null);
+    }
+
+    private void OnDestroy()
+    {
+        if (_healthFeedback != null) _healthFeedback.Dispose();
+    }
 
     private void LateUpdate()
     {
         // PlayerController creates its managers in Awake; always read the current instances.
         var stats = player != null ? player.StatManager : null;
+        var feedbackStats = player != null && player.isActiveAndEnabled && !player.IsStageTransitioning ? stats : null;
+        if (feedbackStats != null && _healthFeedback == null) _healthFeedback = PlayerHealthEdgeFeedback.Create();
+        if (_healthFeedback != null)
+        {
+            _healthFeedback.SetStats(feedbackStats);
+            _healthFeedback.Tick();
+        }
+
         var form = player != null ? player.FormManager?.CurrentForm as BaseForm : null;
         int formIndex = form != null ? GetFormIndex(form.Element) : 0;
         if (player == null || !player.isActiveAndEnabled || stats == null
@@ -50,6 +74,7 @@ public sealed class PlayerHudPresenter : MonoBehaviour
             Auxiliary = new MeterState(stats.CurrentSp, stats.MaxSp),
             UltimateCharge = new MeterState(stats.CurrentUltimateGauge, stats.MaxUltimateGauge),
             ActiveFormIndex = formIndex,
+            LockedFormsMask = GetLockedFormsMask(player.FormManager),
             FireChain = new ChainSkillState(player.FormManager.GetChainReadyRemaining(ElementType.ELEMENT_FIRE),
                 chainTarget != null && chainTarget.Element == ElementType.ELEMENT_FIRE),
             WaterChain = new ChainSkillState(player.FormManager.GetChainReadyRemaining(ElementType.ELEMENT_WATER),
@@ -92,5 +117,13 @@ public sealed class PlayerHudPresenter : MonoBehaviour
             case ElementType.ELEMENT_EARTH: return 5;
             default: return 0;
         }
+    }
+
+    private static int GetLockedFormsMask(FormManager forms)
+    {
+        int mask = 0;
+        for (int i = 0; i < HudElements.Length; i++)
+            if (!forms.IsElementAvailable(HudElements[i])) mask |= 1 << i;
+        return mask;
     }
 }

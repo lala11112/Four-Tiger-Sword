@@ -49,6 +49,7 @@ public class PlayerInputHandler : MonoBehaviour
     private bool _mapInputBlocked;
     private bool _inventoryInputBlocked;
     private bool _rewardInputBlocked;
+    private bool _pauseMenuInputBlocked;
     private bool _waitForGameplayRelease;
     private bool _finisherInputBlocked;
     private bool _finisherNeedsRelease;
@@ -184,6 +185,15 @@ public class PlayerInputHandler : MonoBehaviour
         ClearGameplayInput();
     }
 
+    internal void SetPauseMenuInputBlocked(bool blocked)
+    {
+        if (_pauseMenuInputBlocked == blocked) return;
+        _pauseMenuInputBlocked = blocked;
+        _waitForGameplayRelease = true;
+        _finisherNeedsRelease = true;
+        ClearGameplayInput();
+    }
+
     private void ClearGameplayInput()
     {
         MoveInput = Vector2.zero;
@@ -222,11 +232,13 @@ public class PlayerInputHandler : MonoBehaviour
         if (!IsFinisherHeld) _finisherNeedsRelease = false;
         bool waitForChainSkillRelease = _chainSkillNeedsRelease;
         if (!(ChainSkillAction?.IsPressed() ?? false)) _chainSkillNeedsRelease = false;
-        if (_shopInputBlocked || _mapInputBlocked || _inventoryInputBlocked || _rewardInputBlocked || _finisherInputBlocked || _waitForGameplayRelease)
+        bool gameplayInputBlocked = _shopInputBlocked || _mapInputBlocked || _inventoryInputBlocked
+            || _rewardInputBlocked || _pauseMenuInputBlocked || _finisherInputBlocked;
+        if (gameplayInputBlocked || _waitForGameplayRelease)
         {
             ClearGameplayInput();
             // Ignore the entire first neutral frame so its WasPressedThisFrame flags cannot leak.
-            if (!_shopInputBlocked && !_mapInputBlocked && !_inventoryInputBlocked && !_rewardInputBlocked && !_finisherInputBlocked && !AnyGameplayButtonHeld()) _waitForGameplayRelease = false;
+            if (!gameplayInputBlocked && !AnyGameplayButtonHeld()) _waitForGameplayRelease = false;
             return;
         }
         if (!AllowsCombatInput)
