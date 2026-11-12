@@ -11,11 +11,6 @@ public sealed class PlayerHudPresenter : MonoBehaviour
 
     private bool _warnedMissingDependencies;
     private PlayerHealthEdgeFeedback _healthFeedback;
-    private static readonly ElementType[] HudElements =
-    {
-        ElementType.ELEMENT_FIRE, ElementType.ELEMENT_WATER, ElementType.ELEMENT_WOOD,
-        ElementType.ELEMENT_GOLD, ElementType.ELEMENT_EARTH
-    };
 
     public void Configure(PlayerController targetPlayer, HudController targetHud, CanvasGroup targetVisibility)
     {
@@ -71,10 +66,8 @@ public sealed class PlayerHudPresenter : MonoBehaviour
         var state = new HudState
         {
             Hp = new MeterState(stats.CurrentHp, stats.MaxHp),
-            Auxiliary = new MeterState(stats.CurrentSp, stats.MaxSp),
             UltimateCharge = new MeterState(stats.CurrentUltimateGauge, stats.MaxUltimateGauge),
             ActiveFormIndex = formIndex,
-            LockedFormsMask = GetLockedFormsMask(player.FormManager),
             FireChain = new ChainSkillState(player.FormManager.GetChainReadyRemaining(ElementType.ELEMENT_FIRE),
                 chainTarget != null && chainTarget.Element == ElementType.ELEMENT_FIRE),
             WaterChain = new ChainSkillState(player.FormManager.GetChainReadyRemaining(ElementType.ELEMENT_WATER),
@@ -82,7 +75,7 @@ public sealed class PlayerHudPresenter : MonoBehaviour
             E = new SkillState
             {
                 Remaining = form.SkillCooldownRemaining,
-                Duration = form.SkillCooldown,
+                Duration = form.SkillCooldownDuration,
                 Unavailable = !form.CanSkill
             },
             R = new SkillState
@@ -117,13 +110,5 @@ public sealed class PlayerHudPresenter : MonoBehaviour
             case ElementType.ELEMENT_EARTH: return 5;
             default: return 0;
         }
-    }
-
-    private static int GetLockedFormsMask(FormManager forms)
-    {
-        int mask = 0;
-        for (int i = 0; i < HudElements.Length; i++)
-            if (!forms.IsElementAvailable(HudElements[i])) mask |= 1 << i;
-        return mask;
     }
 }

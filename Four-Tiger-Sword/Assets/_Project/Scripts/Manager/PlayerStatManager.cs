@@ -19,12 +19,12 @@ public class PlayerStatManager : MonoBehaviour
 
     private readonly struct ItemResourceModifiers
     {
-        public readonly float MaxHpRatio, MaxSpAdd, SpRegenAdd, MaxSpCap, SpRegenCap;
+        public readonly float MaxHpRatio;
         public readonly float AttackRatio, DefenseRatio, CriticalChancePoints, CriticalDamagePoints, ShieldGainRatio;
-        public ItemResourceModifiers(float hpRatio, float spAdd, float regenAdd, float spCap, float regenCap,
+        public ItemResourceModifiers(float hpRatio,
             float attackRatio, float defenseRatio, float critChancePoints, float critDamagePoints, float shieldGainRatio)
         {
-            MaxHpRatio = hpRatio; MaxSpAdd = spAdd; SpRegenAdd = regenAdd; MaxSpCap = spCap; SpRegenCap = regenCap;
+            MaxHpRatio = hpRatio;
             AttackRatio = attackRatio; DefenseRatio = defenseRatio; CriticalChancePoints = critChancePoints;
             CriticalDamagePoints = critDamagePoints; ShieldGainRatio = shieldGainRatio;
         }
@@ -39,13 +39,10 @@ public class PlayerStatManager : MonoBehaviour
 
     public event Action OnStatsChanged; // 스탯 바뀔 때 UI 등에 알려주는 이벤트
 
-    // ── 런타임 HP/SP 상태 ────────────────────────────────────────────────────────
+    // ── 런타임 HP 상태 ───────────────────────────────────────────────────────────
     private float _currentHp;
-    private float _currentSp;
-    private float _spRegenTimer;
 
     public float CurrentHp { get { EnsureInitialized(); return _currentHp; } }
-    public float CurrentSp { get { EnsureInitialized(); return _currentSp; } }
 
     // ── 런타임 필살기 게이지 상태 ─────────────────────────────────────────────────
     private float _currentUltimateGauge;
@@ -64,7 +61,6 @@ public class PlayerStatManager : MonoBehaviour
 
     /// <summary>HP가 변경될 때마다 발생합니다. (현재HP, 최대HP) UI 갱신용.</summary>
     public event Action<float, float> OnHpChanged;
-    public event Action<float, float> OnSpChanged;
 
     private void Awake()
     {
@@ -83,7 +79,6 @@ public class PlayerStatManager : MonoBehaviour
         finalValues.Clear();
         _itemResourceModifiers.Clear();
         _shields.Clear();
-        _spRegenTimer = 0f;
         _initialized = false;
         EnsureInitialized();
     }
@@ -99,8 +94,6 @@ public class PlayerStatManager : MonoBehaviour
         _initialized = true;
 
         baseValues[StatType.ST_HP] = baseData != null ? baseData.baseHP : 100f;
-        baseValues[StatType.ST_SP] = baseData != null ? baseData.baseSP : 100f;
-        baseValues[StatType.ST_SP_REGEN] = baseData != null ? baseData.baseSpRegen : 20f;
         baseValues[StatType.ST_ATK] = baseData != null ? baseData.baseATK : 10f;
         baseValues[StatType.ST_DEF] = baseData != null ? baseData.baseDEF : 5f;
         baseValues[StatType.ST_CRT] = baseData != null ? baseData.baseCRT : 5f;
@@ -129,11 +122,9 @@ public class PlayerStatManager : MonoBehaviour
         RecalculateAll(false);
 
         _currentHp             = GetStat(StatType.ST_HP);
-        _currentSp             = GetStat(StatType.ST_SP);
         _currentUltimateGauge  = 0f;
         OnStatsChanged?.Invoke();
         OnHpChanged?.Invoke(_currentHp, MaxHp);
-        OnSpChanged?.Invoke(_currentSp, MaxSp);
     }
 
 
@@ -161,18 +152,16 @@ public class PlayerStatManager : MonoBehaviour
 
 
     /// <summary>Replaces one item's owner contribution atomically without touching form/skill modifiers.</summary>
-    public void SetItemResourceModifiers(object source, float maxHpRatio, float maxSpAdd, float spRegenAdd,
-        float maxSpCap = 200f, float spRegenCap = 40f, float attackRatio = 0f, float defenseRatio = 0f,
+    public void SetItemResourceModifiers(object source, float maxHpRatio, float attackRatio = 0f, float defenseRatio = 0f,
         float criticalChancePoints = 0f, float criticalDamagePoints = 0f, float shieldGainRatio = 0f)
     {
         if (source == null) throw new ArgumentNullException(nameof(source));
-        if (!IsFinite(maxHpRatio) || !IsFinite(maxSpAdd) || !IsFinite(spRegenAdd)
-            || !IsFinite(maxSpCap) || !IsFinite(spRegenCap) || maxSpCap <= 0f || spRegenCap <= 0f
+        if (!IsFinite(maxHpRatio)
             || !IsFinite(attackRatio) || !IsFinite(defenseRatio) || !IsFinite(criticalChancePoints)
             || !IsFinite(criticalDamagePoints) || !IsFinite(shieldGainRatio))
-            throw new ArgumentException("Item resource modifiers and positive caps must be finite.");
+            throw new ArgumentException("Item modifiers must be finite.");
         EnsureInitialized();
-        _itemResourceModifiers[source] = new ItemResourceModifiers(maxHpRatio, maxSpAdd, spRegenAdd, maxSpCap, spRegenCap,
+        _itemResourceModifiers[source] = new ItemResourceModifiers(maxHpRatio,
             attackRatio, defenseRatio, criticalChancePoints, criticalDamagePoints, shieldGainRatio);
         RecalculateAll();
     }
@@ -224,48 +213,66 @@ public class PlayerStatManager : MonoBehaviour
     private void RecalculateStat(StatType stat)
     {
         float previousMaxHp = finalValues.GetValueOrDefault(StatType.ST_HP);
-        float previousMaxSp = finalValues.GetValueOrDefault(StatType.ST_SP);
         finalValues[stat] = CalculateStat(stat);
-        PublishStatChanges(previousMaxHp, previousMaxSp);
+        PublishStatChanges(previousMaxHp);
     }
 
     // === 전체 스탯 재계산 (초기화 시 사용) ===
     private void RecalculateAll(bool publish = true)
     {
         float previousMaxHp = finalValues.GetValueOrDefault(StatType.ST_HP);
-        float previousMaxSp = finalValues.GetValueOrDefault(StatType.ST_SP);
         foreach (StatType stat in Enum.GetValues(typeof(StatType)))
             finalValues[stat] = CalculateStat(stat);
-        if (publish) PublishStatChanges(previousMaxHp, previousMaxSp);
+        if (publish) PublishStatChanges(previousMaxHp);
     }
 
-    private float CalculateStat(StatType stat)
+    private enum StatSource
     {
-        double add = addValues.GetValueOrDefault(stat), mult = multValues.GetValueOrDefault(stat);
-        foreach (var modifiers in _itemResourceModifiers.Values)
+        Workshop,
+        Engraving,
+        Item,
+        All
+    }
+
+    private float CalculateStat(StatType stat) => CalculateStat(stat, StatSource.All);
+
+    private float CalculateStat(StatType stat, StatSource through)
+    {
+        double add = through == StatSource.All ? addValues.GetValueOrDefault(stat) : 0d;
+        double mult = through == StatSource.All ? multValues.GetValueOrDefault(stat) : 0d;
+        if (through >= StatSource.Item)
         {
-            if (stat == StatType.ST_HP) mult += modifiers.MaxHpRatio;
-            else if (stat == StatType.ST_SP) add += modifiers.MaxSpAdd;
-            else if (stat == StatType.ST_SP_REGEN) add += modifiers.SpRegenAdd;
-            else if (stat == StatType.ST_ATK) mult += modifiers.AttackRatio;
-            else if (stat == StatType.ST_DEF) mult += modifiers.DefenseRatio;
-            else if (stat == StatType.ST_CRT) add += modifiers.CriticalChancePoints;
-            else if (stat == StatType.ST_CRTD) add += modifiers.CriticalDamagePoints;
+            foreach (var modifiers in _itemResourceModifiers.Values)
+            {
+                if (stat == StatType.ST_HP) mult += modifiers.MaxHpRatio;
+                else if (stat == StatType.ST_ATK) mult += modifiers.AttackRatio;
+                else if (stat == StatType.ST_DEF) mult += modifiers.DefenseRatio;
+                else if (stat == StatType.ST_CRT) add += modifiers.CriticalChancePoints;
+                else if (stat == StatType.ST_CRTD) add += modifiers.CriticalDamagePoints;
+            }
         }
-        if (stat == StatType.ST_CRT) add += _engravingCriticalPoints;
-        else if (stat == StatType.ST_CRTD) add += _engravingCriticalDamagePoints;
-        else if (stat == StatType.ST_ATK_SPD) mult += _engravingAttackSpeedRatio;
-        double permanentRatio = stat == StatType.ST_HP ? _permanentHealthRatio + _engravingHealthRatio
-            : stat == StatType.ST_ATK ? _permanentAttackRatio + _engravingAttackRatio : stat == StatType.ST_DEF ? _permanentDefenseRatio : 0d;
+        bool includeEngravings = through >= StatSource.Engraving;
+        if (includeEngravings)
+        {
+            if (stat == StatType.ST_CRT) add += _engravingCriticalPoints;
+            else if (stat == StatType.ST_CRTD) add += _engravingCriticalDamagePoints;
+            else if (stat == StatType.ST_ATK_SPD) mult += _engravingAttackSpeedRatio;
+        }
+        double permanentRatio = stat switch
+        {
+            StatType.ST_HP => _permanentHealthRatio + (includeEngravings ? _engravingHealthRatio : 0f),
+            StatType.ST_ATK => _permanentAttackRatio + (includeEngravings ? _engravingAttackRatio : 0f),
+            StatType.ST_DEF => _permanentDefenseRatio,
+            _ => 0d
+        };
         double result = (baseValues.GetValueOrDefault(stat) * (1d + permanentRatio) + add) * (1d + mult);
         return ApplyClamp(stat, (float)Math.Max(-float.MaxValue, Math.Min(float.MaxValue, result)));
     }
 
-    private void PublishStatChanges(float previousMaxHp, float previousMaxSp)
+    private void PublishStatChanges(float previousMaxHp)
     {
-        float hpBefore = _currentHp, spBefore = _currentSp;
+        float hpBefore = _currentHp;
         _currentHp = Mathf.Clamp(_currentHp, 0f, MaxHp);
-        _currentSp = Mathf.Clamp(_currentSp, 0f, MaxSp);
         // Resource replacement is already committed. A view failure must not prevent the other
         // resource listeners (or the inventory transaction) from observing the final state.
         if (OnStatsChanged != null)
@@ -275,7 +282,6 @@ public class PlayerStatManager : MonoBehaviour
                 catch (Exception error) { Debug.LogWarning("[Stats] Stat observer failed: " + error, this); }
             }
         if (previousMaxHp != MaxHp || hpBefore != _currentHp) NotifyResourceChanged(OnHpChanged, _currentHp, MaxHp);
-        if (previousMaxSp != MaxSp || spBefore != _currentSp) NotifyResourceChanged(OnSpChanged, _currentSp, MaxSp);
     }
 
     private void NotifyResourceChanged(Action<float, float> listeners, float current, float maximum)
@@ -292,13 +298,8 @@ public class PlayerStatManager : MonoBehaviour
     private float ApplyClamp(StatType stat, float value)
     {
         if (!IsFinite(value)) value = 0f;
-        if (stat == StatType.ST_HP || stat == StatType.ST_SP || stat == StatType.ST_SP_REGEN)
+        if (stat == StatType.ST_HP)
             value = Mathf.Max(0f, value);
-        foreach (var modifiers in _itemResourceModifiers.Values)
-        {
-            if (stat == StatType.ST_SP) value = Mathf.Min(value, modifiers.MaxSpCap);
-            else if (stat == StatType.ST_SP_REGEN) value = Mathf.Min(value, modifiers.SpRegenCap);
-        }
         return stat switch
         {
             StatType.ST_SPD => Mathf.Max(value, 2f), // 이동속도 최소 2 (너무 느려지면 안됨)
@@ -321,6 +322,17 @@ public class PlayerStatManager : MonoBehaviour
     {
         EnsureInitialized();
         return baseValues.GetValueOrDefault(stat, 0f);
+    }
+
+    // Attribute the applied differences in order so the detail values add up after scaling and caps.
+    internal (float Workshop, float Engraving, float Item, float Other) GetStatContributions(StatType stat)
+    {
+        EnsureInitialized();
+        float baseValue = GetBaseStat(stat);
+        float workshop = CalculateStat(stat, StatSource.Workshop);
+        float engraving = CalculateStat(stat, StatSource.Engraving);
+        float item = CalculateStat(stat, StatSource.Item);
+        return (workshop - baseValue, engraving - workshop, item - engraving, GetStat(stat) - item);
     }
 
     // ── HP / TakeDamage ──────────────────────────────────────────────────────────
@@ -351,55 +363,6 @@ public class PlayerStatManager : MonoBehaviour
         return new DamageResult(result.Outcome, result.HealthDamage, result.ShieldDamage, _currentHp <= 0f, revived: revived);
     }
 
-    // ── SP 메서드 ────────────────────────────────────────────────────────────────
-
-    /// <summary>SP를 소모합니다. 부족하면 false를 반환하고 소모하지 않습니다.</summary>
-    public bool TryConsumeSp(float amount)
-    {
-        EnsureInitialized();
-        if (!IsFinite(amount) || amount < 0f || _currentSp < amount) return false;
-        if (amount == 0f) return true;
-        _currentSp = Mathf.Max(0f, _currentSp - amount);
-        float delay = baseData != null ? baseData.baseSpRegenDelay : 1f;
-        _spRegenTimer = IsFinite(delay) ? Mathf.Max(0f, delay) : 1f;
-        OnSpChanged?.Invoke(_currentSp, GetStat(StatType.ST_SP));
-        return true;
-    }
-
-    /// <summary>SP를 외부에서 직접 추가합니다 (아이템, 보조 스킬 등).</summary>
-    public void AddSp(float amount)
-    {
-        EnsureInitialized();
-        if (!IsFinite(amount) || amount <= 0f) return;
-        _currentSp = Mathf.Min(_currentSp + amount, GetStat(StatType.ST_SP));
-        OnSpChanged?.Invoke(_currentSp, GetStat(StatType.ST_SP));
-    }
-
-    /// <summary>현재 SP가 요구량 이상인지 확인합니다.</summary>
-    public bool HasEnoughSp(float amount) => IsFinite(amount) && amount >= 0f && CurrentSp >= amount;
-
-    /// <summary>PlayerController.Update()에서 매 프레임 호출. SP 자동 회복을 처리합니다.</summary>
-    public void UpdateSpRegen(float deltaTime)
-    {
-        EnsureInitialized();
-        if (GetComponent<PlayerController>()?.IsStageTransitioning == true) return;
-        if (!IsFinite(deltaTime) || deltaTime <= 0f || _currentHp <= 0f) return;
-        if (_spRegenTimer > 0f)
-        {
-            float waiting = Mathf.Min(_spRegenTimer, deltaTime);
-            _spRegenTimer -= waiting;
-            deltaTime -= waiting;
-            if (deltaTime <= 0f) return;
-        }
-
-        float maxSp = GetStat(StatType.ST_SP);
-        if (_currentSp < maxSp)
-        {
-            _currentSp = Mathf.Min(_currentSp + GetStat(StatType.ST_SP_REGEN) * deltaTime, maxSp);
-            OnSpChanged?.Invoke(_currentSp, maxSp);
-        }
-    }
-
     // ── 필살기 게이지 메서드 ──────────────────────────────────────────────────────
 
     /// <summary>필살기 게이지를 지정한 양만큼 충전합니다. 최대치를 초과하지 않습니다.</summary>
@@ -420,7 +383,6 @@ public class PlayerStatManager : MonoBehaviour
 
     // ── HUD 단축 속성 ────────────────────────────────────────────────────────────
     public float MaxHp => GetStat(StatType.ST_HP);
-    public float MaxSp => GetStat(StatType.ST_SP);
 
     private sealed class ShieldLayer
     {

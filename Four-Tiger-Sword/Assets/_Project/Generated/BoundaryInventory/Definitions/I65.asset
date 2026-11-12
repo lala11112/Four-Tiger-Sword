@@ -18,9 +18,8 @@ MonoBehaviour:
   displayName: "\uC911\uAC11 \uCC9C\uACF5\uC2EC"
   description: "\uB05D\uC744 \uB2E8\uB2E8\uD558\uAC8C \uC18C\uACB0\uD55C \uBB34\uAD11
     \uCC9C\uACF5\uC2EC."
-  effectText: "\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD3C9\uD0C0\uB098 \uC2A4\uD0AC\uB85C
-    \uD53C\uD574\uB97C \uAC00\uD560 \uB54C \uB300\uC0C1\uC758 \uC591\uC218 \uC720\uD6A8
-    \uBC29\uC5B4\uB825\uC744 14% \uBB34\uC2DC\uD55C\uB2E4."
+  effectText: "\uC801 \uBC29\uC5B4\uB825 8% \uAD00\uD1B5 \xB7 \uC815\uC608 \uC774\uC0C1
+    \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574 +6%"
   synergyIds:
   - S15
   - S14
@@ -37,9 +36,30 @@ MonoBehaviour:
   boundaryEffects:
   - effectId: I65
     stat: 7
-    amount: 0.14
+    amount: 0.08
     trigger: 0
-    family: 3
+    family: 0
+    element: 0
+    eliteOrBossOnly: 0
+    targetHpMin: -1
+    targetHpMax: -1
+    selfHpMin: -1
+    selfHpMax: -1
+    firstTargetHit: 0
+    firstSkillHit: 0
+    firstIncomingAttack: 0
+    firstRewardKill: 0
+    requiresFullHealth: 0
+    minimumHealthLossRatio: 0
+    minimumBaseGold: 0
+    maximumBaseGold: 0
+    durationSeconds: 0
+    cooldownSeconds: 0
+  - effectId: I65:elite
+    stat: 6
+    amount: 0.06
+    trigger: 0
+    family: 0
     element: 0
     eliteOrBossOnly: 1
     targetHpMin: -1
@@ -58,9 +78,8 @@ MonoBehaviour:
     cooldownSeconds: 0
   icon: {fileID: 21300000, guid: d09ef596264ca0c448a65e78d0ae13a4, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I65\",\"name\":\"\uC911\uAC11 \uCC9C\uACF5\uC2EC\",\"description\":\"\uB05D\uC744
-    \uB2E8\uB2E8\uD558\uAC8C \uC18C\uACB0\uD55C \uBB34\uAD11 \uCC9C\uACF5\uC2EC.\",\"effect\":\"\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
-    \uD3C9\uD0C0\uB098 \uC2A4\uD0AC\uB85C \uD53C\uD574\uB97C \uAC00\uD560 \uB54C
-    \uB300\uC0C1\uC758 \uC591\uC218 \uC720\uD6A8 \uBC29\uC5B4\uB825\uC744 14% \uBB34\uC2DC\uD55C\uB2E4.\",\"synergies\":[\"S15\",\"S14\"],\"primarySynergy\":\"S15\",\"designIntent\":\"\uBC29\uC5B4\uB825\uC774
-    \uB192\uC740 \uC815\uC608\uC640 \uBCF4\uC2A4\uC5D0 \uC9D1\uC911\uD55C\uB2E4.\",\"origin\":\"new\",\"image\":\"Art/Items/I65.png\"}"
+    \uB2E8\uB2E8\uD558\uAC8C \uC18C\uACB0\uD55C \uBB34\uAD11 \uCC9C\uACF5\uC2EC.\",\"effect\":\"\uC801
+    \uBC29\uC5B4\uB825 8% \uAD00\uD1B5 \xB7 \uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C
+    \uBAA8\uB4E0 \uD53C\uD574 +6%\",\"synergies\":[\"S15\",\"S14\"],\"primarySynergy\":\"S15\",\"origin\":\"new\",\"image\":\"Art/Items/I65.png\",\"grade\":3}"

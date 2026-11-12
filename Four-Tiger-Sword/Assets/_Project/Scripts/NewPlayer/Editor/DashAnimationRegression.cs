@@ -152,14 +152,12 @@ public static class DashAnimationRegression
             Near(Playing().normalizedTime, 0f, "Backstep starts at its first frame.");
             Check(!animator.applyRootMotion, "Dodge disables root motion.");
             Near(animator.speed, 1f, "Dodge resets inherited animation speed.");
-            Near(stats.CurrentSp, statsData.baseSP - player.DodgeSpCost, "Dodge spends SP once on entry.");
             Check((Vector3)Field(dash, "_dashDirection") == Vector3.back, "No input retreats opposite the original facing.");
             Property(input, "MoveInput", Vector2.right);
             Field(dash, "_dashTimer", -player.ActionDeltaTime);
             dash.Update();
             ExpectAnimation("Backstep");
             Check((Vector3)Field(dash, "_dashDirection") == Vector3.back, "New input cannot redirect an active backstep.");
-            Near(stats.CurrentSp, statsData.baseSP - player.DodgeSpCost, "Dodge update never spends SP again.");
             Finish(Vector2.right);
             ExpectAnimation("Run");
 
@@ -188,17 +186,12 @@ public static class DashAnimationRegression
             Ready(Vector2.up); player.DashAnimationName = "MissingDash"; Start(); ExpectAnimation("Idle");
             Ready(Vector2.zero); player.BackstepAnimationName = " "; Start(); ExpectAnimation("Idle");
 
-            foreach (bool cooldown in new[] { false, true })
-            {
-                Ready(Vector2.up);
-                if (cooldown) Field(player, "_dashCooldownTimer", .5f);
-                else stats.TryConsumeSp(stats.CurrentSp);
-                float before = stats.CurrentSp;
-                input.DashBuffer.Set(); machine.Update(true, false);
-                Check(ReferenceEquals(machine.CurrentState, idle), "Unavailable dodge cannot leave Idle.");
-                ExpectAnimation("Idle");
-                Near(stats.CurrentSp, before, "Rejected dodge leaves SP unchanged.");
-            }
+            Ready(Vector2.up);
+            Field(player, "_dashCooldownTimer", .5f);
+            input.DashBuffer.Set(); machine.Update(true, false);
+            Check(ReferenceEquals(machine.CurrentState, idle), "Dodge on cooldown cannot leave Idle.");
+            ExpectAnimation("Idle");
+            Near((float)Field(player, "_dashCooldownTimer"), .5f, "Rejected dodge does not restart cooldown.");
 
             Ready(Vector2.down);
             machine.ChangeState(attack);
@@ -207,8 +200,7 @@ public static class DashAnimationRegression
             Start();
             ExpectAnimation("Dash");
             Check(form.Ends == ends + 1, "Attack-cancel dodge ends the interrupted attack exactly once.");
-            Near(stats.CurrentSp, statsData.baseSP - player.DodgeSpCost, "Attack-cancel dodge spends one cost.");
-            return $"PASS: dash animation ({checks} checks: input selection and threshold, snapshots, restart, fallback, root motion and speed, SP/cooldown gates, attack cancellation and Idle/Run recovery).";
+            return $"PASS: dash animation ({checks} checks: input selection and threshold, snapshots, restart, fallback, root motion and speed, cooldown gate, attack cancellation and Idle/Run recovery).";
         }
         finally
         {

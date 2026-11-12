@@ -64,7 +64,7 @@ public static class HubWorldPlayModeRegression
         Vector3 position = default;
         Quaternion rotation = default;
         float orbitYaw = 0f, orbitPitch = 0f;
-        float sp = 0f, regen = 0f, dashCooldown = 0f;
+        float dashCooldown = 0f;
         bool capturedPlayer = false;
         string result = null;
         try
@@ -104,8 +104,6 @@ public static class HubWorldPlayModeRegression
             rotation = player.transform.rotation;
             orbitYaw = orbit.HorizontalAxis.Value;
             orbitPitch = orbit.VerticalAxis.Value;
-            sp = player.StatManager.CurrentSp;
-            regen = Read<float>(player.StatManager, "_spRegenTimer");
             dashCooldown = Read<float>(player, "_dashCooldownTimer");
             capturedPlayer = true;
             actions = Read<InputActionReference>(player.Input, "_moveAction").action.actionMap.asset;
@@ -245,8 +243,6 @@ public static class HubWorldPlayModeRegression
                 try
                 {
                     Teleport(player, camera, position, rotation);
-                    Write(player.StatManager, "_currentSp", sp);
-                    Write(player.StatManager, "_spRegenTimer", regen);
                     Write(player, "_dashCooldownTimer", dashCooldown);
                     if (orbit != null)
                     {

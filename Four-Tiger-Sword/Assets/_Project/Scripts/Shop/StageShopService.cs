@@ -290,7 +290,7 @@ public sealed class StageShopService : MonoBehaviour
             var result = _transactions.TryFuse(firstId, secondId, out var item);
             _message = result switch
             {
-                ShopFusionResult.Success => $"{item.displayName} ({item.grade}등급)을 획득했습니다.",
+                ShopFusionResult.Success => $"{item.displayName} ({ItemDisplayText.Stars(item.grade)})을 획득했습니다.",
                 ShopFusionResult.NotOwned => "선택한 재료를 더 이상 보유하고 있지 않습니다.",
                 ShopFusionResult.InvalidMaterials => "같은 등급의 서로 다른 아이템 두 개를 선택하세요.",
                 ShopFusionResult.NoCandidates => "획득할 수 있는 합성 결과가 없습니다.",
@@ -333,7 +333,7 @@ public sealed class StageShopService : MonoBehaviour
             if (result == ShopFusionResult.Success)
             {
                 _fusionChoice = null; _fusionFirst = _fusionSecond = null; _fusionResult = item;
-                _message = $"{item.displayName} ({item.grade}등급)을 획득했습니다.";
+                _message = $"{item.displayName} ({ItemDisplayText.Stars(item.grade)})을 획득했습니다.";
             }
             else _message = "합성 후보나 재료가 변경되었습니다. 취소하고 재료를 다시 확인하세요.";
             return result;
@@ -489,12 +489,13 @@ public sealed class StageShopService : MonoBehaviour
         state.RefreshCount = CurrentStock?.RefreshCount ?? 0;
         state.CanRefresh = state.Visible && _tab == ShopTab.Buy && _fusionChoice == null
             && CurrentStock.CanRefresh(_items) && Wallet.Gold >= state.RefreshCost;
+        var ownedSynergies = _items.SynergyStates;
         state.FusionChoiceActive = state.Visible && _tab == ShopTab.Fuse && _fusionChoice != null;
         if (state.FusionChoiceActive)
         {
             state.FusionCandidates = new ShopOwnedItemViewState[_fusionChoice.Candidates.Count];
             for (int i = 0; i < state.FusionCandidates.Length; i++)
-                state.FusionCandidates[i] = OwnedState(_fusionChoice.Candidates[i]);
+                state.FusionCandidates[i] = OwnedState(_fusionChoice.Candidates[i], ownedSynergies);
         }
         if (CurrentStock != null)
         {
@@ -511,8 +512,9 @@ public sealed class StageShopService : MonoBehaviour
                     Id = offer.Id, Icon = offer.Item != null ? offer.Item.icon : null,
                     Name = offer.IsHealing ? "체력 회복" : offer.Item.displayName,
                     Description = offer.IsHealing ? $"최대 체력의 {settings.healingFraction * 100:0}%를 즉시 회복합니다."
-                        : ItemDisplayText.Description(offer.Item, _items.Catalog),
+                        : ItemDisplayText.Description(offer.Item, _items.Catalog, ownedSynergies),
                     PrimarySynergyName = offer.Item != null ? offer.Item.primarySynergyName : null,
+                    SynergyMembership = ItemDisplayText.SynergyMembership(offer.Item, _items.Catalog),
                     PrimarySynergyIcon = offer.Item != null ? offer.Item.primarySynergyIcon : null,
                     Price = offer.Price, ButtonLabel = label,
                     Grade = offer.Item != null ? offer.Item.grade : 0,
@@ -532,13 +534,13 @@ public sealed class StageShopService : MonoBehaviour
                     _offerSelection = offer.Id; offer.Selected = true; state.SelectedOffer = offer;
                     break;
                 }
-        PopulateOwnedState(state);
+        PopulateOwnedState(state, ownedSynergies);
         state.DetailSource = _detailSource == ShopDetailSource.Owned && state.SelectedOwned != null
             ? ShopDetailSource.Owned : state.SelectedOffer != null ? ShopDetailSource.Offer : ShopDetailSource.None;
         RenderSafely(() => _view.Render(state));
     }
 
-    private void PopulateOwnedState(ShopViewState state)
+    private void PopulateOwnedState(ShopViewState state, IReadOnlyList<ItemSynergyState> ownedSynergies)
     {
         if (!_items.Contains(_saleSelection)) _saleSelection = null;
         if (!_items.Contains(_fusionFirst)) _fusionFirst = null;
@@ -556,7 +558,7 @@ public sealed class StageShopService : MonoBehaviour
         for (int i = 0; i < owned.Count; i++)
         {
             var item = owned[i];
-            var row = OwnedState(item);
+            var row = OwnedState(item, ownedSynergies);
             row.Selected = item.itemId == _saleSelection;
             row.IsMaterial = item.itemId == _fusionFirst || item.itemId == _fusionSecond;
             row.CanSelect = state.Visible;
@@ -569,28 +571,30 @@ public sealed class StageShopService : MonoBehaviour
             if (item.itemId == _fusionSecond) state.FusionSecond = row;
         }
         state.CanSell = state.Visible && _fusionChoice == null && state.SelectedSale != null && state.SelectedSale.CanSell;
-        state.FusionResult = _fusionResult != null ? OwnedState(_fusionResult) : null;
+        state.FusionResult = _fusionResult != null ? OwnedState(_fusionResult, ownedSynergies) : null;
         if (_transactions != null && _fusionFirst != null && _fusionSecond != null)
         {
             var preview = _transactions.GetFusionPreview(_fusionFirst, _fusionSecond, out int grade, out float chance);
             state.CanFuse = state.Visible && _fusionChoice == null && preview == ShopFusionResult.Success;
             state.FusionOddsText = preview == ShopFusionResult.Success
-                ? chance <= 0f ? $"{grade}등급 100% · 골드 소모 없음"
-                    : $"{grade}등급 {(1f - chance) * 100f:0.#}% / {grade + 1}등급 {chance * 100f:0.#}%\n골드 소모 없음"
+                ? chance <= 0f ? $"{ItemDisplayText.Stars(grade)} 100% · 골드 소모 없음"
+                    : $"{ItemDisplayText.Stars(grade)} {(1f - chance) * 100f:0.#}% / {ItemDisplayText.Stars(grade + 1)} {chance * 100f:0.#}%\n골드 소모 없음"
                 : "선택한 재료로 합성할 수 없습니다.";
         }
         state.EmptyMessage = owned.Count == 0 ? "보유한 아이템이 없습니다."
             : _tab == ShopTab.Fuse && !HasFusionPair(owned) ? "합성하려면 같은 등급의 아이템 두 개가 필요합니다." : string.Empty;
     }
 
-    private ShopOwnedItemViewState OwnedState(ItemDefinition item)
+    private ShopOwnedItemViewState OwnedState(ItemDefinition item, IReadOnlyList<ItemSynergyState> ownedSynergies)
     {
         int price = 0;
         bool sellable = _transactions != null && _transactions.TryGetSalePrice(item.itemId, out price);
         return new ShopOwnedItemViewState
         {
-            Id = item.itemId, Name = item.displayName, Description = ItemDisplayText.Description(item, _items.Catalog),
+            Id = item.itemId, Name = item.displayName,
+            Description = ItemDisplayText.Description(item, _items.Catalog, ownedSynergies),
             PrimarySynergyName = item.primarySynergyName, PrimarySynergyIcon = item.primarySynergyIcon,
+            SynergyMembership = ItemDisplayText.SynergyMembership(item, _items.Catalog),
             Grade = item.grade, Icon = item.icon, SalePrice = price,
             Element = item.element,
             CanSell = sellable && price <= int.MaxValue - Wallet.Gold

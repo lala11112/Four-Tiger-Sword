@@ -121,7 +121,7 @@ namespace Penta.Upgrade.Editor
         {
             var importer = AssetImporter.GetAtPath(BackgroundPath) as TextureImporter;
             if (!importer) throw new InvalidOperationException("Demo background missing: " + BackgroundPath);
-            if (importer.npotScale != TextureImporterNPOTScale.None || importer.maxTextureSize != 4096
+            if (importer.npotScale != TextureImporterNPOTScale.None || importer.maxTextureSize != 3896
                 || importer.mipmapEnabled || importer.wrapMode != TextureWrapMode.Clamp
                 || importer.textureCompression != TextureImporterCompression.Uncompressed)
             {
@@ -309,13 +309,13 @@ namespace Penta.Upgrade.Editor
             var canvas = prefab.GetComponent<Canvas>();
             if (!canvas || canvas.renderMode != RenderMode.ScreenSpaceOverlay || canvas.sortingOrder < 200)
                 throw new InvalidOperationException("Expected high-order screen overlay canvas.");
-            if (PentaUpgradeCatalog.Nodes.Count != 40) throw new InvalidOperationException("Expected 40 nodes: free origin and 39 upgrades.");
-            int[] counts = { 1, 5, 16, 13, 5 };
+            if (PentaUpgradeCatalog.Nodes.Count != 38) throw new InvalidOperationException("Expected 38 nodes: free origin and 37 upgrades.");
+            int[] counts = { 1, 4, 15, 13, 5 };
             for (int tier = 0; tier < counts.Length; tier++)
                 if (PentaUpgradeCatalog.Nodes.Count(x => x.Tier == tier) != counts[tier])
                     throw new InvalidOperationException("Unexpected concept tier layout.");
-            if (PentaUpgradeCatalog.Nodes.Sum(x => x.ParentIds.Count) != 39)
-                throw new InvalidOperationException("Expected 39 simple tree connections.");
+            if (PentaUpgradeCatalog.Nodes.Sum(x => x.ParentIds.Count) != 37)
+                throw new InvalidOperationException("Expected 37 simple tree connections.");
             ValidateConceptGraph();
             ValidatePrefabGraph(prefab);
             ValidatePrefabGraph(panel);
@@ -343,15 +343,15 @@ namespace Penta.Upgrade.Editor
 
         static Dictionary<string, string> ExpectedParents() => new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            { "atk", "origin" }, { "hp", "origin" }, { "footwork", "origin" }, { "gold", "origin" }, { "heirloom", "origin" },
+            { "atk", "origin" }, { "hp", "origin" }, { "footwork", "origin" }, { "gold", "origin" },
             { "crit", "atk" }, { "bossdmg", "atk" }, { "heal", "hp" }, { "guard", "hp" }, { "bossguard", "hp" },
             { "counter", "footwork" }, { "pursuit", "footwork" }, { "firstblood", "gold" }, { "discount", "gold" },
-            { "sell", "gold" }, { "reroll", "heirloom" }, { "severe", "crit" }, { "pity", "crit" },
+            { "sell", "gold" }, { "reroll", "origin" }, { "severe", "crit" }, { "pity", "crit" },
             { "shield", "heal" }, { "revive", "guard" }, { "refresh", "discount" },
             { "speed", "atk" }, { "reach", "speed" }, { "opener", "reach" }, { "combo", "speed" },
             { "finisher", "combo" }, { "critheal", "severe" }, { "armor", "hp" }, { "crowdguard", "armor" },
             { "roomheal", "heal" }, { "escape", "footwork" }, { "backstab", "counter" }, { "haste", "pursuit" },
-            { "starterelement", "heirloom" }, { "choices", "heirloom" }, { "hold", "reroll" },
+            { "choices", "origin" }, { "hold", "reroll" },
             { "synergy", "choices" }, { "fusion", "synergy" }, { "stock", "refresh" }
         };
 
@@ -371,8 +371,8 @@ namespace Penta.Upgrade.Editor
                     || node.ParentIds[0] != expectedParent)
                     throw new InvalidOperationException("Unexpected concept branch or parent: " + node.Id);
                 var parent = PentaUpgradeCatalog.Find(expectedParent);
-                if (parent == null || parent.Tier != node.Tier - 1)
-                    throw new InvalidOperationException("Parent must be on the immediately preceding tier: " + node.Id);
+                if (parent == null || parent.Tier != node.Tier - 1 && !(parent.Id == "origin" && node.Tier == 2))
+                    throw new InvalidOperationException("Invalid tier for concept parent: " + node.Id);
                 var visited = new HashSet<string>(StringComparer.Ordinal);
                 var cursor = node;
                 while (cursor.Id != "origin")
@@ -388,8 +388,8 @@ namespace Penta.Upgrade.Editor
         {
             var view = prefab.GetComponent<PentaUpgradeView>();
             var nodeViews = new SerializedObject(view).FindProperty("nodeViews");
-            if (nodeViews == null || nodeViews.arraySize != 40)
-                throw new InvalidOperationException(prefab.name + " must contain exactly 40 node controls.");
+            if (nodeViews == null || nodeViews.arraySize != 38)
+                throw new InvalidOperationException(prefab.name + " must contain exactly 38 node controls.");
             var ids = new HashSet<string>(StringComparer.Ordinal);
             for (int i = 0; i < nodeViews.arraySize; i++)
             {
@@ -400,8 +400,8 @@ namespace Penta.Upgrade.Editor
                     throw new InvalidOperationException(prefab.name + " has an invalid or duplicate node control: " + id);
             }
             var links = prefab.GetComponentsInChildren<PentaUpgradeLinks>(true);
-            if (links.Length != 1 || links[0].ConnectionCount != 39)
-                throw new InvalidOperationException(prefab.name + " must contain exactly 39 graph links.");
+            if (links.Length != 1 || links[0].ConnectionCount != 37)
+                throw new InvalidOperationException(prefab.name + " must contain exactly 37 graph links.");
             var serializedLinks = new SerializedObject(links[0]).FindProperty("links");
             var expected = ExpectedParents();
             var children = new HashSet<string>(StringComparer.Ordinal);

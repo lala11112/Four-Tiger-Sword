@@ -30,7 +30,13 @@ public sealed partial class RunManager : MonoBehaviour
     private PauseMenuPresenter _pauseMenu;
     private Coroutine _deathPresentation;
     private uint _deathPresentationVersion;
+    private PlayerStatsPresenter _playerStats;
     public bool IsDeathPresentationPlaying { get; private set; }
+    internal bool CanShowPlayerStats => isActiveAndEnabled && State == RunState.Playing && _transition == null
+        && !IsShopOpen && !IsMapOpen && !IsInventoryOpen && !IsRewardOpen && !IsPauseMenuOpen
+        && !HasPendingItemChoice && !IsUpgradeSaveBlocked
+        && stageManager != null && stageManager.IsReady && stageManager.Result?.success == true
+        && stageManager.Result.root != null && stageManager.Result.root.activeInHierarchy;
 
     private void Awake()
     {
@@ -40,6 +46,7 @@ public sealed partial class RunManager : MonoBehaviour
         resultUI.Bind(this);
         RunRewardFeedPresenter.Ensure(this, player);
         _pauseMenu = PauseMenuPresenter.Ensure(this);
+        _playerStats = PlayerStatsPresenter.Ensure(this);
     }
 
     private IEnumerator Start()
@@ -236,7 +243,7 @@ public sealed partial class RunManager : MonoBehaviour
     {
         if (state != RunState.Playing)
         {
-            if (_pauseMenu != null) _pauseMenu.CloseForHostShutdown();
+            _pauseMenu?.CloseForHostShutdown();
             CloseItemChoiceModal();
             CleanupMapOnShutdown();
             CleanupInventoryOnShutdown();
@@ -250,13 +257,13 @@ public sealed partial class RunManager : MonoBehaviour
         && !IsShopOpen && !IsMapOpen && !IsInventoryOpen && !IsRewardOpen && !HasPendingItemChoice
         && !IsUpgradeSaveBlocked && !IsReturningToHub && !HubReturnTransition.IsActive
         && player != null && player.isActiveAndEnabled && !player.IsStageTransitioning && !player.IsFinisherSelecting
-        && player.StatManager != null && player.StatManager.CurrentHp > 0f
+        && !player.IsStatsOpen && !player.IsFallRecovering && player.StatManager != null && player.StatManager.CurrentHp > 0f
         && stageManager != null && stageManager.isActiveAndEnabled && stageManager.IsReady
         && stageManager.Result != null && stageManager.Result.success && stageManager.Result.root != null
         && stageManager.Result.root.activeInHierarchy;
 
     internal bool TryPreparePauseMenuExit()
-        => IsPauseMenuOpen && IsPauseMenuContextValid && CanLeaveUpgradeRewards();
+        => IsPauseMenuOpen && IsPauseMenuContextValid && CanLeaveUpgradeRewards() && TrySaveSupplyDepotExit();
 
     public void RestartRun()
     {
@@ -297,7 +304,7 @@ public sealed partial class RunManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_pauseMenu != null) _pauseMenu.CloseForHostShutdown();
+        _pauseMenu?.CloseForHostShutdown();
         CancelStagePresentation();
         CleanupUpgradeRewards();
         CloseItemChoiceModal();

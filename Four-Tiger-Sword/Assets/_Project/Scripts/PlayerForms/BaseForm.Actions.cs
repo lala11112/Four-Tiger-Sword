@@ -149,7 +149,6 @@ public abstract partial class BaseForm
     {
         BeginItemCast();
         _currentAction = ActionType.Skill;
-        _playerController.StatManager.TryConsumeSp(SkillSpCost);
         _skillStep = 0;
         FindSoftTarget();
         _playerController.SetAnimationSpeed(AttackSpeed);
@@ -188,7 +187,7 @@ public abstract partial class BaseForm
         _skillStep = 0;
         _softTarget = null;
         ClearHitTargets();
-        _skillCooldownTimer = SkillCooldown;
+        _skillCooldownTimer = Mathf.Max(0f, SkillCooldown);
         _playerController.SetAnimationSpeed(1f);
     }
 
@@ -238,7 +237,7 @@ public abstract partial class BaseForm
     {
         BeginItemCast();
         ResetActionTiming();
-        _ultimateCooldownTimer = _weaponActionData != null ? _weaponActionData.UltimateCooldown : 30f;
+        _ultimateCooldownTimer = BaseUltimateCooldown;
         _playerController.StatManager.ConsumeAllUltimateGauge();
     }
 

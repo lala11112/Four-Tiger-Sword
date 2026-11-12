@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ItemPresentationText = BoundaryZero.Inventory.ItemPresentationText;
 using Penta.Upgrade;
 using TMPro;
 using UnityEngine;
@@ -12,19 +13,11 @@ public sealed class RunItemChoiceView : MonoBehaviour
     {
         public RectTransform Root;
         public UnityEngine.UI.Image Icon;
-        public TMP_Text Title, Grade, Meta, Description, HoldLabel;
+        public TMP_Text Title, Grade, EffectTitle, Effect, SynergyTitle, Synergy, HoldLabel;
+        public RectTransform EffectPanel, SynergyRule;
         public UnityEngine.UI.Image[] RarityBorder;
         public UnityEngine.UI.Button Choose, Hold;
         public UnityEngine.UI.ScrollRect Scroll;
-        public string Id, SessionId;
-    }
-
-    private sealed class SynergyOption
-    {
-        public RectTransform Root;
-        public UnityEngine.UI.Image Icon;
-        public TMP_Text Title, Summary;
-        public UnityEngine.UI.Button Button;
         public string Id, SessionId;
     }
 
@@ -39,7 +32,7 @@ public sealed class RunItemChoiceView : MonoBehaviour
 
     private RunItemChoiceService _service;
     private TMP_FontAsset _font;
-    private RectTransform _window, _cardsRoot, _synergiesRoot;
+    private RectTransform _window, _cardsRoot;
     private RectTransform _ownedSynergiesRoot;
     private UnityEngine.UI.ScrollRect _ownedSynergiesScroll;
     private TMP_Text _noOwnedSynergies;
@@ -47,11 +40,10 @@ public sealed class RunItemChoiceView : MonoBehaviour
     private RectTransform _synergyTooltip;
     private TMP_Text _synergyTooltipTitle, _synergyTooltipBody;
     private OwnedSynergy _hoveredSynergy, _focusedSynergy;
-    private TMP_Text _title, _guide, _status, _empty, _emptyLabel, _rerollLabel;
+    private TMP_Text _title, _status, _empty, _rerollLabel;
     private UnityEngine.UI.Button _emptyClaim, _reroll, _skip;
     private readonly List<Card> _cards = new();
-    private readonly List<SynergyOption> _synergies = new();
-    private bool _shown, _busy;
+    private bool _shown, _busy, _ownershipRefreshPending;
     private UIModalMotion _motion;
     private CanvasGroup _windowGroup;
     public bool IsClosing => _motion != null && _motion.IsClosing;
@@ -90,9 +82,13 @@ public sealed class RunItemChoiceView : MonoBehaviour
     public void Bind(RunItemChoiceService service)
     {
         if (ReferenceEquals(_service, service)) return;
-        if (_service != null) _service.Changed -= Refresh;
+        Unsubscribe();
         _service = service;
-        if (_service != null) _service.Changed += Refresh;
+        if (_service != null)
+        {
+            _service.Changed += Refresh;
+            _service.OwnedItemsChanged += QueueOwnershipRefresh;
+        }
         _sessionId = null; _localError = null;
         if (_shown) Refresh();
     }
@@ -133,8 +129,20 @@ public sealed class RunItemChoiceView : MonoBehaviour
         _motion.PlayClose(() => { Hide(); completed?.Invoke(); });
     }
 
+    private void QueueOwnershipRefresh()
+    {
+        // Ownership callbacks fire before the runtime clears its mutation guard.
+        _ownershipRefreshPending = _shown;
+    }
+
+    private void LateUpdate()
+    {
+        if (_ownershipRefreshPending) Refresh();
+    }
+
     public void Refresh()
     {
+        _ownershipRefreshPending = false;
         if (!_shown || _window == null) return;
         var session = _service?.Current;
         if (session == null)
@@ -145,34 +153,11 @@ public sealed class RunItemChoiceView : MonoBehaviour
         }
         bool newSession = _sessionId != session.Id;
         if (newSession) { _sessionId = session.Id; _localError = null; }
-        bool starter = session.Kind == RunItemChoiceKind.Starter;
-        _title.text = starter ? "출격 유품" : "전투 보상";
-        _title.rectTransform.sizeDelta = new Vector2(session.NeedsSynergy ? 1632 : 1288, 52);
-        _guide.text = string.Empty;
-        _guide.gameObject.SetActive(false);
-        _cardsRoot.gameObject.SetActive(!session.NeedsSynergy);
-        _synergiesRoot.gameObject.SetActive(session.NeedsSynergy);
-        RefreshOwnedSynergies(!session.NeedsSynergy, newSession);
+        _title.text = "전투 보상";
+        _cardsRoot.gameObject.SetActive(true);
+        var ownedSynergies = _service.OwnedSynergies;
+        RefreshOwnedSynergies(ownedSynergies, true, newSession);
         VisibleCardCount = 0;
-        int visibleSynergies = 0;
-        if (session.NeedsSynergy)
-        {
-            var options = _service.StarterSynergies();
-            visibleSynergies = options.Count;
-            int columns = Mathf.Max(3, (visibleSynergies + 1) / 2);
-            for (int i = 0; i < visibleSynergies; i++)
-            {
-                if (i == _synergies.Count) _synergies.Add(CreateSynergy(i));
-                var option = _synergies[i]; var definition = options[i];
-                option.Root.gameObject.SetActive(true); option.Id = definition.id; option.SessionId = session.Id;
-                LayoutStarterSynergy(option, i, visibleSynergies, columns);
-                option.Title.text = definition.displayName;
-                option.Summary.text = definition.summary ?? definition.description ?? "이 계통의 유품 후보 보기";
-                option.Icon.sprite = definition.icon; option.Icon.enabled = definition.icon != null;
-                option.Button.interactable = !_busy;
-            }
-        }
-        else
         {
             int count = Mathf.Min(4, session.Candidates.Count);
             VisibleCardCount = count;
@@ -190,12 +175,11 @@ public sealed class RunItemChoiceView : MonoBehaviour
                 card.Title.text = item.displayName;
                 Color rarity = BoundaryZero.Inventory.ItemRarityFrame.ColorFor(item.grade);
                 if (rarity.a == 0f) rarity = Muted;
-                card.Grade.text = ItemDisplayText.Meta(item.grade, null);
+                card.Grade.text = ItemDisplayText.Stars(item.grade);
                 card.Grade.color = rarity;
-                card.Meta.text = item.primarySynergyName;
                 foreach (var edge in card.RarityBorder) edge.color = rarity;
                 card.Icon.sprite = item.icon; card.Icon.enabled = item.icon != null;
-                card.Description.text = ItemDisplayText.RewardDescription(item, _service.Catalog);
+                RenderCardEffects(card, item, width - 48, ownedSynergies);
                 card.Choose.interactable = !_busy;
                 card.Hold.gameObject.SetActive(_service.CanHold);
                 card.Hold.interactable = !_busy;
@@ -210,17 +194,15 @@ public sealed class RunItemChoiceView : MonoBehaviour
             }
         }
         for (int i = VisibleCardCount; i < _cards.Count; i++) _cards[i].Root.gameObject.SetActive(false);
-        for (int i = visibleSynergies; i < _synergies.Count; i++) _synergies[i].Root.gameObject.SetActive(false);
-        bool empty = !session.NeedsSynergy && session.Candidates.Count == 0;
+        bool empty = session.Candidates.Count == 0;
         _empty.gameObject.SetActive(empty); _emptyClaim.gameObject.SetActive(empty);
-        _empty.text = "받을 수 있는 유품이 없습니다.";
-        _emptyLabel.text = "출격 계속";
+        _empty.text = "받을 수 있는 아이템이 없습니다.";
         _emptyClaim.interactable = !_busy;
-        bool showReroll = !starter && !session.NeedsSynergy && !empty && _service.CanReroll;
+        bool showReroll = !empty && _service.CanReroll;
         _reroll.gameObject.SetActive(showReroll);
         _reroll.interactable = !_busy && _service.CanReroll;
         _rerollLabel.text = $"다시 뽑기 · {_service.RerollsRemaining}회";
-        float actionCenter = session.NeedsSynergy ? 880 : 708;
+        const float actionCenter = 708;
         Place((RectTransform)_reroll.transform, actionCenter - 316, 842, 304, 56);
         Place((RectTransform)_skip.transform, showReroll ? actionCenter + 12 : actionCenter - 152, 842, 304, 56);
         _skip.interactable = !_busy;
@@ -240,7 +222,14 @@ public sealed class RunItemChoiceView : MonoBehaviour
 
     private static readonly Color Ink = new Color32(231, 237, 245, 255);
     private static readonly Color Muted = new Color32(160, 178, 198, 255);
-    private static readonly Color ActiveSynergy = new Color32(235, 116, 121, 255);
+    private static readonly Color ActiveSynergy = ParseSynergyColor(ItemPresentationText.ActiveColorHex);
+    private static readonly Color InactiveSynergy = ParseSynergyColor(ItemPresentationText.InactiveColorHex);
+
+    private static Color ParseSynergyColor(string hex)
+    {
+        ColorUtility.TryParseHtmlString("#" + hex, out Color color);
+        return color;
+    }
 
     private void Build()
     {
@@ -255,16 +244,12 @@ public sealed class RunItemChoiceView : MonoBehaviour
         Chrome(_window, PentaUpgradeChrome.Style.Window);
         _title = Label("Title", _window, "전투 보상", 64, 43, 1288, 52, 34);
         _title.alignment = TextAlignmentOptions.Midline;
-        _guide = Label("Guide", _window, "아이템 하나를 선택하세요.", 64, 110, 1632, 42, 21);
-        _guide.color = Muted;
         _cardsRoot = Rect("Candidates", _window, 0, 0, 1760, 930);
-        _synergiesRoot = Rect("Synergies", _window, 0, 0, 1760, 930);
         BuildOwnedSynergies();
         _empty = Label("Empty", _window, "", 64, 330, 1288, 150, 28);
         _empty.alignment = TextAlignmentOptions.Center;
         _emptyClaim = Button("ClaimEmpty", _window, "계속", 468, 520, 480, 60,
-            () => Execute(() => _service.TryClaimEmptyReward(_sessionId)), true);
-        _emptyLabel = _emptyClaim.GetComponentInChildren<TMP_Text>();
+            () => Execute(() => _service.TrySkip(_sessionId)), true);
         _status = Label("Status", _window, "", 64, 794, 1288, 42, 22); _status.color = new Color32(255, 179, 122, 255);
         _status.alignment = TextAlignmentOptions.Center;
         _reroll = Button("Reroll", _window, "다시 뽑기", 392, 842, 304, 56,
@@ -285,26 +270,37 @@ public sealed class RunItemChoiceView : MonoBehaviour
         string[] edges = { "Top", "TopCorner", "Right", "BottomCorner", "Bottom", "Left" };
         for (int i = 0; i < edges.Length; i++)
             card.RarityBorder[i] = Image(Rect("Rarity" + edges[i], card.Root, 0, 0, 0, 0), Color.white, false);
-        card.Icon = Image(Rect("OriginalItemIcon", card.Root, 147, 18, 96, 96), Color.white, false);
+        card.Icon = Image(Rect("OriginalItemIcon", card.Root, 24, 22, 84, 84), Color.white, false);
         card.Icon.preserveAspect = true;
-        card.Title = Label("Name", card.Root, "", 18, 128, 354, 62, 24); card.Title.alignment = TextAlignmentOptions.Center;
-        card.Grade = Label("Grade", card.Root, "", 18, 192, 92, 30, 19);
+        card.Title = Label("Name", card.Root, "", 124, 22, 242, 64, 27);
+        card.Title.fontStyle = FontStyles.Bold;
+        card.Title.alignment = TextAlignmentOptions.MidlineLeft;
+        card.Title.richText = false;
+        card.Grade = Label("Grade", card.Root, "", 124, 88, 242, 32, 25);
         card.Grade.fontStyle = FontStyles.Bold;
-        card.Meta = Label("Meta", card.Root, "", 18, 192, 354, 30, 16); card.Meta.color = Muted;
-        card.Meta.alignment = TextAlignmentOptions.Center;
-        var scroll = Rect("DescriptionScroll", card.Root, 18, 232, 354, 230);
+        card.Grade.alignment = TextAlignmentOptions.MidlineLeft;
+        var scroll = Rect("DescriptionScroll", card.Root, 24, 136, 342, 392);
         card.Scroll = scroll.gameObject.AddComponent<UnityEngine.UI.ScrollRect>();
-        var viewport = Rect("Viewport", scroll, 0, 0, 354, 230);
+        var viewport = Rect("Viewport", scroll, 0, 0, 342, 392);
         Image(viewport, new Color(0, 0, 0, .001f), true);
         viewport.gameObject.AddComponent<UnityEngine.UI.RectMask2D>();
-        card.Description = Label("Content", viewport, "", 0, 0, 354, 230, 22);
-        card.Description.richText = true;
-        card.Description.lineSpacing = 4;
-        var content = card.Description.rectTransform;
-        content.anchorMin = new Vector2(0, 1); content.anchorMax = Vector2.one; content.sizeDelta = new Vector2(0, 230);
-        card.Description.overflowMode = TextOverflowModes.Overflow;
-        var fit = content.gameObject.AddComponent<UnityEngine.UI.ContentSizeFitter>();
-        fit.verticalFit = UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
+        var content = Rect("Content", viewport, 0, 0, 342, 392);
+        card.EffectPanel = Rect("EffectPanel", content, 0, 0, 342, 120);
+        Image(card.EffectPanel, new Color32(28, 48, 69, 255), false);
+        card.EffectTitle = Label("EffectTitle", card.EffectPanel, "개별 효과", 12, 10, 318, 25, 19);
+        card.EffectTitle.fontStyle = FontStyles.Bold;
+        card.EffectTitle.color = new Color32(187, 216, 241, 255);
+        card.Effect = Label("Effect", card.EffectPanel, "", 12, 38, 318, 60, 24);
+        card.Effect.overflowMode = TextOverflowModes.Overflow;
+        card.Effect.lineSpacing = 4;
+        card.SynergyRule = Rect("SynergyRule", content, 0, 132, 342, 1);
+        Image(card.SynergyRule, new Color32(114, 95, 80, 255), false);
+        card.SynergyTitle = Label("SynergyTitle", content, "시너지 효과", 0, 142, 342, 28, 19);
+        card.SynergyTitle.fontStyle = FontStyles.Bold;
+        card.SynergyTitle.color = ActiveSynergy;
+        card.Synergy = Label("Synergy", content, "", 0, 178, 342, 210, 21);
+        card.Synergy.overflowMode = TextOverflowModes.Overflow;
+        card.Synergy.lineSpacing = 3;
         card.Scroll.viewport = viewport; card.Scroll.content = content;
         card.Scroll.horizontal = false; card.Scroll.vertical = true; card.Scroll.inertia = false;
         card.Scroll.movementType = UnityEngine.UI.ScrollRect.MovementType.Clamped; card.Scroll.scrollSensitivity = 32;
@@ -336,15 +332,12 @@ public sealed class RunItemChoiceView : MonoBehaviour
             Place(edge, center.x, center.y, direction.magnitude + 1f, 2f);
             edge.localRotation = Quaternion.Euler(0, 0, -Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
         }
-        float iconSize = narrow ? 64 : 72;
-        float titleLeft = narrow ? 100 : 112;
-        Place(card.Icon.rectTransform, 24, 22, iconSize, iconSize);
-        Place(card.Title.rectTransform, titleLeft, 22, width - titleLeft - 24, 76);
-        card.Title.fontSize = 26; card.Title.alignment = TextAlignmentOptions.MidlineLeft;
-        Place(card.Grade.rectTransform, 24, 108, 74, 32);
-        Place(card.Meta.rectTransform, 102, 108, width - 126, narrow ? 48 : 32);
-        card.Meta.fontSize = 19; card.Meta.alignment = TextAlignmentOptions.TopLeft;
-        float descriptionTop = narrow ? 174 : 158;
+        float iconSize = narrow ? 68 : 84;
+        float titleLeft = 36 + iconSize;
+        Place(card.Icon.rectTransform, 24, 28, iconSize, iconSize);
+        Place(card.Title.rectTransform, titleLeft, 20, width - titleLeft - 24, 64);
+        Place(card.Grade.rectTransform, titleLeft, 86, width - titleLeft - 24, 32);
+        const float descriptionTop = 136;
         float descriptionHeight = height - (hold ? 136 : 80) - descriptionTop;
         Place((RectTransform)card.Scroll.transform, 24, descriptionTop, width - 48, descriptionHeight);
         Place(card.Scroll.viewport, 0, 0, width - 48, descriptionHeight);
@@ -355,6 +348,43 @@ public sealed class RunItemChoiceView : MonoBehaviour
             var label = button.GetComponentInChildren<TMP_Text>(true).rectTransform;
             Place(label, 8, 0, width - 64, 48);
         }
+    }
+
+    private void RenderCardEffects(Card card, ItemDefinition item, float width, IReadOnlyList<ItemSynergyState> ownedSynergies)
+    {
+        string effect = ItemDisplayText.Effect(item);
+        string synergy = ItemDisplayText.SynergyDescription(item, _service.Catalog, ownedSynergies);
+        bool hasEffect = !string.IsNullOrWhiteSpace(effect);
+        bool hasSynergy = !string.IsNullOrWhiteSpace(synergy);
+        card.EffectPanel.gameObject.SetActive(hasEffect);
+        card.SynergyRule.gameObject.SetActive(hasEffect && hasSynergy);
+        card.SynergyTitle.gameObject.SetActive(hasSynergy);
+        card.Synergy.gameObject.SetActive(hasSynergy);
+        float height = 0;
+        if (hasEffect)
+        {
+            card.Effect.text = effect;
+            float effectHeight = card.Effect.GetPreferredValues(effect, width - 24, 0).y;
+            height = 50 + effectHeight;
+            Place(card.EffectPanel, 0, 0, width, height);
+            Place(card.EffectTitle.rectTransform, 12, 10, width - 24, 25);
+            Place(card.Effect.rectTransform, 12, 38, width - 24, effectHeight);
+        }
+        if (hasSynergy)
+        {
+            if (hasEffect)
+            {
+                Place(card.SynergyRule, 0, height + 12, width, 1);
+                height += 22;
+            }
+            Place(card.SynergyTitle.rectTransform, 0, height, width, 28);
+            height += 33;
+            card.Synergy.text = synergy;
+            float synergyHeight = card.Synergy.GetPreferredValues(synergy, width, 0).y;
+            Place(card.Synergy.rectTransform, 0, height, width, synergyHeight);
+            height += synergyHeight;
+        }
+        card.Scroll.content.sizeDelta = new Vector2(width, height);
     }
 
     private void BuildOwnedSynergies()
@@ -395,12 +425,12 @@ public sealed class RunItemChoiceView : MonoBehaviour
         _ownedSynergiesScroll.verticalScrollbarVisibility = UnityEngine.UI.ScrollRect.ScrollbarVisibility.AutoHide;
     }
 
-    private void RefreshOwnedSynergies(bool visible, bool resetScroll)
+    private void RefreshOwnedSynergies(IReadOnlyList<ItemSynergyState> ownedSynergies, bool visible, bool resetScroll)
     {
         _ownedSynergiesRoot.gameObject.SetActive(visible);
         if (!visible) return;
         var states = new List<ItemSynergyState>();
-        foreach (var state in _service.OwnedSynergies)
+        foreach (var state in ownedSynergies)
             if (state.Definition != null && state.OwnedCount > 0) states.Add(state);
         states.Sort((a, b) =>
         {
@@ -453,11 +483,14 @@ public sealed class RunItemChoiceView : MonoBehaviour
             current.Icon.sprite = state.Definition.icon; current.Icon.enabled = current.Icon.sprite != null;
             bool active = state.ActiveTier != null;
             current.Accent.enabled = active;
-            current.Name.color = active ? ActiveSynergy : Ink;
-            current.Progress.color = active ? Ink : Muted;
+            current.Name.color = active ? ActiveSynergy : InactiveSynergy;
+            current.Name.fontStyle = active ? FontStyles.Bold : FontStyles.Normal;
+            current.Progress.color = InactiveSynergy;
             var next = NextSynergyTier(state);
             string progress = next == null ? $"{state.OwnedCount}개 보유" : $"{state.OwnedCount}/{next.count}";
-            current.Progress.text = active ? $"{state.ActiveTier.count}세트 활성 · {progress}" : $"미활성 · {progress}";
+            current.Progress.text = active
+                ? $"<color=#{ItemPresentationText.ActiveColorHex}><b>{state.ActiveTier.count}세트 활성</b></color> · {progress}"
+                : $"미활성 · {progress}";
         }
         for (int i = states.Count; i < _ownedSynergies.Count; i++) _ownedSynergies[i].Root.gameObject.SetActive(false);
         if (resetScroll)
@@ -500,14 +533,10 @@ public sealed class RunItemChoiceView : MonoBehaviour
         }
 
         var state = row.State;
-        var next = NextSynergyTier(state);
         _synergyTooltipTitle.text = ItemDisplayText.LiteralEffect(state.Definition.displayName);
-        _synergyTooltipTitle.color = state.ActiveTier != null ? ActiveSynergy : Ink;
-        string body = state.ActiveTier != null
-            ? $"<color=#EB7479><b>현재 활성 · {state.ActiveTier.count}세트</b></color>\n{ItemDisplayText.LiteralEffect(state.ActiveTier.text)}"
-            : $"<color=#BCCEE0><b>미활성 · {state.OwnedCount}개 보유</b></color>";
-        if (next != null)
-            body += $"\n\n<color=#F9C48A><b>다음 단계 · {state.OwnedCount}/{next.count}</b></color>\n{ItemDisplayText.LiteralEffect(next.text)}";
+        _synergyTooltipTitle.color = state.ActiveTier != null ? ActiveSynergy : InactiveSynergy;
+        _synergyTooltipBody.color = InactiveSynergy;
+        string body = ItemDisplayText.SynergyEffectDescription(state.Definition, state.OwnedCount);
         _synergyTooltipBody.text = body;
         const float width = 460f, inset = 32f, gap = 12f;
         float bodyHeight = _synergyTooltipBody.GetPreferredValues(body, width - 40, 0).y;
@@ -551,36 +580,11 @@ public sealed class RunItemChoiceView : MonoBehaviour
     }
 
     private static void Place(RectTransform rect, float x, float y, float w, float h)
-    { rect.anchoredPosition = new Vector2(x, -y); rect.sizeDelta = new Vector2(w, h); }
-
-    private static void LayoutStarterSynergy(SynergyOption option, int index, int count, int columns)
     {
-        const float areaWidth = 1632f, gap = 24f, left = 64f;
-        int row = index / columns;
-        bool compact = columns > 3;
-        float width = (areaWidth - (columns - 1) * gap) / columns;
-        int itemsInRow = Mathf.Min(columns, count - row * columns);
-        float rowInset = compact ? (columns - itemsInRow) * (width + gap) * .5f : 0f;
-        Place(option.Root, left + rowInset + index % columns * (width + gap), 208 + row * 236, width, 212);
-        float titleLeft = compact ? 86f : 108f;
-        Place(option.Icon.rectTransform, compact ? 18f : 24f, 22, compact ? 52f : 64f, compact ? 52f : 64f);
-        Place(option.Title.rectTransform, titleLeft, 28, width - titleLeft - (compact ? 18f : 28f), 48);
-        Place(option.Summary.rectTransform, compact ? 18f : 24f, compact ? 94f : 108f,
-            width - (compact ? 36f : 48f), compact ? 96f : 78f);
-    }
-
-    private SynergyOption CreateSynergy(int index)
-    {
-        var option = new SynergyOption { Root = Rect("Synergy" + index, _synergiesRoot, 0, 0, 528, 212) };
-        Chrome(option.Root, PentaUpgradeChrome.Style.Detail);
-        option.Button = option.Root.gameObject.AddComponent<UnityEngine.UI.Button>();
-        option.Button.targetGraphic = option.Root.GetComponent<PentaUpgradeChrome>();
-        option.Button.onClick.AddListener(() => Execute(() => _service.TryChooseStarterSynergy(option.SessionId, option.Id)));
-        option.Icon = Image(Rect("SynergyIcon", option.Root, 24, 22, 64, 64), Color.white, false); option.Icon.preserveAspect = true;
-        option.Title = Label("Name", option.Root, "", 108, 28, 392, 48, 26);
-        option.Summary = Label("Summary", option.Root, "", 24, 108, 480, 78, 22); option.Summary.color = Muted;
-        UIButtonMotion.Install(option.Root.gameObject);
-        return option;
+        rect.sizeDelta = new Vector2(w, h);
+        rect.anchoredPosition = rect.TryGetComponent<UIButtonMotion>(out _)
+            ? new Vector2(x + w * rect.pivot.x, -y - h * (1f - rect.pivot.y))
+            : new Vector2(x, -y);
     }
 
     private TMP_Text Label(string name, Transform parent, string value, float x, float y, float w, float h, float size)
@@ -635,5 +639,12 @@ public sealed class RunItemChoiceView : MonoBehaviour
         return TMP_Settings.defaultFontAsset;
     }
 
-    private void OnDestroy() { if (_service != null) _service.Changed -= Refresh; }
+    private void Unsubscribe()
+    {
+        if (_service == null) return;
+        _service.Changed -= Refresh;
+        _service.OwnedItemsChanged -= QueueOwnershipRefresh;
+    }
+
+    private void OnDestroy() => Unsubscribe();
 }

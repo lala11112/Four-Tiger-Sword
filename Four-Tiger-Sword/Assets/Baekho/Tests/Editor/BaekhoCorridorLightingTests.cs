@@ -144,13 +144,16 @@ namespace StudioBaekho.Tests
             AssertVector(new Vector3(2f, 4f, 6f), clone.transform.localPosition);
             Assert.That(Quaternion.Angle(clone.transform.localRotation, rotation), Is.LessThan(Tolerance));
             AssertVector(sourceScale, clone.transform.localScale);
-            Assert.That(clone.GetComponentInChildren<Light>().shadows, Is.EqualTo(LightShadows.None));
-            Assert.That(clone.GetComponentInChildren<Light>().intensity, Is.EqualTo(sourceLight.intensity));
-            Assert.That(clone.GetComponentInChildren<Light>().range, Is.EqualTo(sourceLight.range));
+            var cloneLight = clone.GetComponentInChildren<Light>();
+            Assert.That(cloneLight.shadows, Is.EqualTo(LightShadows.None));
+            Assert.That(cloneLight.GetComponent<BaekhoGeneratedLightShadow>().authoredMode, Is.EqualTo(LightShadows.Soft));
+            Assert.That(cloneLight.intensity, Is.EqualTo(sourceLight.intensity));
+            Assert.That(cloneLight.range, Is.EqualTo(sourceLight.range));
             AssertVector(sourcePosition, source.transform.localPosition);
             AssertVector(sourceScale, source.transform.localScale);
             Assert.That(Quaternion.Angle(sourceRotation, source.transform.localRotation), Is.LessThan(Tolerance));
             Assert.That(sourceLight.shadows, Is.EqualTo(LightShadows.Soft));
+            Assert.That(sourceLight.GetComponent<BaekhoGeneratedLightShadow>(), Is.Null);
             Assert.That(source.GetComponentInChildren<Collider>().enabled, Is.True);
             Assert.That(clone.GetComponentsInChildren<Collider>(true).All(item => !item.enabled), Is.True);
         }

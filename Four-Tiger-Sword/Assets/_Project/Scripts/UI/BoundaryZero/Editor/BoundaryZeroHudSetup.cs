@@ -68,7 +68,7 @@ public static class BoundaryZeroHudSetup
         finally { PrefabUtility.UnloadPrefabContents(root); }
     }
 
-    private static void StyleHud(GameObject root)
+    internal static void StyleHud(GameObject root)
     {
         Canvas(root);
         var view = root.GetComponent<HudView>();
@@ -87,13 +87,6 @@ public static class BoundaryZeroHudSetup
         HorizontalFill(hp);
         Image("RedSeal", vitals, 46, 94, 28, 58, "Icons/red_seal.png");
         var hpLabel = Text("HealthValue", vitals, 126, 110, 320, 30, "", 25);
-        // The housing's lower silver rail occupies the sample label baseline. Keep live values clear of it.
-        var spTrack = PlainImage("SpTrack", vitals, 118, 187, 458, 6, null);
-        spTrack.color = new Color(.12f, .19f, .24f, .8f);
-        var spFill = PlainImage("SpFill", vitals, 118, 187, 458, 6, null);
-        spFill.color = new Color(.35f, .72f, .8f, 1f);
-        HorizontalFill(spFill);
-        var spLabel = Text("SpValue", vitals, 126, 203, 380, 26, "", 18);
         var crosshair = Image("Crosshair", design, 0, 0, 20, 20, "HUD/crosshair.png");
         Center(crosshair.rectTransform, Vector2.zero, new Vector2(20, 20));
 
@@ -121,12 +114,12 @@ public static class BoundaryZeroHudSetup
         var r = Skill(skills, "SkillR", 122, "R", ringSprite, true);
         var charge = Text("ChargeValue", (RectTransform)r.transform, -12, -33, 122, 28, "", 19);
         charge.alignment = TextAlignmentOptions.Center;
-        view.Configure(hp, spFill, overlays, e, r);
+        view.Configure(hp, overlays, e, r);
         view.ConfigureFormArtwork(artwork);
         view.ConfigureElementTheme(theme);
         view.ConfigureUltimateEnergy(null);
         view.ConfigureUltimateCharge(null, charge);
-        view.ConfigureVitalsText(hpLabel, spLabel);
+        view.ConfigureHealthText(hpLabel);
         StyleChainSkills(root);
         StyleFormLocks(root);
         root.GetComponent<HudController>()?.Configure(view);

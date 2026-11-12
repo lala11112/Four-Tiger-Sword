@@ -73,15 +73,15 @@ public sealed class EnemyGoldReward : MonoBehaviour
         var death = _enemy != null ? _enemy.DeathContext : default;
         int engravingBonus = death.Player != null && death.Player.Engravings != null
             ? death.Player.Engravings.BonusKillGold(_enemy, death, _amount) : 0;
+        int itemBonus = 0;
         if (items != null && death.Player != null && death.Player.ItemRuntime == items)
         {
             var context = new ItemKillContext(_enemy.gameObject.GetInstanceID(), _enemy.Rank != EnemyRank.Normal,
                 death.Family, death.CanTrigger, amount, death.PlayerHp, death.PlayerMaxHp, death.CombatEpoch, death.WasInCombat);
-            int bonus = items.ProcessKill(context);
-            amount = (int)Math.Min(int.MaxValue, (long)amount + bonus);
+            itemBonus = items.ProcessKill(context);
         }
-        amount = (int)Math.Min(int.MaxValue, (long)amount + engravingBonus);
-        if (wallet != null) wallet.AddGold(amount);
+        int generatedBonus = (int)Math.Min(int.MaxValue - amount, (long)itemBonus + engravingBonus);
+        if (wallet != null) wallet.TryAddEarnedGold(amount, generatedBonus);
         if (items == null || !items.IsInitialized || items.Catalog == null) return;
         // Ownership is checked again at death: acquiring an item after spawn skips it without compensation.
         foreach (var definition in rewards)

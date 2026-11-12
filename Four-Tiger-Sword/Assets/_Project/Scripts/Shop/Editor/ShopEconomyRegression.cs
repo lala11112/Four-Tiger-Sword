@@ -27,6 +27,7 @@ public static class ShopEconomyRegression
         RejectedPurchasesPreserveBalance();
         HealingRules();
         ConfirmedDeathRewardsOnly();
+        EarnedGoldBonuses();
         return $"Shop economy: {_checks} checks passed (settings, wallet boundaries, seeded stock, ownership, "
             + "transactions, healing, reentry, observer failures and confirmed death rewards).";
     }
@@ -297,6 +298,54 @@ public static class ShopEconomyRegression
         Check(f.Wallet.Gold == 70, "Destroying a living enemy paid a reward.");
     }
 
+    private static void EarnedGoldBonuses()
+    {
+        using var f = new Fixture(40);
+        var rate = f.Item("gold-gain");
+        rate.boundaryEffects = new[]
+        {
+            new BoundaryItemEffect { stat = BoundaryItemStat.GoldGainRatio, amount = .25f }
+        };
+        var tradeItem = f.Item("trade-item");
+        f.Catalog.items = new[] { rate, tradeItem };
+        Check(f.Items.TryAddItem(rate.itemId) && f.Items.TryAddItem(tradeItem.itemId), "Gold modifier setup failed.");
+        int gained = 0;
+        f.Wallet.GoldGained += amount => gained += amount;
+        f.Wallet.Initialize(100);
+        Check(f.Wallet.Gold == 40 && gained == 0, "Starting gold was affected by the gold gain modifier.");
+        Check(f.Wallet.AddGold(12) && f.Wallet.Gold == 52 && gained == 12, "Raw wallet credit was amplified.");
+        var trades = new ShopTransactions(f.Items, f.Wallet, f.Stats, f.Settings, 17);
+        Check(trades.TrySell(tradeItem.itemId) == ShopSaleResult.Success && f.Wallet.Gold == 62 && gained == 22,
+            "Shop sale proceeds were amplified.");
+
+        for (int i = 0; i < 3; i++) Check(f.Wallet.TryAddEarnedGold(1), "A small reward was rejected.");
+        Check(f.Wallet.Gold == 65 && gained == 25, "Small credits rounded up before earning a whole gold.");
+        Check(f.Wallet.AddGold(int.MaxValue - f.Wallet.Gold - 1), "Overflow setup failed.");
+        Check(!f.Wallet.TryAddEarnedGold(1) && f.Wallet.Gold == int.MaxValue - 1, "Overflow should reject the entire earned credit.");
+        Check(f.Wallet.TrySpend(f.Wallet.Gold), "Wallet could not create room for retry.");
+        gained = 0;
+        Check(f.Wallet.TryAddEarnedGold(1) && f.Wallet.Gold == 2 && gained == 2,
+            "Failed credit consumed the accumulated fractional bonus.");
+        Check(f.Wallet.TryAddEarnedGold(1) && f.Wallet.Gold == 3 && gained == 3,
+            "A retry paid the same accumulated fraction twice.");
+
+        var ordinary = f.Enemy("Ordinary gold gain", 12, out _);
+        ordinary.TakeDamage(100f, poiseDamage: 0f);
+        Check(f.Wallet.Gold == 18 && gained == 18, "An ordinary enemy's base gold was not amplified.");
+        var boss = f.Enemy("Boss gold gain", 20, out _);
+        boss.TakeDamage(100f, poiseDamage: 0f);
+        Check(f.Wallet.Gold == 43 && gained == 43, "A boss's base gold was not amplified.");
+        Check(f.Wallet.TryAddEarnedGold(8, 4) && f.Wallet.Gold == 57 && gained == 57,
+            "Generated gold was amplified or the earned credit was published incorrectly.");
+
+        using var nextRun = new Fixture();
+        var newRate = nextRun.Item("next-run-rate");
+        newRate.boundaryEffects = rate.boundaryEffects;
+        nextRun.Catalog.items = new[] { newRate };
+        Check(nextRun.Items.TryAddItem(newRate.itemId) && nextRun.Wallet.TryAddEarnedGold(3)
+            && nextRun.Wallet.Gold == 3, "Fractional carry crossed into a new run.");
+    }
+
     private static ShopOffer ItemOffer(ShopStock stock, ItemDefinition item)
     {
         foreach (var offer in stock.Offers) if (offer.Item == item) return offer;
@@ -337,7 +386,6 @@ public static class ShopEconomyRegression
             Catalog.projectId = "shop-economy-regression";
             var data = Own(ScriptableObject.CreateInstance<PlayerStatData>());
             data.baseHP = 100f;
-            data.baseSP = 100f;
             Stats = _root.AddComponent<PlayerStatManager>();
             Stats.Initialize(data);
             Wallet = _root.AddComponent<PlayerWallet>();

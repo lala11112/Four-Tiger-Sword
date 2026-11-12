@@ -60,6 +60,8 @@ namespace BoundaryZero.Inventory
         private InventoryData data;
         private InventoryData displayData;
         private InventoryHoverTarget hover;
+        private string hoverId;
+        private bool hoverIsSet;
         private bool initialized;
         private bool codex;
 
@@ -115,7 +117,20 @@ namespace BoundaryZero.Inventory
             foreach (var cell in itemCells)
             {
                 if (cell.root != null && cell.root.transform is RectTransform rect)
+                {
                     ItemRarityFrame.Show(rect, items.TryGetValue(cell.id, out var item) ? item.grade : 0);
+                    var stars = rect.Find("Stars")?.GetComponent<TMP_Text>();
+                    if (stars == null) stars = Label("Stars", rect, "", 5, 88, 102, 20, 17, Steel);
+                    stars.text = ItemPresentationText.Stars(item?.grade ?? 0);
+                    stars.color = ItemRarityFrame.ColorFor(item?.grade ?? 0);
+                    stars.alignment = TextAlignmentOptions.Center;
+                    if (!codex && rect.Find("Icon") is RectTransform icon)
+                    {
+                        icon.anchorMin = icon.anchorMax = icon.pivot = TopLeft;
+                        icon.anchoredPosition = new Vector2(22, -8);
+                        icon.sizeDelta = new Vector2(68, 68);
+                    }
+                }
             }
             foreach (var row in setRows)
             {
@@ -205,6 +220,9 @@ namespace BoundaryZero.Inventory
 
         private void Refresh()
         {
+            var previousHover = hover;
+            var previousId = hoverId;
+            bool previousIsSet = hoverIsSet;
             HideTooltip();
             var counts = new Dictionary<string, int>(StringComparer.Ordinal);
             foreach (var id in owned)
@@ -266,16 +284,31 @@ namespace BoundaryZero.Inventory
                 anyVisible |= visible;
                 if (codex)
                 {
-                    row.status.text = "세트 효과 보기";
+                    var definition = synergies[row.id];
+                    row.status.text = "<size=15><color=#BBC9D6>" + ItemPresentationText.TierCounts(definition.tiers)
+                        + "</color></size>\n" + ItemPresentationText.CompactSynergy(definition.tiers);
+                    row.status.color = Steel;
+                    row.status.richText = true;
+                    row.status.fontSize = 17;
+                    row.status.textWrappingMode = TextWrappingModes.Normal;
+                    float height = row.status.GetPreferredValues(row.status.text, 335, 0).y;
+                    row.status.rectTransform.sizeDelta = new Vector2(335, height);
+                    ((RectTransform)row.root.transform).sizeDelta = new Vector2(406, height + 62);
+                    var rule = row.root.transform.Find("Rule") as RectTransform;
+                    if (rule != null) rule.anchoredPosition = new Vector2(0, -height - 61);
                     row.count.text = string.Empty;
                     continue;
                 }
                 if (!active)
                     continue;
-                row.status.text = state.ActiveTier + "세트 적용";
-                row.count.text = $"{state.DisplayCount}/{state.RequiredCount}";
+                row.status.richText = true;
+                row.status.text = ItemPresentationText.StateText(state.ActiveTier + "세트 적용", true);
+                row.count.richText = true;
+                row.count.text = ItemPresentationText.StateText($"{state.DisplayCount}/{state.RequiredCount}", true);
             }
             emptySets.SetActive(!anyVisible);
+            if (previousHover != null)
+                ShowTooltip(previousHover, previousId, previousIsSet);
         }
 
         internal void ShowTooltip(InventoryHoverTarget target, string id, bool isSet)
@@ -297,11 +330,12 @@ namespace BoundaryZero.Inventory
                 AppendTitle(body, item.name);
                 var rarity = ItemRarityFrame.ColorFor(item.grade);
                 if (rarity.a > 0f)
-                    body.Append("<size=16><color=#").Append(ColorUtility.ToHtmlStringRGB(rarity)).Append("><b>")
-                        .Append(item.grade).Append("등급</b></color></size>\n");
+                    body.Append("<size=22><color=#").Append(ColorUtility.ToHtmlStringRGB(rarity)).Append("><b>")
+                        .Append(ItemPresentationText.Stars(item.grade)).Append("</b></color></size>\n");
                 bool hasEffect = !string.IsNullOrWhiteSpace(item.effect);
                 if (hasEffect)
-                    body.Append(ItemDescriptionDivider.EffectHeading).Append(item.effect.TrimEnd());
+                    body.Append(ItemDescriptionDivider.EffectHeading).Append("<size=22><b>")
+                        .Append(item.effect.TrimEnd()).Append("</b></size>");
                 if (item.synergies?.Length > 0)
                 {
                     ItemDescriptionDivider.AppendSynergyHeading(body, hasEffect);
@@ -314,6 +348,8 @@ namespace BoundaryZero.Inventory
             if (hover != target)
                 HideTooltip();
             hover = target;
+            hoverId = id;
+            hoverIsSet = isSet;
             target.SetHighlight(true);
             tooltipText.text = body.ToString().TrimEnd();
             PositionTooltip(target.transform as RectTransform);
@@ -330,49 +366,40 @@ namespace BoundaryZero.Inventory
             if (codex)
             {
                 if (!allTiers)
-                    body.Append("<b>").Append(set.name).Append("</b>\n");
-                foreach (var tier in set.tiers ?? Array.Empty<SynergyTier>())
-                {
-                    if (tier == null) continue;
-                    body.Append("<color=#bbc9d6>").Append(tier.count).Append("세트</color> · ")
-                        .Append(tier.text).Append('\n');
-                }
-                if (allTiers && !string.IsNullOrEmpty(set.effect))
-                    body.Append("\n<size=15><color=#bbc9d6>").Append(set.effect).Append("</color></size>");
-                body.Append('\n');
+                    body.Append("<color=#F4B976><b>").Append(set.name).Append("</b></color>\n");
+                AppendCompactSet(body, set);
+                body.Append("\n\n");
                 return;
             }
             if (!allTiers)
-                body.Append("<b>").Append(set.name).Append("</b>   ");
+                body.Append("<b>").Append(ItemPresentationText.StateText(set.name, state.IsActive)).Append("</b>   ");
             body.Append("<size=15><color=#bbc9d6>");
             if (state.RequiredCount > 0)
                 body.Append(state.DisplayCount).Append('/').Append(state.RequiredCount).Append(" · ");
             body.Append(state.Count).Append("종 보유</color></size>\n");
             if (allTiers)
             {
-                body.Append('\n');
-                foreach (var tier in set.tiers ?? Array.Empty<SynergyTier>())
-                {
-                    if (tier == null)
-                        continue;
-                    var active = tier.count == state.ActiveTier;
-                    body.Append(active ? "<color=#fa8396>◆ " : "<color=#bbc9d6>◇ ")
-                        .Append(tier.count).Append("세트</color> · ").Append(tier.text)
-                        .Append(active ? " <color=#fa8396>· 적용 중</color>\n" : "\n");
-                }
-                if (!string.IsNullOrEmpty(set.effect))
-                    body.Append("\n<size=15><color=#bbc9d6>").Append(set.effect).Append("</color></size>");
+                if (state.IsActive) body.Append(ItemPresentationText.StateText(state.ActiveTier + "세트 적용 중", true)).Append('\n');
+                body.Append("<size=16>").Append(ItemPresentationText.TierCounts(set.tiers, state.Count))
+                    .Append("</size>\n").Append(ItemPresentationText.CompactSynergy(set.tiers, state.Count));
             }
             else
             {
-                body.Append(state.IsActive
+                body.Append(ItemPresentationText.StateText(state.IsActive
                     ? state.ActiveTier + "세트 적용 중 · " + state.ActiveEffect
-                    : "미활성 · 적용 효과 없음");
+                    : "미활성 · 적용 효과 없음", state.IsActive));
                 if (!state.IsActive && state.NextTier > 0)
-                    body.Append("\n<size=15><color=#bbc9d6>").Append(state.NextTier).Append("세트까지 ")
+                    body.Append("\n<size=15><color=#").Append(ItemPresentationText.InactiveColorHex).Append('>')
+                        .Append(state.NextTier).Append("세트까지 ")
                         .Append(state.NextTier - state.Count).Append("종 필요</color></size>");
                 body.Append("\n\n");
             }
+        }
+
+        private static void AppendCompactSet(StringBuilder body, SynergyDefinition set)
+        {
+            body.Append("<size=16><color=#bbc9d6>").Append(ItemPresentationText.TierCounts(set.tiers))
+                .Append("</color></size>\n").Append(ItemPresentationText.CompactSynergy(set.tiers));
         }
 
         internal void HideTooltip(InventoryHoverTarget target = null)
@@ -478,8 +505,6 @@ namespace BoundaryZero.Inventory
             Plate("TitleAccent", window, 70, 48, 3, 34, Red);
             Icon("Seal", window, catalog.seal, 82, 43, 38, 38);
             Label("Title", window, codex ? "아이템 도감" : "인벤토리", 133, 37, 500, 54, 39, Steel).fontStyle = FontStyles.Bold;
-            if (codex)
-                Label("Hint", window, "아이템과 시너지에 마우스를 올려 효과를 확인하세요.", 70, 684, 790, 30, 18, Muted);
             Plate("HeaderRule", window, 70, 101, 1224, 1, Line);
             Plate("HeaderRuleLight", window, 70, 100, 80, 2, Steel);
             Plate("HeaderRuleRed", window, 157, 100, 44, 2, Red);
@@ -638,8 +663,8 @@ namespace BoundaryZero.Inventory
             foreach (var grade in gradeGroups)
             {
                 var rarity = ItemRarityFrame.ColorFor(grade.Key);
-                string heading = grade.Key > 0 ? $"{grade.Key}등급" : "등급 미지정";
-                var gradeName = Label("Grade", section, heading, 8, y, 150, 26, 16, rarity.a > 0 ? rarity : Muted);
+                string heading = ItemPresentationText.Stars(grade.Key);
+                var gradeName = Label("Grade", section, heading, 8, y, 150, 26, 19, rarity.a > 0 ? rarity : Muted);
                 gradeName.alignment = TextAlignmentOptions.MidlineLeft;
                 Plate("GradeRule", section, 148, y + 13, width - 148, 1, Line);
                 y += 28;
@@ -659,8 +684,8 @@ namespace BoundaryZero.Inventory
             var icon = catalog.ItemIcon(item.id);
             if (codex)
             {
-                Icon("Icon", cell, icon, 25, 7, 62, 62);
-                var name = Label("Name", cell, item.name, 6, 70, 100, 35, 15, Steel);
+                Icon("Icon", cell, icon, 30, 6, 52, 52);
+                var name = Label("Name", cell, item.name, 6, 58, 100, 29, 15, Steel);
                 name.alignment = TextAlignmentOptions.Center;
                 name.textWrappingMode = TextWrappingModes.Normal;
                 name.overflowMode = TextOverflowModes.Ellipsis;
@@ -668,7 +693,7 @@ namespace BoundaryZero.Inventory
                 name.fontSizeMin = 12;
                 name.fontSizeMax = 15;
             }
-            else Icon("Icon", cell, icon, 14, 14, 84, 84);
+            else Icon("Icon", cell, icon, 22, 8, 68, 68);
             var accent = Plate("HoverAccent", cell, 0, 0, 34, 2, Red);
             accent.enabled = false;
             cell.gameObject.AddComponent<InventoryHoverTarget>().Configure(this, item.id, false,

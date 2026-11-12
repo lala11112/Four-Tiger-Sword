@@ -82,20 +82,20 @@ namespace Penta.Upgrade.Samples
             Check(!View.GetComponentInChildren<EventSystem>(true), "Panel contains no EventSystem");
             Check(!View.GetComponentInChildren<GraphicRaycaster>(true), "Panel contains no duplicate raycaster");
             Check(View.GetComponentInParent<Canvas>() != null, "Panel is parented under the host Canvas");
-            Check(PentaUpgradeCatalog.Nodes.Count == 40, "Catalog has free origin and 39 upgrades");
+            Check(PentaUpgradeCatalog.Nodes.Count == 38, "Catalog has free origin and 37 upgrades");
             int connections = 0;
             foreach (var node in PentaUpgradeCatalog.Nodes)
             {
                 connections += node.ParentIds.Count;
                 Check(node.ParentIds.Count == (node.Id == "origin" ? 0 : 1), "Single-parent tree: " + node.Id);
             }
-            Check(connections == 39, "Tree has 39 connections");
+            Check(connections == 37, "Tree has 37 connections");
             var graphLinks = View.GetComponentsInChildren<PentaUpgradeLinks>(true);
-            Check(graphLinks.Length == 1 && graphLinks[0].ConnectionCount == 39, "UI graph draws 39 connections");
+            Check(graphLinks.Length == 1 && graphLinks[0].ConnectionCount == 37, "UI graph draws 37 connections");
             int nodeControls = 0;
             foreach (var node in PentaUpgradeCatalog.Nodes)
                 if (View.GetNodeButton(node.Id)) nodeControls++;
-            Check(nodeControls == 40, "UI graph exposes all 40 node controls");
+            Check(nodeControls == 38, "UI graph exposes all 38 node controls");
             foreach (var transform in View.GetComponentsInChildren<Transform>(true))
                 Check(transform.name != "ChildrenHeading" && transform.name != "Child0" && transform.name != "Child1"
                     && transform.name != "Child2" && transform.name != "Child3", "No successor navigation: " + transform.name);

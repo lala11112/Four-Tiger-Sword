@@ -18,8 +18,8 @@ MonoBehaviour:
   displayName: "\uB9C8\uAC10 \uB798\uCE6B"
   description: "\uD1B1\uB2C8 \uB05D\uC774 \uBD89\uC740 \uAC80\uC740 \uC18C\uD615
     \uB798\uCE6B."
-  effectText: "HP\uAC00 25% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAC00\uD558\uB294
-    \uD3C9\uD0C0\uC758 \uCE58\uBA85\uD0C0 \uD53C\uD574 \uBC30\uC728\uC774 15%p \uC99D\uAC00\uD55C\uB2E4."
+  effectText: "HP 25% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9
+    \uCE58\uBA85\uD0C0 \uD53C\uD574 +15%p"
   synergyIds:
   - S10
   - S01
@@ -30,8 +30,8 @@ MonoBehaviour:
   primarySynergyName: "\uB9C8\uBB34\uB9AC"
   primarySynergyIcon: {fileID: 21300000, guid: e242e1bfa4075de44b865b526f506c52, type: 3}
   element: 0
-  grade: 3
-  purchasePrice: 80
+  grade: 1
+  purchasePrice: 20
   effects: []
   boundaryEffects:
   - effectId: I100
@@ -57,10 +57,8 @@ MonoBehaviour:
     cooldownSeconds: 0
   icon: {fileID: 21300000, guid: c89883957e33494469657503f78b81b0, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I100\",\"name\":\"\uB9C8\uAC10 \uB798\uCE6B\",\"description\":\"\uD1B1\uB2C8
-    \uB05D\uC774 \uBD89\uC740 \uAC80\uC740 \uC18C\uD615 \uB798\uCE6B.\",\"effect\":\"HP\uAC00
-    25% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAC00\uD558\uB294 \uD3C9\uD0C0\uC758
-    \uCE58\uBA85\uD0C0 \uD53C\uD574 \uBC30\uC728\uC774 15%p \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S10\",\"S01\"],\"primarySynergy\":\"S10\",\"designIntent\":\"\uCCB4\uB825\uC774
-    \uB0AE\uC740 \uC801\uC5D0\uAC8C \uAC00\uD558\uB294 \uD3C9\uD0C0 \uCE58\uBA85\uD0C0\uB97C
-    \uAC15\uD654\uD55C\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I100.png\"}"
+    \uB05D\uC774 \uBD89\uC740 \uAC80\uC740 \uC18C\uD615 \uB798\uCE6B.\",\"effect\":\"HP
+    25% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9 \uCE58\uBA85\uD0C0
+    \uD53C\uD574 +15%p\",\"synergies\":[\"S10\",\"S01\"],\"primarySynergy\":\"S10\",\"origin\":\"revised\",\"image\":\"Art/Items/I100.png\",\"grade\":1}"

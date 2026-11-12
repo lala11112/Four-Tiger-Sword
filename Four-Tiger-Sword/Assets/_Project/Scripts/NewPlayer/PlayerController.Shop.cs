@@ -4,7 +4,8 @@ public partial class PlayerController
     public bool IsShopPaused { get; private set; }
     public bool IsMapPaused { get; private set; }
     public bool IsPauseMenuPaused { get; private set; }
-    public bool IsGameplayModalPaused => IsShopPaused || IsMapPaused || IsInventoryPaused || IsRewardPaused || IsPauseMenuPaused;
+    public bool IsGameplayModalPaused => IsShopPaused || IsMapPaused || IsInventoryPaused || IsRewardPaused
+        || IsPauseMenuPaused || IsFallRecovering;
 
     internal void SetShopPaused(bool paused)
     {

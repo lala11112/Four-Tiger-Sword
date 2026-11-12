@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using EasternLab.GateAddon;
 using StudioBaekho;
 using TMPro;
 using Unity.Cinemachine;
@@ -83,15 +84,14 @@ public static class ShopPlayModeRegression
         Mouse mouse = null;
         Keyboard keyboard = null;
         RunManager run = null;
+        IDisposable accountScope = null;
+        PlayerUpgradeService previousRunService = null;
+        RunDefinitionSO originalDefinition = null, fixtureDefinition = null;
         try
         {
             run = shop.GetComponent<RunManager>();
             Check(run != null, "Shop has no RunManager.");
             yield return Ready(run);
-            Check(run.CurrentStageIndex < run.definition.chapters[run.CurrentChapterIndex].stages.Length - 1,
-                "Start this regression in a normal stage, before its chapter boss.");
-            Check(run.definition.TryGetNext(run.CurrentChapterIndex, run.CurrentStageIndex, out int nextChapter, out int nextStage),
-                "The fixture requires a next stage.");
             var player = run.player;
             Check(player != null && player.Controller != null && player.Input != null && player.ItemRuntime != null,
                 "Player systems are not initialized.");
@@ -99,6 +99,28 @@ public static class ShopPlayModeRegression
                 "Committed stage has no initialized wallet/shop/stock.");
             Check(Mathf.Approximately(Time.timeScale, 1f) && !run.IsShopOpen, "Start with ordinary gameplay running.");
             snapshot = Restore.Capture(run, shop);
+            previousRunService = Field<PlayerUpgradeService>(run, "_upgradeService");
+            var originalAccount = previousRunService ?? PlayerUpgradeService.Instance;
+            Check(originalAccount.IsReady && originalAccount.Settings != null, "The live progression account is unavailable.");
+            var profile = Field<PlayerUpgradeProfile>(originalAccount, "_profile");
+            var isolatedAccount = new PlayerUpgradeService(originalAccount.Settings, new MemoryUpgradeStore(profile),
+                originalAccount.EngravingSettings);
+            Check(isolatedAccount.IsReady, "The isolated progression account failed to load.");
+            accountScope = PlayerUpgradeService.OverrideForTesting(isolatedAccount);
+            SetField(run, "_upgradeService", isolatedAccount);
+            if (run.CurrentStageIndex == run.definition.chapters[run.CurrentChapterIndex].stages.Length - 1)
+            {
+                Check(run.CurrentChapterIndex == 0 && run.CurrentStageIndex == 0 && !run.stageManager.IsCleared,
+                    "Start this regression in a fresh run or a normal stage.");
+                originalDefinition = run.definition;
+                fixtureDefinition = CreateShopFixture(originalDefinition);
+                run.definition = fixtureDefinition;
+                RetryStage(run, 0, 0, "Preparing the shop regression fixture.");
+                yield return Ready(run);
+                Check(run.stageManager.Result.bossRoom == null, "Retry did not prepare the fixture's first normal stage.");
+            }
+            Check(run.definition.TryGetNext(run.CurrentChapterIndex, run.CurrentStageIndex, out int nextChapter, out int nextStage),
+                "The fixture requires a next stage.");
             CheckGeneratedShop(run, shop);
             var stage = run.stageManager;
             var firstStock = shop.CurrentStock;
@@ -115,11 +137,27 @@ public static class ShopPlayModeRegression
                 && room.Members.Count > 0);
             Check(combatRoom != null && combatRoom.BeginEncounter(), "No real ordinary encounter could activate for the reward check.");
             var victim = combatRoom.Members.First(member => member.Enemy != null && !member.IsDead);
-            Check(victim.GetComponent<EnemyGoldReward>() != null && victim.IsAwake && victim.Enemy.enabled,
+            var enemy = victim.Enemy;
+            var stats = enemy.GetComponent<EnemyStat>();
+            var reward = victim.GetComponent<EnemyGoldReward>();
+            Check(reward != null && reward.IsInitialized && stats != null && victim.IsAwake && enemy.enabled,
                 "Generated encounter members were not wired to gold rewards.");
-            var lethal = victim.Enemy.TakeDamage(victim.GetComponent<EnemyStat>().CurrentHp + 100000f, poiseDamage: 0f);
+            yield return Wait(() => victim != null && victim.IsAwake && !victim.IsDead
+                && enemy != null && enemy.isActiveAndEnabled && !enemy.IsSpawning && !enemy.EncounterPatrolOnly
+                && stats.CurrentHp > 0f, "The ordinary enemy never became ready for the lethal damage probe.", 10f);
+            int rolledGold = EnemyGoldRoll.Roll(run.CurrentStageSeed, victim.RewardRoomId, victim.RewardWaveIndex,
+                victim.RewardSpawnIndex, shop.settings.ordinaryKillGoldMin, shop.settings.ordinaryKillGoldMax);
+            Check(reward.BaseGold == rolledGold, "The ordinary enemy did not snapshot its deterministic reward.");
+            int roomGold = combatRoom.AliveCount == 1 && combatRoom.CurrentWaveNumber == combatRoom.WaveCount
+                ? (int)typeof(PlayerItemRuntime).GetProperty("CombatRoomClearGold", Hidden).GetValue(player.ItemRuntime) : 0;
+            double rate = (double)typeof(PlayerWallet).GetProperty("EarnedGoldRatio", Hidden).GetValue(shop.Wallet);
+            double carry = Field<double>(shop.Wallet, "_earnedGoldRemainder");
+            int baseGold = rolledGold + roomGold;
+            int expectedBalance = shop.Wallet.Gold + baseGold + (int)Math.Floor(carry + baseGold * rate + .000001d);
+            var lethal = enemy.TakeDamage(stats.CurrentHp + 100000f, poiseDamage: 0f);
             Check(lethal.Applied && lethal.Killed && victim.HasDied, "Real lethal enemy damage did not confirm a death.");
-            Check(shop.Wallet.Gold == originalGold + shop.settings.ordinaryKillGold, "Real ordinary kill paid the wrong gold amount.");
+            Check(shop.Wallet.Gold == expectedBalance,
+                $"Real ordinary kill paid the wrong gold amount. Expected balance {expectedBalance}, got {shop.Wallet.Gold}.");
             int afterKill = shop.Wallet.Gold;
             var repeat = victim.Enemy.TakeDamage(100000f, poiseDamage: 0f);
             Check(!repeat.Applied && shop.Wallet.Gold == afterKill, "Repeated lethal damage paid twice.");
@@ -152,6 +190,7 @@ public static class ShopPlayModeRegression
             Check(boundary.StockScroll.content.GetComponentsInChildren<ShopOfferView>(false).Length
                 == firstStock.Offers.Count(offer => !offer.IsHealing),
                 "Stock cards do not match item stock independently of the healing service.");
+            yield return Wait(() => view.IsInteractionReady, "The shop did not finish opening for transactions.", 5f);
             Check(shop.TryBuy(heal.Id) == ShopPurchaseResult.FullHealth && !heal.SoldOut,
                 "Full-health healing was charged or consumed.");
             Check(!boundary.HealingButton.interactable, "Full-health healing is still an enabled UI purchase.");
@@ -179,7 +218,7 @@ public static class ShopPlayModeRegression
             float hpBeforeHeal = player.StatManager.CurrentHp;
             Check(boundary.HealingButton.interactable, "Damaging the player did not enable the healing UI.");
             boundary.HealingButton.onClick.Invoke();
-            Near(player.StatManager.CurrentHp, Mathf.Min(maxHp, hpBeforeHeal + maxHp * shop.settings.healingFraction),
+            Near(player.StatManager.CurrentHp, Mathf.Min(maxHp, hpBeforeHeal + maxHp * shop.settings.healingFraction * (player.Engravings != null ? player.Engravings.HealingMultiplier : 1f)),
                 "The real healing UI restored the wrong amount.");
             Check(heal.SoldOut && shop.Wallet.Gold == 0 && !boundary.HealingButton.interactable,
                 "Healing was not sold once for its configured price.");
@@ -190,7 +229,7 @@ public static class ShopPlayModeRegression
 
             var pausedState = player.StateMachine.CurrentState;
             Vector3 pausedPosition = player.transform.position;
-            float pausedHp = player.StatManager.CurrentHp, pausedSp = player.StatManager.CurrentSp;
+            float pausedHp = player.StatManager.CurrentHp;
             uint attackPress = player.Input.AttackPressId;
             mouse = InputSystem.AddDevice<Mouse>("ShopRegressionMouse");
             keyboard = InputSystem.AddDevice<Keyboard>("ShopRegressionKeyboard");
@@ -200,10 +239,11 @@ public static class ShopPlayModeRegression
             Check(player.StateMachine.CurrentState == pausedState && (player.transform.position - pausedPosition).sqrMagnitude < 0.0001f,
                 "Paused browsing advanced a player action or moved the player.");
             Near(player.StatManager.CurrentHp, pausedHp, "HP changed during the world pause.");
-            Near(player.StatManager.CurrentSp, pausedSp, "SP regenerated during the world pause.");
             Check(NoBufferedInput(player.Input) && player.Input.AttackPressId == attackPress && !player.Input.IsAttackHeld,
                 "Gameplay keys pressed while browsing leaked into gameplay input.");
             Field<Button>(view, "closeButton").onClick.Invoke();
+            yield return Wait(() => !run.IsShopOpen && !Field<GameObject>(view, "panel").activeSelf,
+                "The real close button did not finish hiding the shop.", 5f);
             Check(!run.IsShopOpen && !player.IsShopPaused && Mathf.Approximately(Time.timeScale, 1f),
                 "The real close button did not release the shop pause.");
             Check(!Cursor.visible && Cursor.lockState == CursorLockMode.Locked,
@@ -219,7 +259,9 @@ public static class ShopPlayModeRegression
                 "The neutral release frame replayed a stale gameplay press.");
             InputSystem.RemoveDevice(mouse); mouse = null;
             InputSystem.RemoveDevice(keyboard); keyboard = null;
-            Check(shop.TryOpen() && ReferenceEquals(shop.CurrentStock, firstStock) && item.SoldOut && heal.SoldOut,
+            Check(shop.TryOpen(), "The nearby shop did not reopen after closing.");
+            yield return Wait(() => view.IsInteractionReady, "The reopened shop did not finish its opening animation.", 5f);
+            Check(ReferenceEquals(shop.CurrentStock, firstStock) && item.SoldOut && heal.SoldOut,
                 "Closing/reopening rerolled stock or restored sold offers.");
             run.CloseShop();
 
@@ -245,19 +287,18 @@ public static class ShopPlayModeRegression
 
             stage = run.stageManager;
             var oldRoot = stage.Result.root;
-            stage.Exit.enabled = false; // Retain real arrival detection, control only the exact exit invocation.
+            var oldPortal = stage.Exit.gameObject;
             var end = stage.Result.endRoom.GetComponent<DungeonRoomEncounter>();
             Check(end != null && end.State == DungeonEncounterState.Cleared && end.Members.Count == 0,
                 "The next-stage fixture expects the installed empty end room.");
             yield return Enter(end, player);
-            yield return Frames(2);
+            yield return Wait(() => stage.Exit.IsAvailable, "End-room arrival did not open the actual portal.", 10f);
             Check(end.WasEntered && stage.IsCleared && stage.Exit.IsAvailable, "Actual end-room arrival did not complete its exit objective.");
-            MoveFeet(player, stage.Exit.transform.position);
-            Check(stage.Exit.ContainsPlayer(player), "The player did not overlap the actual stage exit.");
             int generation = Field<int>(stage.Exit, "_generation");
             int goldBeforeNext = shop.Wallet.Gold;
             var ownedBeforeNext = player.ItemRuntime.OwnedItems.Select(definition => definition.itemId).ToArray();
-            Check(stage.TryUseExit(player, generation), "The completed actual exit rejected progression.");
+            Check(!stage.TryUseExit(player, generation), "A direct request bypassed physical portal traversal.");
+            yield return WalkPortal(run, stage.Exit);
             yield return Ready(run);
             Check(run.CurrentChapterIndex == nextChapter && run.CurrentStageIndex == nextStage,
                 "The actual exit advanced to an unexpected stage.");
@@ -271,15 +312,80 @@ public static class ShopPlayModeRegression
             Check(shop.CurrentStock.Offers.Single(offer => offer.IsHealing).SoldOut == false,
                 "The next stage did not receive a fresh healing offer.");
             yield return Frames(3);
-            Check(oldRoot == null && !run.IsShopOpen && !player.IsShopPaused, "An old stage root or shop modal survived progression.");
+            Check(oldRoot == null && oldPortal == null && !run.IsShopOpen && !player.IsShopPaused,
+                "An old stage root, portal or shop modal survived progression.");
             CheckGeneratedShop(run, shop);
+            if (fixtureDefinition != null)
+            {
+                run.definition = originalDefinition;
+                RetryStage(run, 0, 0, "Restoring the installed campaign after the shop regression.");
+                yield return Ready(run);
+                Check(run.CurrentChapterIndex == 0 && run.CurrentStageIndex == 0,
+                    "The original first stage was not restored.");
+            }
         }
         finally
         {
-            if (mouse != null && mouse.added) InputSystem.RemoveDevice(mouse);
-            if (keyboard != null && keyboard.added) InputSystem.RemoveDevice(keyboard);
-            snapshot?.Apply();
+            try
+            {
+                if (fixtureDefinition != null && run != null && run.definition == fixtureDefinition)
+                {
+                    run.definition = originalDefinition;
+                    RetryStage(run, 0, 0, "Restoring the installed campaign after the shop regression failed.");
+                }
+                if (mouse != null && mouse.added) InputSystem.RemoveDevice(mouse);
+                if (keyboard != null && keyboard.added) InputSystem.RemoveDevice(keyboard);
+                snapshot?.Apply();
+            }
+            finally
+            {
+                if (run != null && accountScope != null) SetField(run, "_upgradeService", previousRunService);
+                accountScope?.Dispose();
+                if (fixtureDefinition != null) Object.Destroy(fixtureDefinition);
+            }
         }
+    }
+
+    private static RunDefinitionSO CreateShopFixture(RunDefinitionSO installed)
+    {
+        const string settings = "Assets/_Game/RunProgression/Settings/";
+        var normal = AssetDatabase.LoadAssetAtPath<BaekhoDungeonSettings>(settings + "NormalStage.asset");
+        var boss = AssetDatabase.LoadAssetAtPath<BaekhoDungeonSettings>(settings + "BossStage.asset");
+        var installedBoss = installed.chapters.SelectMany(chapter => chapter.stages)
+            .FirstOrDefault(stage => stage.bossPrefab != null);
+        Check(normal != null && boss != null && installedBoss != null && installedBoss.enemyCatalog != null,
+            "The authored normal/boss settings, boss prefab, or enemy catalog are missing.");
+        var definition = ScriptableObject.CreateInstance<RunDefinitionSO>();
+        definition.hideFlags = HideFlags.DontSave;
+        definition.chapters = new[] { new ChapterDefinition { displayName = "Shop QA", stages = new[]
+        {
+            new StageDefinition { displayName = "QA Normal", dungeonSettings = normal,
+                enemyCatalog = installedBoss.enemyCatalog, mapCountVariation = 0 },
+            new StageDefinition { displayName = "QA Boss", dungeonSettings = boss,
+                enemyCatalog = installedBoss.enemyCatalog, bossPrefab = installedBoss.bossPrefab, mapCountVariation = 0 }
+        } } };
+        if (!definition.Validate(out var error))
+        {
+            Object.Destroy(definition);
+            throw new InvalidOperationException(error);
+        }
+        return definition;
+    }
+
+    private static void RetryStage(RunManager run, int chapter, int stage, string reason)
+    {
+        if (run.State == RunState.Playing)
+            typeof(RunManager).GetMethod("OnStageFailure", Hidden).Invoke(run, new object[] { reason });
+        else if (run.State == RunState.Preparing)
+        {
+            typeof(RunManager).GetMethod("ShowError", Hidden).Invoke(run, new object[] { reason });
+            run.stageManager.Cancel();
+        }
+        if (run.State != RunState.Error) return;
+        SetField(run, "_pendingChapter", chapter);
+        SetField(run, "_pendingStage", stage);
+        SetField(run, "_hasPending", true);
+        run.RetryPendingStage();
     }
 
     private static void CheckGeneratedShop(RunManager run, StageShopService shop)
@@ -373,12 +479,6 @@ public static class ShopPlayModeRegression
         yield return Frames(2);
     }
 
-    private static void MoveFeet(PlayerController player, Vector3 floor)
-    {
-        float halfHeight = player.Controller.height * Mathf.Abs(player.transform.lossyScale.y) * 0.5f;
-        MoveCenter(player, floor + Vector3.up * (halfHeight + player.Controller.skinWidth + 0.05f));
-    }
-
     private static void MoveCenter(PlayerController player, Vector3 center)
     {
         bool enabled = player.Controller.enabled;
@@ -387,6 +487,31 @@ public static class ShopPlayModeRegression
         player.VerticalVelocity = 0f;
         player.Controller.enabled = enabled;
         Physics.SyncTransforms();
+    }
+
+    private static IEnumerator WalkPortal(RunManager run, StageExit exit)
+    {
+        var transit = exit.Transit;
+        Check(transit != null && exit.Activation.State == GateState.Open, "The stage portal is not ready for walking.");
+        var player = run.player;
+        var floor = transit.transform.TransformPoint(new Vector3(0f, 0f, transit.crossingPlaneOffset + 1f));
+        floor.y = exit.transform.position.y;
+        var facing = Quaternion.LookRotation(-transit.transform.forward, Vector3.up);
+        GateTransit.Teleport(player.transform, player.Controller, null,
+            DungeonFastTravelLanding.PlayerRootAtFloor(floor, facing, player.Controller), facing);
+        player.VerticalVelocity = 0f;
+        player.Controller.Move(Vector3.down * .01f);
+        yield return Frames(3);
+        int chapter = run.CurrentChapterIndex, stage = run.CurrentStageIndex;
+        var direction = -transit.transform.forward;
+        for (int step = 0; step < 18 && run.State == RunState.Playing
+            && run.CurrentChapterIndex == chapter && run.CurrentStageIndex == stage; step++)
+        {
+            player.Controller.Move(direction * .1f);
+            yield return Frames(1);
+        }
+        yield return Wait(() => run.State != RunState.Playing || run.CurrentChapterIndex != chapter || run.CurrentStageIndex != stage,
+            "Walking through the actual portal did not advance the stage.");
     }
 
     private static IEnumerator Frames(int count)
@@ -433,6 +558,16 @@ public static class ShopPlayModeRegression
         _checks++;
     }
 
+    private sealed class MemoryUpgradeStore : IPlayerUpgradeStore
+    {
+        private PlayerUpgradeProfile _profile;
+        public MemoryUpgradeStore(PlayerUpgradeProfile profile) => _profile = profile.Copy();
+        public bool TryLoad(out PlayerUpgradeProfile value, out string error)
+        { value = _profile.Copy(); error = null; return true; }
+        public bool TrySave(PlayerUpgradeProfile value, out string error)
+        { _profile = value.Copy(); error = null; return true; }
+    }
+
     /// <summary>Restores only resources/input deliberately changed by this fixture. Real progression stays committed.</summary>
     private sealed class Restore
     {
@@ -441,7 +576,8 @@ public static class ShopPlayModeRegression
         private PlayerController _player;
         private string[] _owned;
         private int _gold;
-        private float _hp, _sp, _gauge, _regen, _timeScale;
+        private double _earnedGoldRemainder;
+        private float _hp, _gauge, _timeScale;
         private Vector3 _position;
         private Quaternion _rotation;
         private int _chapter, _stage;
@@ -453,8 +589,9 @@ public static class ShopPlayModeRegression
         {
             _run = run, _shop = shop, _player = run.player,
             _owned = run.player.ItemRuntime.OwnedItems.Select(item => item.itemId).ToArray(),
-            _gold = shop.Wallet.Gold, _hp = run.player.StatManager.CurrentHp, _sp = run.player.StatManager.CurrentSp,
-            _gauge = run.player.StatManager.CurrentUltimateGauge, _regen = Field<float>(run.player.StatManager, "_spRegenTimer"),
+            _gold = shop.Wallet.Gold, _earnedGoldRemainder = Field<double>(shop.Wallet, "_earnedGoldRemainder"),
+            _hp = run.player.StatManager.CurrentHp,
+            _gauge = run.player.StatManager.CurrentUltimateGauge,
             _timeScale = Time.timeScale, _position = run.player.transform.position, _rotation = run.player.transform.rotation,
             _chapter = run.CurrentChapterIndex, _stage = run.CurrentStageIndex,
             _generationRoot = run.stageManager.Result.root,
@@ -472,13 +609,11 @@ public static class ShopPlayModeRegression
             int gold = _shop.Wallet.Gold;
             if (gold > _gold) _shop.Wallet.TrySpend(gold - _gold);
             else if (gold < _gold) _shop.Wallet.AddGold(_gold - gold);
+            SetField(_shop.Wallet, "_earnedGoldRemainder", _earnedGoldRemainder);
             var stats = _player.StatManager;
             if (stats.CurrentHp < _hp) stats.Heal(_hp - stats.CurrentHp);
             else if (stats.CurrentHp > _hp) stats.ConsumeHealth(stats.CurrentHp - _hp);
-            if (stats.CurrentSp < _sp) stats.AddSp(_sp - stats.CurrentSp);
-            else if (stats.CurrentSp > _sp) stats.TryConsumeSp(stats.CurrentSp - _sp);
             stats.ConsumeAllUltimateGauge(); stats.AddUltimateGauge(_gauge);
-            SetField(stats, "_spRegenTimer", _regen);
             for (int i = 0; i < _stock.Offers.Count; i++)
                 SetField(_stock.Offers[i], "<SoldOut>k__BackingField", _sold[i]);
             _player.Input.AttackBuffer.Consume(); _player.Input.DashBuffer.Consume(); _player.Input.SkillBuffer.Consume();

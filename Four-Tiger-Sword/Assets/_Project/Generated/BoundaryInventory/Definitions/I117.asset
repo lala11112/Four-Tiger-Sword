@@ -18,8 +18,8 @@ MonoBehaviour:
   displayName: "\uCD94\uC801 \uD45C\uC2DD"
   description: "\uC0AC\uB0E5\uAC10\uC744 \uB193\uCE58\uC9C0 \uC54A\uB3C4\uB85D \uD478\uB978
     \uC120\uC744 \uC0C8\uAE34 \uD45C\uC2DD\uC774\uB2E4."
-  effectText: "\uC815\uC608\uC640 \uBCF4\uC2A4\uC5D0\uAC8C \uC8FC\uB294 \uAE30\uBCF8
-    \uACF5\uACA9\uACFC \uC2A4\uD0AC \uD53C\uD574\uAC00 6% \uC99D\uAC00\uD55C\uB2E4."
+  effectText: "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0
+    \uD53C\uD574 +10%"
   synergyIds:
   - S15
   synergyNames:
@@ -28,15 +28,15 @@ MonoBehaviour:
   primarySynergyName: "\uAC70\uBB3C\uC0AC\uB0E5"
   primarySynergyIcon: {fileID: 21300000, guid: ea13f41cbb31a694f917a34c7bf61f48, type: 3}
   element: 0
-  grade: 2
-  purchasePrice: 40
+  grade: 3
+  purchasePrice: 80
   effects: []
   boundaryEffects:
   - effectId: I117
     stat: 6
-    amount: 0.06
+    amount: 0.1
     trigger: 0
-    family: 3
+    family: 0
     element: 0
     eliteOrBossOnly: 1
     targetHpMin: -1
@@ -55,9 +55,8 @@ MonoBehaviour:
     cooldownSeconds: 0
   icon: {fileID: 21300000, guid: e8edfe2546d74724faefbd5d9c6bb7af, type: 3}
   contentStatus: draft
-  contentRevision: 20261110
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I117\",\"name\":\"\uCD94\uC801 \uD45C\uC2DD\",\"description\":\"\uC0AC\uB0E5\uAC10\uC744
     \uB193\uCE58\uC9C0 \uC54A\uB3C4\uB85D \uD478\uB978 \uC120\uC744 \uC0C8\uAE34
-    \uD45C\uC2DD\uC774\uB2E4.\",\"effect\":\"\uC815\uC608\uC640 \uBCF4\uC2A4\uC5D0\uAC8C
-    \uC8FC\uB294 \uAE30\uBCF8 \uACF5\uACA9\uACFC \uC2A4\uD0AC \uD53C\uD574\uAC00
-    6% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S15\"],\"primarySynergy\":\"S15\",\"image\":\"Art/Items/I117.png\",\"origin\":\"expansion\"}"
+    \uD45C\uC2DD\uC774\uB2E4.\",\"effect\":\"\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C
+    \uBAA8\uB4E0 \uD53C\uD574 +10%\",\"synergies\":[\"S15\"],\"primarySynergy\":\"S15\",\"image\":\"Art/Items/I117.png\",\"origin\":\"expansion\",\"grade\":3}"

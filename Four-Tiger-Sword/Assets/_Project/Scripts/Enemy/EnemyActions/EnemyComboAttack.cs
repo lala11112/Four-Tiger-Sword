@@ -20,6 +20,25 @@ public class EnemyComboAttack : EnemyAction
     private int _bossAimStrike;
     private float _normalArmorEnd;
     public override bool SupportsBossPolicy => true;
+    public int CurrentWarningHitIndex => IsActive && !IsFinished && !WasParried && CanContinueAction
+        && BossStage == BossAttackStage.Startup && _data.hits != null && _bossAimStrike < _data.hits.Count
+        && _data.hits[_bossAimStrike] != null ? _bossAimStrike : -1;
+
+    public float WarningProgress
+    {
+        get
+        {
+            int index = CurrentWarningHitIndex;
+            if (index < 0) return 0f;
+
+            var previous = index > 0 ? _data.hits[index - 1] : null;
+            float start = previous == null ? 0f : previous.hitStartTime + previous.hitDuration;
+            float duration = _data.hits[index].hitStartTime - start;
+            if (!(duration > 0f) || float.IsInfinity(duration) || float.IsNaN(_timer)) return 0f;
+            return Mathf.Clamp01((_timer - start) / duration);
+        }
+    }
+
     protected override float BossInitialStartupDuration => _data.hits[0].hitStartTime;
 
     public EnemyComboAttack(MonsterComboAttackSO data, Enemy enemy)

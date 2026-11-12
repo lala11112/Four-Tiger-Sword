@@ -337,6 +337,7 @@ namespace Baekho.Generated.a08babf2b48684e72bc1f482c3b6e8f9c
             {
                 if (second) _secondSwing = true;
                 else _firstSwing = true;
+                EndAttackWarning();
                 EndTelegraph();
                 if (!IsActive || IsFinished) return;
                 PlayState(_data.animName);

@@ -85,7 +85,8 @@ public static class RunProgressionSetup
         AssetDatabase.SaveAssets();
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
-        return $"Installed {definition.chapters.Length} chapters / {definition.TotalStages} stages. Edit {DefinitionPath}. Boss uses existing RealBoss scene content.";
+        string portalResult = StageExitPortalSetup.Setup();
+        return $"Installed {definition.chapters.Length} chapters / {definition.TotalStages} stages. Edit {DefinitionPath}. Boss uses existing RealBoss scene content. {portalResult}";
     }
 
     private static BaekhoMapModule CopyRoom(BaekhoMapModule source, string name, int role)

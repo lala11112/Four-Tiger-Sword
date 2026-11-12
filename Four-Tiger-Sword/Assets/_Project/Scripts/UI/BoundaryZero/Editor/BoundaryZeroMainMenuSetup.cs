@@ -112,7 +112,7 @@ public static class BoundaryZeroMainMenuSetup
         button.colors = colors;
         button.interactable = available;
         var label = Rect("Label", image.transform, 110, 0, 535, 103).gameObject.AddComponent<TextMeshProUGUI>();
-        BoundaryZeroTypography.Assign(label, BoundaryZeroTypography.Role.KoreanTitle);
+        BoundaryZeroTypography.Assign(label);
         label.text = text; label.fontSize = 34; label.fontStyle = FontStyles.Normal;
         label.alignment = TextAlignmentOptions.MidlineLeft;
         label.color = available ? new Color32(230, 237, 244, 255) : new Color32(78, 95, 111, 255);

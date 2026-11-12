@@ -180,7 +180,9 @@ public sealed class BoundaryZeroRunOverlay : MonoBehaviour
     private void AddRevealLayer(GameObject target, float start, float duration, float rise)
     {
         if (target == null) return;
-        var rect = target.transform as RectTransform;
+        // Fade-only layers must not restore geometry: UIButtonMotion can recenter
+        // the action's pivot when the hidden modal is first activated.
+        var rect = rise != 0f ? target.transform as RectTransform : null;
         var group = target.GetComponent<CanvasGroup>();
         if (group == null) group = target.AddComponent<CanvasGroup>();
         _revealLayers.Add(new RevealLayer

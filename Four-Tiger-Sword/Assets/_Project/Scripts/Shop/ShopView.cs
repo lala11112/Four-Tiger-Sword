@@ -219,7 +219,7 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
         Icon(tabs.ResultIcon, state.FusionResult?.Icon);
     }
 
-    private static string ItemLabel(ShopOwnedItemViewState item) => $"{item.Name}  ·  {item.Grade}등급";
+    private static string ItemLabel(ShopOwnedItemViewState item) => $"{item.Name}  ·  {ItemDisplayText.Stars(item.Grade)}";
 
     private void ListenBoundary(bool add)
     {
@@ -529,11 +529,9 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
         var stock = state.SelectedOffer;
         bool any = offer ? stock != null : owned != null;
         boundary.DetailTitle.text = any ? offer ? stock.Name : owned.Name : "아이템 상세";
-        string synergyName = any ? offer ? stock.PrimarySynergyName : owned.PrimarySynergyName : null;
         int grade = !any ? 0 : offer ? stock.Grade : owned.Grade;
-        boundary.DetailMeta.text = !any ? string.Empty : !string.IsNullOrEmpty(synergyName)
-            ? ItemDisplayText.Meta(grade, synergyName)
-            : $"{grade}등급 · {ShopOfferView.ElementName(offer ? stock.Element : owned.Element)}";
+        boundary.DetailMeta.text = any ? ItemDisplayText.Stars(grade) : string.Empty;
+        boundary.DetailMeta.fontStyle = FontStyles.Bold;
         var rarity = ItemRarityFrame.ColorFor(grade);
         _normalDetailMetaColor ??= boundary.DetailMeta.color;
         boundary.DetailMeta.color = rarity.a > 0f ? rarity : _normalDetailMetaColor.Value;
@@ -603,8 +601,8 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
             Grid(boundary.OwnedGrid, 2, 319, 248);
         }
         Place(boundary.DetailIcon.rectTransform, 28, 24, 140, 140);
-        Place(boundary.DetailTitle.rectTransform, 188, 35, detailWidth - 216, 64);
-        Place(boundary.DetailMeta.rectTransform, 188, 105, detailWidth - 216, 36);
+        Place(boundary.DetailTitle.rectTransform, 188, 28, detailWidth - 216, 76);
+        Place(boundary.DetailMeta.rectTransform, 188, 108, detailWidth - 216, 40);
         Place(boundary.DetailBody.rectTransform.parent.parent as RectTransform, 28, 182, detailWidth - 56, 394);
         Place(boundary.DetailPrice.rectTransform, 28, 584, detailWidth - 56, 42);
         Place(boundary.DetailAction.transform as RectTransform, (detailWidth - 260) * .5f, 642, 260, 62);
@@ -636,7 +634,12 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
             if (buttons[i] != null) buttons[i].gameObject.SetActive(!synergyCatalog || i == 0);
     }
     private static void Place(RectTransform rect, float x, float y, float width, float height)
-    { rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0, 1); rect.anchoredPosition = new Vector2(x, -y); rect.sizeDelta = new Vector2(width, height); }
+    {
+        rect.anchorMin = rect.anchorMax = new Vector2(0, 1);
+        if (!rect.TryGetComponent<UIButtonMotion>(out _)) rect.pivot = new Vector2(0, 1);
+        rect.sizeDelta = new Vector2(width, height);
+        rect.anchoredPosition = new Vector2(x + width * rect.pivot.x, -y - height * (1f - rect.pivot.y));
+    }
     private static void Tab(UnityEngine.UI.Button button, bool selected)
     {
         button.interactable = !selected;

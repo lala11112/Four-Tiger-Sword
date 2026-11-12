@@ -104,26 +104,6 @@ public class FormBalanceSettings
 {
     [Min(0f)] public float UltimateCooldown = 30f;
 
-    // Legacy serialized data only. Form upkeep depletion and exhaustion penalties are retired.
-    [HideInInspector]
-    public FormSpSettings FormSp = new FormSpSettings();
-}
-
-[Serializable]
-public class FormSpSettings
-{
-    [Min(0.01f), Tooltip("폼별 SP 최대치. 새 플레이어는 모든 폼이 완충 상태로 시작합니다.")]
-    public float MaxSp = 100f;
-    [Min(0.01f), Tooltip("전투 중 활성 폼이 최대 SP에서 고갈되기까지 걸리는 시간(초).")]
-    public float DepletionSeconds = 30f;
-    [Min(0.01f), Tooltip("비활성 폼이 SP 0에서 완충되기까지 걸리는 시간(초).")]
-    public float RecoverySeconds = 20f;
-    [Range(0.01f, 1f), Tooltip("고갈 페널티가 해제되는 SP 비율. 0.2 = 최대치의 20%.")]
-    public float ExhaustionRecoveryRatio = 0.2f;
-    [Range(0f, 1f), Tooltip("고갈 중 공격력 배율. 0.8 = 20% 감소.")]
-    public float ExhaustedAttackMultiplier = 0.8f;
-    [Range(0f, 1f), Tooltip("고갈 중 공격속도 배율. 0.8 = 20% 감소.")]
-    public float ExhaustedAttackSpeedMultiplier = 0.8f;
 }
 
 [Serializable]

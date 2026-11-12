@@ -362,8 +362,6 @@ RectTransform:
   - {fileID: 821314214}
   - {fileID: 64822676}
   - {fileID: 2118865604}
-  - {fileID: 400318224}
-  - {fileID: 2073981972}
   - {fileID: 31740889}
   - {fileID: 1315911682}
   - {fileID: 1598514103}
@@ -841,81 +839,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &400318223
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 400318224}
-  - component: {fileID: 400318226}
-  - component: {fileID: 400318225}
-  m_Layer: 5
-  m_Name: SpBar
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &400318224
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 400318223}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 49434480}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 220, y: -80}
-  m_SizeDelta: {x: 350, y: 25}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &400318225
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 400318223}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1f6f5b56a3a99f7478529369b848eb3f, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &400318226
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 400318223}
-  m_CullTransparentMesh: 1
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -1749,6 +1672,7 @@ MonoBehaviour:
   EnemyStat: {fileID: 0}
   stateName: 
   HurtDuration: 0.5
+  enemyRank: 0
   _targetMemoryDuration: 4
   ApproachTimeout: 6
   ApproachStuckTimeout: 1.5
@@ -2466,7 +2390,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerUIManager
   hpBarImage: {fileID: 498137103}
-  spBarImage: {fileID: 2073981973}
   ultimateGaugeImage: {fileID: 2118865605}
   FireElement: {fileID: 988649622}
   WaterElement: {fileID: 673056346}
@@ -2523,8 +2446,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44c5a8d6a0941e443a3f0448ebb947bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageManager
-  _spawnEntries: []
-  _stageResultUI: {fileID: 0}
+  generator: {fileID: 0}
+  encounters: {fileID: 0}
 --- !u!4 &1246822376
 Transform:
   m_ObjectHideFlags: 0
@@ -2629,15 +2552,20 @@ MonoBehaviour:
   CoyoteTime: 0.15
   AirAttackDescentSpeed: 25
   DashCooldown: 1
+  DashAnimationName: Dash
+  BackstepAnimationName: Backstep
   FormChangeCooldown: 0.5
   ParryUltimateGaugeReward: 30
   HitDuration: 0.15
   StaggerDuration: 0.4
+  HitRecoveryInputBufferWindow: 0.05
   StaggerPoiseThreshold: 20
   HitStaggerResistance: 2
   HitAnimationName: Hit
   StaggerAnimationName: Stagger
   KnockbackAnimationName: Knockback
+  KnockdownAnimationName: Knockdown
+  GetUpAnimationName: GetUp
   _FireFormActionData: {fileID: 11400000, guid: ddfdcb1b3fb44274a8bbf37f6fe3a95b, type: 2}
   _WaterFormActionData: {fileID: 11400000, guid: 67a5eeaff6129da40a18a395ab4e8a85, type: 2}
   _WoodFormActionData: {fileID: 11400000, guid: 0fc8f1af7750ac34394d988c88544241, type: 2}
@@ -2648,6 +2576,9 @@ MonoBehaviour:
   _hitStopDuration: 0.08
   _hitStopTimeScale: 0.05
   ImpulseSource: {fileID: 0}
+  _finisherTimeScale: 0.05
+  IncomingHitShakeStrength: 0.15
+  IncomingKnockdownShakeStrength: 0.25
   _attackTrails: []
 --- !u!114 &1285247858
 MonoBehaviour:
@@ -2661,6 +2592,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15dfa7a401c971d4a8e7506aba338730, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputHandler
+  _inputMode: 0
   _moveAction: {fileID: 4577224434774360841, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
   _jumpAction: {fileID: -6850310463263698666, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
   _dashAction: {fileID: 3221351052497047372, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
@@ -2673,6 +2605,8 @@ MonoBehaviour:
   _fastFormAction: {fileID: 532521431518318564, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
   _skillAction: {fileID: -4816719396555062990, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
   _ultimateAction: {fileID: -5091557946504675416, guid: 5aafd3e95aa995240a7b8bf1d04fb235, type: 3}
+  _finisherAction: {fileID: 0}
+  _chainSkillAction: {fileID: 0}
 --- !u!114 &1285247859
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3562,6 +3496,7 @@ MonoBehaviour:
   EnemyStat: {fileID: 0}
   stateName: 
   HurtDuration: 0.5
+  enemyRank: 0
   _targetMemoryDuration: 4
   ApproachTimeout: 6
   ApproachStuckTimeout: 1.5
@@ -4207,6 +4142,7 @@ MonoBehaviour:
   EnemyStat: {fileID: 0}
   stateName: 
   HurtDuration: 0.5
+  enemyRank: 0
   _targetMemoryDuration: 4
   ApproachTimeout: 6
   ApproachStuckTimeout: 1.5
@@ -4740,81 +4676,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b868760258ea82c4e8e1e9490a131e0f, type: 3}
---- !u!1 &2073981971
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2073981972}
-  - component: {fileID: 2073981974}
-  - component: {fileID: 2073981973}
-  m_Layer: 5
-  m_Name: Sp
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &2073981972
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2073981971}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 49434480}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 220, y: -80}
-  m_SizeDelta: {x: 350, y: 25}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2073981973
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2073981971}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9d50fceafab3c3c45875004544e7c7e6, type: 3}
-  m_Type: 3
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 0
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &2073981974
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2073981971}
-  m_CullTransparentMesh: 1
 --- !u!1 &2118865603
 GameObject:
   m_ObjectHideFlags: 0

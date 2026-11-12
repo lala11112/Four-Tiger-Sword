@@ -27,6 +27,8 @@ public partial class PlayerController
     public void BeginStageTransition()
     {
         if (IsStageTransitioning) return;
+        CancelFallRecovery();
+        _fallRecovery?.ResetHistory();
         CancelFinisherSelection();
         IsStageTransitioning = true;
         _stageInputEnabled = Input != null && Input.enabled;
@@ -100,20 +102,10 @@ public partial class PlayerController
             throw new ArgumentException("Stage spawn position and rotation must be finite.");
         if (StatManager == null || StatManager.CurrentHp <= 0f) return;
 
-        Vector3 delta = position - transform.position;
         if (Controller != null) Controller.enabled = false;
-        transform.SetPositionAndRotation(position, rotation.normalized);
         VerticalVelocity = 0f;
-        Physics.SyncTransforms();
-        foreach (var camera in FindObjectsByType<CinemachineCamera>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-        {
-            if (!TracksPlayer(camera)) continue;
-            if (IsPlayerTarget(camera.Follow)) camera.OnTargetObjectWarped(camera.Follow, delta);
-            if (camera.LookAt != camera.Follow && IsPlayerTarget(camera.LookAt))
-                camera.OnTargetObjectWarped(camera.LookAt, delta);
-            camera.PreviousStateIsValid = false;
-            if (camera.isActiveAndEnabled) camera.UpdateCameraState(Vector3.up, -1f);
-        }
+        WarpPlayerAndCamera(position, rotation);
+        _fallRecovery?.ResetHistory();
     }
 
     /// <summary>Evaluates Idle behind the loading cover without releasing player or camera controls.</summary>
@@ -190,6 +182,7 @@ public partial class PlayerController
     internal void BeginDeathPresentation()
     {
         if (_deathAnimator != null || StatManager == null || StatManager.CurrentHp > 0f) return;
+        CancelFallRecovery();
 
         // A lethal hit during stage preparation or a modal can reach the run before the state machine ticks.
         StateMachine?.Update(false, false);
@@ -251,6 +244,7 @@ public partial class PlayerController
     internal void NotifyDied()
     {
         if (_deathNotified || StatManager == null || StatManager.CurrentHp > 0f) return;
+        CancelFallRecovery();
         CancelFinisherSelection();
         _deathNotified = true;
         GetComponent<FormEffectRunner>()?.CancelStageEffects();

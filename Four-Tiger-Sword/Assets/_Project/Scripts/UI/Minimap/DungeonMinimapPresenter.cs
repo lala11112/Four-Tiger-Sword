@@ -321,6 +321,7 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
         RefreshVisibility();
         UpdateEnemies(stage, root);
         UpdateChestMarkers(stage.Encounters, root);
+        RefreshRewardNotice();
         _tracking = true;
     }
 
@@ -428,9 +429,19 @@ public sealed class DungeonMinimapPresenter : MonoBehaviour
                 FullMap = fullMapView != null
                     ? fullMapView.AddTrackedMarker(area, position, DungeonMinimapIconGraphic.Symbol.RewardChest) : null
             });
-            if (_rewardNotice == null) _rewardNotice = DungeonRewardNotice.Create();
-            _rewardNotice.Show();
         }
+    }
+
+    private void RefreshRewardNotice()
+    {
+        if (_chestMarkers.Count == 0)
+        {
+            if (_rewardNotice != null) _rewardNotice.Hide();
+            return;
+        }
+
+        if (_rewardNotice == null) _rewardNotice = DungeonRewardNotice.Create();
+        _rewardNotice.Show();
     }
 
     private void ClearChestMarkers()

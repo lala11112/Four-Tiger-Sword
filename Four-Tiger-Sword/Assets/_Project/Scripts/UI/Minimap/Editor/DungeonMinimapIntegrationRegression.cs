@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using StudioBaekho;
 using UnityEditor;
@@ -33,12 +34,13 @@ public static class DungeonMinimapIntegrationRegression
         var definition = ScriptableObject.CreateInstance<RunDefinitionSO>();
         definition.chapters = new[] { new ChapterDefinition { displayName = "Chapter fixture",
             stages = new[] { new StageDefinition(), new StageDefinition() } } };
+        DungeonMinimapPresenter presenter = null;
         try
         {
             SceneManager.SetActiveScene(isolated);
             var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, isolated);
             var view = instance.GetComponent<DungeonMinimapView>();
-            var presenter = instance.GetComponent<DungeonMinimapPresenter>();
+            presenter = instance.GetComponent<DungeonMinimapPresenter>();
             Check(view != null && presenter != null, "Minimap prefab lacks its view or presenter.");
             foreach (var graphic in instance.GetComponentsInChildren<UnityEngine.UI.Graphic>(true))
                 Check(graphic.GetComponent<CanvasRenderer>() != null, "Instantiated graphic has no CanvasRenderer: " + graphic.name);
@@ -46,10 +48,12 @@ public static class DungeonMinimapIntegrationRegression
             Lifecycle(view, presenter, definition);
             Layout(instance);
             return $"Minimap integration: {_checks} checks passed (discovery, markers, transformed roots, " +
-                "height, stage labels, state changes, UI reactivation, replacement stages, input pass-through and multiple aspect ratios).";
+                "height, stage labels, reward notices, UI reactivation, replacement stages, input pass-through and multiple aspect ratios).";
         }
         finally
         {
+            if (presenter != null && Field<DungeonRewardNotice>(presenter, "_rewardNotice") is { } notice && notice != null)
+                Object.DestroyImmediate(notice.gameObject);
             SceneManager.SetActiveScene(previous);
             EditorSceneManager.CloseScene(isolated, true);
             Object.DestroyImmediate(definition);
@@ -84,14 +88,15 @@ public static class DungeonMinimapIntegrationRegression
         var run = runObject.AddComponent<RunManager>();
         var stage = runObject.AddComponent<StageManager>();
         var generator = new GameObject("GeneratorFixture").AddComponent<BaekhoDungeonGenerator>();
-        stage.Configure(generator, null);
+        var director = generator.gameObject.AddComponent<DungeonEncounterDirector>();
+        stage.Configure(generator, director);
         var player = new GameObject("PlayerFixture").AddComponent<PlayerController>();
         run.stageManager = stage;
         run.player = player;
         run.definition = definition;
         Auto(run, "CurrentChapterIndex", 0);
         Auto(run, "CurrentStageIndex", 0);
-        var result = Result();
+        var result = Result(ordinaryRooms: 3);
         Auto(stage, "Result", result);
         Auto(stage, "IsReady", true);
         Auto(generator, "CurrentRoot", result.root);
@@ -104,13 +109,13 @@ public static class DungeonMinimapIntegrationRegression
         var markers = Field<RectTransform>(view, "markerLayer");
         var viewport = Field<RectTransform>(view, "viewport");
         var arrow = Field<DungeonMinimapIconGraphic>(view, "playerArrow");
-        Check(view.IsVisible && view.BuiltAreaCount == 3, "Ready stage did not build its room geometry.");
+        Check(view.IsVisible && view.BuiltAreaCount == result.rooms.Count, "Ready stage did not build its room geometry.");
         Check(view.StageLabel != null && view.StageLabel.gameObject.activeSelf && view.StageLabel.text == run.ProgressLabel,
             "Ready stage did not display the current chapter/stage in the minimap.");
         Check(presenter.Model.Areas[presenter.Model.GetRoomAreaIndex(1)].Visited, "Start room was not discovered.");
         Check(markers.childCount == 2 && !markers.Find("ShopMarker").gameObject.activeSelf
             && !markers.Find("ExitMarker").gameObject.activeSelf, "Undiscovered markers leaked.");
-        Check(content.childCount == 3, "Initial build created unexpected map geometry.");
+        Check(content.childCount == result.rooms.Count, "Initial build created unexpected map geometry.");
 
         player.transform.SetPositionAndRotation(result.root.transform.TransformPoint(new Vector3(20f, 0f, 0f)),
             result.root.transform.rotation * Quaternion.Euler(0f, 90f, 0f));
@@ -135,7 +140,7 @@ public static class DungeonMinimapIntegrationRegression
         Invoke(presenter, "OnEnable");
         Invoke(presenter, "UpdateMap");
         Check(view.IsVisible && presenter.Model.Areas[presenter.Model.GetRoomAreaIndex(2)].Visited
-            && content.childCount == 3 && markers.childCount == 2, "Reactivation lost exploration or duplicated UI.");
+            && content.childCount == result.rooms.Count && markers.childCount == 2, "Reactivation lost exploration or duplicated UI.");
         Check(view.StageLabel.gameObject.activeSelf && view.StageLabel.text == run.ProgressLabel,
             "Reactivation failed to restore the current stage label.");
 
@@ -158,6 +163,7 @@ public static class DungeonMinimapIntegrationRegression
             Check(!graphic.raycastTarget, "Map graphic blocks input: " + graphic.name);
         }
 
+        var notice = CheckRewardNotices(presenter, director, result, player, markers);
         var next = Result();
         string previousLabel = view.StageLabel.text;
         Auto(run, "CurrentStageIndex", 1);
@@ -170,6 +176,7 @@ public static class DungeonMinimapIntegrationRegression
         Check(content.childCount == 3 && markers.childCount == 2, "Replacement stage duplicated old geometry or icons.");
         Check(view.StageLabel.text == run.ProgressLabel && view.StageLabel.text != previousLabel,
             "Replacement stage retained its previous chapter/stage label.");
+        Check(!notice.gameObject.activeSelf, "Replacement stage left a notice for the abandoned chest.");
         view.Clear();
         Check(view.BuiltAreaCount == 0 && content.childCount == 0 && markers.childCount == 0 && !view.IsVisible,
             "Clearing the view left geometry, markers or visibility behind.");
@@ -177,21 +184,91 @@ public static class DungeonMinimapIntegrationRegression
             "Clearing the view retained its stage label.");
     }
 
-    private static BaekhoDungeonResult Result()
+    private static DungeonRewardNotice CheckRewardNotices(DungeonMinimapPresenter presenter,
+        DungeonEncounterDirector director, BaekhoDungeonResult result, PlayerController player, Transform markers)
+    {
+        var first = CreatePlacedChest(director, result.rooms[3]);
+        var second = CreatePlacedChest(director, result.rooms[4]);
+        Auto(director, "IsReady", true);
+        Invoke(presenter, "UpdateMap");
+        var notice = Field<DungeonRewardNotice>(presenter, "_rewardNotice");
+        Check(notice != null && notice.gameObject.activeInHierarchy && markers.childCount == 4,
+            "Two unopened chests did not produce a notice and two map markers.");
+        var panel = NamedRect(notice.gameObject, "NoticePlate");
+        var icon = NamedRect(notice.gameObject, "RewardChest");
+        var label = notice.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        Check(panel.sizeDelta == new Vector2(490f, 57.5f) && panel.anchoredPosition == new Vector2(0f, -106f)
+            && icon.sizeDelta == new Vector2(30f, 30f) && label != null && Mathf.Approximately(label.fontSize, 30f),
+            "The reward notice did not scale its panel, icon and text by 25% at its existing position.");
+        Check(!notice.GetComponent<CanvasGroup>().blocksRaycasts, "The persistent reward notice blocks input.");
+
+        player.transform.position = result.startRoom.transform.position;
+        Invoke(presenter, "OnDisable");
+        Check(!notice.gameObject.activeSelf, "A disabled minimap left the reward notice on screen.");
+        Invoke(presenter, "OnEnable");
+        Invoke(presenter, "UpdateMap");
+        Check(notice.gameObject.activeInHierarchy, "Unopened chests did not restore the notice in another room.");
+
+        Invoke(first, "BeginUse");
+        Invoke(presenter, "UpdateMap");
+        Check(notice.gameObject.activeInHierarchy && markers.childCount == 3,
+            "Opening one of two chests removed the remaining chest's notice or marker.");
+        Invoke(second, "BeginUse");
+        Invoke(presenter, "UpdateMap");
+        Check(!notice.gameObject.activeSelf && markers.childCount == 2,
+            "The notice or marker remained after the last chest was opened.");
+
+        CreatePlacedChest(director, result.rooms[5]);
+        SetField(presenter, "_nextChestRefresh", 0f);
+        Invoke(presenter, "UpdateMap");
+        Check(notice.gameObject.activeInHierarchy, "A newly placed chest did not show the notice again.");
+        return notice;
+    }
+
+    private static DungeonRewardChest CreatePlacedChest(DungeonEncounterDirector director, BaekhoMapModule room)
+    {
+        var encounter = room.gameObject.AddComponent<DungeonRoomEncounter>();
+        Auto(encounter, "State", DungeonEncounterState.Cleared);
+        Auto(encounter, "WasEntered", true);
+        Field<List<DungeonEncounterMember>>(encounter, "_members").Add(room.gameObject.AddComponent<DungeonEncounterMember>());
+        SetField(encounter, "_confirmedDefeats", 1);
+        Field<List<DungeonRoomEncounter>>(director, "_rooms").Add(encounter);
+
+        var chest = new GameObject("CombatRewardChest").AddComponent<DungeonRewardChest>();
+        chest.transform.SetParent(room.transform, false);
+        var model = new GameObject("PlacedModel").transform;
+        model.SetParent(chest.transform, false);
+        SetField(chest, "_model", model);
+        SetField(chest, "_outlines", Array.Empty<GameObject>());
+        Invoke(chest, "CreatePrompt");
+        Invoke(chest, "AdvancePresentation", 1f);
+        return chest;
+    }
+
+    private static BaekhoDungeonResult Result(int ordinaryRooms = 0)
     {
         var result = new BaekhoDungeonResult { success = true, root = new GameObject("GeneratedFixture") };
         result.root.transform.SetPositionAndRotation(new Vector3(125f, 7f, -80f), Quaternion.Euler(0f, 90f, 0f));
         var module = new GameObject("ModuleFixture").AddComponent<BaekhoMapModule>();
         module.localBounds = new Bounds(Vector3.zero, new Vector3(10f, 4f, 10f));
         result.plan = new BaekhoDungeonPlan { startMapId = 1, shopMapId = 2, endMapId = 3 };
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3 + ordinaryRooms; i++)
         {
-            var role = i == 0 ? BaekhoRoomRole.Start : i == 1 ? BaekhoRoomRole.Shop : BaekhoRoomRole.End;
+            var role = i switch
+            {
+                0 => BaekhoRoomRole.Start,
+                1 => BaekhoRoomRole.Shop,
+                2 => BaekhoRoomRole.End,
+                _ => BaekhoRoomRole.Normal
+            };
             var position = new Vector3(i * 20f, 0f, 0f);
             result.plan.rooms.Add(new BaekhoPlacedModule { id = i + 1, prefab = module, position = position, role = role });
             var room = new GameObject("RoomFixture_" + i).AddComponent<BaekhoMapModule>();
             room.transform.SetParent(result.root.transform, false);
             room.transform.localPosition = position;
+            var identity = room.gameObject.AddComponent<BaekhoGeneratedRoom>();
+            identity.instanceId = i + 1;
+            identity.role = role;
             var anchor = new GameObject("AnchorFixture").transform;
             anchor.SetParent(room.transform, false);
             var anchors = room.gameObject.AddComponent<StageMapAnchors>();
@@ -200,7 +277,7 @@ public static class DungeonMinimapIntegrationRegression
             result.rooms.Add(room);
             if (i == 0) result.startRoom = room;
             else if (i == 1) result.shopRoom = room;
-            else result.endRoom = room;
+            else if (i == 2) result.endRoom = room;
         }
         return result;
     }
@@ -353,6 +430,7 @@ public static class DungeonMinimapIntegrationRegression
         throw new InvalidOperationException("Missing HUD rect: " + name);
     }
     private static T Field<T>(object target, string name) => (T)target.GetType().GetField(name, Hidden).GetValue(target);
+    private static void SetField(object target, string name, object value) => target.GetType().GetField(name, Hidden).SetValue(target, value);
     private static void Auto(object target, string property, object value) => target.GetType()
         .GetField("<" + property + ">k__BackingField", Hidden).SetValue(target, value);
     private static void Invoke(object target, string method, params object[] args) => target.GetType()

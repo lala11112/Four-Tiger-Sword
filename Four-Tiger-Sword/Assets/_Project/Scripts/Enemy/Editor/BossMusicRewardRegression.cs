@@ -241,7 +241,7 @@ public static class BossMusicRewardRegression
             root.SetActive(false);
             Catalog = Own(ScriptableObject.CreateInstance<ItemCatalog>()); Catalog.projectId = "boss-reward-regression";
             Group = Own(ScriptableObject.CreateInstance<BossRewardGroupSO>());
-            var data = Own(ScriptableObject.CreateInstance<PlayerStatData>()); data.baseHP = data.baseSP = 100f;
+            var data = Own(ScriptableObject.CreateInstance<PlayerStatData>()); data.baseHP = 100f;
             var stats = root.AddComponent<PlayerStatManager>(); stats.Initialize(data);
             Wallet = root.AddComponent<PlayerWallet>(); Wallet.Initialize(gold);
             Items = root.AddComponent<PlayerItemRuntime>(); Items.Catalog = Catalog;

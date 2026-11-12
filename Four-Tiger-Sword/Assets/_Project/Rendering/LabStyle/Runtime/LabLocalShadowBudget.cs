@@ -14,6 +14,8 @@ namespace FourTigerSword.Rendering
         public BaekhoDungeonGenerator generator;
         public Transform explicitRoot;
         public Camera viewCamera;
+        public bool includeGeneratedLights;
+        public Transform focusTarget;
         [Range(0, 8)] public int maxShadowedLights = 4;
         [Min(0f)] public float maxDistance = 25f;
         [Min(0.1f)] public float refreshInterval = 0.5f;
@@ -21,8 +23,9 @@ namespace FourTigerSword.Rendering
         private sealed class LightState
         {
             public Light light;
-            public LightShadows original, applied;
-            public float originalStrength, distanceSquared;
+            public LightShadows original, preferred, applied;
+            public float distanceSquared;
+            public bool coversFocus;
         }
 
         private readonly List<LightState> _lights = new();
@@ -60,10 +63,14 @@ namespace FourTigerSword.Rendering
                 if (root == null) return;
                 foreach (Light light in root.GetComponentsInChildren<Light>(true))
                 {
-                    if ((light.type != LightType.Spot && light.type != LightType.Point) ||
-                        light.shadows == LightShadows.None) continue;
-                    _lights.Add(new LightState { light = light, original = light.shadows,
-                        applied = light.shadows, originalStrength = light.shadowStrength });
+                    if (light.type != LightType.Spot && light.type != LightType.Point) continue;
+                    if (light.bakingOutput.lightmapBakeType == LightmapBakeType.Baked) continue;
+                    LightShadows original = light.shadows;
+                    LightShadows preferred = original;
+                    if (original == LightShadows.None && light.TryGetComponent(out BaekhoGeneratedLightShadow generated))
+                        preferred = generated.authoredMode;
+                    if (preferred != LightShadows.None)
+                        _lights.Add(new LightState { light = light, original = original, preferred = preferred, applied = original });
                 }
             }
             RefreshBudget();
@@ -84,6 +91,8 @@ namespace FourTigerSword.Rendering
             var pipeline = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
             bool supported = pipeline != null && pipeline.supportsAdditionalLightShadows && camera != null;
             float limitSquared = Mathf.Max(0f, maxDistance) * Mathf.Max(0f, maxDistance);
+            bool hasFocus = focusTarget != null && focusTarget.gameObject.activeInHierarchy;
+            Vector3 focusPosition = hasFocus ? focusTarget.position : Vector3.zero;
             for (int index = _lights.Count - 1; index >= 0; index--)
             {
                 LightState state = _lights[index];
@@ -96,11 +105,16 @@ namespace FourTigerSword.Rendering
                 }
                 // Preserve a gameplay effect that has taken control of this light's shadow mode.
                 if (state.light.shadows != state.applied) continue;
-                if (!supported || !state.light.isActiveAndEnabled) continue;
+                if (!supported || !state.light.isActiveAndEnabled ||
+                    (!includeGeneratedLights && state.original == LightShadows.None)) continue;
                 state.distanceSquared = (state.light.transform.position - camera.transform.position).sqrMagnitude;
-                if (state.distanceSquared <= limitSquared) _candidates.Add(state);
+                if (state.distanceSquared > limitSquared) continue;
+                state.coversFocus = hasFocus && CoversPoint(state.light, focusPosition);
+                _candidates.Add(state);
             }
-            _candidates.Sort((left, right) => left.distanceSquared.CompareTo(right.distanceSquared));
+            _candidates.Sort((left, right) => left.coversFocus == right.coversFocus
+                ? left.distanceSquared.CompareTo(right.distanceSquared)
+                : right.coversFocus.CompareTo(left.coversFocus));
             ShadowedLightCount = Mathf.Min(Mathf.Max(0, maxShadowedLights), _candidates.Count);
             foreach (LightState state in _lights)
             {
@@ -108,18 +122,27 @@ namespace FourTigerSword.Rendering
                 bool selected = false;
                 for (int index = 0; index < ShadowedLightCount; index++)
                     if (_candidates[index] == state) { selected = true; break; }
-                state.applied = selected ? state.original : LightShadows.None;
-                state.light.shadows = state.applied;
+                LightShadows next = selected ? state.preferred : LightShadows.None;
+                if (next == state.applied) continue;
+                state.light.shadows = next;
+                state.applied = next;
             }
+        }
+
+        private static bool CoversPoint(Light light, Vector3 point)
+        {
+            Vector3 toPoint = point - light.transform.position;
+            float distanceSquared = toPoint.sqrMagnitude;
+            if (distanceSquared >= light.range * light.range) return false;
+            if (light.type == LightType.Point) return true;
+            float outerConeCos = Mathf.Cos(light.spotAngle * 0.5f * Mathf.Deg2Rad);
+            return Vector3.Dot(light.transform.forward, toPoint) >= Mathf.Sqrt(distanceSquared) * outerConeCos;
         }
 
         private static void Restore(LightState state)
         {
             if (state.light == null || state.light.shadows != state.applied) return;
             state.light.shadows = state.original;
-            // Strength is never changed by the budget, so externally animated strength is preserved.
-            if (Mathf.Approximately(state.light.shadowStrength, state.originalStrength))
-                state.light.shadowStrength = state.originalStrength;
         }
 
         [ContextMenu("Restore Authored Local Shadows")]

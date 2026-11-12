@@ -17,8 +17,8 @@ MonoBehaviour:
   itemId: I67
   displayName: "\uB300\uD615 \uC555\uB825\uC790"
   description: "\uAD75\uC740 \uBCF4\uAC15\uB300\uB97C \uC811\uC5B4 \uB123\uC740 \uCE21\uC815\uC790."
-  effectText: "HP\uAC00 \uCD5C\uB300 HP\uC758 50% \uC774\uD558\uC778 \uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
-    \uAC00\uD558\uB294 \uD3C9\uD0C0 \uD53C\uD574\uAC00 11% \uC99D\uAC00\uD55C\uB2E4."
+  effectText: "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0
+    \uD53C\uD574 +4%"
   synergyIds:
   - S15
   synergyNames:
@@ -27,19 +27,19 @@ MonoBehaviour:
   primarySynergyName: "\uAC70\uBB3C\uC0AC\uB0E5"
   primarySynergyIcon: {fileID: 21300000, guid: ea13f41cbb31a694f917a34c7bf61f48, type: 3}
   element: 0
-  grade: 2
-  purchasePrice: 40
+  grade: 1
+  purchasePrice: 20
   effects: []
   boundaryEffects:
   - effectId: I67
     stat: 6
-    amount: 0.11
+    amount: 0.04
     trigger: 0
-    family: 1
+    family: 0
     element: 0
     eliteOrBossOnly: 1
     targetHpMin: -1
-    targetHpMax: 0.5
+    targetHpMax: -1
     selfHpMin: -1
     selfHpMax: -1
     firstTargetHit: 0
@@ -54,9 +54,7 @@ MonoBehaviour:
     cooldownSeconds: 0
   icon: {fileID: 21300000, guid: 6f802d0672d8f0142a41b2cbef891811, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I67\",\"name\":\"\uB300\uD615 \uC555\uB825\uC790\",\"description\":\"\uAD75\uC740
-    \uBCF4\uAC15\uB300\uB97C \uC811\uC5B4 \uB123\uC740 \uCE21\uC815\uC790.\",\"effect\":\"HP\uAC00
-    \uCD5C\uB300 HP\uC758 50% \uC774\uD558\uC778 \uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
-    \uAC00\uD558\uB294 \uD3C9\uD0C0 \uD53C\uD574\uAC00 11% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S15\"],\"primarySynergy\":\"S15\",\"designIntent\":\"\uAD50\uC804
-    \uD6C4\uBC18\uC5D0 \uD3C9\uD0C0\uB97C \uC774\uC5B4\uAC00\uBA70 \uB9C8\uBB34\uB9AC\uD55C\uB2E4.\",\"origin\":\"new\",\"image\":\"Art/Items/I67.png\"}"
+    \uBCF4\uAC15\uB300\uB97C \uC811\uC5B4 \uB123\uC740 \uCE21\uC815\uC790.\",\"effect\":\"\uC815\uC608
+    \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574 +4%\",\"synergies\":[\"S15\"],\"primarySynergy\":\"S15\",\"origin\":\"new\",\"image\":\"Art/Items/I67.png\",\"grade\":1}"

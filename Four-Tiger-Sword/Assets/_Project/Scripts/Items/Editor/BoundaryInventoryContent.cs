@@ -5,35 +5,103 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
-/// <summary>Reviewed, typed translation of the 2026-11-08 handoff; never parses gameplay from prose.</summary>
+/// <summary>Reviewed gameplay rules for supported Boundary Inventory revisions.</summary>
 internal static class BoundaryInventoryContent
 {
     internal const string ProjectId = "boundaryzero-inventory-2026-11-08";
     internal const string LegacySourceRevision = "2026-11-08";
     internal const string ExpandedSourceRevision = "2026-11-10";
+    internal const string RevisedSourceRevision = "2026-11-11";
     internal const int LegacyRevision = 20261108;
     internal const int ExpandedRevision = 20261110;
-    internal static readonly Dictionary<string, int> LegacyGrades = CreateGrades(false);
-    internal static readonly Dictionary<string, int> Grades = CreateGrades(true);
+    internal const int RevisedRevision = 20261111;
+    internal static readonly Dictionary<string, int> LegacyGrades = CreateLegacyGrades();
+    internal static readonly Dictionary<string, int> Grades = CreateGrades();
 
-    private static Dictionary<string, int> CreateGrades(bool expanded)
+    internal static readonly Dictionary<string, int> RevisedGrades = CreateRevisedGrades();
+
+    private static Dictionary<string, int> CreateRevisedGrades()
+    {
+        var result = new Dictionary<string, int>(Grades, StringComparer.Ordinal);
+        foreach (string id in new[] { "I90", "I93", "I94", "I121" })
+            result.Remove(id);
+        result["I122"] = 3;
+        return result;
+    }
+
+    private static Dictionary<string, int> CreateLegacyGrades()
     {
         var result = new Dictionary<string, int>(StringComparer.Ordinal);
         Add(1, "I13 I41 I47 I51 I66 I68 I71 I75 I77 I89 I91 I93 I94");
         Add(2, "I01 I04 I06 I07 I08 I15 I17 I18 I19 I20 I21 I22 I31 I32 I42 I44 I46 I48 I57 I60 I63 I67 I69 I73 I78 I90");
         Add(3, "I02 I05 I16 I30 I33 I43 I50 I61 I62 I64 I65 I72 I92 I100");
         Add(4, "I09 I14 I34 I56 I81 I95");
-        if (expanded)
-        {
-            Add(1, "I101 I103 I105 I113 I119 I121");
-            Add(2, "I107 I109 I111 I115 I117");
-            Add(3, "I102 I104 I106 I108 I110 I114 I120 I122");
-            Add(4, "I112 I116 I118");
-        }
         return result;
         void Add(int grade, string ids)
         {
             foreach (string id in ids.Split(' ')) result.Add(id, grade);
+        }
+    }
+
+    private static Dictionary<string, int> CreateGrades()
+    {
+        var result = new Dictionary<string, int>(StringComparer.Ordinal);
+        Add(1, "I08 I100 I103 I105 I108 I110 I111 I113 I115 I119 I13 I18 I19 I22 I31 I33 I41 I46 I47 I48 I51 I57 I60 I63 I66 I67 I68 I71 I77 I91 I93 I94");
+        Add(2, "I01 I04 I05 I101 I104 I120 I15 I17 I21 I30 I42 I43 I50 I61 I62 I69 I73 I78 I89 I92");
+        Add(3, "I02 I06 I07 I106 I112 I114 I117 I121 I14 I16 I20 I32 I64 I65 I72 I75 I81 I90 I95");
+        Add(4, "I09 I102 I107 I109 I116 I118 I122 I34 I44 I56");
+        return result;
+
+        void Add(int grade, string ids)
+        {
+            foreach (string id in ids.Split(' ')) result.Add(id, grade);
+        }
+    }
+
+    internal static BoundaryItemEffect[] RevisedItemEffects(string id)
+    {
+        switch (id)
+        {
+            case "I32": return One(id, BoundaryItemStat.ShieldMaxHpRatio, .06f, trigger: BoundaryItemTrigger.DamageTaken, duration: 5, cooldown: 15);
+            case "I46": return One(id, BoundaryItemStat.DamageRatio, .10f);
+            case "I50": return One(id, BoundaryItemStat.ShieldMaxHpRatio, .06f, trigger: BoundaryItemTrigger.DamageTaken, selfMax: .40f, duration: 5, cooldown: 15);
+            case "I56": return new[] {
+                E(id, BoundaryItemStat.AttackRatio, .06f),
+                E(id + ":rate", BoundaryItemStat.NormalAttackRateRatio, .06f) };
+            case "I60":
+            case "I63":
+            case "I115":
+                return One(id, BoundaryItemStat.IgnoreDefenseRatio, .03f);
+            case "I61": return One(id, BoundaryItemStat.IgnoreDefenseRatio, .05f);
+            case "I62": return new[] {
+                E(id, BoundaryItemStat.IgnoreDefenseRatio, .05f),
+                E(id + ":cooldown", BoundaryItemStat.SkillCooldownReductionRatio, .03f) };
+            case "I64": return One(id, BoundaryItemStat.IgnoreDefenseRatio, .08f);
+            case "I65": return new[] {
+                E(id, BoundaryItemStat.IgnoreDefenseRatio, .08f),
+                E(id + ":elite", BoundaryItemStat.DamageRatio, .06f, elite: true) };
+            case "I66":
+            case "I67":
+            case "I68":
+                return One(id, BoundaryItemStat.DamageRatio, .04f, elite: true);
+            case "I69":
+            case "I92":
+                return One(id, BoundaryItemStat.DamageRatio, .07f, elite: true);
+            case "I71": return One(id, BoundaryItemStat.SkillCooldownReductionRatio, .03f);
+            case "I72": return new[] {
+                E(id, BoundaryItemStat.DamageRatio, .05f, BoundaryAttackFamily.Skill),
+                E(id + ":cooldown", BoundaryItemStat.SkillCooldownReductionRatio, .05f) };
+            case "I77": return One(id, BoundaryItemStat.IncomingDamageReductionRatio, .04f);
+            case "I89": return One(id, BoundaryItemStat.GoldFlat, 8, trigger: BoundaryItemTrigger.RoomCleared);
+            case "I91": return One(id, BoundaryItemStat.GoldGainRatio, .05f);
+            case "I102": return One(id, BoundaryItemStat.CriticalDamagePoints, 15);
+            case "I111": return One(id, BoundaryItemStat.ShieldMaxHpRatio, .04f, trigger: BoundaryItemTrigger.DamageTaken, duration: 4, cooldown: 12);
+            case "I116": return One(id, BoundaryItemStat.IgnoreDefenseRatio, .12f);
+            case "I117": return One(id, BoundaryItemStat.DamageRatio, .10f, elite: true);
+            case "I118": return One(id, BoundaryItemStat.DamageRatio, .15f, elite: true);
+            case "I120": return One(id, BoundaryItemStat.SkillCooldownReductionRatio, .05f);
+            case "I122": return One(id, BoundaryItemStat.GoldGainRatio, .15f);
+            default: return Effects(id);
         }
     }
 
@@ -91,7 +159,7 @@ internal static class BoundaryInventoryContent
             case "I71": return One(id, BoundaryItemStat.DamageRatio, .07f, BoundaryAttackFamily.Skill, firstSkill: true);
             case "I72": return One(id, BoundaryItemStat.DamageRatio, .05f, BoundaryAttackFamily.Skill);
             case "I73": return One(id, BoundaryItemStat.DamageRatio, .08f, BoundaryAttackFamily.Skill, elite: true);
-            case "I75": return One(id, BoundaryItemStat.DamageRatio, .09f, BoundaryAttackFamily.Skill, targetMax: .25f);
+            case "I75": return One(id, BoundaryItemStat.DamageRatio, .09f, BoundaryAttackFamily.NormalOrSkill, targetMax: .25f);
             case "I77": return One(id, BoundaryItemStat.IncomingDamageReductionRatio, .12f, firstIncoming: true);
             case "I78": return One(id, BoundaryItemStat.IncomingDamageReductionRatio, .08f, trigger: BoundaryItemTrigger.DamageTaken, duration: 3, minimumLoss: .20f);
             case "I81": return One(id, BoundaryItemStat.IncomingDamageReductionRatio, .05f, trigger: BoundaryItemTrigger.NormalHit, duration: 1.5f);
@@ -153,12 +221,34 @@ internal static class BoundaryInventoryContent
             firstSkillHit = firstSkill, firstIncomingAttack = firstIncoming, firstRewardKill = firstReward,
             requiresFullHealth = fullHealth, minimumBaseGold = minimumGold, maximumBaseGold = maximumGold };
 
-    internal static BoundaryItemEffect[] SynergyEffects(string id, int count, JObject values)
+    internal static BoundaryItemEffect[] SynergyEffects(string id, int count, JObject values, bool revised = false)
     {
-        if (count is not (2 or 4 or 6 or 8)) throw new InvalidDataException("시너지 단계는 2/4/6/8입니다.");
-        int index = count / 2 - 1;
+        bool harvest = revised && id == "S19";
+        if (harvest ? count is < 1 or > 3 : count is not (2 or 4 or 6 or 8))
+            throw new InvalidDataException("지원하지 않는 시너지 단계: " + id + "/" + count);
+        int index = harvest ? count - 1 : count / 2 - 1;
         // Keep source identity across tier changes so a promotion cannot reset a cooldown.
         string key = id;
+        if (revised)
+        {
+            switch (id)
+            {
+                case "S14":
+                    Keys(values, "ignoreDefensePct");
+                    return One(key, BoundaryItemStat.IgnoreDefenseRatio, V("ignoreDefensePct", 6, 9, 12, 15) / 100);
+                case "S15":
+                    Keys(values, "damagePct");
+                    return One(key, BoundaryItemStat.DamageRatio, V("damagePct", 4, 6, 8, 10) / 100, elite: true);
+                case "S16":
+                    Keys(values, "percent", "skillCooldownReductionPct");
+                    return new[] {
+                        E(key, BoundaryItemStat.DamageRatio, V("percent", 4, 8, 12, 16) / 100, BoundaryAttackFamily.Skill),
+                        E(key + ":cooldown", BoundaryItemStat.SkillCooldownReductionRatio, V("skillCooldownReductionPct", 3, 6, 9, 12) / 100) };
+                case "S19":
+                    Keys(values, "percent");
+                    return One(key, BoundaryItemStat.GoldGainRatio, V("percent", 5, 10, 20) / 100);
+            }
+        }
         switch (id)
         {
             case "S01":

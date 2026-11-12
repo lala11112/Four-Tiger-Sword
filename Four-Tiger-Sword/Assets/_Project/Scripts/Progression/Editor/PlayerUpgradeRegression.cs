@@ -98,7 +98,7 @@ public static class PlayerUpgradeRegression
         Check(f.Service.TryUpgrade(StatType.ST_DEF, out _) && f.Service.TryUpgrade(StatType.ST_DEF, out _), "Reach maximum");
         int balance = f.Service.Balance, saves = f.Store.SaveCount;
         Check(f.Service.GetNextCost(StatType.ST_DEF) == 0 && !f.Service.TryUpgrade(StatType.ST_DEF, out _), "Reject maximum level");
-        Check(!f.Service.TryUpgrade(StatType.ST_SP, out _) && !f.Service.TryGrantReward("", 1, out _)
+        Check(!f.Service.TryUpgrade((StatType)1, out _) && !f.Service.TryGrantReward("", 1, out _)
             && !f.Service.TryGrantReward("negative", -1, out _), "Invalid requests");
         Check(f.Service.Balance == balance && f.Store.SaveCount == saves, "Invalid requests have no state or file effects");
         var large = PlayerUpgradeProfile.New();
@@ -148,7 +148,7 @@ public static class PlayerUpgradeRegression
         stats.RemoveModifier(StatType.ST_ATK, 5f, .2f);
         Near(stats.GetStat(StatType.ST_ATK), 15f, "Skill expiration preserves growth");
         var item = new object();
-        stats.SetItemResourceModifiers(item, .2f, 0f, 0f);
+        stats.SetItemResourceModifiers(item, .2f);
         Near(stats.MaxHp, 180f, "Item health scales upgraded basis");
         Near(stats.CurrentHp, 150f, "Item maximum increase does not heal");
         stats.TakeDamage(50f, ElementType.ELEMENT_NONE, false);

@@ -40,7 +40,7 @@ public sealed class EngravingSettingsSO : ScriptableObject
     public bool Validate(out string error)
     {
         error = null;
-        if (tierCosts == null || tierCosts.Length != 5 || tierCosts[0] != 0 || nodes == null || nodes.Length != 40
+        if (tierCosts == null || tierCosts.Length != 5 || tierCosts[0] != 0 || nodes == null || nodes.Length != 38
             || baseRewardChoices < 1 || emptyRewardGold < 0 || baseRefreshCost < 0)
         { error = "각인 설정 구성이 유효하지 않습니다."; return false; }
         for (int i = 1; i < tierCosts.Length; i++) if (tierCosts[i] <= 0) { error = "각인 비용이 유효하지 않습니다."; return false; }
@@ -58,7 +58,7 @@ public sealed class EngravingSettingsSO : ScriptableObject
         {
             if (node.id == "origin") { if (node.tier != 0 || !string.IsNullOrEmpty(node.parentId)) { error = "시작 각인이 유효하지 않습니다."; return false; } continue; }
             var parent = Find(node.parentId);
-            if (parent == null || parent.tier != node.tier - 1) { error = "각인 선행 관계가 유효하지 않습니다: " + node.id; return false; }
+            if (parent == null || parent.tier != node.tier - 1 && !(parent.id == "origin" && node.tier == 2)) { error = "각인 선행 관계가 유효하지 않습니다: " + node.id; return false; }
         }
         if (Find("origin") == null) { error = "시작 각인이 없습니다."; return false; }
         return true;
@@ -102,8 +102,6 @@ public sealed class EngravingSettingsSO : ScriptableObject
             "sell" => $"매각 가격이 기준가의 {P(n.amount)}%로 증가",
             "refresh" => $"상품 새로고침 비용 -{P(n.amount)}%",
             "stock" => $"서로 다른 아이템 상품 수 +{n.amount:0}",
-            "heirloom" => $"출격 시 1등급 후보 최대 {n.limit}개 중 1개 선택",
-            "starterelement" => "유품의 시너지 계통 선택. 1등급 후보가 있는 시너지 중 선택",
             "reroll" => $"일반 전투 보상 재선택을 런당 총 {n.limit}회 제공",
             "hold" => $"재선택 시 후보 {n.limit}개를 보관하고 나머지만 교체",
             "choices" => $"일반 전투 보상 후보 +{n.amount:0}개 (선택한 1개만 획득)",
@@ -125,13 +123,12 @@ public sealed class EngravingSettingsSO : ScriptableObject
         N("origin", null, 0, "첫 각인"); list[0].description = "이미 열린 무료 시작점. 원하는 성장 가지를 선택하세요.";
         N("atk", "origin", 1, "공격력", .08f); N("hp", "origin", 1, "최대 체력", .10f);
         N("footwork", "origin", 1, "발놀림", .08f); N("gold", "origin", 1, "출격 자금", 30);
-        N("heirloom", "origin", 1, "출격 유품", limit: 3);
         N("crit", "atk", 2, "치명타 확률", .05f); N("bossdmg", "atk", 2, "거물 사냥", .10f); N("speed", "atk", 2, "공격 속도", .06f);
         N("heal", "hp", 2, "회복 증폭", .15f); N("guard", "hp", 2, "위기 방어", .20f, threshold: .30f);
         N("bossguard", "hp", 2, "거물 방어", .50f); N("armor", "hp", 2, "단단한 각인", .05f);
         N("counter", "footwork", 2, "회피 반격", .20f, duration: 5); N("pursuit", "footwork", 2, "추격", .15f, duration: 3); N("escape", "footwork", 2, "탈출", .15f, duration: 2);
         N("firstblood", "gold", 2, "전리품", .20f); N("discount", "gold", 2, "상점 할인", .10f); N("sell", "gold", 2, "매각 수완", .60f);
-        N("reroll", "heirloom", 2, "보상 재선택", limit: 3); N("starterelement", "heirloom", 2, "유품의 계통: 시너지 선택"); N("choices", "heirloom", 2, "넓은 선택", 1);
+        N("reroll", "origin", 2, "보상 재선택", limit: 3); N("choices", "origin", 2, "넓은 선택", 1);
         N("severe", "crit", 3, "치명타 피해", .20f); N("pity", "crit", 3, "실패의 축적", .02f, cap: .20f);
         N("reach", "speed", 3, "긴 사거리", .15f); N("combo", "speed", 3, "연속 적중", .05f, duration: 3, cap: .15f);
         N("shield", "heal", 3, "넘치는 생명", .50f, duration: 10, cap: .10f); N("roomheal", "heal", 3, "전투의 숨", .03f);

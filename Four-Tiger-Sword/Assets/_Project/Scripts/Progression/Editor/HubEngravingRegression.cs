@@ -29,8 +29,8 @@ public static class HubEngravingRegression
             var treeTab = frame.Find("EngravingTab")?.GetComponent<UnityEngine.UI.Button>();
             Check(basicTab != null && treeTab != null && ((RectTransform)basicTab.transform).rect.height >= 48f
                 && ((RectTransform)treeTab.transform).rect.height >= 48f, "The shared frame needs two readable tabs.");
-            Check(tree != null && tree.NodeCount == 40, "The workshop must expose all 40 delivered nodes.");
-            Check(tree.GetComponentInChildren<PentaUpgradeLinks>(true).ConnectionCount == 39, "The delivered 39 connections changed.");
+            Check(tree != null && tree.NodeCount == 38, "The workshop must expose all 38 delivered nodes.");
+            Check(tree.GetComponentInChildren<PentaUpgradeLinks>(true).ConnectionCount == 37, "The delivered 37 connections changed.");
             Check(root.GetComponent<Canvas>() != null && root.GetComponent<UnityEngine.UI.GraphicRaycaster>() != null,
                 "The workshop requires its host canvas and raycaster.");
             Check(view.Entries.Length == 3, "Keep all three basic upgrades.");
@@ -106,7 +106,7 @@ public static class HubEngravingRegression
                 && tree.DescriptionScroll.content.GetComponent<TMPro.TMP_Text>().fontSize >= 22f,
                 "Numeric descriptions need readable text in a masked scroll area.");
             view.Close();
-            return "PASS: " + checks + " engraving UI checks, all 40 selections/39 purchases, basic/tree tabs, state refresh, remembered viewport and save failure.";
+            return "PASS: " + checks + " engraving UI checks, all 38 selections/37 purchases, basic/tree tabs, state refresh, remembered viewport and save failure.";
         }
         finally { PrefabUtility.UnloadPrefabContents(root); }
     }
@@ -134,7 +134,7 @@ public static class HubEngravingRegression
                 if (!hits.Any() || !(hits[0].gameObject == button.gameObject || hits[0].gameObject.transform.IsChildOf(button.transform)))
                     throw new InvalidOperationException("Focused node did not receive the top pointer raycast: " + node.Id);
             }
-            return "PASS: all 40 focused nodes receive pointer raycasts at " + Screen.width + "x" + Screen.height + ".";
+            return "PASS: all 38 focused nodes receive pointer raycasts at " + Screen.width + "x" + Screen.height + ".";
         }
         finally { tree.Select(selected); tree.SetZoom(zoom); tree.NodeContent.anchoredPosition = position; }
     }

@@ -68,6 +68,8 @@ public sealed class PlayerUpgradeFileStore : IPlayerUpgradeStore
                 throw new InvalidDataException("필수 저장 항목이 없습니다: unlockedNodeIds");
             if (profile == null || !profile.Validate(out error))
                 throw new InvalidDataException(error ?? "저장 데이터가 비어 있습니다.");
+            if (!profile.TryMigrateRetiredEngravings(out profile))
+                throw new InvalidDataException("저장된 각인 또는 선행 조건이 유효하지 않습니다: starterelement");
             var definitions = _engravings != null ? _engravings : EngravingSettingsSO.Default;
             var owned = new HashSet<string>(profile.unlockedNodeIds ?? Array.Empty<string>(), StringComparer.Ordinal);
             foreach (string id in owned)

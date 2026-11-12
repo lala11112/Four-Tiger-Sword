@@ -27,13 +27,13 @@ public static class ActionTimingPlayModeRegression
     {
         public Vector3 Position;
         public Quaternion Rotation;
-        public float Gravity, Vertical, Speed, Hp, Sp, Ultimate, SpRegen;
+        public float Gravity, Vertical, Speed, Hp, Ultimate;
         public uint AttackPressId;
         public bool PlayerEnabled, InputEnabled, ControllerEnabled, RootMotion;
         public AnimatorCullingMode Culling;
         public IForm Form;
-        public readonly List<(BaseForm Form, double Sp, bool Exhausted, float Skill, float Ultimate)> Forms
-            = new List<(BaseForm, double, bool, float, float)>();
+        public readonly List<(BaseForm Form, float Skill, float Ultimate)> Forms
+            = new List<(BaseForm, float, float)>();
     }
 
     public static string Start()
@@ -99,13 +99,12 @@ public static class ActionTimingPlayModeRegression
             PlayerEnabled = player.enabled, InputEnabled = player.Input.enabled,
             ControllerEnabled = player.Controller.enabled, RootMotion = player.Animator.applyRootMotion,
             Culling = player.Animator.cullingMode, Form = player.FormManager.CurrentForm,
-            Hp = player.StatManager.CurrentHp, Sp = player.StatManager.CurrentSp,
+            Hp = player.StatManager.CurrentHp,
             Ultimate = player.StatManager.CurrentUltimateGauge,
-            SpRegen = Read<float>(player.StatManager, "_spRegenTimer"),
             AttackPressId = player.Input.AttackPressId
         };
-        foreach (var form in Forms()) saved.Forms.Add((form, Read<double>(form, "_currentFormSp"),
-            form.IsFormSpExhausted, Read<float>(form, "_skillCooldownTimer"), Read<float>(form, "_ultimateCooldownTimer")));
+        foreach (var form in Forms()) saved.Forms.Add((form,
+            Read<float>(form, "_skillCooldownTimer"), Read<float>(form, "_ultimateCooldownTimer")));
         return saved;
     }
 
@@ -154,10 +153,7 @@ public static class ActionTimingPlayModeRegression
         player.FormManager.CleanupTransientEffects();
         player.FormManager.ChangeForm(form);
         Write(form, "_skillCooldownTimer", 0f); Write(form, "_ultimateCooldownTimer", 0f);
-        Write(form, "_currentFormSp", (double)form.MaxFormSp);
-        typeof(BaseForm).GetProperty("IsFormSpExhausted").SetValue(form, false);
         player.StatManager.Heal(player.StatManager.MaxHp);
-        player.StatManager.AddSp(player.StatManager.MaxSp);
         player.StatManager.AddUltimateGauge(player.StatManager.MaxUltimateGauge);
         ClearInput(); Move(Isolation); player.SetAnimationSpeed(1f);
         player.Animator.CrossFade("Idle", 0f, 0, 0f);
@@ -216,7 +212,7 @@ public static class ActionTimingPlayModeRegression
         while (true)
         {
             yield return null;
-            float delta = player.ActionDeltaTime * AnimationSpeed(form);
+            float delta = player.ActionDeltaTime * AnimationSpeed();
             actionTime += delta;
             tick(out bool complete);
             if (SampleAnimation(animation, out float length, out float normalizedTime))
@@ -318,13 +314,12 @@ public static class ActionTimingPlayModeRegression
         Check(Read<bool>(attack, "_normalStarted") && !attack.IsHeavyAttack,
             label + " did not enter a normal attack.");
         Write(form, "_comboStep", stage); Invoke(form, "PlayCombo");
-        float requestedAt = Elapsed(form), spent = 0f, waited = 0f, transitionAt = -1f;
+        float requestedAt = Elapsed(form), waited = 0f, transitionAt = -1f;
         float firstNormalized = 0f, lastNormalized = 0f;
         bool observed = false;
-        int startFrame = Time.frameCount, attackFrames = 0, spamTaps = 0, spends = 0;
+        int startFrame = Time.frameCount, attackFrames = 0, spamTaps = 0;
         player.Input.SkillBuffer.Set(.15f);
         SetMove(Vector2.up); TapAttack(); spamTaps++;
-        float before = player.StatManager.CurrentSp;
         // Invoke the production pre-transition hook through PlayerController.Update itself.
         // The component remains disabled so Unity cannot run a second controller tick.
         Invoke(player, "Update");
@@ -332,8 +327,7 @@ public static class ActionTimingPlayModeRegression
             label + " did not reserve the early E input through PlayerController.Update.");
         Check(!player.Input.SkillBuffer.IsActive && !player.Input.AttackBuffer.IsActive,
             label + " did not consume E and the competing normal tap at capture.");
-        Check(Mathf.Abs(player.StatManager.CurrentSp - before) < .001f,
-            label + " spent spirit before the queued skill executed.");
+        Check(form.SkillCooldownRemaining <= 0f, label + " started cooldown on reservation.");
 
         while (ReferenceEquals(machine.CurrentState, attack))
         {
@@ -350,17 +344,14 @@ public static class ActionTimingPlayModeRegression
                 if (!observed) firstNormalized = normalized;
                 observed = true; lastNormalized = normalized;
             }
-            before = player.StatManager.CurrentSp;
             Invoke(player, "Update");
-            float consumed = Mathf.Max(0f, before - player.StatManager.CurrentSp);
-            if (consumed > .001f) { spent += consumed; spends++; }
             if (ReferenceEquals(machine.CurrentState, attack))
             {
                 Check(form.CurrentComboStage == stage && QueuedSkill(attack),
                     label + " allowed normal spam to replace the reserved hit.");
                 Check(!attack.CanCancelToMove && !player.Input.AttackBuffer.IsActive,
                     label + " allowed held movement or a competing normal tap to steal the reservation.");
-                Check(consumed < .001f, label + " spent spirit while still attacking.");
+                Check(form.SkillCooldownRemaining <= 0f, label + " started cooldown while still attacking.");
                 continue;
             }
             transitionAt = elapsed;
@@ -368,8 +359,7 @@ public static class ActionTimingPlayModeRegression
                 label + " did not transition directly to skill at the same hit's action gate.");
             Check(!QueuedSkill(attack) && !attack.HasSkillRequest && !player.Input.AttackBuffer.IsActive,
                 label + " left a reservation or competing tap after execution.");
-            Check(Mathf.Abs(consumed - form.SkillSpCost) < .01f,
-                label + " did not consume exactly one skill's spirit cost on entry.");
+            Check(form.SkillCooldownRemaining <= 0f, label + " started cooldown before skill exit.");
         }
 
         Check(waited > .15f && attackFrames > 1 && Time.frameCount > startFrame + 1,
@@ -385,10 +375,7 @@ public static class ActionTimingPlayModeRegression
             yield return null;
             UpdateBuffers(); SetMove(Vector2.up);
             var previous = machine.CurrentState;
-            before = player.StatManager.CurrentSp;
             Invoke(player, "Update");
-            float consumed = Mathf.Max(0f, before - player.StatManager.CurrentSp);
-            if (consumed > .001f) { spent += consumed; spends++; }
             if (machine.CurrentState is PlayerSkillState && !(previous is PlayerSkillState)) skillEntries++;
             // Isolation has no floor: Run legitimately becomes Fall on its next controller tick.
             bool recovered = machine.CurrentState is PlayerRunState || machine.CurrentState is PlayerFallState;
@@ -396,14 +383,18 @@ public static class ActionTimingPlayModeRegression
                 label + " leaked into another attack or unexpected state after casting: " + machine.CurrentState.GetType().Name);
             Check(!QueuedSkill(attack) && !attack.HasSkillRequest,
                 label + " restored an already consumed skill reservation.");
-            if (recovered) settledFrames++;
+            if (recovered)
+            {
+                if (previous is PlayerSkillState)
+                    Check(form.SkillCooldownRemaining > 0f && form.SkillCooldownRemaining <= form.SkillCooldownDuration,
+                        label + " did not start cooldown when the skill exited.");
+                settledFrames++;
+            }
         }
-        Check(skillEntries == 1 && Mathf.Abs(spent - form.SkillSpCost) < .01f
-            && spends == (form.SkillSpCost > .001f ? 1 : 0),
-            label + " executed or charged the reserved skill more than once.");
+        Check(skillEntries == 1, label + " executed the reserved skill more than once.");
         Report.AppendLine($"{form.GetType().Name} {label}: input={N(requestedAt)}, gate={N(step.ActionCancelTime)}, "
             + $"transition={N(transitionAt)}, buffered={N(waited)}, spamTaps={spamTaps}, casts={skillEntries}, "
-            + $"spSpent={N(spent)}, attackNormalized={N(firstNormalized)}->{N(lastNormalized)}, "
+            + $"attackNormalized={N(firstNormalized)}->{N(lastNormalized)}, "
             + $"attackFrames={attackFrames}, frames={Time.frameCount - startFrame}, controllerUpdate=true");
         ClearInput(); machine.ChangeState(new NeutralState());
     }
@@ -430,8 +421,6 @@ public static class ActionTimingPlayModeRegression
         player.FormManager.CleanupTransientEffects(); player.FormManager.ChangeForm(saved.Form);
         foreach (var state in saved.Forms)
         {
-            Write(state.Form, "_currentFormSp", state.Sp);
-            typeof(BaseForm).GetProperty("IsFormSpExhausted").SetValue(state.Form, state.Exhausted);
             Write(state.Form, "_skillCooldownTimer", state.Skill); Write(state.Form, "_ultimateCooldownTimer", state.Ultimate);
         }
         player.Controller.enabled = false;
@@ -439,9 +428,8 @@ public static class ActionTimingPlayModeRegression
         player.Controller.enabled = saved.ControllerEnabled; player.Gravity = saved.Gravity; player.VerticalVelocity = saved.Vertical;
         player.Animator.cullingMode = saved.Culling;
         player.SetAnimationSpeed(saved.Speed);
-        Write(player.StatManager, "_currentHp", saved.Hp); Write(player.StatManager, "_currentSp", saved.Sp);
+        Write(player.StatManager, "_currentHp", saved.Hp);
         Write(player.StatManager, "_currentUltimateGauge", saved.Ultimate);
-        Write(player.StatManager, "_spRegenTimer", saved.SpRegen);
         typeof(PlayerInputHandler).GetProperty("AttackPressId").SetValue(player.Input, saved.AttackPressId);
         player.StateMachine.ChangeState(State<PlayerIdleState>());
         player.Animator.applyRootMotion = saved.RootMotion;
@@ -479,8 +467,8 @@ public static class ActionTimingPlayModeRegression
     private static void UpdateBuffers()
     { float dt = player.ActionDeltaTime; player.Input.AttackBuffer.Update(dt); player.Input.SkillBuffer.Update(dt);
       player.Input.UltimateBuffer.Update(dt); player.Input.JumpBuffer.Update(dt); player.Input.DashBuffer.Update(dt); }
-    private static float AnimationSpeed(BaseForm form)
-        => (float)typeof(BaseForm).GetProperty("CurrentAttackAnimationSpeed", Hidden).GetValue(form);
+    private static float AnimationSpeed()
+        => player.ActorClock != null ? player.ActorClock.AnimationSpeed : player.Animator.speed;
     private static float Elapsed(BaseForm form)
         => (float)typeof(BaseForm).GetProperty("CurrentActionElapsed", Hidden).GetValue(form);
     private static FieldInfo Field(object target, string name)

@@ -25,6 +25,7 @@ public static class DungeonRewardChestRegression
         var generator = AssetDatabase.LoadAssetAtPath<GameObject>(GeneratorPath).GetComponent<DungeonEncounterDirector>();
         var crate = new SerializedObject(generator).FindProperty("rewardChestPrefab").objectReferenceValue;
         Check(crate == AssetDatabase.LoadAssetAtPath<GameObject>(CratePath), "The production generator is missing its reward crate.");
+        Check(FindOutline(((GameObject)crate).transform) == null, "The shared crate prefab contains a reward outline.");
         var door = AssetDatabase.LoadAssetAtPath<GameObject>(DoorPath);
         var threshold = door.transform.Find("Frame_Threshold");
         Check(threshold != null && threshold.gameObject.layer == LayerMask.NameToLayer("Ground")
@@ -49,7 +50,7 @@ public static class DungeonRewardChestRegression
             Cursor.lockState = cursorLock;
             Application.targetFrameRate = frameRate;
         }
-        return "PASS: reward chest spawn, range, one use, choice delay, direct gold, shared F priority and door grounding.";
+        return "PASS: reward chest spawn, outline, collision, range, one use, choice delay, direct gold, shared F priority and door grounding.";
     }
 
     private static void CheckRoom(DungeonEncounterDirector generator, bool exhausted, float x)
@@ -106,7 +107,11 @@ public static class DungeonRewardChestRegression
             var wallet = player.GetComponent<PlayerWallet>() ?? player.gameObject.AddComponent<PlayerWallet>();
             wallet.Initialize(0);
             if (exhausted)
+            {
                 foreach (var item in items.Catalog.items) Check(items.TryAddItem(item.itemId), "Failed to populate the exhausted item pool.");
+                Check(wallet.AddGold(int.MaxValue), "Could not force the room credit to retry.");
+            }
+            int initialGold = wallet.Gold;
 
             var choices = new RunItemChoiceService(items, wallet, EngravingSnapshot.Empty, 781);
             var run = Child(root.transform, "Run").AddComponent<RunManager>();
@@ -122,37 +127,79 @@ public static class DungeonRewardChestRegression
             Field(encounter, "_ownedNavigation", navigation);
 
             Call(run, "OnUpgradeCombatRoomCleared", encounter);
-            Check(room.GetComponentInChildren<DungeonRewardChest>() == null, "A fighting room spawned a chest.");
+            Check(room.GetComponentInChildren<DungeonRewardChest>() == null && wallet.Gold == initialGold,
+                "A fighting room granted a reward.");
             Property(encounter, "State", DungeonEncounterState.Cleared);
             Field(encounter, "_confirmedDefeats", 1);
             Call(run, "OnUpgradeCombatRoomCleared", encounter);
-            Check(room.GetComponentInChildren<DungeonRewardChest>() == null, "A room cleared by despawn spawned a chest.");
+            Check(room.GetComponentInChildren<DungeonRewardChest>() == null && wallet.Gold == initialGold,
+                "A room cleared by despawn granted a reward.");
             Field(encounter, "_confirmedDefeats", 2);
+            Property(encounter, "WasEntered", false);
+            Call(run, "OnUpgradeCombatRoomCleared", encounter);
+            Check(room.GetComponentInChildren<DungeonRewardChest>() == null && wallet.Gold == initialGold,
+                "An unentered room granted a reward.");
+            Property(encounter, "WasEntered", true);
             Call(run, "OnUpgradeCombatRoomCleared", encounter);
             Call(run, "OnUpgradeCombatRoomCleared", encounter);
             var chests = room.GetComponentsInChildren<DungeonRewardChest>();
-            Check(chests.Length == 1 && choices.Current == null && !run.HasPendingItemChoice && wallet.Gold == 0,
-                "A clear did not reserve exactly one chest without blocking play or settling rewards.");
+            Check(chests.Length == 1 && choices.Current == null && !run.HasPendingItemChoice && wallet.Gold == initialGold,
+                "A clear did not reserve exactly one chest or settle wallet credit correctly.");
+            if (exhausted)
+            {
+                Check(wallet.TrySpend(initialGold), "Could not clear room-credit overflow.");
+                Call(wallet, "LateUpdate");
+                Check(wallet.Gold == 11, "I89 did not pay its earned room gold plus the gold gain bonus.");
+                Call(run, "BindUpgradeRooms");
+                Call(run, "OnUpgradeCombatRoomCleared", encounter);
+                Call(wallet, "LateUpdate");
+                Check(wallet.Gold == 11, "Rebinding a cleared room paid its receipt twice.");
+            }
             var chest = chests[0];
+            var outline = FindOutline(chest.transform);
+            Check(outline != null && outline.gameObject.activeInHierarchy,
+                "The spawned reward crate has no active outline.");
             Check((chest.transform.position - room.transform.position).sqrMagnitude > 1f, "Chest did not leave the clear teleport landing free.");
-            Check(chest.GetComponentInChildren<BoxCollider>() is { enabled: false }, "Reward crate blocks movement.");
+            var crateCollider = chest.GetComponentInChildren<BoxCollider>();
+            Check(crateCollider is { enabled: false }, "The reward crate became solid before finishing materialization.");
             var prompt = chest.GetComponentInChildren<TMP_Text>(true);
             Check(prompt != null && prompt.textBounds.size.y * prompt.transform.lossyScale.y >= .24f,
                 "The interaction label is too small in world space.");
             if (!exhausted) CheckPromptSize(chest, prompt, root.transform);
             Check(!(bool)Call(run, "TryOpenRewardChest", chest), "An interaction opened during materialization.");
             Call(chest, "AdvancePresentation", .25f);
+            Check(crateCollider is { enabled: true, isTrigger: false }, "The materialized reward crate is not solid.");
             Check(!(bool)Call(run, "TryOpenRewardChest", chest), "An out-of-range interaction opened the chest.");
+            Check(outline.gameObject.activeInHierarchy && crateCollider.enabled,
+                "The rejected interaction removed the outline or collision.");
 
-            player.transform.position = chest.transform.position + chest.transform.forward * 1.4f + Vector3.up * .02f;
+            Vector3 approach = chest.transform.position + chest.transform.forward * 1.4f + Vector3.up * .02f;
+            player.transform.position = approach;
+            Physics.SyncTransforms();
+            var collision = controller.Move(-chest.transform.forward * 1.3f);
+            Check((collision & CollisionFlags.Sides) != 0
+                && Vector3.Dot(player.transform.position - chest.transform.position, chest.transform.forward) > .4f,
+                "The player moved through the solid reward crate.");
+
+            player.transform.position = approach;
+            var blocker = Child(root.transform, "Interaction blocker");
+            blocker.transform.SetPositionAndRotation(chest.transform.position + chest.transform.forward * .9f + Vector3.up * .75f,
+                chest.transform.rotation);
+            blocker.AddComponent<BoxCollider>().size = new Vector3(2f, 1.5f, .1f);
+            Physics.SyncTransforms();
+            Check(!(bool)Call(run, "TryOpenRewardChest", chest) && outline.gameObject.activeInHierarchy && crateCollider.enabled,
+                "A wall-blocked interaction changed the unopened reward crate.");
+            Object.DestroyImmediate(blocker);
             Physics.SyncTransforms();
             player.Input.ChainSkillBuffer.Set();
             Check((bool)Call(run, "TryOpenRewardChest", chest) && !player.Input.ChainSkillBuffer.IsActive,
                 "A nearby interaction failed or leaked the shared F press into combat.");
+            Check(chest.gameObject.activeInHierarchy && !outline.gameObject.activeInHierarchy && !crateCollider.enabled,
+                "The outline or collider remained enabled during the successful opening animation.");
             Call(run, "UpdateItemChoiceSession");
             Check(!run.IsRewardOpen, "A reward modal interrupted the chest animation.");
             Check(!(bool)Call(run, "TryOpenRewardChest", chest), "A second interaction consumed the same chest.");
-            Check(exhausted ? wallet.Gold == 10 && choices.Current == null : wallet.Gold == 0 && choices.Current?.Candidates.Count == 3,
+            Check(exhausted ? wallet.Gold == 25 && choices.Current == null : wallet.Gold == 0 && choices.Current?.Candidates.Count == 3,
                 "An opened chest did not settle its correct reward.");
 
             if (!exhausted)
@@ -168,6 +215,16 @@ public static class DungeonRewardChestRegression
             }
         }
         finally { Object.DestroyImmediate(root); Object.DestroyImmediate(data); }
+    }
+
+    private static Transform FindOutline(Transform root)
+    {
+        foreach (var renderer in root.GetComponentsInChildren<MeshRenderer>(true))
+        {
+            var outline = renderer.transform.Find("RewardChestOutline");
+            if (outline != null) return outline;
+        }
+        return null;
     }
 
     private static GameObject Child(Transform parent, string name)

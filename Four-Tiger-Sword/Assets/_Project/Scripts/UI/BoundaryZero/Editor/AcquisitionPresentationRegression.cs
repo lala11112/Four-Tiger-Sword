@@ -31,7 +31,7 @@ public static class AcquisitionPresentationRegression
         try
         {
             var data = ScriptableObject.CreateInstance<PlayerStatData>(); objects.Add(data);
-            data.baseHP = data.baseSP = 100;
+            data.baseHP = 100;
             var stats = root.AddComponent<PlayerStatManager>(); stats.Initialize(data);
             var wallet = root.AddComponent<PlayerWallet>();
             int goldCalls = 0, gained = 0;
@@ -97,7 +97,7 @@ public static class AcquisitionPresentationRegression
         var data = ScriptableObject.CreateInstance<PlayerStatData>();
         try
         {
-            data.baseHP = data.baseSP = 100;
+            data.baseHP = 100;
             var stats = root.AddComponent<PlayerStatManager>();
             stats.Initialize(data);
             catalog.projectId = "synergy-acquisition-regression";

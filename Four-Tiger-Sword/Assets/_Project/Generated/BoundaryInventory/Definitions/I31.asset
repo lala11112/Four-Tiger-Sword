@@ -17,10 +17,9 @@ MonoBehaviour:
   itemId: I31
   displayName: "\uCDA9\uACA9 \uBCF4\uC874\uD310"
   description: "\uB20C\uB9B0 \uC790\uAD6D\uC774 \uB0A8\uC740 \uC801\uCE35 \uD569\uAE08\uD310."
-  effectText: "\uD55C \uBC88\uC758 \uC801 \uACF5\uACA9\uC73C\uB85C \uCD5C\uB300 HP\uC758
-    15% \uC774\uC0C1\uC744 \uC783\uC73C\uBA74 \uCD5C\uB300 HP\uC758 4%\uC5D0 \uD574\uB2F9\uD558\uB294
-    \uBCF4\uD638\uB9C9\uC744 4\uCD08\uAC04 \uC5BB\uB294\uB2E4. \uC7AC\uC0AC\uC6A9
-    \uB300\uAE30\uC2DC\uAC04\uC740 10\uCD08\uB2E4."
+  effectText: "\uC801 \uACF5\uACA9 \uD55C \uBC88\uC73C\uB85C \uCD5C\uB300 HP\uC758
+    15% \uC774\uC0C1\uC744 \uC783\uC73C\uBA74 \uCD5C\uB300 HP\uC758 4%\uB9CC\uD07C
+    \uBCF4\uD638\uB9C9 (4\uCD08)\n\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 10\uCD08"
   synergyIds:
   - S08
   synergyNames:
@@ -29,8 +28,8 @@ MonoBehaviour:
   primarySynergyName: "\uC218\uD638"
   primarySynergyIcon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
   element: 0
-  grade: 2
-  purchasePrice: 40
+  grade: 1
+  purchasePrice: 20
   effects: []
   boundaryEffects:
   - effectId: I31
@@ -56,12 +55,11 @@ MonoBehaviour:
     cooldownSeconds: 10
   icon: {fileID: 21300000, guid: 197f7fcb60d769940aa6390a653cbef1, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I31\",\"name\":\"\uCDA9\uACA9 \uBCF4\uC874\uD310\",\"description\":\"\uB20C\uB9B0
-    \uC790\uAD6D\uC774 \uB0A8\uC740 \uC801\uCE35 \uD569\uAE08\uD310.\",\"effect\":\"\uD55C
-    \uBC88\uC758 \uC801 \uACF5\uACA9\uC73C\uB85C \uCD5C\uB300 HP\uC758 15% \uC774\uC0C1\uC744
-    \uC783\uC73C\uBA74 \uCD5C\uB300 HP\uC758 4%\uC5D0 \uD574\uB2F9\uD558\uB294 \uBCF4\uD638\uB9C9\uC744
-    4\uCD08\uAC04 \uC5BB\uB294\uB2E4. \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04\uC740
-    10\uCD08\uB2E4.\",\"synergies\":[\"S08\"],\"primarySynergy\":\"S08\",\"designIntent\":\"\uD070
+    \uC790\uAD6D\uC774 \uB0A8\uC740 \uC801\uCE35 \uD569\uAE08\uD310.\",\"effect\":\"\uC801
+    \uACF5\uACA9 \uD55C \uBC88\uC73C\uB85C \uCD5C\uB300 HP\uC758 15% \uC774\uC0C1\uC744
+    \uC783\uC73C\uBA74 \uCD5C\uB300 HP\uC758 4%\uB9CC\uD07C \uBCF4\uD638\uB9C9 (4\uCD08)\\n\uC7AC\uC0AC\uC6A9
+    \uB300\uAE30\uC2DC\uAC04 10\uCD08\",\"synergies\":[\"S08\"],\"primarySynergy\":\"S08\",\"designIntent\":\"\uD070
     \uD53C\uD574\uB97C \uBC1B\uC740 \uC9C1\uD6C4 \uBCF4\uD638\uB9C9\uC73C\uB85C \uD6C4\uC18D
-    \uD53C\uD574\uB97C \uC904\uC778\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I31.png\"}"
+    \uD53C\uD574\uB97C \uC904\uC778\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I31.png\",\"grade\":1}"

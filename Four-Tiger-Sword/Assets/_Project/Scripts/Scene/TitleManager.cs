@@ -2,12 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
-using UnityEngine.SceneManagement;
 
 public class TitleManager : MonoBehaviour
 {
-    private const string GameSceneName = "Hub Scene";
-
     [SerializeField] private UnityEngine.UI.Button startButton;
     [SerializeField] private UnityEngine.UI.Button quitButton;
     [SerializeField] private BoundaryZeroRunOverlay loadingOverlay;
@@ -15,7 +12,6 @@ public class TitleManager : MonoBehaviour
     public bool IsLoading { get; private set; }
     private bool _entering;
     private UIModalMotion[] _menuMotions;
-    private AsyncOperation _sceneLoad;
     private UnityEngine.UI.Button[] _buttons;
 
     public void Configure(UnityEngine.UI.Button start, UnityEngine.UI.Button quit, BoundaryZeroRunOverlay overlay)
@@ -67,11 +63,11 @@ public class TitleManager : MonoBehaviour
 
     public void OnStartButton()
     {
-        if (_entering || IsLoading || !isActiveAndEnabled) return;
+        if (_entering || IsLoading || HubReturnTransition.IsActive || !isActiveAndEnabled) return;
         IsLoading = true;
         SetMenuInteractable(false);
         if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
-        StartCoroutine(LoadGame());
+        HubReturnTransition.TryStart(loadingOverlay, RestoreMenu);
     }
 
     public void OnQuitButton()
@@ -84,42 +80,9 @@ public class TitleManager : MonoBehaviour
 #endif
     }
 
-    private IEnumerator LoadGame()
-    {
-        if (!Application.CanStreamedLevelBeLoaded(GameSceneName))
-        {
-            RestoreMenu("The game scene is not enabled in the build scene list: " + GameSceneName);
-            yield break;
-        }
-
-        if (loadingOverlay != null)
-        {
-            loadingOverlay.ShowLoading();
-            loadingOverlay.Title.text = "이동 중...";
-            loadingOverlay.Details.text = string.Empty;
-            loadingOverlay.StageLabel.gameObject.SetActive(false);
-            loadingOverlay.ActionButton.gameObject.SetActive(false);
-            loadingOverlay.ModalRoot.SetActive(true);
-        }
-        Canvas.ForceUpdateCanvases();
-        // Let the loading presentation render before scene deserialization starts.
-        yield return null;
-
-        AsyncOperation operation = null;
-        string failure = null;
-        try { operation = SceneManager.LoadSceneAsync(GameSceneName, LoadSceneMode.Single); }
-        catch (System.Exception error) { failure = error.Message; }
-        if (operation == null)
-        {
-            RestoreMenu("Could not load the game scene: " + (failure ?? GameSceneName));
-            yield break;
-        }
-        _sceneLoad = operation;
-        while (!operation.isDone) yield return null;
-    }
-
     private void RestoreMenu(string reason)
     {
+        if (this == null) return;
         if (loadingOverlay != null) loadingOverlay.Hide();
         IsLoading = false;
         SetMenuInteractable(true);
@@ -173,7 +136,7 @@ public class TitleManager : MonoBehaviour
         StopAllCoroutines();
         if (_menuMotions != null) foreach (var motion in _menuMotions) motion?.ShowImmediate();
         _entering = false;
-        IsLoading = _sceneLoad != null && !_sceneLoad.isDone;
+        IsLoading = HubReturnTransition.IsActive;
         if (!IsLoading && loadingOverlay != null) loadingOverlay.Hide();
         SetMenuInteractable(!IsLoading);
     }
@@ -182,7 +145,7 @@ public class TitleManager : MonoBehaviour
     {
         // Start runs only once. A re-enabled menu must not retain its entrance input lock.
         if (_menuMotions == null) return;
-        IsLoading = _sceneLoad != null && !_sceneLoad.isDone;
+        IsLoading = HubReturnTransition.IsActive;
         SetMenuInteractable(!IsLoading);
         if (!IsLoading) ClearSelection();
     }

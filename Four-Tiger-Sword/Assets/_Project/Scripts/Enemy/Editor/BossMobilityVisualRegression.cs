@@ -30,7 +30,7 @@ public static class BossMobilityVisualRegression
     {
         public string variant, kind, startupImage, activeImage, landingImage;
         public int frames;
-        public float startingHp, endingHp, movement, peakJumpHeight, landingError, navigationError, warningDestinationError;
+        public float startingHp, endingHp, movement, peakJumpHeight, landingError, navigationError, warningDestinationError, peakWarningFill;
         public bool completed, navigationRestored, collidersPreserved, midairHitApplied, midairReactionObserved, offensiveWarningVerified;
         public Vector3 start, destination, end;
     }
@@ -108,6 +108,7 @@ public static class BossMobilityVisualRegression
         bool updatePosition = nav.updatePosition, updateRotation = nav.updateRotation, stopped = nav.isStopped;
         var colliders = owner.GetComponentsInChildren<Collider>(true).Where(c => c.enabled).ToArray();
         var sample = new Sample { variant = variant, kind = skill.kind.ToString(), startingHp = owner.EnemyStat.CurrentHp };
+        var presentation = owner.GetComponent<SwordRobotBossPresentation>();
         _report.samples.Add(sample);
         Check(skill.TryCreateAction(owner, out var action), variant + " could not plan " + skill.kind + " on clear ground.");
         sample.start = action.StartPosition;
@@ -143,11 +144,22 @@ public static class BossMobilityVisualRegression
 
             if (!skill.DealsDamage)
             {
-                var presentation = owner.GetComponent<SwordRobotBossPresentation>();
-                Check(presentation == null || (presentation.warning == null || !presentation.warning.enabled)
+                Check(presentation == null || !presentation.WarningVisible
                     && (presentation.bladeTrail == null || !presentation.bladeTrail.emitting),
                     "A movement-only mobility action displayed an attack warning or blade trail.");
             }
+            else if (action.BossStage == BossAttackStage.Startup
+                || skill.kind == BossMobilityKind.JumpSlam && action.BossStage == BossAttackStage.Active)
+            {
+                Check(presentation != null && presentation.WarningVisible
+                    && presentation.WarningFillProgress >= sample.peakWarningFill - .01f
+                    && presentation.WarningFillProgress <= 1f,
+                    "An offensive mobility warning disappeared or its fill moved backward before impact.");
+                sample.peakWarningFill = Mathf.Max(sample.peakWarningFill, presentation.WarningFillProgress);
+            }
+            else
+                Check(presentation != null && !presentation.WarningVisible,
+                    "An offensive mobility warning remained visible after impact.");
             if (skill.DealsDamage && !startupCaptured && action.BossStage == BossAttackStage.Startup)
             {
                 sample.warningDestinationError = VerifyWarning(owner, action, skill);
@@ -195,8 +207,8 @@ public static class BossMobilityVisualRegression
         Check(sample.completed && activeCaptured && landingCaptured,
             variant + " " + skill.kind + " did not complete both active and landing captures.");
         if (skill.DealsDamage)
-            Check(startupCaptured && sample.offensiveWarningVerified,
-                "An offensive mobility action did not show a verified destination warning during startup.");
+            Check(startupCaptured && sample.offensiveWarningVerified && sample.peakWarningFill > .65f,
+                "An offensive mobility action did not show and fill its verified destination warning before impact.");
         Check(sample.movement > 3f && sample.landingError < .15f && sample.navigationError < .1f,
             variant + " " + skill.kind + " did not move and land at its validated destination.");
         if (skill.IsJump)
@@ -226,23 +238,25 @@ public static class BossMobilityVisualRegression
     private static float VerifyWarning(Boss owner, BossMobilityAction action, BossMobilitySkillSO skill)
     {
         var presentation = owner.GetComponent<SwordRobotBossPresentation>();
-        var warning = presentation != null ? presentation.warning : null;
-        Check(warning != null && warning.enabled && warning.useWorldSpace,
+        Check(presentation != null && presentation.WarningVisible,
             "Offensive mobility must display a world-space destination warning.");
         if (skill.kind == BossMobilityKind.JumpSlam)
         {
-            Check(warning.positionCount >= 32, "Jump slam did not draw a landing circle.");
-            var bounds = new Bounds(warning.GetPosition(0), Vector3.zero);
-            for (int i = 1; i < warning.positionCount; i++) bounds.Encapsulate(warning.GetPosition(i));
-            float error = Vector3.Distance(bounds.center, action.Destination + Vector3.up * .045f);
-            Check(error < .07f && Mathf.Abs(bounds.extents.x - skill.slamRadius) < .05f
-                && Mathf.Abs(bounds.extents.z - skill.slamRadius) < .05f,
+            var circle = presentation.WarningCircle;
+            Check(!presentation.IsCorridorWarning && circle != null && circle.isActiveAndEnabled
+                && circle.Type == Shapes.DiscType.Ring, "Jump slam did not draw a Shapes landing circle.");
+            float error = Vector3.Distance(circle.transform.position, action.Destination + Vector3.up * .045f);
+            Check(error < .07f && Mathf.Abs(circle.Radius - skill.slamRadius) < .05f,
                 "The jump slam warning did not match its locked landing position and damage radius.");
             return error;
         }
-        Check(warning.positionCount == 5, "Dash slash did not draw its locked travel corridor.");
-        Vector3 begin = (warning.GetPosition(0) + warning.GetPosition(3)) * .5f;
-        Vector3 end = (warning.GetPosition(1) + warning.GetPosition(2)) * .5f;
+        var corridor = presentation.WarningCorridor;
+        Check(presentation.IsCorridorWarning && corridor != null && corridor.isActiveAndEnabled
+            && corridor.IsBorder && Mathf.Abs(corridor.Width - skill.hitBoxRadius * 2f) < .05f,
+            "Dash slash did not draw its locked travel corridor with the authored width.");
+        Vector3 forward = corridor.transform.up * (corridor.Height * .5f);
+        Vector3 begin = corridor.transform.position - forward;
+        Vector3 end = corridor.transform.position + forward;
         float destinationError = Vector3.Distance(end, action.Destination + Vector3.up * .045f);
         Check(Vector3.Distance(begin, action.StartPosition + Vector3.up * .045f) < .07f
             && destinationError < .07f, "The dash warning moved away from its locked start or destination.");
@@ -276,10 +290,10 @@ public static class BossMobilityVisualRegression
             float distance = bounds.extents.magnitude / Mathf.Sin(camera.fieldOfView * .5f * Mathf.Deg2Rad) * 1.08f;
             camera.transform.position = bounds.center + new Vector3(.55f, .85f, 1f).normalized * distance;
             camera.transform.LookAt(bounds.center);
-            var warning = owner.GetComponent<SwordRobotBossPresentation>().warning;
-            for (int i = 0; i < warning.positionCount; i++)
+            var warning = owner.GetComponent<SwordRobotBossPresentation>();
+            for (int i = 0; i < warning.GetWarningPointCount(); i++)
             {
-                Vector3 viewport = camera.WorldToViewportPoint(warning.GetPosition(i));
+                Vector3 viewport = camera.WorldToViewportPoint(warning.GetWarningPoint(i));
                 Check(viewport.z > 0f && viewport.x > .02f && viewport.x < .98f
                     && viewport.y > .02f && viewport.y < .98f,
                     "The offensive startup capture did not include its complete destination warning.");
@@ -379,7 +393,7 @@ public static class BossMobilityVisualRegression
         throw new MissingFieldException(target.GetType().Name, name);
     }
 
-    private sealed class Fixture
+    internal sealed class Fixture
     {
         private readonly Scene _scene;
         private readonly List<Object> _owned = new List<Object>();
@@ -388,11 +402,13 @@ public static class BossMobilityVisualRegression
         private readonly UnityEngine.Random.State _random = UnityEngine.Random.state;
         private readonly Vector3 _origin = new Vector3(16000f, 0f, 16000f);
         private readonly Transform _target;
+        private readonly Action<bool, string> _check;
         private NavMeshDataInstance _navigation;
         public readonly Camera Camera;
 
-        public Fixture()
+        public Fixture(Action<bool, string> check = null)
         {
+            _check = check ?? Check;
             Time.timeScale = 1f;
             Application.runInBackground = true;
             _scene = SceneManager.CreateScene("BossMobilityVisual-" + Guid.NewGuid().ToString("N"));
@@ -436,7 +452,7 @@ public static class BossMobilityVisualRegression
             if (data == null) throw new InvalidOperationException("Could not create isolated mobility visual navigation.");
             _owned.Add(data);
             _navigation = NavMesh.AddNavMeshData(data);
-            Check(_navigation.valid, "The isolated mobility visual NavMesh did not register.");
+            _check(_navigation.valid, "The isolated mobility visual NavMesh did not register.");
             Physics.SyncTransforms();
         }
 
@@ -483,7 +499,7 @@ public static class BossMobilityVisualRegression
         {
             _target.position = _origin + Vector3.forward * (kind == BossMobilityKind.EscapeJump ? 2.5f : 10f);
             var nav = owner.GetComponent<NavMeshAgent>();
-            Check(nav.Warp(_origin), "Could not reset the visual actor on its isolated NavMesh.");
+            _check(nav.Warp(_origin), "Could not reset the visual actor on its isolated NavMesh.");
             owner.transform.position = nav.nextPosition;
             owner.transform.rotation = Quaternion.identity;
             nav.ResetPath();

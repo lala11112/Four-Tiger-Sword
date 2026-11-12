@@ -16,11 +16,11 @@ public static class BaekhoItemRuntimeRegression
         OwnershipAndRemoval();
         TimedRefreshAndFormFiltering();
         IndependentSourcesAndReacquisition();
-        AtomicResourceCapsAndLegacyModifiers();
+        AtomicHealthAndLegacyModifiers();
         FormChangeDoesNotTemporarilyClamp();
         DisableAndDeathCleanup();
         InitiallyDisabledRuntime();
-        RegenerationAndInvalidSpends();
+        RetiredSerializedEffectsRejected();
         int actualItems = ImportedCatalogs();
         string result = $"Baekho item runtime: 8 regression scenarios passed; {actualItems} imported items verified.";
         Debug.Log(result);
@@ -96,48 +96,41 @@ public static class BaekhoItemRuntimeRegression
         Near(f.Runtime.GetSwitchDamageMultiplier(f.Form), 1.5f, "A new success refreshes each owned source.");
     }
 
-    private static void AtomicResourceCapsAndLegacyModifiers()
+    private static void AtomicHealthAndLegacyModifiers()
     {
         using var f = new Fixture();
         f.Stats.AddModifier(StatType.ST_ATK, 25f, 0.1f);
-        f.Stats.AddModifier(StatType.ST_SP, 25f, 0f);
-        var item = f.Item("capped", Effect(ItemStat.MaxHp, 1f), Effect(ItemStat.MaxSp, 300f),
-            Effect(ItemStat.SpRegen, 100f), Effect(ItemStat.DodgeSpCost, -100f), Effect(ItemStat.SwitchSpCost, -100f));
+        f.Stats.AddModifier(StatType.ST_HP, 25f, 0f);
+        var item = f.Item("health", Effect(ItemStat.MaxHp, 1f));
         f.Catalog.items = new[] { item };
-        int batches = 0, spEvents = 0;
+        int batches = 0, hpEvents = 0;
         f.Stats.OnStatsChanged += () => batches++;
-        f.Stats.OnSpChanged += (_, _) => spEvents++;
-        Check(f.Runtime.TryAddItem(item.itemId), "Capped grant");
-        Check(batches == 1 && spEvents == 1, "A resource replacement must publish one final batch.");
-        Near(f.Stats.MaxSp, 200f, "Max SP cap");
-        Near(f.Stats.GetStat(StatType.ST_SP_REGEN), 40f, "SP regeneration cap");
-        Near(f.Runtime.DodgeSpCost, 8f, "Dodge minimum");
-        Near(f.Runtime.SwitchSpCost, 4f, "Switch minimum");
-        Near(f.Stats.CurrentSp, 100f, "Increasing max SP must not refill.");
-        f.Stats.AddSp(100f);
-        Near(f.Stats.CurrentSp, 200f, "SP setup");
-        Check(f.Runtime.TryRemoveItem(item.itemId), "Capped removal");
-        Near(f.Stats.MaxSp, 125f, "Legacy SP modifier survives removal.");
-        Near(f.Stats.CurrentSp, 125f, "Decreasing max SP clamps current SP.");
-        Near(f.Stats.GetStat(StatType.ST_SP_REGEN), 20f, "Regeneration source removal");
+        f.Stats.OnHpChanged += (_, _) => hpEvents++;
+        Check(f.Runtime.TryAddItem(item.itemId), "Health item grant");
+        Check(batches == 1 && hpEvents == 1, "An item replacement must publish one final HP change.");
+        Near(f.Stats.MaxHp, 2050f, "Item and existing HP modifiers compose.");
+        Near(f.Stats.CurrentHp, 1000f, "Increasing max HP must not refill.");
+        f.Stats.Heal(2050f);
+        Near(f.Stats.CurrentHp, 2050f, "Full health setup");
+        Check(f.Runtime.TryRemoveItem(item.itemId), "Health item removal");
+        Near(f.Stats.MaxHp, 1025f, "Existing HP modifier survives removal.");
+        Near(f.Stats.CurrentHp, 1025f, "Decreasing max HP clamps current HP.");
         Near(f.Stats.GetStat(StatType.ST_ATK), 137.5f, "Legacy form modifiers survive item replacement.");
-        Near(f.Runtime.DodgeSpCost, 20f, "Base dodge cost");
-        Near(f.Runtime.SwitchSpCost, 10f, "Base switch cost");
     }
 
     private static void FormChangeDoesNotTemporarilyClamp()
     {
         using var f = new Fixture();
-        var water = f.Item("water-max", Scoped(ItemStat.MaxSp, 100f, ElementType.ELEMENT_WATER));
-        var fire = f.Item("fire-max", Scoped(ItemStat.MaxSp, 100f, ElementType.ELEMENT_FIRE));
+        var water = f.Item("water-max", Scoped(ItemStat.MaxHp, 1f, ElementType.ELEMENT_WATER));
+        var fire = f.Item("fire-max", Scoped(ItemStat.MaxHp, 1f, ElementType.ELEMENT_FIRE));
         f.Catalog.items = new[] { water, fire };
         Check(f.Runtime.TryAddItem(water.itemId) && f.Runtime.TryAddItem(fire.itemId), "Scoped grants");
-        f.Stats.AddSp(100f);
+        f.Stats.Heal(1000f);
         int changes = 0;
         f.Stats.OnStatsChanged += () => changes++;
         f.ChangeForm(ElementType.ELEMENT_FIRE);
-        Near(f.Stats.MaxSp, 200f, "Destination max SP");
-        Near(f.Stats.CurrentSp, 200f, "Form replacement must not clamp through an intermediate max.");
+        Near(f.Stats.MaxHp, 2000f, "Destination max HP");
+        Near(f.Stats.CurrentHp, 2000f, "Form replacement must not clamp through an intermediate max.");
         Check(changes == 1, "Form replacement publishes once.");
     }
 
@@ -163,18 +156,18 @@ public static class BaekhoItemRuntimeRegression
         Near(f.Stats.CurrentHp, 0f, "Effect cleanup cannot revive a player.");
     }
 
-    private static void RegenerationAndInvalidSpends()
+    private static void RetiredSerializedEffectsRejected()
     {
         using var f = new Fixture();
-        Check(!f.Stats.TryConsumeSp(float.NaN) && !f.Stats.TryConsumeSp(float.PositiveInfinity)
-            && !f.Stats.TryConsumeSp(-1f) && !f.Stats.TryConsumeSp(101f), "Invalid spends must fail without changing SP.");
-        Check(f.Stats.TryConsumeSp(20f), "Valid spend");
-        f.Stats.UpdateSpRegen(0.5f);
-        Near(f.Stats.CurrentSp, 80f, "Regen delay");
-        f.Stats.UpdateSpRegen(0.75f);
-        Near(f.Stats.CurrentSp, 85f, "Only time beyond the one-second delay regenerates SP.");
-        f.Stats.UpdateSpRegen(100f);
-        Near(f.Stats.CurrentSp, 100f, "Regeneration clamps to max SP.");
+        Check((int)ItemStat.MaxHp == 0 && (int)ItemStat.NormalDamage == 3 && (int)ItemStat.SwitchDamage == 4,
+            "Existing item effects must keep their serialized stat IDs.");
+        foreach (int retired in new[] { 1, 2, 5, 6 })
+        {
+            var item = f.Item("retired-" + retired, Effect((ItemStat)retired, 10f));
+            f.Catalog.items = new[] { item };
+            Check(!f.Runtime.TryAddItem(item.itemId) && f.Runtime.OwnedItems.Count == 0,
+                "An unmigrated resource effect must not be reinterpreted as a live stat.");
+        }
     }
 
     private static void InitiallyDisabledRuntime()
@@ -267,9 +260,6 @@ public static class BaekhoItemRuntimeRegression
             var data = ScriptableObject.CreateInstance<PlayerStatData>();
             _owned.Add(data);
             data.baseHP = 1000f;
-            data.baseSP = 100f;
-            data.baseSpRegen = 20f;
-            data.baseSpRegenDelay = 1f;
             data.baseATK = 100f;
             Stats = _root.AddComponent<PlayerStatManager>();
             Stats.Initialize(data);

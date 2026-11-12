@@ -216,7 +216,14 @@ namespace StudioBaekho
             instance.transform.localRotation = rotation;
             instance.transform.localScale = prefab.transform.localScale;
             foreach (var collider in instance.GetComponentsInChildren<Collider>(true)) collider.enabled = false;
-            foreach (var light in instance.GetComponentsInChildren<Light>(true)) light.shadows = LightShadows.None;
+            foreach (var light in instance.GetComponentsInChildren<Light>(true))
+            {
+                if (light.shadows == LightShadows.None) continue;
+                var shadow = light.GetComponent<BaekhoGeneratedLightShadow>()
+                    ?? light.gameObject.AddComponent<BaekhoGeneratedLightShadow>();
+                shadow.authoredMode = light.shadows;
+                light.shadows = LightShadows.None;
+            }
             return instance;
         }
 

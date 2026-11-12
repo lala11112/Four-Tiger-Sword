@@ -17,8 +17,7 @@ MonoBehaviour:
   itemId: I63
   displayName: "\uC2EC\uCE35 \uCD94\uC801\uAE30"
   description: "\uB450 \uB2E8\uACC4\uB85C \uC7A0\uAE30\uB294 \uB0A9\uC791\uD55C \uCD94\uC801\uAE30."
-  effectText: "HP\uAC00 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C
-    \uC904 \uB54C \uC591\uC218 \uC720\uD6A8 \uBC29\uC5B4\uB825\uC744 18% \uBB34\uC2DC\uD55C\uB2E4."
+  effectText: "\uC801 \uBC29\uC5B4\uB825 3% \uAD00\uD1B5"
   synergyIds:
   - S14
   synergyNames:
@@ -27,19 +26,19 @@ MonoBehaviour:
   primarySynergyName: "\uAD00\uD1B5"
   primarySynergyIcon: {fileID: 21300000, guid: 9fac5d8b6848b5a4483ff48eb719037a, type: 3}
   element: 0
-  grade: 2
-  purchasePrice: 40
+  grade: 1
+  purchasePrice: 20
   effects: []
   boundaryEffects:
   - effectId: I63
     stat: 7
-    amount: 0.18
+    amount: 0.03
     trigger: 0
     family: 0
     element: 0
     eliteOrBossOnly: 0
     targetHpMin: -1
-    targetHpMax: 0.3
+    targetHpMax: -1
     selfHpMin: -1
     selfHpMax: -1
     firstTargetHit: 0
@@ -54,9 +53,7 @@ MonoBehaviour:
     cooldownSeconds: 0
   icon: {fileID: 21300000, guid: ea19f02020b186d42a2fc08f2c2de22b, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I63\",\"name\":\"\uC2EC\uCE35 \uCD94\uC801\uAE30\",\"description\":\"\uB450
-    \uB2E8\uACC4\uB85C \uC7A0\uAE30\uB294 \uB0A9\uC791\uD55C \uCD94\uC801\uAE30.\",\"effect\":\"HP\uAC00
-    30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C \uC904 \uB54C \uC591\uC218
-    \uC720\uD6A8 \uBC29\uC5B4\uB825\uC744 18% \uBB34\uC2DC\uD55C\uB2E4.\",\"synergies\":[\"S14\"],\"primarySynergy\":\"S14\",\"designIntent\":\"\uCCB4\uB825\uC774
-    \uB0AE\uC740 \uC801\uC758 \uBC29\uC5B4\uB825\uC744 \uC77C\uBD80 \uBB34\uC2DC\uD55C\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I63.png\"}"
+    \uB2E8\uACC4\uB85C \uC7A0\uAE30\uB294 \uB0A9\uC791\uD55C \uCD94\uC801\uAE30.\",\"effect\":\"\uC801
+    \uBC29\uC5B4\uB825 3% \uAD00\uD1B5\",\"synergies\":[\"S14\"],\"primarySynergy\":\"S14\",\"origin\":\"revised\",\"image\":\"Art/Items/I63.png\",\"grade\":1}"

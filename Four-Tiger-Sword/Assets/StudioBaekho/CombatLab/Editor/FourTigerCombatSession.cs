@@ -55,8 +55,8 @@ namespace StudioBaekho.CombatLab.FourTigerSword
         private bool _heavyHolding;
         private bool _resourcesPrepared;
         private bool _resourceExhaustionRecorded;
-        private float _oldSp, _oldSpRegenTimer, _oldUltimateGauge;
-        private FieldInfo _spField, _spRegenField, _ultimateGaugeField;
+        private float _oldUltimateGauge;
+        private FieldInfo _ultimateGaugeField;
         private FieldInfo _formTimerField, _formStepField;
         private bool _wasExecuting;
         private int _lastActionStep = -1;
@@ -154,7 +154,7 @@ namespace StudioBaekho.CombatLab.FourTigerSword
                 if (_ultimateFollowUp)
                     _metrics.notes.Add("This ultimate activates a buff rather than a direct attack. The policy presses R once, then plays the unchanged normal combo to show its effect. Follow-up attacks are identified separately in events.");
                 if (_isSkill)
-                    _metrics.notes.Add("Only E skills are requested. Their original cooldown and SP cost remain active; no basic attacks are substituted while waiting.");
+                    _metrics.notes.Add("Only E skills are requested. Their original cooldown remains active; no basic attacks are substituted while waiting.");
                 if (candidate.values.Exists(value => value.id == FourTigerCombatAdapter.HitStopId))
                     _metrics.notes.Add("The selected action's Feedback.HitStop duration is applied to every effective hit, including hit overrides. Each hit's original effective time scale is preserved. Player defaults, parries and other actions remain unchanged; exported form copies retain the action overrides.");
                 _metrics.notes.Add(_fixedScenario ? "고정 표적: 같은 초기 방향·거리에서 선택 동작을 한 번 실행합니다. 표적 AI는 수동 상태이며 피격·넉백은 유지됩니다. 표적 런타임 HP만 1,000,000으로 높여 연타 도중 사망을 방지합니다. 프레임과 물리는 완전 결정적이지 않습니다."
@@ -374,28 +374,16 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             }
             if (!_isSkill && !_isUltimate) return;
             var stats = _player.StatManager;
-            _spField = typeof(PlayerStatManager).GetField("_currentSp", Hidden);
-            _spRegenField = typeof(PlayerStatManager).GetField("_spRegenTimer", Hidden);
             _ultimateGaugeField = typeof(PlayerStatManager).GetField("_currentUltimateGauge", Hidden);
-            if (_spField == null || _spRegenField == null || _ultimateGaugeField == null)
+            if (_ultimateGaugeField == null)
                 throw new InvalidOperationException("The adapter can no longer snapshot and restore skill/ultimate resources.");
-            _oldSp = stats.CurrentSp;
-            _oldSpRegenTimer = (float)_spRegenField.GetValue(stats);
             _oldUltimateGauge = stats.CurrentUltimateGauge;
             _resourcesPrepared = true;
-            if (_isSkill)
-            {
-                if (stats.MaxSp < _form.SkillSpCost)
-                    throw new InvalidOperationException("The player's maximum SP is below this skill's cost. Increase the test player's SP before running this action.");
-                stats.AddSp(stats.MaxSp);
-                _metrics.notes.Add("Scenario setup fills SP once before E is requested. Original skill cost, cooldown and regeneration remain active. Pre-test SP and regeneration state are restored on disposal.");
-            }
             if (_isUltimate)
             {
                 stats.AddUltimateGauge(stats.MaxUltimateGauge);
                 _metrics.notes.Add("Scenario setup fills the ultimate gauge once. R is requested until its execution is observed, then never toggled off or refilled by the policy. The original gauge is restored on disposal.");
             }
-            Value("runtime.policy.initialSP", stats.CurrentSp);
             Value("runtime.policy.initialUltimateGauge", stats.CurrentUltimateGauge);
         }
 
@@ -551,7 +539,6 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             Value("runtime.action.selectedStepCount", _selectedSteps.Count);
             if (_isSkill)
             {
-                Value("runtime.action.skillSpCost", _form.SkillSpCost);
                 Value("runtime.action.skillCooldown", _form.SkillCooldown);
             }
             if (_isUltimate) Value("runtime.action.ultimateCooldown", data.CommonBalance.UltimateCooldown);
@@ -946,11 +933,8 @@ namespace StudioBaekho.CombatLab.FourTigerSword
             {
                 if (!_resourcesPrepared || _player == null || _player.StatManager == null) return;
                 var stats = _player.StatManager;
-                _spField.SetValue(stats, _oldSp);
-                _spRegenField.SetValue(stats, _oldSpRegenTimer);
                 _ultimateGaugeField.SetValue(stats, _oldUltimateGauge);
                 // Public zero-delta notifications refresh the HUD after resource restoration.
-                stats.AddSp(0f);
                 stats.AddUltimateGauge(0f);
             });
             Cleanup(() => { if (_keyboard != null && _keyboard.added) InputSystem.RemoveDevice(_keyboard); });

@@ -860,7 +860,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1580568280823608530}
-  m_Mesh: {fileID: 4300000, guid: 35adba1c81dfe8947acf97c1c163f546, type: 2}
+  m_Mesh: {fileID: 4300000, guid: e3f20452fbeca2a47bc3f3798c26f0cf, type: 2}
 --- !u!23 &6846304661895477402
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -973,7 +973,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1786760960830772529}
-  m_Mesh: {fileID: 7931506788784891249, guid: 7564a743977c9f24a96541241ca9998c, type: 3}
+  m_Mesh: {fileID: 4300000, guid: b202095e6535e8d41a100264d7b694a7, type: 2}
 --- !u!23 &377149543912793946
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1084,7 +1084,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1803091420792267827}
-  m_Mesh: {fileID: 4300000, guid: f35c48156ec8e104fb1eb02f5386b377, type: 2}
+  m_Mesh: {fileID: 4300000, guid: 07694ec63c8e4df40805191a241fced8, type: 2}
 --- !u!23 &5070541146884946715
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1197,7 +1197,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1822409719362380630}
-  m_Mesh: {fileID: 1658174955599465953, guid: 42c0da806154596448f7288e3044ca8c, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 6c7a68f7a1cca3444b4382945de04974, type: 2}
 --- !u!23 &3317020420959958163
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1323,6 +1323,7 @@ GameObject:
   - component: {fileID: 6562684850054667396}
   - component: {fileID: 1637390341189825822}
   - component: {fileID: 5488832623795526029}
+  - component: {fileID: 6634548710289156296}
   m_Layer: 0
   m_Name: Room light left (configurable)
   m_TagString: Untagged
@@ -1439,6 +1440,19 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!114 &6634548710289156296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2082569259792576048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f10bb67a55c349d4b8843a7013a3dc8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: StudioBaekho.Maps::StudioBaekho.BaekhoGeneratedLightShadow
+  authoredMode: 2
 --- !u!1 &2194566516240617853
 GameObject:
   m_ObjectHideFlags: 0
@@ -1528,7 +1542,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2278244578782438537}
-  m_Mesh: {fileID: 4300000, guid: d0ba7ab9c1c3ade4a940e22b7544e20e, type: 2}
+  m_Mesh: {fileID: 4300000, guid: 21db4c0d7dca3da42a5e78a50b72541a, type: 2}
 --- !u!23 &2131604088320704638
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2795,7 +2809,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6581125156759541287}
-  m_Mesh: {fileID: 7931506788784891249, guid: 7564a743977c9f24a96541241ca9998c, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 7533db6ba3e0f8f4baebf2a5ac03d769, type: 2}
 --- !u!23 &3119284609008202236
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3294,7 +3308,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7364882619047043718}
-  m_Mesh: {fileID: 4300000, guid: c27fc6499e0553d44b110315f3c3297c, type: 2}
+  m_Mesh: {fileID: 4300000, guid: 5674faa9c427d1245b74b4ab6b82e4c1, type: 2}
 --- !u!23 &20906405747396227
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3424,7 +3438,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7498613948109284196}
-  m_Mesh: {fileID: 4300000, guid: 35d4773ebf7d73e458d96e4345194b04, type: 2}
+  m_Mesh: {fileID: 4300000, guid: 2a6fcfe569f54cf438e322a888946814, type: 2}
 --- !u!23 &4971611392870616510
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3508,6 +3522,7 @@ GameObject:
   - component: {fileID: 8877594199443215929}
   - component: {fileID: 7349892502691455612}
   - component: {fileID: 6307542019771855002}
+  - component: {fileID: 485911904402273631}
   m_Layer: 0
   m_Name: Room light right (configurable)
   m_TagString: Untagged
@@ -3624,6 +3639,19 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!114 &485911904402273631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7737198809246104485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f10bb67a55c349d4b8843a7013a3dc8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: StudioBaekho.Maps::StudioBaekho.BaekhoGeneratedLightShadow
+  authoredMode: 2
 --- !u!1 &7739370441091944390
 GameObject:
   m_ObjectHideFlags: 0
@@ -3681,7 +3709,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7739370441091944390}
-  m_Mesh: {fileID: 4300000, guid: ed717e04f7e4f534890e83782eb69d9a, type: 2}
+  m_Mesh: {fileID: 4300000, guid: 534db65784fe4864e92d174965461cb0, type: 2}
 --- !u!23 &5615330612720008207
 MeshRenderer:
   m_ObjectHideFlags: 0

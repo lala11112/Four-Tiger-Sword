@@ -3,12 +3,9 @@ using System.Collections.Generic;
 
 public class EarthForm : BaseForm
 {
-    protected override float CurrentAttackAnimationSpeed
-        => _currentAction == ActionType.Skill || _currentAction == ActionType.SwitchAttack ? FixedActionSpeed : AttackSpeed;
     private readonly EarthFormActionDataSO _earthData;
 
     public override ElementType Element => ElementType.ELEMENT_EARTH;
-    public override float SkillSpCost => Mathf.Max(0f, _earthData.SkillSpiritCost);
     public override float SkillCooldown => Mathf.Max(0f, _earthData.SkillCooldownSeconds);
     public override bool CanUltimate => _earthData != null && UltimateResourcesReady;
     private readonly object _skillShieldSource = new(), _ultimateShieldSource = new();

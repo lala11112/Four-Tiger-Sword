@@ -14,6 +14,8 @@ public sealed class BossPhaseBurstSkillSO : MonsterSkillData
     [Min(0f)] public float recoveryTime = 1.2f;
     [Min(0f)] public float damage = 2f;
     [Min(0f)] public float knockbackForce = 38f;
+    [Min(0f), Tooltip("Camera impulse strength at the burst, even when dodged. Zero disables it; the player's impulse source supplies duration and direction.")]
+    public float burstCameraShakeStrength = .45f;
     [Min(0f)] public float preparationDuration = .53333336f;
     [Range(0f, 1f)] public float chargePoseNormalized = .19512194f;
     [Min(0f)] public float releaseHitDelay = .93333334f;
@@ -32,6 +34,8 @@ public sealed class BossPhaseBurstSkillSO : MonsterSkillData
             yield return "Burst preparation and release must fit inside the total warning duration.";
         if (!BossCombatValidation.Nonnegative(damage) || !BossCombatValidation.Nonnegative(knockbackForce))
             yield return "Burst damage and knockback must be finite and nonnegative.";
+        if (!BossCombatValidation.Nonnegative(burstCameraShakeStrength))
+            yield return "Burst camera shake strength must be finite and nonnegative.";
         if (isParryable) yield return "The phase burst must be non-parryable; its floor warning is independent of parry events.";
     }
 

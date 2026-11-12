@@ -35,7 +35,7 @@ namespace ArpgHud
     [Serializable]
     public struct HudState
     {
-        public MeterState Hp, Auxiliary, UltimateCharge;
+        public MeterState Hp, UltimateCharge;
         public int ActiveFormIndex;
         // Bits 0..4 follow HUD order: Fire, Water, Wood, Metal, Earth. Zero preserves unrestricted previews.
         public int LockedFormsMask;

@@ -2,7 +2,8 @@ using UnityEngine;
 
 /// <summary>
 /// 전방 부채꼴 시야와 근거리 전방위 감지로 플레이어를 탐지합니다.
-/// 두 감지 방식 모두 대상까지의 장애물을 확인합니다.
+/// 발견했거나 위치를 기억하는 동안에는 방향과 무관하게 추적합니다.
+/// 모든 감지 방식은 지형 장애물을 확인하며, 다른 적의 몸은 시야를 가리지 않습니다.
 /// </summary>
 [DisallowMultipleComponent]
 public class FanVisionSensor : MonoBehaviour, IEnemySensor
@@ -14,14 +15,18 @@ public class FanVisionSensor : MonoBehaviour, IEnemySensor
     [SerializeField, Min(1)] private int _rayCount = 7;
     [SerializeField] private float _heightOffset = 0.5f;
     [SerializeField] private LayerMask _visibilityMask = Physics.DefaultRaycastLayers;
+    private Enemy _owner;
     private Transform _player;
     private float _nextPlayerSearch;
     private readonly RaycastHit[] _visibilityHits = new RaycastHit[32];
 
     public Transform DetectedTarget { get; private set; }
 
+    private void Awake() => _owner = GetComponentInParent<Enemy>();
+
     public bool DetectTarget()
     {
+        Transform previousTarget = DetectedTarget;
         DetectedTarget = null;
         if (!isActiveAndEnabled) return false;
         if (_player == null || !_player.gameObject.activeInHierarchy)
@@ -36,20 +41,32 @@ public class FanVisionSensor : MonoBehaviour, IEnemySensor
         if (offset.sqrMagnitude > range * range) return false;
         float proximityRange = Mathf.Clamp(_proximityRange, 0f, range);
         bool isNearby = proximityRange > 0f && offset.sqrMagnitude <= proximityRange * proximityRange;
+        // The patrol cone acquires an unknown target. Turning during a fight must not
+        // erase awareness; remembered cues still require current range and clear sight.
+        bool isAlert = previousTarget == _player || (_owner != null && _owner.HasTargetMemory);
         Vector3 flatDirection = Vector3.ProjectOnPlane(offset, Vector3.up);
-        if (!isNearby && flatDirection.sqrMagnitude > 0.001f
-            && Vector3.Angle(transform.forward, flatDirection) > _halfAngle) return false;
+        Vector3 flatForward = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
+        if (!isNearby && !isAlert && flatDirection.sqrMagnitude > 0.001f
+            && Vector3.Angle(flatForward, flatDirection) > _halfAngle) return false;
 
         Vector3 origin = transform.position + Vector3.up * _heightOffset;
         Vector3 ray = _player.position + Vector3.up * _heightOffset - origin;
         int count = Physics.RaycastNonAlloc(origin, ray.normalized, _visibilityHits,
             ray.magnitude, _visibilityMask, QueryTriggerInteraction.Ignore);
-        // 버퍼가 가득 차면 누락된 장애물이 있을 수 있으므로 보이지 않는 것으로 처리합니다.
-        if (count == _visibilityHits.Length) return false;
+        // A crowd can fill the non-alloc buffer with body colliders. Check all hits in
+        // that rare case so neither allies nor an omitted wall produce a false result.
+        RaycastHit[] hits = _visibilityHits;
+        if (count == hits.Length)
+        {
+            hits = Physics.RaycastAll(origin, ray.normalized, ray.magnitude,
+                _visibilityMask, QueryTriggerInteraction.Ignore);
+            count = hits.Length;
+        }
         for (int i = 0; i < count; i++)
         {
-            Transform hit = _visibilityHits[i].transform;
-            if (hit.IsChildOf(transform) || hit.IsChildOf(_player)) continue;
+            Transform hit = hits[i].collider.transform;
+            if (hit.IsChildOf(transform) || hit.IsChildOf(_player)
+                || hit.GetComponentInParent<Enemy>() != null) continue;
             return false;
         }
         DetectedTarget = _player;

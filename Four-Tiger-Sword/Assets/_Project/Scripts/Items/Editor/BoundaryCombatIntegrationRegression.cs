@@ -328,6 +328,27 @@ public static class BoundaryCombatIntegrationRegression
             Items = go.AddComponent<PlayerItemRuntime>();
             _catalog = Object.Instantiate(AssetDatabase.LoadAssetAtPath<ItemCatalog>("Assets/_Project/Generated/BoundaryInventory/ItemCatalog.asset"));
             _objects.Add(_catalog); _catalog.synergies = Array.Empty<ItemSynergyDefinition>();
+            // This ordering regression still exercises the previous rules, including retired kill effects.
+            var legacyDefinitions = new List<ItemDefinition>(BoundaryInventoryContent.Grades.Count);
+            foreach (var entry in BoundaryInventoryContent.Grades)
+            {
+                string id = entry.Key;
+                var source = _catalog.Find(id) ?? AssetDatabase.LoadAssetAtPath<ItemDefinition>(
+                    $"Assets/_Project/Generated/BoundaryInventory/Definitions/{id}.asset");
+                var definition = source != null
+                    ? Object.Instantiate(source)
+                    : ScriptableObject.CreateInstance<ItemDefinition>();
+                _objects.Add(definition);
+                definition.projectId = _catalog.projectId;
+                definition.itemId = id;
+                definition.candidateKey = id;
+                if (source == null) definition.displayName = id;
+                definition.grade = entry.Value;
+                definition.purchasePrice = 20 << (entry.Value - 1);
+                definition.boundaryEffects = BoundaryInventoryContent.Effects(id);
+                legacyDefinitions.Add(definition);
+            }
+            _catalog.items = legacyDefinitions.ToArray();
             Items.Catalog = _catalog; Items.Initialize(Stats, () => ElementType.ELEMENT_NONE);
             Set(Player, nameof(PlayerController.ItemRuntime), Items);
             Wallet = go.AddComponent<PlayerWallet>(); Wallet.Initialize(0);

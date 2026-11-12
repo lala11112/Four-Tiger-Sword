@@ -428,7 +428,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: adf9e2eca4e9f7b4aaf0ea6185c11614, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleButtonFocus
 --- !u!1 &152945331
 GameObject:
@@ -671,6 +671,10 @@ PrefabInstance:
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: -7958799580173226891, guid: db0aa7e467c40b643b168acf0543dadb, type: 2}
+    - target: {fileID: 1799577742108365350, guid: d71b537d888f8634796b0d01d5a9d22a, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 2267775639508027998, guid: d71b537d888f8634796b0d01d5a9d22a, type: 3}
       propertyPath: m_Name
       value: BoundaryZeroRunOverlay
@@ -679,14 +683,6 @@ PrefabInstance:
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: -7958799580173226891, guid: db0aa7e467c40b643b168acf0543dadb, type: 2}
-    - target: {fileID: 3105245977973731322, guid: d71b537d888f8634796b0d01d5a9d22a, type: 3}
-      propertyPath: m_overflowMode
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 3105245977973731322, guid: d71b537d888f8634796b0d01d5a9d22a, type: 3}
-      propertyPath: m_TextStyleHashCode
-      value: -1183493901
-      objectReference: {fileID: 0}
     - target: {fileID: 7772620764990915119, guid: d71b537d888f8634796b0d01d5a9d22a, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -1573,8 +1569,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC124\uC815"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8b17723f55540584e8d72c619d1e4151, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: ac6e110874f9fad46af13896764166f5, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: db0aa7e467c40b643b168acf0543dadb, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 116fd2169beeaa04b932761fea68e77a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2016,7 +2012,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: adf9e2eca4e9f7b4aaf0ea6185c11614, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleButtonFocus
 --- !u!114 &1221412021
 MonoBehaviour:
@@ -2220,7 +2216,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: adf9e2eca4e9f7b4aaf0ea6185c11614, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleButtonFocus
 --- !u!1 &1340719883
 GameObject:
@@ -2281,8 +2277,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC774\uC5B4\uD558\uAE30"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8b17723f55540584e8d72c619d1e4151, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: ac6e110874f9fad46af13896764166f5, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: db0aa7e467c40b643b168acf0543dadb, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 116fd2169beeaa04b932761fea68e77a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2385,7 +2381,7 @@ RectTransform:
   m_GameObject: {fileID: 1363463916}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.93870765, y: 0.93870765, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1029493645}
@@ -2477,8 +2473,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC885\uB8CC"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8b17723f55540584e8d72c619d1e4151, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: ac6e110874f9fad46af13896764166f5, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: db0aa7e467c40b643b168acf0543dadb, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 116fd2169beeaa04b932761fea68e77a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3199,7 +3195,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: adf9e2eca4e9f7b4aaf0ea6185c11614, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleButtonFocus
 --- !u!1 &2072686142
 GameObject:
@@ -3335,8 +3331,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC0C8 \uAC8C\uC784"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8b17723f55540584e8d72c619d1e4151, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: ac6e110874f9fad46af13896764166f5, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: db0aa7e467c40b643b168acf0543dadb, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 116fd2169beeaa04b932761fea68e77a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

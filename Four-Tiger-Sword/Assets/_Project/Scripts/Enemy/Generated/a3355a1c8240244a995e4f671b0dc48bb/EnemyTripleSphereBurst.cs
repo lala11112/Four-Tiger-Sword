@@ -132,7 +132,11 @@ namespace Baekho.Generated.a3355a1c8240244a995e4f671b0dc48bb
                 if (!AdvanceProjectiles((launchTime - cursor) / rate)) return;
                 cursor = launchTime;
                 _fired++;
-                if (_fired == 1) EndTelegraph();
+                if (_fired == 1)
+                {
+                    EndAttackWarning();
+                    EndTelegraph();
+                }
                 if (!IsActive || _exitHandled || !CanContinueAction) return;
                 SpawnProjectile();
                 if (!IsActive || _exitHandled || !CanContinueAction) return;

@@ -66,6 +66,7 @@ public class EnemyDashAttack : EnemyAction
                     _dashDirection = HasBossPolicy ? BossAimDirection : GetDirectionToTarget();
                     _timer = 0f;
                     _phase = Phase.Dash;
+                    EndAttackWarning();
                     SetBossStage(BossAttackStage.Active);
                     if (!string.IsNullOrWhiteSpace(_data.startupAnimName) && !string.IsNullOrWhiteSpace(_data.animName))
                         _enemy.Animator?.CrossFade(_data.animName, .03f, 0, 0f);

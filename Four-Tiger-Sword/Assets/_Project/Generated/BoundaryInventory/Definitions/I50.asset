@@ -18,9 +18,9 @@ MonoBehaviour:
   displayName: "\uC120\uBD09 \uBCF4\uD638\uD328"
   description: "\uC55E\uCABD \uBAA8\uC11C\uB9AC\uAC00 \uB450\uAEBC\uC6B4 \uC138\uB77C\uBBF9
     \uBCF4\uD638\uD328."
-  effectText: "\uC804\uD22C \uC911 \uC790\uC2E0\uC758 HP\uAC00 \uCC98\uC74C 40% \uC774\uD558\uAC00
-    \uB418\uBA74 \uCD5C\uB300 HP\uC758 6%\uC5D0 \uD574\uB2F9\uD558\uB294 \uBCF4\uD638\uB9C9\uC744
-    5\uCD08\uAC04 \uC5BB\uB294\uB2E4."
+  effectText: "\uD53C\uACA9\uC73C\uB85C HP\uB97C \uC783\uC740 \uB4A4 \uC790\uC2E0\uC758
+    HP\uAC00 40% \uC774\uD558\uC77C \uB54C \uCD5C\uB300 HP\uC758 6%\uB9CC\uD07C \uBCF4\uD638\uB9C9
+    (5\uCD08)\n\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 15\uCD08"
   synergyIds:
   - S08
   synergyNames:
@@ -29,14 +29,14 @@ MonoBehaviour:
   primarySynergyName: "\uC218\uD638"
   primarySynergyIcon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
   element: 0
-  grade: 3
-  purchasePrice: 80
+  grade: 2
+  purchasePrice: 40
   effects: []
   boundaryEffects:
   - effectId: I50
     stat: 8
     amount: 0.06
-    trigger: 6
+    trigger: 2
     family: 0
     element: 0
     eliteOrBossOnly: 0
@@ -53,14 +53,12 @@ MonoBehaviour:
     minimumBaseGold: 0
     maximumBaseGold: 0
     durationSeconds: 5
-    cooldownSeconds: 0
+    cooldownSeconds: 15
   icon: {fileID: 21300000, guid: 031b4ecedf8bf4a488630d3b70500a87, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I50\",\"name\":\"\uC120\uBD09 \uBCF4\uD638\uD328\",\"description\":\"\uC55E\uCABD
-    \uBAA8\uC11C\uB9AC\uAC00 \uB450\uAEBC\uC6B4 \uC138\uB77C\uBBF9 \uBCF4\uD638\uD328.\",\"effect\":\"\uC804\uD22C
-    \uC911 \uC790\uC2E0\uC758 HP\uAC00 \uCC98\uC74C 40% \uC774\uD558\uAC00 \uB418\uBA74
-    \uCD5C\uB300 HP\uC758 6%\uC5D0 \uD574\uB2F9\uD558\uB294 \uBCF4\uD638\uB9C9\uC744
-    5\uCD08\uAC04 \uC5BB\uB294\uB2E4.\",\"synergies\":[\"S08\"],\"primarySynergy\":\"S08\",\"designIntent\":\"\uC804\uD22C
-    \uC911 \uCC98\uC74C\uC73C\uB85C \uCCB4\uB825\uC774 \uB0AE\uC544\uC84C\uC744 \uB54C
-    \uBCF4\uD638\uB9C9\uC744 \uC5BB\uB294\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I50.png\"}"
+    \uBAA8\uC11C\uB9AC\uAC00 \uB450\uAEBC\uC6B4 \uC138\uB77C\uBBF9 \uBCF4\uD638\uD328.\",\"effect\":\"\uD53C\uACA9\uC73C\uB85C
+    HP\uB97C \uC783\uC740 \uB4A4 \uC790\uC2E0\uC758 HP\uAC00 40% \uC774\uD558\uC77C
+    \uB54C \uCD5C\uB300 HP\uC758 6%\uB9CC\uD07C \uBCF4\uD638\uB9C9 (5\uCD08)\\n\uC7AC\uC0AC\uC6A9
+    \uB300\uAE30\uC2DC\uAC04 15\uCD08\",\"synergies\":[\"S08\"],\"primarySynergy\":\"S08\",\"origin\":\"revised\",\"image\":\"Art/Items/I50.png\",\"grade\":2}"

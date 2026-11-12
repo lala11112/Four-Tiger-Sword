@@ -18,8 +18,7 @@ MonoBehaviour:
   displayName: "\uCD08\uC810 \uC410\uAE30"
   description: "\uB05D\uC774 \uD55C\uCABD\uC73C\uB85C \uAC08\uB9B0 \uBC31\uC0C9 \uC138\uB77C\uBBF9
     \uC410\uAE30."
-  effectText: "\uC2A4\uD0AC\uC774 \uCC98\uC74C \uB9DE\uD78C \uC801\uC5D0\uAC8C \uC8FC\uB294
-    \uCCAB \uD0C0\uACA9 \uD53C\uD574\uAC00 7% \uC99D\uAC00\uD55C\uB2E4."
+  effectText: "\uC2A4\uD0AC \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 \u22123%"
   synergyIds:
   - S16
   synergyNames:
@@ -33,10 +32,10 @@ MonoBehaviour:
   effects: []
   boundaryEffects:
   - effectId: I71
-    stat: 6
-    amount: 0.07
+    stat: 14
+    amount: 0.03
     trigger: 0
-    family: 2
+    family: 0
     element: 0
     eliteOrBossOnly: 0
     targetHpMin: -1
@@ -44,7 +43,7 @@ MonoBehaviour:
     selfHpMin: -1
     selfHpMax: -1
     firstTargetHit: 0
-    firstSkillHit: 1
+    firstSkillHit: 0
     firstIncomingAttack: 0
     firstRewardKill: 0
     requiresFullHealth: 0
@@ -55,10 +54,7 @@ MonoBehaviour:
     cooldownSeconds: 0
   icon: {fileID: 21300000, guid: b1ac7c7cc53643d4aaac184ac4b423d1, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I71\",\"name\":\"\uCD08\uC810 \uC410\uAE30\",\"description\":\"\uB05D\uC774
-    \uD55C\uCABD\uC73C\uB85C \uAC08\uB9B0 \uBC31\uC0C9 \uC138\uB77C\uBBF9 \uC410\uAE30.\",\"effect\":\"\uC2A4\uD0AC\uC774
-    \uCC98\uC74C \uB9DE\uD78C \uC801\uC5D0\uAC8C \uC8FC\uB294 \uCCAB \uD0C0\uACA9
-    \uD53C\uD574\uAC00 7% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S16\"],\"primarySynergy\":\"S16\",\"designIntent\":\"\uC2A4\uD0AC\uC774
-    \uCC98\uC74C \uB9DE\uD78C \uC801\uC5D0\uAC8C \uCCAB \uD0C0\uACA9 \uD53C\uD574\uB97C
-    \uB298\uB9B0\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I71.png\"}"
+    \uD55C\uCABD\uC73C\uB85C \uAC08\uB9B0 \uBC31\uC0C9 \uC138\uB77C\uBBF9 \uC410\uAE30.\",\"effect\":\"\uC2A4\uD0AC
+    \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 \u22123%\",\"synergies\":[\"S16\"],\"primarySynergy\":\"S16\",\"origin\":\"revised\",\"image\":\"Art/Items/I71.png\",\"grade\":1}"

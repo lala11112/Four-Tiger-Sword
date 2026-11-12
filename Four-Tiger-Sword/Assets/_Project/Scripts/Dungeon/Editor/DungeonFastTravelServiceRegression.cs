@@ -183,7 +183,6 @@ public static class DungeonFastTravelServiceRegression
             Check(service.CanTravel(2, out reason), "Destination did not recover after removing the obstacle: " + reason);
 
             stats.TakeDamage(7f, ElementType.ELEMENT_NONE, false);
-            stats.TryConsumeSp(11f);
             stats.AddUltimateGauge(32f);
             var wallet = player.gameObject.AddComponent<PlayerWallet>();
             wallet.Initialize(57);
@@ -196,7 +195,7 @@ public static class DungeonFastTravelServiceRegression
             items.Initialize(stats, () => ElementType.ELEMENT_FIRE);
             Property(player, "ItemRuntime", items);
             Check(items.TryAddItem(item.itemId), "Fixture could not own its sample item.");
-            float hp = stats.CurrentHp, sp = stats.CurrentSp, gauge = stats.CurrentUltimateGauge;
+            float hp = stats.CurrentHp, gauge = stats.CurrentUltimateGauge;
             Set(player, "_dashCooldownTimer", .37f);
             Set(player, "_formChangeCooldownTimer", .82f);
             player.VerticalVelocity = -9f;
@@ -208,7 +207,7 @@ public static class DungeonFastTravelServiceRegression
             Check(Vector3.Distance(player.transform.position, anchor.position) < .0001f
                 && Quaternion.Angle(player.transform.rotation, anchor.rotation) < .001f && controller.enabled,
                 "Success changed the authored pose or left the collider disabled.");
-            Check(stats.CurrentHp == hp && stats.CurrentSp == sp && stats.CurrentUltimateGauge == gauge && wallet.Gold == 57
+            Check(stats.CurrentHp == hp && stats.CurrentUltimateGauge == gauge && wallet.Gold == 57
                 && player.ItemRuntime == items && items.Contains(item.itemId) && effect != null && effect.gameObject.activeInHierarchy,
                 "Success reset player resources, ownership or world effects.");
             Check(Mathf.Approximately(Field<float>(player, "_dashCooldownTimer"), .37f)

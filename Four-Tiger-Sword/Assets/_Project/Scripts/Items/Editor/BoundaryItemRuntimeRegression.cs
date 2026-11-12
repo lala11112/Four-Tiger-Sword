@@ -15,9 +15,12 @@ public static class BoundaryItemRuntimeRegression
         _checks = 0;
         foreach (string id in BoundaryInventoryContent.Grades.Keys) VerifyMappedItem(id);
         VerifyConditionalCommit();
+        VerifyAllDamagePassives();
+        VerifySkillCooldowns();
         VerifySynergyTiers();
         VerifyShieldAndIncomingOrdering();
         VerifyDamageThresholdBoundaries();
+        VerifyLowHealthDirectDamage();
         VerifyGoldAndCombatLifetime();
         VerifyFirstRewardRequiresCapturedCombat();
         VerifyReacquisitionAndMidCombatAcquisition();
@@ -180,6 +183,129 @@ public static class BoundaryItemRuntimeRegression
         Near(fixture.Items.EvaluateOutgoing(normal).DamageMultiplier, 1.28f, "new combat resets per-target flags");
     }
 
+    private static void VerifyAllDamagePassives()
+    {
+        using var fixture = new Fixture();
+        var player = fixture.AttachPlayer();
+        var damageItem = fixture.Definition("I46", BoundaryInventoryContent.RevisedItemEffects("I46"));
+        var eliteItem = fixture.Definition("I65", BoundaryInventoryContent.RevisedItemEffects("I65"));
+        var skillItem = fixture.Definition("I72", BoundaryInventoryContent.RevisedItemEffects("I72"));
+        var shieldItem = fixture.Definition("I34", BoundaryInventoryContent.RevisedItemEffects("I34"));
+        var killItem = fixture.Definition("legacy-kill-heal", BoundaryInventoryContent.Effects("I68"));
+        fixture.Catalog.items = new[] { damageItem, eliteItem, skillItem, shieldItem, killItem };
+        var members = new[] { damageItem.itemId, eliteItem.itemId };
+        fixture.Catalog.synergies = new[] {
+            Synergy("S14", "ignoreDefensePct", 6),
+            Synergy("S15", "damagePct", 4)
+        };
+        foreach (var item in fixture.Catalog.items) Check(fixture.Items.TryAddItem(item.itemId), item.itemId + " grant");
+        fixture.Items.SetCombatState(true);
+        var target = fixture.AddDefendedTarget();
+        var probe = new DamageProbe();
+        var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        var rank = typeof(Enemy).GetField("enemyRank", flags);
+        var random = UnityEngine.Random.state;
+        var activeSettings = typeof(CombatSettings).GetProperty(nameof(CombatSettings.Active));
+        var previousSettings = CombatSettings.Active;
+        try
+        {
+            activeSettings.SetValue(null, fixture.NeutralCombatSettings());
+            foreach (var enemyRank in new[] { EnemyRank.Normal, EnemyRank.Elite, EnemyRank.Boss })
+            {
+                rank.SetValue(target, enemyRank);
+                foreach (var category in new[] { PlayerAttackCategory.Normal, PlayerAttackCategory.Other, PlayerAttackCategory.Secondary })
+                {
+                    float expected = (enemyRank == EnemyRank.Normal ? 110f : 120f) / 1.86f;
+                    Near(DealDamage(category), expected, enemyRank + " " + category + " passives applied once");
+                    Check(probe.Context.CanTrigger == (category == PlayerAttackCategory.Normal),
+                        category + " keeps its original trigger eligibility");
+                }
+            }
+
+            Near(fixture.Stats.Shield, 0f, "secondary damage cannot grant a skill-hit shield");
+            Near(DealDamage(PlayerAttackCategory.Skill), 125f / 1.86f, "skill-specific damage stacks on an authored skill");
+            Near(fixture.Stats.Shield, 30f, "authored skill grants its shield");
+            DealDamage(PlayerAttackCategory.Secondary);
+            fixture.Stats.ConsumeHealth(100f);
+            var death = probe.Context;
+            fixture.Items.ProcessKill(new ItemKillContext(1, true, death.Family, death.CanTrigger,
+                0, 900f, 1000f, death.CombatEpoch, death.WasInCombat));
+            Near(fixture.Stats.CurrentHp, 900f, "additional damage cannot grant kill healing");
+            fixture.Items.ProcessKill(Kill(fixture, 1, BoundaryAttackFamily.Skill, 0));
+            Near(fixture.Stats.CurrentHp, 905f, "additional damage cannot consume a direct kill receipt");
+        }
+        finally
+        {
+            activeSettings.SetValue(null, previousSettings);
+            UnityEngine.Random.state = random;
+        }
+
+        ItemSynergyDefinition Synergy(string id, string key, int amount) => new ItemSynergyDefinition {
+            id = id, members = members, tiers = new[] { new ItemSynergyTier { count = 2,
+                effects = BoundaryInventoryContent.SynergyEffects(id, 2,
+                    new Newtonsoft.Json.Linq.JObject { [key] = amount }, revised: true) } }
+        };
+
+        float DealDamage(PlayerAttackCategory category)
+            => DamageManager.Apply(new HitInfo(100f, ElementType.ELEMENT_NONE, 0f, 1f, source: player,
+                category: category, castId: 7), probe, target.gameObject).HealthDamage;
+    }
+
+    private sealed class DamageProbe : IDamageable
+    {
+        public ItemDeathContext Context;
+        public DamageResult TakeDamage(float damage, ElementType damageType, bool isCritical, Vector3 power,
+            float poiseDamage, StaggerResistLevel staggerResistLevel, bool isParryable, object source)
+        {
+            Context = ItemDamageContext.Current;
+            return new DamageResult(DamageOutcome.Applied, damage);
+        }
+    }
+
+    private static void VerifySkillCooldowns()
+    {
+        using var fixture = new Fixture();
+        var player = fixture.AttachPlayer();
+        var form = new CooldownProbeForm();
+        form.Equip(player);
+        fixture.Catalog.items = new[] {
+            fixture.Definition("I71", BoundaryInventoryContent.RevisedItemEffects("I71")),
+            fixture.Definition("I120", BoundaryInventoryContent.RevisedItemEffects("I120")),
+            fixture.Definition("cap", new BoundaryItemEffect {
+                stat = BoundaryItemStat.SkillCooldownReductionRatio, amount = .45f })
+        };
+        Check(fixture.Items.TryAddItem("I71") && fixture.Items.TryAddItem("I120"), "cooldown items acquired");
+        Near(fixture.Items.SkillCooldownReductionRatio, .08f, "cooldown reductions add");
+        form.EndSkill();
+        form.StartUltimateCooldown();
+        Near(form.SkillCooldownRemaining, 4.6f, "E timer starts at the effective duration");
+        Near(form.UltimateCooldownRemaining, 27.6f, "R timer starts at the effective duration");
+        Near(form.SkillCooldownDuration, 4.6f, "E display duration uses reduction");
+        Near(form.UltimateCooldownDuration, 27.6f, "R display duration uses reduction");
+        var advance = typeof(BaseForm).GetMethod("AdvanceSkillCooldowns",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        advance.Invoke(form, new object[] { .92f });
+        Near(form.SkillCooldownRemaining, 3.68f, "E timer tracks real elapsed seconds");
+        Near(form.UltimateCooldownRemaining, 26.68f, "R timer tracks real elapsed seconds");
+        Check(fixture.Items.TryAddItem("cap"), "cap fixture item acquired");
+        Near(fixture.Items.SkillCooldownReductionRatio, .40f, "cooldown reduction caps at 40 percent");
+        Near(form.SkillCooldownRemaining, 2.4f, "acquisition scales remaining E work");
+        Near(form.UltimateCooldownRemaining, 17.4f, "acquisition scales remaining R work");
+        Check(fixture.Items.TryRemoveItem("cap") && fixture.Items.TryRemoveItem("I71")
+            && fixture.Items.TryRemoveItem("I120"), "cooldown items removed");
+        Near(form.SkillCooldownRemaining, 4f, "removal restores E remaining base seconds");
+        Near(form.UltimateCooldownRemaining, 29f, "removal restores R remaining base seconds");
+        advance.Invoke(form, new object[] { 60f });
+        Near(form.SkillCooldownRemaining, 0f, "E cooldown clamps at zero");
+        Near(form.UltimateCooldownRemaining, 0f, "R cooldown clamps at zero");
+    }
+
+    private sealed class CooldownProbeForm : BaseForm
+    {
+        public CooldownProbeForm() : base(null) { }
+        public void StartUltimateCooldown() => ConsumeUltimateResources();
+    }
+
     private static void VerifySynergyTiers()
     {
         using var fixture = new Fixture();
@@ -309,6 +435,24 @@ public static class BoundaryItemRuntimeRegression
         Near(fixture.Items.EvaluateIncoming(incoming), .92f, "I78 exact 20 percent is inclusive");
     }
 
+    private static void VerifyLowHealthDirectDamage()
+    {
+        using var fixture = new Fixture();
+        fixture.Own("I75");
+
+        foreach (var family in new[] { BoundaryAttackFamily.Normal, BoundaryAttackFamily.Skill })
+        {
+            Near(DamageMultiplier(family, 249f), 1.09f, $"I75 boosts {family} below 25 percent target HP");
+            Near(DamageMultiplier(family, 250f), 1.09f, $"I75 boosts {family} at exactly 25 percent target HP");
+            Near(DamageMultiplier(family, 251f), 1f, $"I75 leaves {family} above 25 percent target HP unchanged");
+        }
+        Near(DamageMultiplier(BoundaryAttackFamily.Any, 249f, false), 1f, "I75 excludes secondary damage");
+
+        float DamageMultiplier(BoundaryAttackFamily family, float targetHp, bool canTrigger = true)
+            => fixture.Items.EvaluateOutgoing(new ItemHitContext(1, targetHp, 1000f, false,
+                family, ElementType.ELEMENT_FIRE, canTrigger, 1)).DamageMultiplier;
+    }
+
     private static void VerifyReacquisitionAndMidCombatAcquisition()
     {
         using var fixture = new Fixture();
@@ -365,12 +509,52 @@ public static class BoundaryItemRuntimeRegression
             _root.SetActive(false);
             var data = ScriptableObject.CreateInstance<PlayerStatData>(); _objects.Add(data);
             data.baseHP = 1000; data.baseATK = 100; data.baseDEF = 100; data.baseCRT = 10; data.baseCRTD = 150;
-            data.baseAtkSpd = 1; data.baseSP = 100; data.baseSpRegen = 20;
+            data.baseAtkSpd = 1;
             Stats = _root.AddComponent<PlayerStatManager>(); Stats.Initialize(data);
             Catalog = ScriptableObject.CreateInstance<ItemCatalog>(); _objects.Add(Catalog); Catalog.projectId = "boundary-runtime-test";
             Items = _root.AddComponent<PlayerItemRuntime>(); Items.Catalog = Catalog;
             Items.Initialize(Stats, () => ElementType.ELEMENT_FIRE);
         }
+        public PlayerController AttachPlayer()
+        {
+            var player = _root.AddComponent<PlayerController>();
+            typeof(PlayerController).GetProperty(nameof(PlayerController.StatManager)).SetValue(player, Stats);
+            typeof(PlayerController).GetProperty(nameof(PlayerController.ItemRuntime)).SetValue(player, Items);
+            return player;
+        }
+        public Enemy AddDefendedTarget()
+        {
+            var go = new GameObject("Boundary item damage target") { hideFlags = HideFlags.HideAndDontSave };
+            _objects.Add(go);
+            go.SetActive(false);
+            var enemy = go.AddComponent<Enemy>();
+            enemy.enabled = false;
+            var stats = go.GetComponent<EnemyStat>();
+            var data = ScriptableObject.CreateInstance<EnemyData>();
+            data.maxHp = 1000;
+            data.baseDef = 100f;
+            _objects.Add(data);
+            var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+            typeof(EnemyStat).GetField("baseData", flags).SetValue(stats, data);
+            typeof(EnemyStat).GetMethod("InitializeFromData", flags).Invoke(stats, null);
+            go.SetActive(true);
+            return enemy;
+        }
+
+        public CombatSettings NeutralCombatSettings()
+        {
+            var table = ScriptableObject.CreateInstance<ElementEffectiveManager>();
+            _objects.Add(table);
+            foreach (ElementType attack in Enum.GetValues(typeof(ElementType)))
+                foreach (ElementType defense in Enum.GetValues(typeof(ElementType)))
+                    table.elementEffectiveList.Add(new ElementEffective { AttackType = attack, DefenseType = defense, multiplier = 1f });
+            table.Initialize();
+            var settings = _root.AddComponent<CombatSettings>();
+            typeof(CombatSettings).GetField("_elementTable",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(settings, table);
+            return settings;
+        }
+
         public ItemDefinition Definition(string id, params BoundaryItemEffect[] effects)
         {
             var definition = ScriptableObject.CreateInstance<ItemDefinition>(); _objects.Add(definition);

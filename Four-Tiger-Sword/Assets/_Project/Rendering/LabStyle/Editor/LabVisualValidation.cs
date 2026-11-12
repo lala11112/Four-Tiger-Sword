@@ -1,4 +1,5 @@
 using System;
+using StudioBaekho;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -44,7 +45,25 @@ namespace FourTigerSword.Rendering.Editor
                     spots[index].shadows = originalModes[index] = index % 2 == 0 ? LightShadows.Hard : LightShadows.Soft;
                     spots[index].cullingMask = 0;
                     spots[index].shadowStrength = 0.7f;
+                    spots[index].spotAngle = 40f;
                 }
+                Light generated = AddLight(scope.transform, "Generated Fixture", LightType.Spot, 1f);
+                generated.transform.localPosition = Vector3.right * 12f;
+                generated.range = 3f;
+                generated.spotAngle = 40f;
+                generated.shadows = LightShadows.None;
+                generated.cullingMask = 0;
+                generated.gameObject.AddComponent<BaekhoGeneratedLightShadow>().authoredMode = LightShadows.Soft;
+                Light baked = AddLight(scope.transform, "Baked Spot", LightType.Spot, 1f);
+                baked.transform.localPosition = Vector3.right * 11.9f;
+                baked.range = 3f;
+                baked.spotAngle = 40f;
+                baked.shadows = LightShadows.Hard;
+                baked.cullingMask = 0;
+                baked.bakingOutput = new LightBakingOutput { lightmapBakeType = LightmapBakeType.Baked, isBaked = true };
+                var focus = new GameObject("Budget Player Focus") { hideFlags = HideFlags.HideAndDontSave };
+                focus.transform.SetParent(scope.transform, false);
+                focus.transform.localPosition = generated.transform.localPosition + Vector3.forward;
                 Light unshadowed = AddLight(scope.transform, "Authored No Shadows", LightType.Point, 1f);
                 unshadowed.shadows = LightShadows.None;
                 unshadowed.cullingMask = 0;
@@ -96,7 +115,28 @@ namespace FourTigerSword.Rendering.Editor
                 Require(unshadowed.shadows == LightShadows.None && directional.shadows == LightShadows.Soft &&
                     outsideLight.shadows == LightShadows.Hard, "Restore changed an untracked light.");
 
-                return "PASS: Shadow budget scope, nearest-four/range selection, repeated application, authored-mode restoration, and external shadow overrides; additional-light shadow support=" + supported + ".";
+                // Reset the earlier external override before capturing the next baseline.
+                spots[0].shadows = originalModes[0];
+                budget.focusTarget = focus.transform;
+                budget.ApplyCurrent();
+                Require(generated.shadows == LightShadows.None, "A generated fixture cast shadows without opt-in.");
+                budget.includeGeneratedLights = true;
+                budget.ApplyCurrent();
+                Require(generated.shadows == (supported ? LightShadows.Soft : LightShadows.None),
+                    "A generated fixture covering the player did not receive its authored mode and priority.");
+                Require(budget.ShadowedLightCount == (supported ? 4 : 0),
+                    "Opting into generated fixture shadows exceeded the budget or ignored pipeline support.");
+                Require(baked.shadows == LightShadows.Hard, "Budgeting changed a baked light's authored shadow mode.");
+                for (int index = 0; index < spots.Length; index++)
+                    Require(spots[index].shadows == (supported && index < 3 ? originalModes[index] : LightShadows.None),
+                        "The remaining slots were not assigned in camera distance order: " + index);
+                budget.RestoreOriginals();
+                Require(generated.shadows == LightShadows.None, "Restoration enabled a generated fixture's stored mode.");
+                Require(baked.shadows == LightShadows.Hard, "Restoration changed a baked light.");
+                for (int index = 0; index < spots.Length; index++)
+                    Require(spots[index].shadows == originalModes[index], "Restoration did not recover the authored mode: " + index);
+
+                return "PASS: Shadow budget scope, nearest-four/range selection, generated fixture opt-in and focus priority, baked-light exclusion, mode restoration, and external overrides. Additional-light shadow support=" + supported + ".";
             }
             catch (Exception exception)
             {

@@ -23,18 +23,6 @@ public partial class FormManager
 
     public bool IsElementAvailable(ElementType element) => _elementAvailability?.Invoke(element) ?? true;
 
-    /// <summary>World resource time runs before actions; switching never resets a form's resource.</summary>
-    public void UpdateFormSp(float deltaTime)
-    {
-        if (_playerController == null || !_playerController.isActiveAndEnabled
-            || _playerController.IsStageTransitioning || _playerController.IsShopPaused
-            || _playerController.StatManager == null || _playerController.StatManager.CurrentHp <= 0f) return;
-        bool inCombat = _playerController.IsInRoomCombat;
-        foreach (var form in _registeredForms)
-            if (form is BaseForm normalForm)
-                normalForm.UpdateFormSp(deltaTime, form == CurrentForm, inCombat);
-    }
-
     public void Update()
     {
         foreach (var form in _registeredForms)
@@ -104,7 +92,7 @@ public partial class FormManager
         return null;
     }
 
-    /// <summary>A committed combo finisher changes form once without switch costs or an E-style attack.</summary>
+    /// <summary>A committed combo finisher changes form once independently of the direct-switch cooldown, without an E-style attack.</summary>
     public bool TrySwitchForFinisher(BaseForm target)
     {
         if (target == null || target == CurrentForm || CurrentForm == null || !IsElementAvailable(target.Element)
@@ -141,14 +129,13 @@ public partial class FormManager
         }
     }
 
-    /// <summary>Eligibility only. Initial/editor assignments use ChangeForm and never spend SP or proc items.</summary>
+    /// <summary>Eligibility only. Initial/editor assignments use ChangeForm and never proc items.</summary>
     public bool CanSwitchForm(IForm target)
         => target is BaseForm
             && CurrentForm != null && target != CurrentForm && _registeredForms.Contains(target)
             && IsElementAvailable(target.Element)
             && _playerController.isActiveAndEnabled && _playerController.StatManager != null
-            && _playerController.StatManager.CurrentHp > 0f && _playerController.CanChangeForm
-            && _playerController.StatManager.HasEnoughSp(_playerController.SwitchSpCost);
+            && _playerController.StatManager.CurrentHp > 0f && _playerController.CanChangeForm;
 
     public bool TrySwitchForm(IForm target, SwitchReason reason = SwitchReason.Direct)
     {
@@ -158,7 +145,7 @@ public partial class FormManager
         var state = _playerController.StateMachine?.CurrentState;
         bool permitted = (state is PlayerIdleState || state is PlayerRunState)
             && (CanTransition == null || CanTransition());
-        if (!permitted || !_playerController.StatManager.TryConsumeSp(_playerController.SwitchSpCost)) return false;
+        if (!permitted) return false;
 
         IForm previous = CurrentForm;
         // New-form passives and freshly triggered effects are reconciled together: never

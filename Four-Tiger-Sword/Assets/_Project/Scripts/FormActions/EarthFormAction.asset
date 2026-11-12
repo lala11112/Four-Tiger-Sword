@@ -981,13 +981,6 @@ MonoBehaviour:
       HitEvents: []
   CommonBalance:
     UltimateCooldown: 40
-    FormSp:
-      MaxSp: 100
-      DepletionSeconds: 30
-      RecoverySeconds: 20
-      ExhaustionRecoveryRatio: 0.2
-      ExhaustedAttackMultiplier: 0.8
-      ExhaustedAttackSpeedMultiplier: 0.8
   CommonExecution:
     ParryAnimationName: Parry
     AirAttackStartAnimationName: 
@@ -1017,7 +1010,6 @@ MonoBehaviour:
     VulnerabilityBonusPercent: 0
   _chainSettingsVersion: 1
   FormBalance:
-    SkillSpiritCost: 15
     SkillCooldownSeconds: 8
     SkillDashDamageMultiplier: 2
     ShieldAmount: 300

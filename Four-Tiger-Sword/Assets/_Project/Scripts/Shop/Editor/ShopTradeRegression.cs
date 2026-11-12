@@ -243,15 +243,13 @@ public static class ShopTradeRegression
     private static void AtomicExchangePreservesResources()
     {
         using var f = new Fixture();
-        var a = f.Item("a", 1, Passive(ItemStat.MaxHp, .5f), Passive(ItemStat.MaxSp, 50f));
-        var b = f.Item("b", 1, Passive(ItemStat.MaxHp, .5f), Passive(ItemStat.MaxSp, 50f));
-        var result = f.Item("result", 2, Passive(ItemStat.MaxHp, 1f), Passive(ItemStat.MaxSp, 100f));
+        var a = f.Item("a", 1, Passive(ItemStat.MaxHp, .5f));
+        var b = f.Item("b", 1, Passive(ItemStat.MaxHp, .5f));
+        var result = f.Item("result", 2, Passive(ItemStat.MaxHp, 1f));
         f.Catalog.items = new[] { a, b, result };
         f.Give(a, b);
         f.Stats.Heal(100f);
-        f.Stats.AddSp(100f);
         Near(f.Stats.CurrentHp, 200f, "Atomic HP setup");
-        Near(f.Stats.CurrentSp, 200f, "Atomic SP setup");
         int ownership = 0, stats = 0;
         f.Items.OnOwnedItemsChanged += () => ownership++;
         f.Stats.OnStatsChanged += () => stats++;
@@ -259,7 +257,6 @@ public static class ShopTradeRegression
         Check(f.Trades().TryFuse(a.itemId, b.itemId, out var granted) == ShopFusionResult.Success && granted == result,
             "Resource-preserving fusion failed.");
         Near(f.Stats.CurrentHp, 200f, "Fusion clamped HP through an intermediate lower maximum");
-        Near(f.Stats.CurrentSp, 200f, "Fusion clamped SP through an intermediate lower maximum");
         Check(ownership == 1 && stats == 1, "Fusion must publish one inventory and stat replacement.");
     }
 
@@ -403,7 +400,6 @@ public static class ShopTradeRegression
             Catalog.projectId = "shop-trade-regression";
             var data = Own(ScriptableObject.CreateInstance<PlayerStatData>());
             data.baseHP = 100f;
-            data.baseSP = 100f;
             Stats = _root.AddComponent<PlayerStatManager>();
             Stats.Initialize(data);
             Wallet = _root.AddComponent<PlayerWallet>();

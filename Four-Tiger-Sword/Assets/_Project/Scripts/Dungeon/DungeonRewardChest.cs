@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using StudioBaekho;
 using TMPro;
 using UnityEngine;
@@ -17,6 +18,8 @@ public sealed class DungeonRewardChest : MonoBehaviour
     private RunManager _run;
     private GameObject _prefab;
     private Transform _model;
+    private GameObject[] _outlines;
+    private readonly List<Collider> _solidColliders = new();
     private TMP_Text _prompt;
     private float _promptBaseScale;
     private Light _useLight;
@@ -54,9 +57,16 @@ public sealed class DungeonRewardChest : MonoBehaviour
         }
         transform.SetPositionAndRotation(position, rotation);
         _model = Instantiate(_prefab, transform, false).transform;
-        foreach (var collider in _model.GetComponentsInChildren<Collider>(true)) collider.enabled = false;
+        _solidColliders.Clear();
+        foreach (var collider in _model.GetComponentsInChildren<Collider>(true))
+        {
+            if (collider.enabled && !collider.isTrigger) _solidColliders.Add(collider);
+            collider.enabled = false;
+        }
+        _spawnAge = 0f;
         _model.localPosition = Vector3.up * .3f;
         _model.localScale = Vector3.zero;
+        _outlines = DungeonRewardChestOutline.Create(_model);
         CreatePrompt();
     }
 
@@ -99,6 +109,7 @@ public sealed class DungeonRewardChest : MonoBehaviour
             float eased = 1f - Mathf.Pow(1f - t, 3f);
             _model.localScale = Vector3.one * (ModelScale * eased);
             _model.localPosition = Vector3.up * (.3f * (1f - eased));
+            if (t >= 1f) SetSolidColliders(true);
         }
         if (!_used) return;
 
@@ -122,13 +133,15 @@ public sealed class DungeonRewardChest : MonoBehaviour
         Vector3 origin = feet + Vector3.up * .8f;
         Vector3 ray = transform.position + Vector3.up * .55f - origin;
         int solidMask = ~LayerMask.GetMask("Player", "Enemy", "PlayerSkill", "EnemySkill");
-        return !gameObject.scene.GetPhysicsScene().Raycast(origin, ray.normalized, out _, ray.magnitude,
-            solidMask, QueryTriggerInteraction.Ignore);
+        return !gameObject.scene.GetPhysicsScene().Raycast(origin, ray.normalized, out var hit, ray.magnitude,
+            solidMask, QueryTriggerInteraction.Ignore) || hit.collider.transform.IsChildOf(transform);
     }
 
     internal void BeginUse()
     {
         _used = true;
+        SetSolidColliders(false);
+        foreach (var outline in _outlines) outline.SetActive(false);
         _prompt.gameObject.SetActive(false);
         var lightRoot = new GameObject("RewardGlow", typeof(Light));
         lightRoot.transform.SetParent(transform, false);
@@ -138,6 +151,12 @@ public sealed class DungeonRewardChest : MonoBehaviour
         _useLight.color = new Color(1f, .67f, .24f);
         _useLight.range = 2f;
         _useLight.intensity = 0f;
+    }
+
+    private void SetSolidColliders(bool enabled)
+    {
+        foreach (var collider in _solidColliders)
+            if (collider != null) collider.enabled = enabled;
     }
 
     private void CreatePrompt()

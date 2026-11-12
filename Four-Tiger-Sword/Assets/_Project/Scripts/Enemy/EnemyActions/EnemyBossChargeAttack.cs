@@ -14,6 +14,27 @@ public sealed class EnemyBossChargeAttack : EnemyAction
 
     public override bool SupportsBossPolicy => true;
     public bool IsCharging => IsActive && !IsFinished && (_phase == Phase.Preparation || _phase == Phase.Holding);
+    public float WarningProgress
+    {
+        get
+        {
+            if (!IsActive || IsFinished || WasParried || !CanContinueAction || BossStage != BossAttackStage.Startup)
+                return 0f;
+
+            // Convert the hold clock to the same attack-speed-scaled units as preparation and release.
+            float holdDuration = _data.chargeSeconds * _data.attackSpeed;
+            float duration = _data.chargePoseTime + holdDuration + _data.releaseHitDelay;
+            if (!(duration > 0f) || float.IsInfinity(duration)) return 0f;
+
+            float elapsed = _phase switch
+            {
+                Phase.Preparation => _timer,
+                Phase.Holding => _data.chargePoseTime + _heldSeconds * _data.attackSpeed,
+                _ => _data.chargePoseTime + holdDuration + _timer
+            };
+            return float.IsNaN(elapsed) ? 0f : Mathf.Clamp01(elapsed / duration);
+        }
+    }
     public override bool AllowsKnockbackDuringBossArmor => IsCharging && _data.interruptOnKnockback;
     protected override float BossInitialStartupDuration => _data.chargePoseTime;
     protected override bool UsesTimedTelegraph => false;

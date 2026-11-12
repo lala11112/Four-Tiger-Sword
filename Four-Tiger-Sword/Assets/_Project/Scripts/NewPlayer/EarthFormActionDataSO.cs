@@ -8,7 +8,6 @@ public class EarthFormActionDataSO : WeaponActionDataSO
     [InspectorName("폼 동작·판정 (Execution)")]
     public EarthFormExecutionSettings FormExecution = new EarthFormExecutionSettings();
 
-    public float SkillSpiritCost { get => FormBalance.SkillSpiritCost; set => FormBalance.SkillSpiritCost = value; }
     public float SkillCooldownSeconds { get => FormBalance.SkillCooldownSeconds; set => FormBalance.SkillCooldownSeconds = value; }
     public float SkillDashDistance { get => FormExecution.SkillDashDistance; set => FormExecution.SkillDashDistance = value; }
     public float SkillDashDuration { get => FormExecution.SkillDashDuration; set => FormExecution.SkillDashDuration = value; }
@@ -27,7 +26,6 @@ public class EarthFormActionDataSO : WeaponActionDataSO
 public class EarthFormBalanceSettings
 {
     [Header("Earth Skill - Charge")]
-    [Min(0f)] public float SkillSpiritCost = 15f;
     [Min(0f)] public float SkillCooldownSeconds = 8f;
     [Min(0f), Tooltip("돌진 공격력 계수. 한 번의 돌진은 적마다 한 번 타격합니다.")]
     public float SkillDashDamageMultiplier = 2f;

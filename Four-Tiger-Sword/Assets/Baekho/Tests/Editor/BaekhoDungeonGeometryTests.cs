@@ -99,6 +99,36 @@ namespace StudioBaekho.Tests
             Assert.That(parent.GetComponentsInChildren<Collider>().Count(collider => collider.enabled), Is.EqualTo(4));
         }
 
+        [TestCase(2f)]
+        [TestCase(.02f)]
+        public void WallTrimEndsDoNotShareTheCeramicPanelReturnPlanes(float wallWidth)
+        {
+            var profile = Own(ScriptableObject.CreateInstance<BaekhoArchitectureProfile>());
+            profile.wallMaterial = Own(new Material(Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard")));
+            var size = new Vector3(wallWidth, 4f, .25f);
+            var skin = BaekhoWallAppearance.Apply(parent.transform, new Bounds(Vector3.zero, size), profile);
+            var mesh = skin.GetComponent<MeshFilter>().sharedMesh;
+            Vector3[] positions = mesh.vertices;
+            Vector3[] normals = mesh.normals;
+
+            foreach (Vector3 outward in new[] { Vector3.left, Vector3.right })
+            {
+                // Use the end faces on the front of the wall and below the top of the lower trim.
+                float[] ReturnPlanes(int subMesh) => mesh.GetTriangles(subMesh)
+                    .Where(index => normals[index] == outward && positions[index].z > 0f
+                        && positions[index].y < -.5f * size.y + .16f
+                        && Mathf.Abs(positions[index].x) < .5f * wallWidth - Tolerance)
+                    .Select(index => positions[index].x).Distinct().ToArray();
+
+                float[] ceramic = ReturnPlanes(0);
+                float[] trim = ReturnPlanes(2);
+                Assert.That(ceramic, Is.Not.Empty);
+                Assert.That(trim, Is.Not.Empty);
+                Assert.That(trim.All(end => ceramic.All(panel => Mathf.Abs(end - panel) > Tolerance)), Is.True,
+                    "A trim end and the same-facing ceramic return need separate depth planes.");
+            }
+        }
+
         [Test]
         public void NarrowConnectionCapsOnlyTheDoorShouldersAndHidesPlaceholder()
         {

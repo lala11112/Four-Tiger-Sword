@@ -6,9 +6,10 @@ public enum BoundaryItemStat
 {
     MaxHpRatio, AttackRatio, DefenseRatio, CriticalChancePoints, CriticalDamagePoints,
     NormalAttackRateRatio, DamageRatio, IgnoreDefenseRatio, ShieldMaxHpRatio,
-    ShieldGainRatio, IncomingDamageReductionRatio, HealMaxHpRatio, GoldFlat, GoldFraction
+    ShieldGainRatio, IncomingDamageReductionRatio, HealMaxHpRatio, GoldFlat, GoldFraction,
+    SkillCooldownReductionRatio = 14, GoldGainRatio = 15
 }
-public enum BoundaryItemTrigger { WhileOwned, Kill, DamageTaken, CombatEntered, SkillHit, NormalHit, FirstLowHealth }
+public enum BoundaryItemTrigger { WhileOwned, Kill, DamageTaken, CombatEntered, SkillHit, NormalHit, FirstLowHealth, RoomCleared = 7 }
 
 /// <summary>Ratios use 0.05 for 5%; critical points use 5 for +5 percentage points.</summary>
 [Serializable]

@@ -18,9 +18,8 @@ MonoBehaviour:
   displayName: "\uD68C\uBCF5 \uC644\uCDA9\uAD00"
   description: "\uC11C\uB85C \uB2E4\uB978 \uB0B4\uD53C\uB97C \uACB9\uCE5C \uB0A9\uC791\uD55C
     \uAD00."
-  effectText: "\uC801\uC744 \uCC98\uCE58\uD558\uBA74 \uCD5C\uB300 HP\uC758 3%\uC5D0
-    \uD574\uB2F9\uD558\uB294 \uBCF4\uD638\uB9C9\uC744 4\uCD08\uAC04 \uC5BB\uB294\uB2E4.
-    \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04\uC740 5\uCD08\uB2E4."
+  effectText: "\uC801 \uCC98\uCE58 \uC2DC \uCD5C\uB300 HP\uC758 3%\uB9CC\uD07C \uBCF4\uD638\uB9C9
+    (4\uCD08)\n\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 5\uCD08"
   synergyIds:
   - S08
   synergyNames:
@@ -29,8 +28,8 @@ MonoBehaviour:
   primarySynergyName: "\uC218\uD638"
   primarySynergyIcon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
   element: 0
-  grade: 3
-  purchasePrice: 80
+  grade: 2
+  purchasePrice: 40
   effects: []
   boundaryEffects:
   - effectId: I30
@@ -56,11 +55,10 @@ MonoBehaviour:
     cooldownSeconds: 5
   icon: {fileID: 21300000, guid: 4d7726a5c23af5149b330616f195d4cc, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I30\",\"name\":\"\uD68C\uBCF5 \uC644\uCDA9\uAD00\",\"description\":\"\uC11C\uB85C
-    \uB2E4\uB978 \uB0B4\uD53C\uB97C \uACB9\uCE5C \uB0A9\uC791\uD55C \uAD00.\",\"effect\":\"\uC801\uC744
-    \uCC98\uCE58\uD558\uBA74 \uCD5C\uB300 HP\uC758 3%\uC5D0 \uD574\uB2F9\uD558\uB294
-    \uBCF4\uD638\uB9C9\uC744 4\uCD08\uAC04 \uC5BB\uB294\uB2E4. \uC7AC\uC0AC\uC6A9
-    \uB300\uAE30\uC2DC\uAC04\uC740 5\uCD08\uB2E4.\",\"synergies\":[\"S08\"],\"primarySynergy\":\"S08\",\"designIntent\":\"\uC801
+    \uB2E4\uB978 \uB0B4\uD53C\uB97C \uACB9\uCE5C \uB0A9\uC791\uD55C \uAD00.\",\"effect\":\"\uC801
+    \uCC98\uCE58 \uC2DC \uCD5C\uB300 HP\uC758 3%\uB9CC\uD07C \uBCF4\uD638\uB9C9 (4\uCD08)\\n\uC7AC\uC0AC\uC6A9
+    \uB300\uAE30\uC2DC\uAC04 5\uCD08\",\"synergies\":[\"S08\"],\"primarySynergy\":\"S08\",\"designIntent\":\"\uC801
     \uCC98\uCE58 \uC9C1\uD6C4 \uB2E4\uC74C \uACF5\uACA9\uC5D0 \uB300\uBE44\uD560
-    \uBCF4\uD638\uB9C9\uC744 \uC5BB\uB294\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I30.png\"}"
+    \uBCF4\uD638\uB9C9\uC744 \uC5BB\uB294\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I30.png\",\"grade\":2}"

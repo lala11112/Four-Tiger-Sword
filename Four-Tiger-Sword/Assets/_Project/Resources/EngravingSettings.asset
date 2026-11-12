@@ -78,19 +78,6 @@ MonoBehaviour:
     range: 0
     cap: 0
     limit: 0
-  - id: heirloom
-    parentId: origin
-    displayName: "\uCD9C\uACA9 \uC720\uD488"
-    description: "\uCD9C\uACA9 \uC2DC 1\uB4F1\uAE09 \uD6C4\uBCF4 \uCD5C\uB300 3\uAC1C
-      \uC911 1\uAC1C \uC120\uD0DD"
-    tier: 1
-    amount: 0
-    secondary: 0
-    duration: 0
-    threshold: 0
-    range: 0
-    cap: 0
-    limit: 3
   - id: crit
     parentId: atk
     displayName: "\uCE58\uBA85\uD0C0 \uD655\uB960"
@@ -257,7 +244,7 @@ MonoBehaviour:
     cap: 0
     limit: 0
   - id: reroll
-    parentId: heirloom
+    parentId: origin
     displayName: "\uBCF4\uC0C1 \uC7AC\uC120\uD0DD"
     description: "\uC77C\uBC18 \uC804\uD22C \uBCF4\uC0C1 \uC7AC\uC120\uD0DD\uC744
       \uB7F0\uB2F9 \uCD1D 3\uD68C \uC81C\uACF5"
@@ -269,21 +256,8 @@ MonoBehaviour:
     range: 0
     cap: 0
     limit: 3
-  - id: starterelement
-    parentId: heirloom
-    displayName: "\uC720\uD488\uC758 \uACC4\uD1B5: \uC2DC\uB108\uC9C0 \uC120\uD0DD"
-    description: "\uC720\uD488\uC758 \uC2DC\uB108\uC9C0 \uACC4\uD1B5 \uC120\uD0DD.
-      1\uB4F1\uAE09 \uD6C4\uBCF4\uAC00 \uC788\uB294 \uC2DC\uB108\uC9C0 \uC911 \uC120\uD0DD"
-    tier: 2
-    amount: 0
-    secondary: 0
-    duration: 0
-    threshold: 0
-    range: 0
-    cap: 0
-    limit: 0
   - id: choices
-    parentId: heirloom
+    parentId: origin
     displayName: "\uB113\uC740 \uC120\uD0DD"
     description: "\uC77C\uBC18 \uC804\uD22C \uBCF4\uC0C1 \uD6C4\uBCF4 +1\uAC1C (\uC120\uD0DD\uD55C
       1\uAC1C\uB9CC \uD68D\uB4DD)"

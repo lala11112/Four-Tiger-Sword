@@ -88,6 +88,7 @@ MonoBehaviour:
   EnemyStat: {fileID: 3938509720960690630}
   stateName: 
   HurtDuration: 0.5
+  enemyRank: 0
   _targetMemoryDuration: 4
   ApproachTimeout: 6
   ApproachStuckTimeout: 1.5
@@ -215,6 +216,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDeathFade
   _delay: 0.35
   _duration: 2
+  _spawnDuration: 1
   _targets:
   - Renderer: {fileID: 5397022545627790}
     Materials:
@@ -323,6 +325,18 @@ PrefabInstance:
     - target: {fileID: -9070493210130169274, guid: 8f1a82d51d2659947a4c189df102a7e7, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8f1a82d51d2659947a4c189df102a7e7, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8f1a82d51d2659947a4c189df102a7e7, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 8f1a82d51d2659947a4c189df102a7e7, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8f1a82d51d2659947a4c189df102a7e7, type: 3}
       propertyPath: m_LocalPosition.x

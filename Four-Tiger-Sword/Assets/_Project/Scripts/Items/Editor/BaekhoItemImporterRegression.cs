@@ -58,21 +58,48 @@ public static class BaekhoItemImporterRegression
             Write(scratch, "manifest.json", manifest);
             Rehash(scratch);
 
+            var sourceItems = ((JArray)catalogJson["items"]).Cast<JObject>().ToArray();
+            var excludedItems = sourceItems.Where(item => ((JArray)item["effects"]).Count > 0
+                && !RetainedEffects(item).Any()).ToArray();
+            string excludedPath = null;
+            if (excludedItems.Length > 0)
+            {
+                string excludedKey = (string)excludedItems[0]["candidateKey"];
+                AssetDatabase.CreateFolder(BaekhoItemImporter.OutputRoot, projectId);
+                AssetDatabase.CreateFolder(destination, "Definitions");
+                excludedPath = destination + "/Definitions/" + excludedKey + ".asset";
+                var retired = ScriptableObject.CreateInstance<ItemDefinition>();
+                retired.projectId = projectId;
+                retired.candidateKey = excludedKey;
+                retired.itemId = (string)excludedItems[0]["itemId"];
+                AssetDatabase.CreateAsset(retired, excludedPath);
+            }
             ItemCatalog catalog = BaekhoItemImporter.ImportPackage(scratch);
-            Check(catalog != null && catalog.items.Length == ((JArray)catalogJson["items"]).Count, "catalog/item count");
+            Check(catalog != null && catalog.items.Length == sourceItems.Length - excludedItems.Length,
+                "catalog excludes only items with exclusively retired effects");
+            if (excludedPath != null)
+                Check(!File.Exists(excludedPath) && !File.Exists(excludedPath + ".meta"), "stale retired definition was deleted");
+            foreach (JObject excluded in excludedItems)
+                Check(catalog.Find((string)excluded["itemId"]) == null, "retired item is unavailable");
             Check(catalog.contentStatus == (string)catalogJson["contentStatus"], "draft/adopted state preserved");
             Check(catalog.sourceJson == File.ReadAllText(Path.Combine(scratch, BaekhoItemImporter.CatalogFile)), "catalog provenance preserved");
             Check(catalog.manifestSha256 == BaekhoItemImporter.Hash(File.ReadAllBytes(Path.Combine(scratch, "manifest.json"))), "manifest fingerprint");
             foreach (ItemDefinition item in catalog.items)
             {
-                JObject expected = ((JArray)catalogJson["items"]).Cast<JObject>().Single(i => (string)i["candidateKey"] == item.candidateKey);
-                Check(item.effects.Length == ((JArray)expected["effects"]).Count, "all effects imported: " + item.itemId);
+                JObject expected = sourceItems.Single(i => (string)i["candidateKey"] == item.candidateKey);
+                var surviving = RetainedEffects(expected).ToArray();
+                Check(item.effects.Select(effect => effect.stat).SequenceEqual(surviving.Select(effect =>
+                    (ItemStat)Enum.Parse(typeof(ItemStat), (string)effect["stat"], true))), "surviving effects imported: " + item.itemId);
+                if (surviving.Length < ((JArray)expected["effects"]).Count)
+                    Check(!item.description.Contains("SP") && !item.effectText.Contains("SP")
+                        && item.effectText.Length > 0 && item.sourceJson.Contains("SP"), "mixed item visible text reflects retained effects");
                 if (expected["iconPath"].Type != JTokenType.Null)
                     Check(item.icon != null && item.icon.texture.width == 256 && item.icon.texture.height == 256, "256px Sprite: " + item.itemId);
                 if ((string)expected["element"] == "metal") Check(item.element == ElementType.ELEMENT_GOLD, "metal enum mapping");
             }
             string catalogGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(catalog));
             ItemDefinition first = catalog.items[0];
+            int firstSourceIndex = System.Array.FindIndex(sourceItems, i => (string)i["candidateKey"] == first.candidateKey);
             string definitionPath = AssetDatabase.GetAssetPath(first), definitionGuid = AssetDatabase.AssetPathToGUID(definitionPath);
             string iconPath = first.icon == null ? null : AssetDatabase.GetAssetPath(first.icon);
             string iconGuid = iconPath == null ? null : AssetDatabase.AssetPathToGUID(iconPath);
@@ -80,7 +107,7 @@ public static class BaekhoItemImporterRegression
             Check(repeated == catalog && repeated.items[0] == first, "repeat import retains object references");
             Check(AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(repeated)) == catalogGuid, "catalog GUID retained");
 
-            RenameFirst(scratch, first.itemId.Substring(0, Math.Min(48, first.itemId.Length)) + "_REIMPORT");
+            RenameItem(scratch, firstSourceIndex, first.itemId.Substring(0, Math.Min(48, first.itemId.Length)) + "_REIMPORT");
             ItemCatalog renamed = BaekhoItemImporter.ImportPackage(scratch);
             Check(renamed.items[0] == first && renamed.items[0].itemId.EndsWith("_REIMPORT", StringComparison.Ordinal), "mutable ID updates existing candidate");
             Check(AssetDatabase.AssetPathToGUID(definitionPath) == definitionGuid, "definition GUID survives ID edit");
@@ -134,7 +161,7 @@ public static class BaekhoItemImporterRegression
             }
 
             JObject changed = Read(scratch, BaekhoItemImporter.CatalogFile);
-            changed["items"][0]["name"] = "Rollback probe";
+            changed["items"][firstSourceIndex]["name"] = "Rollback probe";
             Write(scratch, BaekhoItemImporter.CatalogFile, changed);
             Rehash(scratch);
             BaekhoItemImporter.AfterItemImported = count => { if (count == 1) throw new IOException("Injected write failure"); };
@@ -144,19 +171,20 @@ public static class BaekhoItemImporterRegression
             Check(AssetDatabase.LoadAssetAtPath<ItemDefinition>(definitionPath) == first && first.displayName != "Rollback probe", "rollback restores live object and references");
 
             // A new candidate created immediately before failure must also be removed.
-            changed["items"][0]["candidateKey"] = Guid.NewGuid().ToString("D");
-            string newKey = (string)changed["items"][0]["candidateKey"];
+            changed["items"][firstSourceIndex]["candidateKey"] = Guid.NewGuid().ToString("D");
+            string newKey = (string)changed["items"][firstSourceIndex]["candidateKey"];
             foreach (JObject reference in (JArray)changed["synergyReferences"])
                 foreach (JObject referenceItem in (JArray)reference["items"])
                     if ((string)referenceItem["itemId"] == first.itemId) referenceItem["candidateKey"] = newKey;
-            if ((string)Read(scratch, "manifest.json")["kind"] == "draft" && changed["items"][0]["iconPath"].Type != JTokenType.Null)
+            if ((string)Read(scratch, "manifest.json")["kind"] == "draft"
+                && changed["items"][firstSourceIndex]["iconPath"].Type != JTokenType.Null)
             {
-                string previousPng = (string)changed["items"][0]["iconPath"], newPng = "icons/" + newKey + ".png";
+                string previousPng = (string)changed["items"][firstSourceIndex]["iconPath"], newPng = "icons/" + newKey + ".png";
                 File.Move(Path.Combine(scratch, previousPng), Path.Combine(scratch, newPng));
-                changed["items"][0]["iconPath"] = newPng;
+                changed["items"][firstSourceIndex]["iconPath"] = newPng;
                 JObject newManifest = Read(scratch, "manifest.json");
                 ((JArray)newManifest["files"]).Cast<JObject>().Single(f => (string)f["path"] == previousPng)["path"] = newPng;
-                newManifest["icons"][0]["iconPath"] = newPng;
+                newManifest["icons"][firstSourceIndex]["iconPath"] = newPng;
                 Write(scratch, "manifest.json", newManifest);
             }
             Write(scratch, BaekhoItemImporter.CatalogFile, changed);
@@ -178,21 +206,25 @@ public static class BaekhoItemImporterRegression
         }
     }
 
-    private static void RenameFirst(string root, string newId)
+    private static IEnumerable<JObject> RetainedEffects(JObject item)
+        => ((JArray)item["effects"]).Cast<JObject>().Where(effect =>
+            (string)effect["stat"] is "maxHp" or "normalDamage" or "switchDamage");
+
+    private static void RenameItem(string root, int index, string newId)
     {
         JObject catalog = Read(root, BaekhoItemImporter.CatalogFile), manifest = Read(root, "manifest.json");
-        string key = (string)catalog["items"][0]["candidateKey"];
-        catalog["items"][0]["itemId"] = newId;
+        string key = (string)catalog["items"][index]["candidateKey"];
+        catalog["items"][index]["itemId"] = newId;
         foreach (JObject reference in (JArray)catalog["synergyReferences"])
             foreach (JObject item in (JArray)reference["items"])
                 if ((string)item["candidateKey"] == key) item["itemId"] = newId;
-        manifest["icons"][0]["itemId"] = newId;
+        manifest["icons"][index]["itemId"] = newId;
         if ((string)manifest["kind"] == "release")
         {
-            string oldPath = (string)catalog["items"][0]["iconPath"], newPath = "icons/" + newId + ".png";
+            string oldPath = (string)catalog["items"][index]["iconPath"], newPath = "icons/" + newId + ".png";
             File.Move(Path.Combine(root, oldPath), Path.Combine(root, newPath));
-            catalog["items"][0]["iconPath"] = newPath;
-            manifest["icons"][0]["iconPath"] = newPath;
+            catalog["items"][index]["iconPath"] = newPath;
+            manifest["icons"][index]["iconPath"] = newPath;
             ((JArray)manifest["files"]).Cast<JObject>().Single(f => (string)f["path"] == oldPath)["path"] = newPath;
         }
         Write(root, BaekhoItemImporter.CatalogFile, catalog);
@@ -256,6 +288,9 @@ public static class BaekhoItemImporterRegression
                 })
             });
         }
+        var mixed = (JObject)items[3];
+        mixed["description"] = "전환 성공 후 모든 폼 기본 공격 피해 +8%, 최대 SP +2 SP";
+        ((JArray)mixed["effects"]).Add(items[1]["effects"][0].DeepClone());
         Write(root, BaekhoItemImporter.CatalogFile, new JObject
         {
             ["schemaVersion"] = 1, ["contentStatus"] = "draft", ["projectId"] = projectId, ["contentRevision"] = 1,

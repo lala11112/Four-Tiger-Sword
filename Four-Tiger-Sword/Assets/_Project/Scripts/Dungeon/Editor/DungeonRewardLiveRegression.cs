@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+using EasternLab.GateAddon;
 using LabDoor;
 using StudioBaekho;
 using UnityEditor;
@@ -26,7 +27,7 @@ public static class DungeonRewardLiveRegression
     private static GameObject _oldRoot;
     private static DungeonEncounterGate _gate;
     private static BoxCollider _threshold;
-    private static bool _doorClosed, _expectGold, _chestArmed;
+    private static bool _doorClosed, _expectGold, _chestArmed, _portalAdvancing;
     private static int _goldAtOpen, _expectedWave, _seed;
     private static Keyboard _keyboard;
     private static string _action = "idle";
@@ -69,6 +70,7 @@ public static class DungeonRewardLiveRegression
         _gate = null;
         _threshold = null;
         _chestArmed = false;
+        _portalAdvancing = false;
         _action = "scene loaded";
     }
 
@@ -203,7 +205,7 @@ public static class DungeonRewardLiveRegression
         int gold = run.player.GetComponent<PlayerWallet>().Gold;
         Check(_chest == null && RoomChests().Length == 0, "The used chest is still present. Wait for its animation or check whether F reached the game.");
         if (_expectGold)
-            Check(gold == _goldAtOpen + 10 && choice == null && !run.IsRewardOpen, "Exhausted chest must pay exactly ten gold with no modal.");
+            Check(gold == _goldAtOpen + 14 && choice == null && !run.IsRewardOpen, "Exhausted chest did not pay ten base gold plus the owned 40% gold gain bonus.");
         else
             Check(gold == _goldAtOpen && choice?.Kind == RunItemChoiceKind.Room && choice.Candidates.Count > 0 && run.IsRewardOpen,
                 "The actual item reward modal did not open with current candidates.");
@@ -269,15 +271,67 @@ public static class DungeonRewardLiveRegression
     {
         var run = PlayingRun();
         Check(_chest != null && !run.HasPendingItemChoice && !run.IsRewardOpen, "Leave a fresh cleared-room chest unopened first.");
-        Check(run.CurrentStageIndex == 0 && run.stageManager.Exit != null && run.stageManager.Exit.IsAvailable, "The real first-stage exit is unavailable.");
+        Check(run.CurrentStageIndex == 0 && run.stageManager.Exit != null && !_portalAdvancing,
+            "The real first-stage portal is missing or the traversal is already running.");
         _oldRoot = run.stageManager.Result.root;
         _abandonedChest = _chest;
-        var exit = run.stageManager.Exit.transform;
-        var p = run.player;
-        Check(p.TryFastTravel(DungeonFastTravelLanding.PlayerRootAtFloor(exit.position, exit.rotation, p.Controller), exit.rotation),
-            "The real player rejected the exit pose.");
-        _action = "standing on the actual StageExit";
+        _portalAdvancing = true;
+        _action = "entering the end room, opening its portal and walking through";
+        run.StartCoroutine(AdvanceThroughPortal(run));
         return Status();
+    }
+
+    private static IEnumerator AdvanceThroughPortal(RunManager run)
+    {
+        try
+        {
+            var stage = run.stageManager;
+            var exit = stage.Exit;
+            var player = run.player;
+            var end = stage.Result.endRoom.GetComponent<DungeonRoomEncounter>();
+            Check(end != null, "The actual end-room encounter is missing.");
+            if (!end.WasEntered)
+            {
+                var doorway = end.Gates.FirstOrDefault(candidate => !candidate.IsLocked);
+                Check(doorway != null, "The actual end room has no open doorway.");
+                player.BeginStageTransition();
+                for (int frame = 0; frame < 3; frame++) yield return null;
+                var outsideCenter = doorway.transform.TransformPoint(new Vector3(0f, 1.2f, .5f));
+                var facing = doorway.transform.rotation;
+                player.CompleteStageTransition(outsideCenter - facing * Vector3.Scale(player.Controller.center,
+                    player.transform.lossyScale), facing);
+                yield return null;
+                yield return null;
+                var insideCenter = doorway.transform.TransformPoint(new Vector3(0f, 1.2f, -3f));
+                GateTransit.Teleport(player.transform, player.Controller, null,
+                    insideCenter - player.transform.TransformVector(player.Controller.center), player.transform.rotation);
+                yield return null;
+                yield return null;
+                Check(end.WasEntered, "Crossing the actual doorway did not register end-room arrival.");
+            }
+            float deadline = Time.realtimeSinceStartup + 10f;
+            while (!exit.IsAvailable && run.State == RunState.Playing && Time.realtimeSinceStartup < deadline) yield return null;
+            Check(exit.IsAvailable, "The arrival-triggered portal did not finish opening.");
+            var transit = exit.Transit;
+            var floor = transit.transform.TransformPoint(new Vector3(0f, 0f, transit.crossingPlaneOffset + 1f));
+            floor.y = exit.transform.position.y;
+            var portalFacing = Quaternion.LookRotation(-transit.transform.forward, Vector3.up);
+            GateTransit.Teleport(player.transform, player.Controller, null,
+                DungeonFastTravelLanding.PlayerRootAtFloor(floor, portalFacing, player.Controller), portalFacing);
+            player.VerticalVelocity = 0f;
+            player.Controller.Move(Vector3.down * .01f);
+            for (int frame = 0; frame < 3; frame++) yield return null;
+            var direction = -transit.transform.forward;
+            for (int step = 0; step < 18 && run.State == RunState.Playing && run.CurrentStageIndex == 0; step++)
+            {
+                player.Controller.Move(direction * .1f);
+                yield return null;
+            }
+            Check(run.State != RunState.Playing || run.CurrentStageIndex != 0,
+                "Actual CharacterController movement through the portal did not request progression.");
+            _action = "walked through the actual stage portal with an unopened chest";
+        }
+        finally { _portalAdvancing = false; }
     }
 
     public static string VerifyStageCleanup()
@@ -391,6 +445,7 @@ public static class DungeonRewardLiveRegression
         SceneManager.sceneLoaded -= ConfigureScene;
         EditorApplication.playModeStateChanged -= OnPlayModeState;
         ReleaseKeyboard();
+        _portalAdvancing = false;
         if (_definition != null) Object.Destroy(_definition);
         if (_normalSettings != null) Object.Destroy(_normalSettings);
     }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 [DefaultExecutionOrder(-100)]
 public class PlayerInputHandler : MonoBehaviour
@@ -50,6 +51,11 @@ public class PlayerInputHandler : MonoBehaviour
     private bool _inventoryInputBlocked;
     private bool _rewardInputBlocked;
     private bool _pauseMenuInputBlocked;
+    private bool _fallRecoveryInputBlocked;
+    private RectTransform _statsPointerRegion;
+    private bool _statsOwnsLeftPress;
+    private bool _statsOwnsRightPress;
+    private int _statsPointerReadFrame = -1;
     private bool _waitForGameplayRelease;
     private bool _finisherInputBlocked;
     private bool _finisherNeedsRelease;
@@ -61,7 +67,8 @@ public class PlayerInputHandler : MonoBehaviour
     private InputAction ChainSkillAction => _chainSkillAction != null ? _chainSkillAction.action
         : _attackAction?.action?.actionMap?.FindAction("ChainSkill", false) ?? _ownedChainSkillAction;
     public bool FinisherPressedThisFrame { get; private set; }
-    public bool IsFinisherHeld => AllowsCombatInput && Mouse.current != null && Mouse.current.rightButton.isPressed;
+    public bool IsFinisherHeld => AllowsCombatInput && !_statsOwnsRightPress
+        && Mouse.current != null && Mouse.current.rightButton.isPressed;
     public bool IsFinisherInputAvailable => AllowsCombatInput && isActiveAndEnabled && FinisherAction != null
         && FinisherAction.enabled && Mouse.current != null;
     public Vector2 FinisherPointerDelta => AllowsCombatInput && Mouse.current != null ? Mouse.current.delta.ReadValue() : Vector2.zero;
@@ -194,6 +201,72 @@ public class PlayerInputHandler : MonoBehaviour
         ClearGameplayInput();
     }
 
+    internal void SetFallRecoveryInputBlocked(bool blocked)
+    {
+        if (_fallRecoveryInputBlocked == blocked) return;
+        _fallRecoveryInputBlocked = blocked;
+        _waitForGameplayRelease = true;
+        _finisherNeedsRelease = true;
+        ClearGameplayInput();
+    }
+
+    internal void SetStatsPointerRegion(RectTransform region)
+    {
+        if (_statsPointerRegion == region) return;
+        // Sample before dropping the region so a close click cannot become a gameplay press.
+        ReadStatsPointerPresses();
+        _statsPointerRegion = region;
+    }
+
+    private void ReadStatsPointerPresses()
+    {
+        if (_statsPointerReadFrame == Time.frameCount) return;
+        _statsPointerReadFrame = Time.frameCount;
+        var mouse = Mouse.current;
+        if (mouse == null)
+        {
+            _statsOwnsLeftPress = _statsOwnsRightPress = false;
+            return;
+        }
+
+        bool leftPressed = mouse.leftButton.wasPressedThisFrame;
+        bool rightPressed = mouse.rightButton.wasPressedThisFrame;
+        bool overPanel = (leftPressed || rightPressed) && _statsPointerRegion != null
+            && _statsPointerRegion.gameObject.activeInHierarchy
+            && RectTransformUtility.RectangleContainsScreenPoint(_statsPointerRegion, mouse.position.ReadValue());
+
+        // Keep a consumed tap suppressed for its press frame even if it was already released.
+        if (leftPressed || !mouse.leftButton.isPressed) _statsOwnsLeftPress = leftPressed && overPanel;
+        if (rightPressed || !mouse.rightButton.isPressed) _statsOwnsRightPress = rightPressed && overPanel;
+    }
+
+    private bool ReadCombatButton(InputAction action, bool pressedThisFrame)
+    {
+        if (action == null || !action.enabled) return false;
+        if (!_statsOwnsLeftPress && !_statsOwnsRightPress)
+            return pressedThisFrame ? action.WasPressedThisFrame() : action.IsPressed();
+
+        // A mouse gesture can own the action's active control while another binding is pressed.
+        var mouse = Mouse.current;
+        bool hasConsumedBinding = false;
+        bool hasOtherButtonInput = false;
+        foreach (var control in action.controls)
+        {
+            if (IsStatsPointerButton(control, mouse)) hasConsumedBinding = true;
+            else if (control is ButtonControl button && (pressedThisFrame ? button.wasPressedThisFrame : button.isPressed))
+                hasOtherButtonInput = true;
+        }
+        if (hasConsumedBinding) return hasOtherButtonInput;
+        return pressedThisFrame ? action.WasPressedThisFrame() : action.IsPressed();
+    }
+
+    private bool IsStatsPointerButton(InputControl control, Mouse mouse)
+        => mouse != null && (_statsOwnsLeftPress && control == mouse.leftButton
+            || _statsOwnsRightPress && control == mouse.rightButton);
+
+    private bool GameplayInputBlocked => _shopInputBlocked || _mapInputBlocked || _inventoryInputBlocked
+        || _rewardInputBlocked || _pauseMenuInputBlocked || _fallRecoveryInputBlocked || _finisherInputBlocked;
+
     private void ClearGameplayInput()
     {
         MoveInput = Vector2.zero;
@@ -227,18 +300,17 @@ public class PlayerInputHandler : MonoBehaviour
 
     private void Update()
     {
+        ReadStatsPointerPresses();
         FinisherPressedThisFrame = false;
         bool waitForFinisherRelease = _finisherNeedsRelease;
         if (!IsFinisherHeld) _finisherNeedsRelease = false;
         bool waitForChainSkillRelease = _chainSkillNeedsRelease;
         if (!(ChainSkillAction?.IsPressed() ?? false)) _chainSkillNeedsRelease = false;
-        bool gameplayInputBlocked = _shopInputBlocked || _mapInputBlocked || _inventoryInputBlocked
-            || _rewardInputBlocked || _pauseMenuInputBlocked || _finisherInputBlocked;
-        if (gameplayInputBlocked || _waitForGameplayRelease)
+        if (GameplayInputBlocked || _waitForGameplayRelease)
         {
             ClearGameplayInput();
             // Ignore the entire first neutral frame so its WasPressedThisFrame flags cannot leak.
-            if (!gameplayInputBlocked && !AnyGameplayButtonHeld()) _waitForGameplayRelease = false;
+            if (!GameplayInputBlocked && !AnyGameplayButtonHeld()) _waitForGameplayRelease = false;
             return;
         }
         if (!AllowsCombatInput)
@@ -254,7 +326,7 @@ public class PlayerInputHandler : MonoBehaviour
             return;
         }
         FinisherPressedThisFrame = !waitForFinisherRelease && IsFinisherInputAvailable
-            && FinisherAction.WasPressedThisFrame();
+            && ReadCombatButton(FinisherAction, pressedThisFrame: true);
         float actionDelta = _player != null ? _player.ActionDeltaTime : Time.deltaTime;
         bool retainFormInput = actionDelta <= 0f || _wasActionStopped;
         if (!retainFormInput) ConsumeFormInput();
@@ -276,8 +348,9 @@ public class PlayerInputHandler : MonoBehaviour
         if(_jumpAction?.action?.WasPressedThisFrame() ?? false)
             JumpBuffer.Set();
 
-        IsAttackHeld = _attackAction?.action?.IsPressed() ?? false;
-        if (_attackAction?.action?.WasPressedThisFrame() ?? false)
+        InputAction attackAction = _attackAction?.action;
+        IsAttackHeld = ReadCombatButton(attackAction, pressedThisFrame: false);
+        if (ReadCombatButton(attackAction, pressedThisFrame: true))
         {
             AttackPressId++;
             AttackHeldTime = 0f;

@@ -5,6 +5,7 @@ public abstract class EnemyAction
     public MonsterSkillData SkillData { get; protected set; }
     public bool IsFinished { get; protected set; }
     public bool IsActive { get; private set; }
+    public bool IsAttackWarningActive { get; private set; }
     public float AttackTimeline => _timer;
     public bool WasParried { get; private set; }
     public virtual bool SupportsBossPolicy => false;
@@ -41,6 +42,7 @@ public abstract class EnemyAction
     protected Vector3 BossAimDirection => _bossAimRotation * Vector3.forward;
     protected virtual float BossInitialStartupDuration => float.PositiveInfinity;
     protected virtual bool UsesTimedTelegraph => true;
+    protected virtual bool StartsAttackWarningOnEnter => true;
     protected bool CanContinueAction => !(_guardBossLifetime || _guardNormalLifetime)
         || IsActive && !IsFinished && !WasParried && _enemy != null
             && _enemy.isActiveAndEnabled && !_enemy.IsDead && _enemy.CurrentAction == this
@@ -59,6 +61,8 @@ public abstract class EnemyAction
     private bool _telegraphActive = false;
     // _timer는 서브클래스가 페이즈 전환 시 리셋하므로, 예고 타이밍은 독립 타이머로 관리
     private float _telegraphTimer = 0f;
+    private bool _attackWarningStarted;
+    private DamageTextManager _attackWarningManager;
 
     protected EnemyAction(MonsterSkillData data, Enemy enemy)
     {
@@ -83,6 +87,8 @@ public abstract class EnemyAction
 
     public virtual void Enter()
     {
+        EndAttackWarning();
+        _attackWarningStarted = false;
         // Keep callback checks active even if a callback switches the current phase/profile.
         _guardBossLifetime = HasBossPolicy || _enemy is Boss boss && boss.ActiveCombatProfile != null;
         _guardNormalLifetime = _enemy != null && !(_enemy is Boss) && !(this is EnemySelfDestruct)
@@ -115,6 +121,7 @@ public abstract class EnemyAction
             _enemy.SetAnimationSpeed(SkillData.attackSpeed);
 
         StartTelegraph();
+        if (StartsAttackWarningOnEnter) BeginAttackWarning();
     }
 
     public virtual void Update()
@@ -133,6 +140,7 @@ public abstract class EnemyAction
 
     public virtual void Exit()
     {
+        EndAttackWarning();
         if (!IsActive) return;
         // 중단된 공격도 패링 시스템에서 완료된 공격으로 취급해야 합니다.
         IsFinished = true;
@@ -147,6 +155,28 @@ public abstract class EnemyAction
     }
 
     protected void EndNormalAttackArmor() => _normalAttackArmor = false;
+
+    protected void BeginAttackWarning()
+    {
+        if (_attackWarningStarted || !IsActive || IsFinished || WasParried || !CanContinueAction
+            || _enemy == null || !_enemy.isActiveAndEnabled || _enemy.IsDead || _enemy.CurrentAction != this)
+            return;
+
+        _attackWarningStarted = true;
+        IsAttackWarningActive = true;
+        _attackWarningManager = DamageTextManager.Instance;
+        if (_attackWarningManager != null) _attackWarningManager.ShowAttackWarning(this);
+    }
+
+    // Actions that release a projectile before checking hits call this at launch.
+    protected void EndAttackWarning()
+    {
+        if (!IsAttackWarningActive) return;
+        IsAttackWarningActive = false;
+        var manager = _attackWarningManager;
+        _attackWarningManager = null;
+        if (manager != null) manager.HideAttackWarning(this);
+    }
 
     protected void BeginBossPreparation()
     {
@@ -210,6 +240,7 @@ public abstract class EnemyAction
     /// </summary>
     protected void BroadcastHit()
     {
+        EndAttackWarning();
         if (SkillData.isParryable)
             ParryEventBus.BroadcastHit(this);
     }
@@ -260,6 +291,7 @@ public abstract class EnemyAction
     {
         if (_guardNormalLifetime && !SkillData.isParryable) return;
         WasParried = true;
+        EndAttackWarning();
         EndNormalAttackArmor();
         if (_guardNormalLifetime && IsActive) Exit();
     }

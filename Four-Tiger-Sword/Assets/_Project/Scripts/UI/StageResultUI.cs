@@ -36,6 +36,7 @@ public class StageResultUI : MonoBehaviour
     private GameObject _progressRoot;
     private string _progressLabel = string.Empty;
     private CanvasGroup _introCover;
+    private UnityEngine.UI.Image _introWorldCover;
     private TMP_Text _introNumber;
     private CanvasGroup _deathFade;
     private uint _deathFadeVersion;
@@ -121,7 +122,7 @@ public class StageResultUI : MonoBehaviour
         root.SetActive(false);
     }
 
-    /// <summary>Shows a stage banner over the world while RunManager keeps gameplay suspended.</summary>
+    /// <summary>Reveals the prepared world from black while RunManager keeps gameplay suspended.</summary>
     public void BeginStageIntro(int chapterNumber, int stageNumber)
     {
         EnsureInitialized();
@@ -132,6 +133,7 @@ public class StageResultUI : MonoBehaviour
         IsStageIntroPlaying = true;
         _introCover.alpha = 1f;
         _introCover.blocksRaycasts = true;
+        _introWorldCover.color = Color.black;
         _introNumber.text = $"Stage {chapterNumber} - {stageNumber}";
         _introNumber.alpha = 0f;
         _introCover.gameObject.SetActive(true);
@@ -144,29 +146,38 @@ public class StageResultUI : MonoBehaviour
     {
         uint version = _introVersion;
         if (!IntroIsCurrent(version)) yield break;
-        // Let the banner and the newly placed camera settle for a rendered frame.
+        // Render one completely black frame before revealing the prepared camera and player.
         yield return null;
         float elapsed = 0f;
-        float fadeInEnd = introNumberFadeIn;
-        float holdEnd = fadeInEnd + introNumberHold;
-        float numberEnd = holdEnd + introNumberFadeOut;
-        float end = numberEnd + introWorldReveal;
+        float end = introNumberFadeIn + introNumberHold + introNumberFadeOut + introWorldReveal;
         while (elapsed < end)
         {
             if (!IntroIsCurrent(version)) yield break;
-            _introNumber.alpha = elapsed < fadeInEnd ? Phase(elapsed, 0f, introNumberFadeIn)
-                : elapsed < holdEnd ? 1f : 1f - Phase(elapsed, holdEnd, introNumberFadeOut);
-            _introCover.alpha = 1f - Phase(elapsed, numberEnd, introWorldReveal);
+            ApplyStageIntro(elapsed);
             yield return null;
             elapsed += Time.unscaledDeltaTime;
         }
         if (!IntroIsCurrent(version)) yield break;
         _introNumber.alpha = 0f;
+        _introWorldCover.color = Color.clear;
         _introCover.alpha = 0f;
         _introCover.blocksRaycasts = false;
         _introCover.gameObject.SetActive(false);
         IsStageIntroPlaying = false;
         StageIntroCompleted = true;
+    }
+
+    private void ApplyStageIntro(float elapsed)
+    {
+        float fadeInEnd = introNumberFadeIn;
+        float holdEnd = fadeInEnd + introNumberHold;
+        float numberEnd = holdEnd + introNumberFadeOut;
+        _introNumber.alpha = elapsed < fadeInEnd ? Phase(elapsed, 0f, introNumberFadeIn)
+            : elapsed < holdEnd ? 1f : 1f - Phase(elapsed, holdEnd, introNumberFadeOut);
+        // Keep the existing banner timing, but independently fade the entire screen in at arrival.
+        _introCover.alpha = 1f - Phase(elapsed, numberEnd, introWorldReveal);
+        _introWorldCover.color = new Color(0f, 0f, 0f,
+            1f - Mathf.SmoothStep(0f, 1f, Phase(elapsed, 0f, introWorldReveal)));
     }
 
     public void CancelStageIntro()
@@ -175,6 +186,7 @@ public class StageResultUI : MonoBehaviour
         IsStageIntroPlaying = false;
         StageIntroCompleted = false;
         if (_introCover == null) return;
+        if (_introWorldCover != null) _introWorldCover.color = Color.clear;
         _introCover.alpha = 0f;
         _introCover.blocksRaycasts = false;
         _introCover.gameObject.SetActive(false);
@@ -378,7 +390,14 @@ public class StageResultUI : MonoBehaviour
         {
             _hubReturnError = CreateText("HubReturnError", retryButton.transform,
                 boundaryOverlay != null ? 34f : 20f, TextAlignmentOptions.TopLeft);
-            if (detailText != null && detailText.font != null) _hubReturnError.font = detailText.font;
+            if (detailText != null && detailText.font != null)
+            {
+                var font = detailText.font;
+                var material = detailText.fontSharedMaterial;
+                _hubReturnError.font = font;
+                _hubReturnError.fontSharedMaterial = material != null && material.mainTexture == font.atlasTexture
+                    ? material : font.material;
+            }
             _hubReturnError.color = new Color(1f, .6f, .56f, 1f);
             var rect = _hubReturnError.rectTransform;
             rect.anchorMin = Vector2.zero;
@@ -536,6 +555,13 @@ public class StageResultUI : MonoBehaviour
         Stretch(numberRect);
         numberRect.offsetMin = new Vector2(48f, 20f);
         numberRect.offsetMax = new Vector2(-48f, -20f);
+
+        // Last sibling covers the banner too: loading must hand off to a fully black first frame.
+        var worldCover = CreateRect("WorldReveal", root.transform);
+        Stretch(worldCover);
+        _introWorldCover = worldCover.gameObject.AddComponent<UnityEngine.UI.Image>();
+        _introWorldCover.color = Color.black;
+        _introWorldCover.raycastTarget = false;
         root.SetActive(false);
     }
 
@@ -546,7 +572,7 @@ public class StageResultUI : MonoBehaviour
         _initialized = true;
 
         if (fontAsset == null)
-            fontAsset = TMP_Settings.defaultFontAsset;
+            fontAsset = Resources.Load<TMP_FontAsset>("BoundaryUI/Fonts/BoundaryFont") ?? TMP_Settings.defaultFontAsset;
 
         if (boundaryOverlay != null)
         {
@@ -662,7 +688,10 @@ public class StageResultUI : MonoBehaviour
         RectTransform rect = CreateRect(objectName, parent);
         var label = rect.gameObject.AddComponent<TextMeshProUGUI>();
         if (fontAsset != null)
+        {
             label.font = fontAsset;
+            label.fontSharedMaterial = fontAsset.material;
+        }
         label.fontSize = size;
         label.alignment = alignment;
         label.color = new Color(0.94f, 0.96f, 0.98f, 1f);

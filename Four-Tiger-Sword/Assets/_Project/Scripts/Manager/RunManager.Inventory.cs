@@ -28,7 +28,7 @@ public sealed partial class RunManager
         if (IsInventoryOpen) return owner != null && owner == _inventoryOwner && IsInventorySessionCurrent;
         if (!isActiveAndEnabled || !OwnerIsAvailable(owner) || State != RunState.Playing || _transition != null
             || IsShopOpen || IsMapOpen || IsRewardOpen || HasPendingItemChoice || player == null || !player.isActiveAndEnabled || player.IsStageTransitioning
-            || player.IsGameplayModalPaused || player.IsFinisherSelecting || player.StatManager == null
+            || player.IsGameplayModalPaused || player.IsStatsOpen || player.IsFinisherSelecting || player.StatManager == null
             || player.StatManager.CurrentHp <= 0f || stageManager == null || !stageManager.IsReady
             || stageManager.Result == null || !stageManager.Result.success || stageManager.Result.root == null
             || !stageManager.Result.root.activeInHierarchy) return false;

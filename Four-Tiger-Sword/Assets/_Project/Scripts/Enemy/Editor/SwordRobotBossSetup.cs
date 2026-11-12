@@ -180,6 +180,7 @@ public static class SwordRobotBossSetup
         burst.animName = charge.animName;
         burst.radius = 12f; burst.chargeDuration = 2.5f; burst.activeDuration = .15f;
         burst.recoveryTime = 1.2f; burst.damage = 2f; burst.knockbackForce = 38f;
+        burst.burstCameraShakeStrength = .45f;
         burst.heightTolerance = 4f; burst.preparationDuration = charge.chargePoseTime;
         burst.chargePoseNormalized = charge.chargePoseNormalized; burst.releaseHitDelay = charge.releaseHitDelay;
         burst.isParryable = false; burst.playerHitReaction = EnemyPlayerHitReaction.Knockdown;
@@ -350,11 +351,7 @@ public static class SwordRobotBossSetup
             presentation.visualPivot = pivot.transform; presentation.sweepSkill = sweep;
             var material = AssetDatabase.LoadAssetAtPath<Material>(Folder + "/Telegraph.mat");
             if (material == null) { material = new Material(Shader.Find("Sprites/Default")); AssetDatabase.CreateAsset(material, Folder + "/Telegraph.mat"); }
-            var ring = new GameObject("AttackWarning"); ring.transform.SetParent(root.transform, false);
-            var line = ring.AddComponent<LineRenderer>(); line.sharedMaterial = material; line.useWorldSpace = true;
-            line.widthMultiplier = .055f; line.numCornerVertices = 3; line.enabled = false;
-            line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; line.receiveShadows = false;
-            presentation.warning = line;
+            presentation.burstMaterial = material;
             var trailGO = new GameObject("BladeTrail"); trailGO.transform.SetParent(weapon.transform, false); trailGO.transform.localPosition = Vector3.up * 1.5f;
             var trail = trailGO.AddComponent<TrailRenderer>(); trail.sharedMaterial = material; trail.time = .12f; trail.widthMultiplier = .3f;
             trail.startColor = new Color(1f, .65f, .2f, .6f); trail.endColor = new Color(1f, .2f, .05f, 0f); trail.emitting = false;

@@ -3,12 +3,9 @@ using UnityEngine;
 
 public class WaterForm : BaseForm, IHeavyAttackForm
 {
-    protected override float CurrentAttackAnimationSpeed
-        => _currentAction == ActionType.Ultimate ? FixedActionSpeed : AttackSpeed;
     private readonly WaterFormActionDataSO _waterData;
 
     public override ElementType Element => ElementType.ELEMENT_WATER;
-    public override float SkillSpCost => 15f;
     public override float SkillCooldown => 6f;
     private readonly WaterFlowGauge _flow;
     public float WaterGauge => _flow.CurrentGauge;

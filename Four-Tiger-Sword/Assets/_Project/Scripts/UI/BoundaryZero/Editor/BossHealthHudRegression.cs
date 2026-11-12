@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Penta.BossUI;
 using StudioBaekho;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -14,6 +15,8 @@ public static class BossHealthHudRegression
 {
     private const BindingFlags Hidden = BindingFlags.Instance | BindingFlags.NonPublic;
     private const string ChapterBossPath = "Assets/_Game/RunProgression/Prefabs/ChapterBoss.prefab";
+    private const string BossUiPath = "Assets/UI/PentaBossGroggy/Prefabs/BossHPWithGroggy.prefab";
+    private const string OverlayPath = "Assets/_Project/Prefabs/UI/BoundaryZeroRunOverlay.prefab";
     private const string HealthArtRoot = "Assets/_Project/Sprites/UI/BoundaryZERO/EnemyHealth/";
     private static int _checks;
 
@@ -27,14 +30,16 @@ public static class BossHealthHudRegression
         _checks = 0;
         using (var fixture = new Fixture())
         {
+            ValidateRepeatedSetup(fixture.Run);
             Exercise(fixture);
+            ExerciseGroggy(fixture);
             ExerciseNameBinding(fixture);
             ExercisePhaseRevival(fixture);
         }
         return $"Boss health HUD: {_checks} checks passed (waiting-room suppression, real ChapterBoss entry, smooth fill, "
-            + "delayed/repeated-hit trail, damage, max HP, "
+            + "delayed/repeated-hit trail, damage, max HP, poise damage, recovery and groggy, "
             + "shielded ConfiguredBoss, HP-zero down, revival refill, final death, ordinary/preparing/terminal stages, replacement, "
-            + "disable/reactivation, names/fallbacks, removed actors and input pass-through).";
+            + "disable/reactivation, names/fallbacks, removed actors, repeated setup and input pass-through).";
     }
 
     public static string ValidateInstalledScene()
@@ -53,12 +58,9 @@ public static class BossHealthHudRegression
         var serialized = new SerializedObject(hud);
         var run = serialized.FindProperty("run").objectReferenceValue as RunManager;
         var visibility = serialized.FindProperty("visibility").objectReferenceValue as CanvasGroup;
-        var fill = serialized.FindProperty("fill").objectReferenceValue as UnityEngine.UI.Image;
-        var bossName = serialized.FindProperty("bossName").objectReferenceValue as TMPro.TMP_Text;
-        Require(run != null && run.gameObject.scene == scene && visibility != null && fill != null,
-            "The installed boss HUD lost its explicit run/visibility/fill bindings.");
-        Require(bossName != null && bossName.transform.IsChildOf(visibility.transform),
-            "The installed boss HUD lost its name binding under the visible bar.");
+        Require(run != null && run.gameObject.scene == scene && visibility != null,
+            "The installed boss HUD lost its explicit run or visibility binding.");
+        RequireIntegratedView(serialized, visibility.transform);
         Require(hud.gameObject.activeInHierarchy && visibility.transform != hud.transform,
             "Hiding the bar would disable its own presenter.");
         foreach (var graphic in visibility.GetComponentsInChildren<UnityEngine.UI.Graphic>(true))
@@ -71,7 +73,7 @@ public static class BossHealthHudRegression
         var label = minimap.View.StageLabel;
         Require(label.transform.parent == minimap.View.transform.Find("Panel") && !label.raycastTarget,
             "Stage progress is not a fixed, input-transparent child of the minimap panel.");
-        return "Installed boss HUD and minimap progress: explicit bindings, hidden legacy label, fixed label parent and input pass-through verified.";
+        return "Installed boss HUD and minimap progress: integrated HP/groggy bindings, hidden legacy label, fixed label parent and input pass-through verified.";
     }
 
     public static string ValidateArtwork()
@@ -100,7 +102,7 @@ public static class BossHealthHudRegression
         Check(!monsterTrack.gameObject.activeSelf, "The obsolete monster track still covers the new artwork.");
         FillLayout(monsterFill, monsterTrail);
 
-        var overlay = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/UI/BoundaryZeroRunOverlay.prefab");
+        var overlay = AssetDatabase.LoadAssetAtPath<GameObject>(OverlayPath);
         Check(overlay != null, "The authored boss overlay prefab is missing.");
         var hud = overlay.GetComponent<BossHealthHud>();
         Check(hud != null, "The boss overlay lost its health presenter.");
@@ -110,46 +112,92 @@ public static class BossHealthHudRegression
             && (bar.anchorMax - new Vector2(.5f, 1f)).sqrMagnitude < .001f
             && (bar.pivot - new Vector2(.5f, 1f)).sqrMagnitude < .001f,
             "The boss artwork is not anchored at the top center.");
-        Check((bar.anchoredPosition - new Vector2(0f, -48f)).sqrMagnitude < .001f
-            && (bar.sizeDelta - new Vector2(720f, 72f)).sqrMagnitude < .001f,
-            "The boss artwork differs from the approved display size or offset.");
+        Check((bar.anchoredPosition - new Vector2(0f, -48f)).sqrMagnitude < .001f,
+            "The boss artwork differs from the approved display offset.");
         var settings = new SerializedObject(hud);
-        var fill = settings.FindProperty("fill").objectReferenceValue as UnityEngine.UI.Image;
+        var view = RequireIntegratedView(settings, bar);
+        var viewRect = (RectTransform)view.transform;
+        var topCenter = new Vector2(.5f, 1f);
+        Check(viewRect.rect.size == new Vector2(640f, 54f) && viewRect.localScale == Vector3.one
+            && viewRect.anchorMin == topCenter && viewRect.anchorMax == topCenter
+            && viewRect.pivot == topCenter && viewRect.anchoredPosition == Vector2.zero,
+            "The integrated boss artwork lost its native display size or placement.");
+        Check(settings.FindProperty("visibility").objectReferenceValue == bar.GetComponent<CanvasGroup>(),
+            "The integrated boss artwork is outside the HUD's visibility group.");
+        foreach (var graphic in bar.GetComponentsInChildren<UnityEngine.UI.Graphic>(true))
+            Check(!graphic.raycastTarget, "A boss health or groggy graphic intercepts gameplay input.");
+
+        var fill = view.HealthFill;
         var trail = settings.FindProperty("trail").objectReferenceValue as UnityEngine.UI.Image;
-        var frame = bar.Find("Frame")?.GetComponent<UnityEngine.UI.Image>();
-        var background = bar.GetComponent<UnityEngine.UI.Image>();
-        var bossName = settings.FindProperty("bossName").objectReferenceValue as TMPro.TMP_Text;
-        Artwork(background, "boss_background.png");
-        Artwork(trail, "boss_trail.png");
-        Artwork(fill, "boss_fill.png");
-        Artwork(frame, "boss_frame.png");
-        Check(bossName != null && bossName.transform.parent == bar && !bossName.raycastTarget
-            && bossName.transform.GetSiblingIndex() > frame.transform.GetSiblingIndex(),
-            "The boss name is not bound above the frame or intercepts input.");
-        Check((bossName.rectTransform.anchoredPosition - Vector2.zero).sqrMagnitude < .001f
-            && (bossName.rectTransform.sizeDelta - new Vector2(720f, 30f)).sqrMagnitude < .001f
-            && (bossName.rectTransform.anchorMin - new Vector2(0f, 1f)).sqrMagnitude < .001f
-            && (bossName.rectTransform.anchorMax - new Vector2(0f, 1f)).sqrMagnitude < .001f
-            && (bossName.rectTransform.pivot - new Vector2(0f, 1f)).sqrMagnitude < .001f,
-            "The boss name differs from the supplied top-left 720 by 30 layout.");
-        Near(bossName.fontSize, 24f, "The boss name differs from the supplied font size.");
-        Check(bossName.color == (Color)new Color32(232, 238, 245, 255)
-            && bossName.alignment == TMPro.TextAlignmentOptions.Center && !bossName.enableAutoSizing,
-            "The boss name lost its fixed size, centered alignment or supplied #E8EEF5 color.");
-        ValidateNameRendering(bossName);
-        Check(fill.transform.parent == bar && trail.transform.parent == bar && frame.transform.parent == bar,
-            "Boss artwork layers are not direct children of the fixed bar.");
-        Check(trail.transform.GetSiblingIndex() < fill.transform.GetSiblingIndex()
-            && fill.transform.GetSiblingIndex() < frame.transform.GetSiblingIndex(),
-            "Boss damage trail, fill and frame draw in the wrong order.");
-        var oldTrack = bar.Find("Track");
-        Check(oldTrack != null && !oldTrack.gameObject.activeSelf, "The obsolete boss track was not disabled.");
-        Check((fill.rectTransform.anchoredPosition - new Vector2(16f, -44f)).sqrMagnitude < .001f
-            && (fill.rectTransform.sizeDelta - new Vector2(688f, 12f)).sqrMagnitude < .001f,
-            "The boss fill does not align with the supplied frame's empty slot.");
+        var interior = fill.transform.parent;
+        Check(trail != null && trail.transform.parent == interior && interior.GetComponent<UnityEngine.UI.Mask>()
+            && trail.maskable && trail.transform.GetSiblingIndex() == fill.transform.GetSiblingIndex() - 1,
+            "The delayed HP trail must draw directly behind the fill inside the same mask.");
+        Check(trail.sprite == fill.sprite && trail.color == (Color)new Color32(255, 145, 150, 255),
+            "The delayed HP trail lost its fill sprite or tint.");
         FillLayout(fill, trail);
-        return $"Health artwork: {_checks - firstCheck} checks passed (provided monster/boss sprites, layer order, "
-            + "disabled legacy tracks, aligned horizontal fill/trail, input pass-through and boss placement).";
+        Check(fill.rectTransform.anchorMin == trail.rectTransform.anchorMin
+            && fill.rectTransform.anchorMax == trail.rectTransform.anchorMax
+            && fill.rectTransform.pivot == trail.rectTransform.pivot,
+            "The delayed HP trail stretches differently from the fill.");
+        Check(view.Groggy.Track.transform.parent == interior && view.Groggy.Fill.transform.parent == view.Groggy.Track.transform,
+            "The groggy strip is outside its masked lower row.");
+        Check(bar.GetComponent<UnityEngine.UI.Image>() == null && bar.childCount == 1,
+            "Legacy boss artwork still draws alongside the integrated bar.");
+        Check(view.BossName.fontSize == 20f && !view.BossName.enableAutoSizing
+            && view.BossName.textWrappingMode == TMPro.TextWrappingModes.NoWrap
+            && view.BossName.overflowMode == TMPro.TextOverflowModes.Ellipsis && !view.BossName.richText,
+            "The integrated boss label lost its fixed size or single-line plain text display.");
+        ValidateNameRendering(view.BossName);
+        return $"Health artwork: {_checks - firstCheck} checks passed (monster sprites, linked integrated boss prefab, "
+            + "aligned masked HP trail, input pass-through and boss placement).";
+    }
+
+    private static BossHealthGroggyUI RequireIntegratedView(SerializedObject settings, Transform bar)
+    {
+        var views = bar.GetComponentsInChildren<BossHealthGroggyUI>(true);
+        Require(views.Length == 1 && views[0].transform.parent == bar,
+            "Expected one integrated boss UI under the visibility group.");
+        var view = views[0];
+        Require(AssetDatabase.GetAssetPath(PrefabUtility.GetCorrespondingObjectFromOriginalSource(view.gameObject)) == BossUiPath,
+            "The integrated boss UI lost its prefab link.");
+        Require(view.HealthFill != null && view.BossName != null && view.Groggy != null
+            && view.Groggy.Track != null && view.Groggy.Fill != null
+            && settings.FindProperty("fill").objectReferenceValue == view.HealthFill
+            && settings.FindProperty("bossName").objectReferenceValue == view.BossName
+            && settings.FindProperty("groggy").objectReferenceValue == view.Groggy,
+            "The boss HUD is not bound to the integrated prefab's fill, name and groggy strip.");
+        return view;
+    }
+
+    private static void ValidateRepeatedSetup(RunManager run)
+    {
+        var contents = PrefabUtility.LoadPrefabContents(OverlayPath);
+        try
+        {
+            var bar = contents.transform.Find("BossHealthBar");
+            Require(bar != null, "The overlay lost its visibility root.");
+            var group = bar.GetComponent<CanvasGroup>();
+            var first = BoundaryZeroResultSetup.EnsureBossHealthHud(contents, run);
+            var firstSettings = new SerializedObject(first);
+            var view = RequireIntegratedView(firstSettings, bar);
+            var trail = firstSettings.FindProperty("trail").objectReferenceValue;
+            var second = BoundaryZeroResultSetup.EnsureBossHealthHud(contents);
+            var secondSettings = new SerializedObject(second);
+            Check(first == second && RequireIntegratedView(secondSettings, bar) == view
+                && secondSettings.FindProperty("trail").objectReferenceValue == trail
+                && view.HealthFill.transform.parent.childCount == 3,
+                "Repeated boss setup replaced or duplicated the integrated UI or trail.");
+            Check(group != null && secondSettings.FindProperty("visibility").objectReferenceValue == group
+                && secondSettings.FindProperty("run").objectReferenceValue == run,
+                "Repeated boss setup lost the existing visibility group or run binding.");
+        }
+        finally
+        {
+            var hud = contents.GetComponent<BossHealthHud>();
+            if (hud != null) hud.Bind(null);
+            PrefabUtility.UnloadPrefabContents(contents);
+        }
     }
 
     private static void ValidateNameRendering(TMPro.TMP_Text source)
@@ -160,7 +208,10 @@ public static class BossHealthHudRegression
         {
             canvas = new GameObject("BossNameRendering", typeof(RectTransform), typeof(Canvas));
             SceneManager.MoveGameObjectToScene(canvas, preview);
-            var label = Object.Instantiate(source, canvas.transform);
+            var labelHost = new GameObject("Boss UI bounds", typeof(RectTransform)).GetComponent<RectTransform>();
+            labelHost.SetParent(canvas.transform, false);
+            labelHost.sizeDelta = ((RectTransform)source.transform.parent).rect.size;
+            var label = Object.Instantiate(source, labelHost);
             foreach (string name in new[] { "Test_Boss", "경계의 수호자" })
             {
                 label.text = name;
@@ -357,6 +408,77 @@ public static class BossHealthHudRegression
         enemy.GetComponent<PoiseHandler>().ResetPoise();
     }
 
+    private static void ExerciseGroggy(Fixture f)
+    {
+        var result = f.Result(true, false, out var room, out var enemy);
+        f.Install(result);
+        f.Tick();
+        Check(!f.Hud.IsVisible, "Groggy became visible while the boss was waiting.");
+        Fight(room, enemy);
+        f.Tick();
+        Check(f.Hud.IsVisible && f.Groggy.Track.gameObject.activeSelf,
+            "The chapter boss did not reveal its groggy strip on room entry.");
+        Near(f.Groggy.Fill.fillAmount, 1f, "The boss did not reveal full initial poise.");
+
+        var poise = enemy.GetComponent<PoiseHandler>();
+        var maxPoise = poise.MaxPoise;
+        var hit = enemy.TakeDamage(1f, poiseDamage: maxPoise * .25f);
+        Check(hit.Applied, "The groggy fixture did not receive a hit.");
+        f.Tick();
+        Near(f.Groggy.Fill.fillAmount, .75f, "Damage did not reduce the groggy strip by the actual poise loss.");
+
+        // Advance the poise sample without relying on editor deltaTime.
+        Set(poise, "_currentPoise", maxPoise * .8f);
+        f.Tick();
+        Near(f.Groggy.Fill.fillAmount, .8f, "The groggy strip did not follow passive poise recovery.");
+        poise.ForceBreak();
+        Check(enemy.PendingGroggy, "The groggy fixture did not queue a break.");
+        f.Tick();
+        Near(f.Groggy.Fill.fillAmount, 0f, "A forced break did not empty the groggy strip.");
+
+        enemy.IsGroggy = true;
+        var groggyState = new EnemyGroggyState(enemy);
+        groggyState.Enter();
+        // The short break timer can expire before the reaction state does.
+        Set(poise, "_currentPoise", maxPoise * .1f);
+        f.Tick();
+        Near(f.Groggy.Fill.fillAmount, 0f, "The strip refilled while the boss was still groggy.");
+        groggyState.Exit();
+        f.Tick();
+        Near(f.Groggy.Fill.fillAmount, 1f, "Groggy recovery did not restore the strip.");
+
+        foreach (float invalidMax in new[] { 0f, -1f, float.NaN, float.PositiveInfinity })
+        {
+            Set(poise, "_maxPoise", invalidMax);
+            poise.ResetPoise();
+            // Infinity can produce a finite ratio, which still must not show a strip.
+            if (float.IsInfinity(invalidMax)) Set(poise, "_currentPoise", maxPoise);
+            f.Tick();
+            Check(f.Hud.IsVisible && !f.Groggy.Track.gameObject.activeSelf,
+                $"Invalid maximum poise ({invalidMax}) hid the HP bar or displayed a groggy strip.");
+        }
+        Set(poise, "_maxPoise", maxPoise);
+        poise.ResetPoise();
+        poise.TakePoiseDamage(maxPoise * .6f);
+        f.Tick();
+        Check(f.Groggy.Track.gameObject.activeSelf, "Restoring valid poise did not reveal the groggy strip.");
+        Near(f.Groggy.Fill.fillAmount, .4f, "The boss did not recover its current groggy display.");
+
+        f.Hud.Bind(null);
+        Check(!f.Hud.IsVisible && !f.Groggy.Track.gameObject.activeSelf,
+            "Unbinding the run retained a stale groggy strip.");
+        f.Hud.Bind(f.Run);
+        Near(f.Groggy.Fill.fillAmount, .4f, "Rebinding the run did not read the current boss's poise.");
+
+        var replacement = f.Result(true, true, out var nextRoom, out var nextEnemy);
+        f.Install(replacement);
+        f.Tick();
+        Check(!f.Hud.IsVisible, "The replacement boss revealed a strip before room entry.");
+        Fight(nextRoom, nextEnemy);
+        f.Tick();
+        Near(f.Groggy.Fill.fillAmount, 1f, "The replacement boss inherited the previous boss's poise display.");
+    }
+
     private static void ExercisePhaseRevival(Fixture f)
     {
         var result = f.Result(true, true, out var room, out var enemy);
@@ -367,6 +489,10 @@ public static class BossHealthHudRegression
         f.Tick();
         Near(f.Hud.FillAmount, 1f, "The phased boss did not reveal its first HP bar.");
         Check(f.Name.text == "기상 보스", "The phased boss did not display its authored name.");
+        var poise = boss.GetComponent<PoiseHandler>();
+        poise.TakePoiseDamage(poise.MaxPoise * .25f);
+        f.Tick();
+        Near(f.Groggy.Fill.fillAmount, .75f, "The phased boss did not display poise damage.");
 
         var hit = boss.TakeDamage(1000f, poiseDamage: 0f);
         Check(hit.Applied && !hit.Killed && boss.IsTransitioning && !boss.IsDead,
@@ -375,6 +501,7 @@ public static class BossHealthHudRegression
             "The HP-zero boss lost its HUD binding or encounter membership.");
         Near(f.Hud.FillAmount, 0f, "The depletion event did not empty the fill immediately.");
         Near(f.Hud.TrailAmount, 0f, "The previous phase's delayed damage trail survived depletion.");
+        Near(f.Groggy.Fill.fillAmount, 0f, "The previous phase's groggy fill survived depletion.");
         Check(f.Name.text == "기상 보스", "Depletion cleared the undefeated boss's name.");
         Invoke(room, "PruneRemoved");
         Check(room.State == DungeonEncounterState.Fighting && room.AliveCount == 1 && !room.BossDefeated,
@@ -391,6 +518,7 @@ public static class BossHealthHudRegression
         Near(boss.ReviveProgress, .25f, "The fixture did not reach a quarter of the rise interval.");
         Near(f.Hud.FillAmount, .25f, "The fill did not follow the revival progress directly.");
         Near(f.Hud.TrailAmount, .25f, "The revival trail lagged behind the refill.");
+        Near(f.Groggy.Fill.fillAmount, 0f, "The groggy strip refilled before revival finished.");
         Check(f.Name.text == "기상 보스", "The name changed during the rise animation.");
         f.Animate(.01f);
         Near(f.Hud.FillAmount, .25f, "Ordinary damage interpolation changed the revival display.");
@@ -403,6 +531,7 @@ public static class BossHealthHudRegression
             $"The revived phase lost its bar (HP={boss.EnemyStat.CurrentHp}/{boss.EnemyStat.MaxHp}, "
             + $"room={room.State}, alive={room.AliveCount}, dead={boss.IsDead}, defeated={room.BossDefeated}).");
         Near(f.Hud.FillAmount, 1f, "The next phase did not finish refilling its HP bar.");
+        Near(f.Groggy.Fill.fillAmount, 1f, "The next phase did not display its reset poise.");
         Near(boss.EnemyStat.MaxHp, 120f, "The bar retained the previous phase's maximum HP.");
         Check(f.Name.text == "기상 보스", "Revival lost the same boss's name.");
 
@@ -410,6 +539,7 @@ public static class BossHealthHudRegression
         Check(final.Killed && room.BossDefeated && !f.Hud.IsVisible,
             "The final phase did not confirm defeat and hide the HUD.");
         Check(f.Name.text == string.Empty, "Final defeat retained the previous boss's name.");
+        Check(!f.Groggy.Track.gameObject.activeSelf, "Final defeat retained the groggy strip.");
     }
 
     private static void ExerciseNameBinding(Fixture f)
@@ -467,6 +597,7 @@ public static class BossHealthHudRegression
         public readonly CanvasGroup Visibility;
         public readonly UnityEngine.UI.Image Fill;
         public readonly UnityEngine.UI.Image Trail;
+        public readonly BossGroggyHPIntegration Groggy;
         public readonly TMPro.TMP_Text Name;
 
         public Fixture()
@@ -483,12 +614,12 @@ public static class BossHealthHudRegression
             var bar = Make("Boss health", typeof(RectTransform), typeof(CanvasGroup));
             bar.transform.SetParent(canvas.transform, false);
             Visibility = bar.GetComponent<CanvasGroup>();
-            Fill = Make("Fill", typeof(RectTransform), typeof(CanvasRenderer), typeof(UnityEngine.UI.Image))
-                .GetComponent<UnityEngine.UI.Image>();
-            Fill.transform.SetParent(bar.transform, false);
-            Fill.raycastTarget = false;
-            Fill.type = UnityEngine.UI.Image.Type.Filled;
-            Fill.fillMethod = UnityEngine.UI.Image.FillMethod.Horizontal;
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(BossUiPath);
+            Require(prefab != null, "The integrated boss UI fixture prefab is missing.");
+            var view = ((GameObject)PrefabUtility.InstantiatePrefab(prefab, bar.transform)).GetComponent<BossHealthGroggyUI>();
+            Fill = view.HealthFill;
+            Groggy = view.Groggy;
+            Name = view.BossName;
             Trail = Make("Trail", typeof(RectTransform), typeof(CanvasRenderer), typeof(UnityEngine.UI.Image))
                 .GetComponent<UnityEngine.UI.Image>();
             Trail.transform.SetParent(bar.transform, false);
@@ -496,11 +627,8 @@ public static class BossHealthHudRegression
             Trail.type = UnityEngine.UI.Image.Type.Filled;
             Trail.fillMethod = UnityEngine.UI.Image.FillMethod.Horizontal;
             Hud.ConfigureVisuals(Trail, 8f, .35f, .6f);
-            Name = Make("Name", typeof(RectTransform), typeof(CanvasRenderer), typeof(TMPro.TextMeshProUGUI))
-                .GetComponent<TMPro.TMP_Text>();
-            Name.transform.SetParent(bar.transform, false);
-            Name.raycastTarget = false;
             Hud.ConfigureName(Name);
+            Hud.ConfigureGroggy(Groggy);
         }
 
         public BaekhoDungeonResult Result(bool hasBoss, bool configured, out DungeonRoomEncounter room, out Enemy enemy)
@@ -594,6 +722,7 @@ public static class BossHealthHudRegression
         }
         public void Dispose()
         {
+            Hud.Bind(null);
             foreach (var member in _members) if (member != null) member.Release();
             EditorSceneManager.ClosePreviewScene(_scene);
             foreach (var asset in _assets) if (asset != null) Object.DestroyImmediate(asset);

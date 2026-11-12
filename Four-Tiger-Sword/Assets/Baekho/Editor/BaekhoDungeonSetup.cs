@@ -237,6 +237,18 @@ namespace StudioBaekho
                 name.StartsWith("bridge_", StringComparison.Ordinal) || name.StartsWith("slope_", StringComparison.Ordinal);
         }
 
+        internal static bool HasTwoByThreeDoor(BaekhoMapModule module)
+        {
+            const float tolerance = 0.002f;
+            if (module == null || module.connections == null) return false;
+            foreach (var door in module.connections)
+            {
+                if (door != null && Mathf.Abs(door.width - 2f) <= tolerance && Mathf.Abs(door.height - 3f) <= tolerance)
+                    return true;
+            }
+            return false;
+        }
+
         [MenuItem("Tools/Baekho/Dungeon/Create Demo Assets")]
         private static void CreateDemoFromMenu() { Debug.Log("Baekho dungeon demo: " + CreateDemoAssets()); }
 
@@ -289,6 +301,7 @@ namespace StudioBaekho
             if (settings == null)
             {
                 settings = ScriptableObject.CreateInstance<BaekhoDungeonSettings>();
+                maps.RemoveAll(HasTwoByThreeDoor);
                 settings.maps = maps.ToArray();
                 settings.startRoom = startRoom;
                 settings.endRoom = endRoom;

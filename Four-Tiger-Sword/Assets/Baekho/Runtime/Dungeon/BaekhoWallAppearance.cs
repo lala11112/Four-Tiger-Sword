@@ -130,10 +130,15 @@ namespace StudioBaekho
                     else Panel(b, origin, right, normal, x + seam, y + seam, w, h, -depth * .1f, depth * .9f, 0, scale);
                 }
                 float trim = Mathf.Min(profile.trimWidth, size.y * .1f);
-                if (cellWidth > seam * 2 && size.y > .3f)
+                float trimRun = cellWidth - seam * 2f;
+                if (trimRun > 0f && size.y > .3f)
                 {
-                    Panel(b, origin, right, normal, x + seam, .12f, cellWidth - seam * 2, trim, 0, depth, 2, scale);
-                    Panel(b, origin, right, normal, x + seam, size.y - .12f - trim, cellWidth - seam * 2, trim, 0, depth, 2, scale);
+                    // Separate the trim end faces from the ceramic panel returns.
+                    float endInset = Mathf.Min(.002f, trimRun * .1f);
+                    float trimStart = x + seam + endInset;
+                    trimRun -= endInset * 2f;
+                    Panel(b, origin, right, normal, trimStart, .12f, trimRun, trim, 0, depth, 2, scale);
+                    Panel(b, origin, right, normal, trimStart, size.y - .12f - trim, trimRun, trim, 0, depth, 2, scale);
                 }
                 if (profile.accentMaterial && cellWidth > .5f && profile.accentHeight + .08f < size.y)
                     Panel(b, origin, right, normal, x + .12f, profile.accentHeight,

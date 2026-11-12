@@ -54,7 +54,7 @@ public static class EngravingVisualQA
         var choice = run.ItemChoices?.Current;
         return "Run=" + run.State + ", StageReady=" + (run.stageManager != null && run.stageManager.IsReady)
             + ", RewardOpen=" + run.IsRewardOpen + ", Pending=" + (choice?.Kind.ToString() ?? "none")
-            + ", NeedsSynergy=" + (choice?.NeedsSynergy ?? false) + ", Candidates=" + (choice?.Candidates.Count ?? 0)
+            + ", Candidates=" + (choice?.Candidates.Count ?? 0)
             + ", Error=" + (run.LastError ?? "none");
     }
 
@@ -63,7 +63,7 @@ public static class EngravingVisualQA
         var run = Object.FindFirstObjectByType<RunManager>();
         if (_gameAccountScope == null || run?.ItemChoices == null)
             throw new InvalidOperationException("Begin the isolated Game Scene fixture and wait for item choices to initialize first.");
-        if (run.ItemChoices.Current != null) return "WAIT: resolve the current starter/reward before queueing the next receipt.";
+        if (run.ItemChoices.Current != null) return "WAIT: resolve the current reward before queueing the next receipt.";
         return run.ItemChoices.BeginRoomReward(receipt) ? "QUEUED: the RunManager will open its real reward modal next frame." : "Receipt was already queued or could not be opened.";
     }
 
@@ -147,13 +147,12 @@ public static class EngravingVisualQA
         var items = _rewardInventory.AddComponent<PlayerItemRuntime>(); items.Catalog = catalog;
         items.Initialize(stats, () => ElementType.ELEMENT_NONE);
         var wallet = _rewardInventory.AddComponent<PlayerWallet>(); wallet.Initialize(0);
-        var nodes = scenario == "synergy" ? new[] { "heirloom", "starterelement" } : new[] { "heirloom", "choices", "reroll", "hold" };
+        var nodes = new[] { "choices", "reroll", "hold" };
         _rewardInventory.SetActive(true);
         var snapshot = new EngravingSnapshot(EngravingSettingsSO.Default, nodes);
         _rewardService = new RunItemChoiceService(items, wallet, snapshot, 812763);
         if (scenario == "empty") foreach (var item in catalog.items) items.TryAddItem(item.itemId);
-        bool begun = scenario == "starter" || scenario == "synergy"
-            ? _rewardService.BeginStarterChoice() : _rewardService.BeginRoomReward("visual-qa");
+        bool begun = _rewardService.BeginRoomReward("visual-qa");
         if (!begun) throw new InvalidOperationException("Could not create the isolated visual reward receipt.");
         _rewardRoot = new GameObject("Engraving reward visual overlay", typeof(RectTransform), typeof(Canvas),
             typeof(UnityEngine.UI.CanvasScaler), typeof(UnityEngine.UI.GraphicRaycaster));

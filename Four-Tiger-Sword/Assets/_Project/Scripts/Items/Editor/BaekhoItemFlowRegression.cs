@@ -162,13 +162,12 @@ public static class BaekhoItemFlowRegression
             Field(player, "_groundLayer", (LayerMask)(1 << ground.layer));
             Physics.SyncTransforms();
 
-            ItemCatalog catalog = source.ItemRuntime != null ? source.ItemRuntime.Catalog : null;
-            if (catalog == null || catalog.items.Length != 20)
-                catalog = AssetDatabase.FindAssets("t:ItemCatalog", new[] { BaekhoItemImporter.OutputRoot })
-                    .Select(g => AssetDatabase.LoadAssetAtPath<ItemCatalog>(AssetDatabase.GUIDToAssetPath(g))).FirstOrDefault(c => c != null && c.items.Length == 20);
-            Check(catalog != null && catalog.items.Length == 20, "imported actual twenty-item catalog required");
+            const string projectId = "93190cd9-a826-4b58-b257-cf4ba077b827";
+            ItemCatalog catalog = AssetDatabase.LoadAssetAtPath<ItemCatalog>(
+                BaekhoItemImporter.OutputRoot + "/" + projectId + "/ItemCatalog.asset");
+            Check(catalog != null && catalog.items.Length == 10, "migrated Baekho item catalog required");
             data = ScriptableObject.CreateInstance<PlayerStatData>();
-            data.baseHP = 100; data.baseSP = 100; data.baseSpRegen = 20; data.baseSpRegenDelay = 1;
+            data.baseHP = 100;
             player.StatManager.Initialize(data);
             player.ItemRuntime.Catalog = catalog;
 
@@ -197,9 +196,7 @@ public static class BaekhoItemFlowRegression
             manager.ChangeForm(water);
             player.ItemRuntime.Initialize(player);
             foreach (ItemDefinition item in catalog.items) Check(player.ItemRuntime.TryAddItem(item.itemId), "grant actual item " + item.itemId);
-            Check(player.ItemRuntime.OwnedItems.Count == 20, "all twenty items granted through public API");
-            Near(player.SwitchSpCost, 6, "actual package switch cost");
-            Near(player.DodgeSpCost, 15, "actual package passive dodge cost");
+            Check(player.ItemRuntime.OwnedItems.Count == 10, "all retained items granted through public API");
 
             fixture = new Fixture
             {
@@ -224,7 +221,7 @@ public static class BaekhoItemFlowRegression
             Cancellations(fixture);
             ChainInputBlocks(fixture);
             Check(inputStates.All(p => p.Key.enabled == p.Value), "live input action enable states unchanged");
-            string result = "PASS: " + checks + " flow assertions; actual FormManager/controller/state instances, plain direct switch, attack-cancel dash spending, F-chain selection/resources/recovery, damage snapshots, earth counter and interruption cleanup.";
+            string result = "PASS: " + checks + " flow assertions; actual FormManager/controller/state instances, plain direct switch, attack-cancel dash and cooldown gates, F-chain selection/recovery, damage snapshots, earth counter and interruption cleanup.";
             Debug.Log("[Baekho Items] " + result);
             return result;
         }
@@ -244,30 +241,22 @@ public static class BaekhoItemFlowRegression
     {
         f.Reset();
         int begins = f.Fire.SwitchBegins;
-        float before = f.Stats.CurrentSp;
         Check(f.Forms.TrySwitchForm(f.Fire), "direct switch succeeds");
-        Near(f.Stats.CurrentSp, before - 6, "direct switch spends exactly six SP");
         Check(f.Events == 1 && f.Machine.CurrentState == f.Idle && f.Fire.SwitchBegins == begins,
             "direct success emits once and stays in locomotion without an automatic attack");
         Check(!f.Player.HasPendingSwitchAttack && !f.Player.CanChangeForm, "plain swap starts its existing cooldown without a pending attack");
         Check(!f.Fire.IsChainBuffActive, "plain swap does not activate the fire chain buff");
         f.Machine.Update();
-        Near(f.Stats.CurrentSp, before - 6, "switch attack does not spend E cost");
         Near(f.Fire.SkillCooldownRemaining, 0, "switch attack does not start E cooldown");
         Check(!f.Forms.TrySwitchForm(f.Metal) && f.Events == 1, "cooldown rejects second switch without event");
-        Near(f.Stats.CurrentSp, before - 6, "cooldown failure does not spend SP");
 
         f.Reset();
         Check(!f.Forms.TrySwitchForm(f.Water) && f.Events == 0, "same-form switch rejected");
-        Near(f.Stats.CurrentSp, 100, "same-form request does not consume");
-        f.Stats.TryConsumeSp(f.Stats.CurrentSp - 5);
-        Check(!f.Forms.TrySwitchForm(f.Fire) && f.Events == 0 && f.Player.CanChangeForm, "insufficient SP rejects without cooldown/event");
-        Near(f.Stats.CurrentSp, 5, "insufficient switch does not consume");
+        Check(f.Player.CanChangeForm, "same-form request does not start cooldown");
 
         f.Reset();
         f.Machine.ChangeState(f.Counter);
         Check(!f.Forms.TrySwitchForm(f.Fire) && f.Events == 0, "direct switch blocked during counter");
-        Near(f.Stats.CurrentSp, 100, "state-blocked request does not consume");
         Check(f.Player.CanChangeForm, "state-blocked request does not start cooldown");
 
         f.Reset();
@@ -283,27 +272,23 @@ public static class BaekhoItemFlowRegression
     private static void DashFlow(Fixture f)
     {
         f.Reset();
-        float cost = f.Player.DodgeSpCost;
         f.Input.DashBuffer.Set();
         f.Machine.Update();
         Check(f.Machine.CurrentState == f.Dash, "actual transition enters dash");
-        Near(f.Stats.CurrentSp, 100 - cost, "dash spends only on entry");
-        f.Machine.Update();
-        Near(f.Stats.CurrentSp, 100 - cost, "dash update does not spend again");
+        Check(!f.Dash.IsDashComplete, "available dash starts normally");
         f.Machine.ChangeState(f.Idle);
         Check(!f.Player.CanDash, "successful dash starts cooldown on exit");
 
         f.Reset();
-        f.Stats.TryConsumeSp(f.Stats.CurrentSp - (cost - 1));
+        Field(f.Player, "_dashCooldownTimer", .25f);
         f.Input.DashBuffer.Set();
         f.Machine.Update();
-        Check(f.Machine.CurrentState == f.Idle, "insufficient SP blocks actual dash transition");
-        Near(f.Stats.CurrentSp, cost - 1, "blocked dash does not consume");
-        Near((float)GetField(f.Player, "_dashCooldownTimer"), 0, "blocked dash does not start cooldown");
-        f.Machine.ChangeState(f.Dash); // Even a forced entry must retain the resource guard.
-        Check(f.Dash.IsDashComplete, "forced unaffordable dash immediately completes");
+        Check(f.Machine.CurrentState == f.Idle, "active cooldown blocks actual dash transition");
+        Near((float)GetField(f.Player, "_dashCooldownTimer"), .25f, "blocked dash preserves cooldown");
+        f.Machine.ChangeState(f.Dash);
+        Check(f.Dash.IsDashComplete, "forced entry during cooldown immediately completes");
         f.Machine.ChangeState(f.Idle);
-        Near((float)GetField(f.Player, "_dashCooldownTimer"), 0, "failed forced entry does not start cooldown");
+        Near((float)GetField(f.Player, "_dashCooldownTimer"), .25f, "failed forced entry does not reset cooldown");
     }
 
     private static void AttackDashFlow(Fixture f)
@@ -311,32 +296,24 @@ public static class BaekhoItemFlowRegression
         f.Reset();
         f.Machine.ChangeState(f.Attack);
         int ended = f.Water.AttackEnds;
-        float cost = f.Player.DodgeSpCost;
         Check(!f.Attack.IsAttackComplete, "attack-cancel fixture starts with an unfinished normal attack");
         f.Input.DashBuffer.Set();
         f.Machine.Update();
         Check(f.Machine.CurrentState == f.Dash, "unfinished normal attack cancels directly into actual dash state");
         Check(f.Water.AttackEnds == ended + 1, "successful dodge ends the interrupted normal attack exactly once");
-        Near(f.Stats.CurrentSp, 100 - cost, "attack-cancel dodge spends the item-adjusted cost once");
         f.Machine.Update();
-        Near(f.Stats.CurrentSp, 100 - cost, "attack-cancel dodge update never spends a second cost");
         Check(f.Water.AttackEnds == ended + 1, "dash update does not end the interrupted attack again");
 
         f.Reset();
         f.Machine.ChangeState(f.Attack);
         ended = f.Water.AttackEnds;
-        f.Stats.TryConsumeSp(f.Stats.CurrentSp - (cost - 1));
-        Field(f.Stats, "_spRegenTimer", .37f);
-        float regenDelay = (float)GetField(f.Stats, "_spRegenTimer");
-        float cooldown = (float)GetField(f.Player, "_dashCooldownTimer");
+        Field(f.Player, "_dashCooldownTimer", .25f);
         f.Input.DashBuffer.Set();
         f.Machine.Update();
         Check(f.Machine.CurrentState == f.Attack && !f.Attack.IsAttackComplete,
-            "insufficient SP leaves the unfinished normal attack running");
+            "active dodge cooldown leaves the unfinished normal attack running");
         Check(f.Water.AttackEnds == ended, "rejected dodge must not run normal attack cancellation cleanup");
-        Near(f.Stats.CurrentSp, cost - 1, "rejected attack-cancel dodge preserves SP");
-        Near((float)GetField(f.Player, "_dashCooldownTimer"), cooldown, "rejected attack-cancel dodge preserves cooldown");
-        Near((float)GetField(f.Stats, "_spRegenTimer"), regenDelay, "rejected attack-cancel dodge preserves regeneration delay");
+        Near((float)GetField(f.Player, "_dashCooldownTimer"), .25f, "rejected attack-cancel dodge preserves cooldown");
     }
 
     private static void SuccessfulDodgeFlow(Fixture f)
@@ -362,13 +339,11 @@ public static class BaekhoItemFlowRegression
         f.Player.TakeDamage(3f, source: attack);
         Near(f.Forms.GetChainReadyRemaining(f.Water.Element), 4f,
             "later hits in the same dash do not refresh water readiness");
-        float sp = f.Stats.CurrentSp;
         f.Input.ChainSkillBuffer.Set();
         Property(f.Dash, "IsDashComplete", true);
         f.Machine.Update();
         Check(f.Machine.CurrentState == f.Switch && f.Forms.CurrentForm == f.Water && f.Events == 1,
             "F buffered during dodge starts water immediately after dodge completion");
-        Near(f.Stats.CurrentSp, sp, "post-dodge chain adds no cost to the paid dodge");
         Check(!f.Player.CanDash && !f.Input.ChainSkillBuffer.IsActive,
             "dodge exit keeps its cooldown and the chain consumes F once");
     }
@@ -460,17 +435,13 @@ public static class BaekhoItemFlowRegression
             "F without a ready condition does not change form");
         f.Input.ChainSkillBuffer.Consume();
         f.Forms.NotifyFinalComboHit(f.Water.Element);
-        f.Stats.TryConsumeSp(f.Stats.CurrentSp);
         Field(f.Player, "_formChangeCooldownTimer", 1.5f);
-        float regenDelay = (float)GetField(f.Stats, "_spRegenTimer");
         f.Input.ChainSkillBuffer.Set();
         f.Machine.Update();
         Check(f.Machine.CurrentState == f.Switch && f.Forms.CurrentForm == f.Fire
             && f.Fire.SwitchBegins == before + 1 && f.Events == 1,
-            "F chain succeeds with zero SP while the normal switch cooldown is active");
-        Near(f.Stats.CurrentSp, 0f, "chain spends no SP");
+            "F chain succeeds while the normal switch cooldown is active");
         Near((float)GetField(f.Player, "_formChangeCooldownTimer"), 1.5f, "chain preserves the normal switch cooldown");
-        Near((float)GetField(f.Stats, "_spRegenTimer"), regenDelay, "chain does not reset SP regeneration delay");
         Near(f.Fire.SkillCooldownRemaining, 0f, "chain starts no E cooldown");
         Near(f.Forms.GetChainReadyRemaining(f.Fire.Element), 0f, "chain consumes readiness once");
         Check(!f.Player.HasPendingSwitchAttack && !f.Input.ChainSkillBuffer.IsActive,
@@ -538,7 +509,6 @@ public static class BaekhoItemFlowRegression
             "counter completion no longer launches a queued switch attack");
         Check(f.Events == 0 && f.Forms.GetChainReadyRemaining(f.Fire.Element) > 0f,
             "blocked counter input preserves unused readiness");
-        Near(f.Stats.CurrentSp, 100, "counter does not spend switch SP");
 
         PlayerUIManager savedUi = PlayerUIManager.Instance;
         try

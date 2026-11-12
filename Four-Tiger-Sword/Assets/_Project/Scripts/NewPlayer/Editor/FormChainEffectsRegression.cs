@@ -45,7 +45,7 @@ public static class FormChainEffectsRegression
             Player = host.AddComponent<PlayerController>();
             Stats = host.GetComponent<PlayerStatManager>();
             var stats = Asset<PlayerStatData>();
-            stats.baseHP = 1000f; stats.baseATK = 100f; stats.baseSP = 100f;
+            stats.baseHP = 1000f; stats.baseATK = 100f;
             stats.baseAtkSpd = 1f; stats.baseCRT = stats.baseElmAtk = 0f;
             Stats.Initialize(stats);
             Set(Player, nameof(PlayerController.StatManager), Stats);

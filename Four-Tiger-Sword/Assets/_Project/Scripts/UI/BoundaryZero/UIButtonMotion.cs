@@ -1,3 +1,4 @@
+using Penta.Upgrade;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -10,9 +11,9 @@ public sealed class UIButtonMotion : MonoBehaviour, IPointerDownHandler, IPointe
     private Vector3 _scale;
     private bool _pressed, _hovered, _selected;
     private float _submitUntil;
-    private CanvasGroup _focus;
-    private Vector2 _focusOffsetMin = new Vector2(2, 2);
-    private Vector2 _focusOffsetMax = new Vector2(-2, -2);
+    private RectTransform _rect;
+    private PentaUpgradeChrome _treeNode;
+    private float _treeNodeFocus;
 
     public static void Install(GameObject root)
     {
@@ -24,46 +25,29 @@ public sealed class UIButtonMotion : MonoBehaviour, IPointerDownHandler, IPointe
     private void Awake()
     {
         _button = GetComponent<UnityEngine.UI.Button>();
+        _rect = transform as RectTransform;
         _scale = transform.localScale;
         var colors = _button.colors;
         colors.fadeDuration = .1f;
         _button.colors = colors;
-        BuildFocus();
+        if (_button.targetGraphic is PentaUpgradeChrome chrome && chrome.IsTreeNode)
+            _treeNode = chrome;
+        CenterVisualPivot();
     }
 
-    private void BuildFocus()
+    private void CenterVisualPivot()
     {
-        var rect = new GameObject("HoverFocus", typeof(RectTransform), typeof(CanvasGroup)).GetComponent<RectTransform>();
-        rect.SetParent(transform, false);
-        rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one;
-        rect.offsetMin = _focusOffsetMin; rect.offsetMax = _focusOffsetMax;
-        _focus = rect.GetComponent<CanvasGroup>();
-        _focus.interactable = _focus.blocksRaycasts = false;
-        _focus.alpha = 0;
-        Edge(rect, "Top", new Vector2(0, 1), Vector2.one, new Vector2(0, -2), new Vector2(0, 0));
-        Edge(rect, "Bottom", Vector2.zero, new Vector2(1, 0), Vector2.zero, new Vector2(0, 2));
-        Edge(rect, "Left", Vector2.zero, new Vector2(0, 1), Vector2.zero, new Vector2(3, 0));
-        Edge(rect, "Right", new Vector2(1, 0), Vector2.one, new Vector2(-2, 0), Vector2.zero);
-    }
-
-    public void SetFocusOffsets(Vector2 min, Vector2 max)
-    {
-        _focusOffsetMin = min;
-        _focusOffsetMax = max;
-        if (_focus == null) return;
-        var rect = (RectTransform)_focus.transform;
-        rect.offsetMin = min;
-        rect.offsetMax = max;
-    }
-
-    private static void Edge(RectTransform parent, string name, Vector2 min, Vector2 max, Vector2 offsetMin, Vector2 offsetMax)
-    {
-        var image = new GameObject(name, typeof(RectTransform), typeof(UnityEngine.UI.Image)).GetComponent<UnityEngine.UI.Image>();
-        image.transform.SetParent(parent, false);
-        image.rectTransform.anchorMin = min; image.rectTransform.anchorMax = max;
-        image.rectTransform.offsetMin = offsetMin; image.rectTransform.offsetMax = offsetMax;
-        image.raycastTarget = false;
-        image.color = name == "Left" ? new Color32(255, 73, 111, 255) : new Color32(255, 225, 232, 230);
+        if (_rect == null) return;
+        Rect bounds = _rect.rect;
+        if (bounds.width <= 0 || bounds.height <= 0) return;
+        // Keep the authored shape and its children in place while moving the scale origin.
+        Vector2 center = _treeNode != null && _treeNode.rectTransform == _rect
+            ? _treeNode.TreeNodeCenter : bounds.center;
+        Vector2 pivot = (center - bounds.min) / bounds.size;
+        if ((_rect.pivot - pivot).sqrMagnitude < .00000001f) return;
+        Vector3 worldCenter = _rect.TransformPoint(center);
+        _rect.pivot = pivot;
+        _rect.position = worldCenter;
     }
 
     private bool Available => _button != null && _button.IsActive() && _button.IsInteractable();
@@ -75,15 +59,24 @@ public sealed class UIButtonMotion : MonoBehaviour, IPointerDownHandler, IPointe
     public void OnDeselect(BaseEventData data) { _pressed = _selected = false; _submitUntil = 0; }
     public void OnSubmit(BaseEventData data) { if (Available) _submitUntil = Time.unscaledTime + .08f; }
 
-    private void Update()
+    private void Update() => Tick(Time.unscaledDeltaTime);
+
+    private void Tick(float deltaTime)
     {
+        CenterVisualPivot();
         bool available = Available;
         if (!available) { _pressed = false; _submitUntil = 0; }
         bool down = available && (_pressed || Time.unscaledTime < _submitUntil);
         bool focus = available && (_hovered || _selected);
         Vector3 target = _scale * (down ? .975f : focus ? 1.035f : 1f);
-        transform.localScale = Vector3.MoveTowards(transform.localScale, target, Time.unscaledDeltaTime * _scale.magnitude * .6f);
-        if (_focus != null) _focus.alpha = Mathf.MoveTowards(_focus.alpha, focus ? 1 : 0, Time.unscaledDeltaTime * 12f);
+        transform.localScale = Vector3.MoveTowards(transform.localScale, target, deltaTime * _scale.magnitude * .6f);
+        float focusTarget = focus ? 1f : 0f;
+        float focusStep = deltaTime * 12f;
+        if (_treeNode != null)
+        {
+            _treeNodeFocus = Mathf.MoveTowards(_treeNodeFocus, focusTarget, focusStep);
+            _treeNode.SetTreeNodeFocus(_treeNodeFocus);
+        }
     }
 
     private void OnDisable()
@@ -91,6 +84,7 @@ public sealed class UIButtonMotion : MonoBehaviour, IPointerDownHandler, IPointe
         _pressed = _hovered = _selected = false;
         _submitUntil = 0;
         if (_button != null) transform.localScale = _scale;
-        if (_focus != null) _focus.alpha = 0;
+        _treeNodeFocus = 0;
+        if (_treeNode != null) _treeNode.SetTreeNodeFocus(0);
     }
 }

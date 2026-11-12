@@ -75,7 +75,7 @@ public sealed class ShopOfferViewState
 {
     public string Id, Name, Description, ButtonLabel;
     public Sprite Icon;
-    public string PrimarySynergyName;
+    public string PrimarySynergyName, SynergyMembership;
     public Sprite PrimarySynergyIcon;
     public ElementType Element;
     public int Price, Grade;
@@ -88,7 +88,7 @@ public sealed class ShopOwnedItemViewState
     public string Id, Name, Description;
     public int Grade, SalePrice;
     public Sprite Icon;
-    public string PrimarySynergyName;
+    public string PrimarySynergyName, SynergyMembership;
     public Sprite PrimarySynergyIcon;
     public ElementType Element;
     public bool CanSelect, Selected, CanSell;

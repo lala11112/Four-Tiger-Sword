@@ -59,7 +59,6 @@ public static class ChainSkillHudRegression
             view.Render(new HudState
             {
                 Hp = new MeterState(4200, 5000),
-                Auxiliary = new MeterState(75, 100),
                 UltimateCharge = new MeterState(65, 100),
                 ActiveFormIndex = formLocks ? 1 : 3,
                 LockedFormsMask = formLocks ? 30 : 0,
@@ -109,6 +108,7 @@ public static class ChainSkillHudRegression
             root = (GameObject)PrefabUtility.InstantiatePrefab(prefab, preview);
             var view = root.GetComponent<HudView>();
             Check(view != null, "PlayerHUD view is missing.");
+            CheckVitals(root, view);
             var group = root.transform.Find("BoundaryZeroHUD/Forms/ChainSkills");
             Check(group != null, "Chain skill HUD was not saved on PlayerHUD.");
             var fire = group.Find("Fire");
@@ -197,13 +197,37 @@ public static class ChainSkillHudRegression
             }
             foreach (var graphic in group.GetComponentsInChildren<UnityEngine.UI.Graphic>(true))
                 Check(!graphic.raycastTarget, "The chain display must not capture gameplay clicks.");
+
+            BoundaryZeroHudSetup.StyleHud(root);
+            CheckVitals(root, view);
         }
         finally
         {
             if (root != null) UnityEngine.Object.DestroyImmediate(root);
             EditorSceneManager.ClosePreviewScene(preview);
         }
-        return "Chain skill HUD: " + _checks + " checks passed (saved bindings, timers, F selection, form locks, restoration, passive rendering).";
+        return "Chain skill HUD: " + _checks + " checks passed (saved and regenerated vitals, timers, F selection, form locks, restoration, passive rendering).";
+    }
+
+    private static void CheckVitals(GameObject root, HudView view)
+    {
+        var vitals = root.transform.Find("BoundaryZeroHUD/Vitals");
+        Check(vitals != null, "The health HUD is missing.");
+        Check(vitals.Find("SpTrack") == null && vitals.Find("SpFill") == null && vitals.Find("SpValue") == null
+            && root.transform.Find("HudRoot/VitalsGroup/AuxiliaryBar") == null, "The retired SP display still exists.");
+
+        view.Render(new HudState
+        {
+            Hp = new MeterState(75, 100),
+            UltimateCharge = new MeterState(50, 100),
+            ActiveFormIndex = 1
+        });
+        var hp = vitals.Find("HealthValue")?.GetComponent<TMP_Text>();
+        var charge = root.transform.Find("BoundaryZeroHUD/Skills/SkillR/ChargeValue")?.GetComponent<TMP_Text>();
+        Check(hp != null && hp.text == "75 / 100" && Mathf.Approximately(view.HpRatio, .75f),
+            "The HUD must render the player's current health.");
+        Check(charge != null && charge.text == "50%" && view.SkillR != null && Mathf.Approximately(view.SkillR.Progress, .5f),
+            "The HUD must render the player's ultimate charge.");
     }
 
     private static void Check(bool condition, string message)

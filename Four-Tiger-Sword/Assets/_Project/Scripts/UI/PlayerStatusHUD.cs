@@ -5,7 +5,6 @@ public class PlayerStatusHUD : PlayerStatManager
 {
     [Header("Bars")]
     [SerializeField] private Slider hpBar;
-    [SerializeField] private Slider spBar;
 
     private PlayerStatManager statManager;
     
@@ -18,6 +17,5 @@ public class PlayerStatusHUD : PlayerStatManager
     {
         if (statManager == null) return;
         hpBar.value = statManager.CurrentHp / statManager.MaxHp;
-        spBar.value = statManager.CurrentSp / statManager.MaxSp;
     }
-}   
+}

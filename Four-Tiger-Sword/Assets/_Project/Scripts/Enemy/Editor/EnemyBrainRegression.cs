@@ -41,6 +41,19 @@ public static partial class EnemyBrainRegression
         try
         {
             fixture = new RuntimeFixture();
+            await ExercisePerceptionAndGroupCombat(fixture);
+            await fixture.DisposeAsync();
+            fixture = null;
+            fixture = new RuntimeFixture();
+            await ExerciseGroupAwareness(fixture);
+            await ExerciseGroupAttackTiming(fixture);
+            await ExerciseGroupAttackQueue(fixture);
+            await ExerciseGroupCounterTiming(fixture);
+            await ExerciseGroupPositioning(fixture);
+            await ExerciseAuthoredMixedGroup(fixture);
+            await fixture.DisposeAsync();
+            fixture = null;
+            fixture = new RuntimeFixture();
             await ExerciseCounterattacks(fixture);
             await fixture.DisposeAsync();
             fixture = null;
@@ -638,14 +651,14 @@ public static partial class EnemyBrainRegression
             "An enemy that lost its target outside its patrol radius did not walk home.");
         spacing.enabled = false;
 
-        var reinforcement = fixture.Actor<Enemy>("Reinforcement entry cue", fixture.SkillSet(melee), out _);
+        var earlyListener = fixture.Actor<Enemy>("Reported cue before Start", fixture.SkillSet(melee), out _);
         Vector3 cue = fixture.Origin + Vector3.forward * 7f;
-        reinforcement.RememberEncounterPosition(cue);
-        await Until(() => reinforcement.Brain != null, "Reinforcement cue fixture did not initialize.");
-        Check(reinforcement.HasTargetMemory && reinforcement.LastKnownTargetPosition == cue
-            && reinforcement.DetectedTarget == null && reinforcement.CurrentAction == null,
-            "A reinforcement cue recorded before Start must survive initialization without granting vision or an attack.");
-        reinforcement.enabled = false;
+        earlyListener.RememberEncounterPosition(cue);
+        await Until(() => earlyListener.Brain != null, "The early alert listener did not initialize.");
+        Check(earlyListener.HasTargetMemory && earlyListener.LastKnownTargetPosition == cue
+            && earlyListener.DetectedTarget == null && earlyListener.CurrentAction == null,
+            "A reported cue recorded before Start must survive initialization without granting vision or an attack.");
+        earlyListener.enabled = false;
     }
 
     private static async Task ExerciseAuthoredSpacing(RuntimeFixture fixture, string path, float preferredDistance)

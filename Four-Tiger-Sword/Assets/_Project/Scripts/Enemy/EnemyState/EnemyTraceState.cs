@@ -1,33 +1,40 @@
 using UnityEngine;
-using UnityEngine.AI;
 
 public class EnemyTraceState : IPlayerState
 {
-    Enemy _enemy;
-
+    private readonly Enemy _enemy;
+    private float _previousStoppingDistance;
     public Transform _target;
 
-    NavMeshAgent _navMeshAgent;
-
-    public EnemyTraceState(Enemy enemy) {_enemy = enemy;}
+    public EnemyTraceState(Enemy enemy) { _enemy = enemy; }
 
     public void Enter()
     {
-        _navMeshAgent = _enemy.GetComponent<NavMeshAgent>();
         _target = _enemy.DetectedTarget;
-        _enemy.Animator.CrossFade("Move", 0.1f);
+        var positioning = _enemy.TacticalPositioning;
+        var agent = positioning.Navigation.Agent;
+        _previousStoppingDistance = agent.stoppingDistance;
+        // The trace endpoint sits inside the combat threshold. Leave enough margin to reach it.
+        agent.stoppingDistance = Mathf.Min(_previousStoppingDistance, .05f);
+        positioning.Navigation.RefreshAnimation();
+        positioning.Reset();
     }
 
     public void Update()
     {
         _target = _enemy.DetectedTarget;
-        if ((_target != null || _enemy.HasTargetMemory) && _navMeshAgent.enabled && _navMeshAgent.isOnNavMesh)
-            _navMeshAgent.SetDestination(_target != null ? _target.position : _enemy.LastKnownTargetPosition);
-        //플레이어를 추적하는 로직  
+        var positioning = _enemy.TacticalPositioning;
+        if (_target != null)
+            positioning.UpdateVisibleTarget(_target, positioning.PreferredSkill(_target), true,
+                Mathf.Max(0f, _enemy.CombatRange - .1f));
+        else if (_enemy.HasTargetMemory)
+            positioning.Investigate(_enemy.LastKnownTargetPosition);
     }
 
     public void Exit()
     {
-        
+        var positioning = _enemy.TacticalPositioning;
+        positioning.Navigation.Agent.stoppingDistance = _previousStoppingDistance;
+        positioning.Reset();
     }
 }

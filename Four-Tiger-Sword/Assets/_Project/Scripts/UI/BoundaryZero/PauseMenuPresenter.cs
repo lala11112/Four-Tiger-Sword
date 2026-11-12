@@ -181,6 +181,11 @@ public sealed partial class PauseMenuPresenter : MonoBehaviour
     public void ConfirmExit()
     {
         if (!SessionIsCurrent || !IsConfirming || IsExiting || _closing) return;
+        if (_choice == ExitChoice.Title && SceneLoaderOverride == null && !Application.CanStreamedLevelBeLoaded("TitleScene"))
+        {
+            RestoreExitFailure("타이틀 씬을 찾을 수 없습니다.");
+            return;
+        }
         IsExiting = true;
         SetButtonsInteractable(false);
         if (_run != null && !_run.TryPreparePauseMenuExit())
@@ -194,8 +199,6 @@ public sealed partial class PauseMenuPresenter : MonoBehaviour
         {
             if (_choice == ExitChoice.Title)
             {
-                if (SceneLoaderOverride == null && !Application.CanStreamedLevelBeLoaded("TitleScene"))
-                { RestoreExitFailure("타이틀 씬을 찾을 수 없습니다."); return; }
                 _heading.text = "이동 중...";
                 var operation = SceneLoaderOverride != null ? SceneLoaderOverride("TitleScene")
                     : SceneManager.LoadSceneAsync("TitleScene", LoadSceneMode.Single);

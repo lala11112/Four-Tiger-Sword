@@ -15,6 +15,7 @@ public class PoiseHandler : MonoBehaviour
     private float _breakTimer;
 
     public bool IsPoiseBreaking => _breakTimer > 0f;
+    public float MaxPoise       => _maxPoise;
     public float PoiseRatio     => _currentPoise / _maxPoise;
 
     public event Action OnPoiseBreak;

@@ -32,16 +32,22 @@ public static class BoundaryInventoryImporterRegression
         {
             Directory.CreateDirectory(scratch);
             ItemCatalog catalog = BoundaryInventoryImporter.ImportForRegression(sourcePath, output);
-            bool expanded = catalog.contentRevision == BoundaryInventoryContent.ExpandedRevision;
-            int itemCount = expanded ? 81 : 59;
+            bool revised = catalog.contentRevision == BoundaryInventoryContent.RevisedRevision;
+            bool expanded = catalog.contentRevision >= BoundaryInventoryContent.ExpandedRevision;
+            int itemCount = revised ? 77 : expanded ? 81 : 59;
             int maxTier = expanded ? 8 : 6;
             int[] thresholds = expanded ? new[] { 2, 4, 6, 8 } : new[] { 2, 4, 6 };
-            int[] gradeCounts = expanded ? new[] { 19, 31, 22, 9 } : new[] { 13, 26, 14, 6 };
+            int[] gradeCounts = revised ? new[] { 30, 20, 18, 9 }
+                : expanded ? new[] { 32, 20, 19, 10 } : new[] { 13, 26, 14, 6 };
             Check(catalog.items.Length == itemCount && catalog.synergies.Length == 11, "expected items / 11 synergies");
             Check(catalog.items.Select(i => i.itemId).Distinct().Count() == itemCount, "unique IDs");
-            Check(catalog.items.SelectMany(i => i.synergyIds).Count() == (expanded ? 89 : 67), "approved tag memberships");
+            Check(catalog.items.SelectMany(i => i.synergyIds).Count() == (revised ? 84 : expanded ? 89 : 67), "approved tag memberships");
             Check(Enumerable.Range(1, 4).All(grade => catalog.items.Count(i => i.grade == grade) == gradeCounts[grade - 1]),
                 "approved grades");
+            Check((int)JObject.Parse(catalog.manifestJson)["balanceRevision"] == (revised ? 5 : expanded ? 4 : 1), "balance revision");
+            JObject importedSource = JObject.Parse(catalog.sourceJson);
+            var sourceGrades = importedSource["items"].ToDictionary(i => (string)i["id"], i => (int)i["grade"]);
+            Check(catalog.items.All(i => sourceGrades[i.itemId] == i.grade), "source grades match generated definitions");
             foreach (ItemDefinition item in catalog.items)
             {
                 Check(item.grade >= 1 && item.grade <= 4 && item.purchasePrice == (20 << (item.grade - 1)), "price: " + item.itemId);
@@ -53,27 +59,41 @@ public static class BoundaryInventoryImporterRegression
             }
             foreach (ItemSynergyDefinition set in catalog.synergies)
             {
-                Check(set.tiers.Select(t => t.count).SequenceEqual(thresholds), "tiers: " + set.id);
+                bool harvest = revised && set.id == "S19";
+                Check(set.tiers.Select(t => t.count).SequenceEqual(harvest ? new[] { 1, 2, 3 } : thresholds), "tiers: " + set.id);
                 Check(set.tiers.All(t => t.effects.Length > 0 && t.effects.All(e => e.IsValid())), "typed tiers: " + set.id);
-                Check(set.members.Length == maxTier + (set.id == "S16" ? 1 : 0)
+                Check(set.members.Length == (harvest ? 3 : maxTier + (set.id == "S16" ? 1 : 0))
                     && set.members.All(id => catalog.Find(id) != null), "members: " + set.id);
-                if (expanded)
+                if (harvest)
+                    Check(set.members.ToHashSet().SetEquals(new[] { "I89", "I91", "I122" }), "approved harvest items");
+                else if (expanded)
+                {
                     Check(set.members.Count(id => !BoundaryInventoryContent.LegacyGrades.ContainsKey(id)) == 2,
                         "two added items: " + set.id);
+                    var expectedGradeCounts = set.id == "S16" ? new[] { 3, 3, 2, 1 } : new[] { 3, 2, 2, 1 };
+                    Check(Enumerable.Range(1, 4).All(grade =>
+                        set.members.Count(id => catalog.Find(id).grade == grade) == expectedGradeCounts[grade - 1]),
+                        "approved synergy grades: " + set.id);
+                }
                 var sourceIds = set.tiers[0].effects.Select(effect => effect.effectId).ToArray();
                 Check(set.tiers.All(tier => tier.effects.Select(effect => effect.effectId).SequenceEqual(sourceIds)),
                     "stable tier sources: " + set.id);
             }
-            ItemDefinition i89 = catalog.Find("I89");
-            Check(i89.effectText.Contains("1~10") && i89.boundaryEffects[0].minimumBaseGold == 1
-                && i89.boundaryEffects[0].maximumBaseGold == 10, "I89 authored threshold override");
             Check(catalog.Find("I16").boundaryEffects.Length == 2, "two elemental bonuses");
-            Check(new[] { "I04", "I43", "I44", "I64", "I65", "I66" }.All(id =>
-                catalog.Find(id).boundaryEffects.All(e => e.family == BoundaryAttackFamily.NormalOrSkill)), "explicit normal-and-skill scope");
-            Check(new[] { "S10", "S14", "S15" }.All(id => catalog.synergies.Single(s => s.id == id)
-                .tiers.All(t => t.effects.All(e => e.family == BoundaryAttackFamily.NormalOrSkill))), "explicit normal-and-skill synergy scope");
-            Check(catalog.Find("I68").boundaryEffects[0].amount == .005f
-                && catalog.Find("I68").boundaryEffects[0].cooldownSeconds == 20, "I68 healing/cooldown");
+            if (revised)
+                CheckRevisedEffects(catalog);
+            else
+            {
+                ItemDefinition i89 = catalog.Find("I89");
+                Check(i89.effectText.Contains("1~10") && i89.boundaryEffects[0].minimumBaseGold == 1
+                    && i89.boundaryEffects[0].maximumBaseGold == 10, "I89 authored threshold override");
+                Check(new[] { "I04", "I43", "I44", "I64", "I65", "I66" }.All(id =>
+                    catalog.Find(id).boundaryEffects.All(e => e.family == BoundaryAttackFamily.NormalOrSkill)), "explicit normal-and-skill scope");
+                Check(new[] { "S10", "S14", "S15" }.All(id => catalog.synergies.Single(s => s.id == id)
+                    .tiers.All(t => t.effects.All(e => e.family == BoundaryAttackFamily.NormalOrSkill))), "explicit normal-and-skill synergy scope");
+                Check(catalog.Find("I68").boundaryEffects[0].amount == .005f
+                    && catalog.Find("I68").boundaryEffects[0].cooldownSeconds == 20, "I68 healing/cooldown");
+            }
 
             var identities = catalog.items.ToDictionary(i => i.itemId, i => AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(i)));
             string catalogGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(catalog));
@@ -98,6 +118,8 @@ public static class BoundaryInventoryImporterRegression
             };
             if (expanded)
                 invalid.Add(j => j["synergies"][0]["tiers"][3]["values"]["critChanceBonusPoints"] = 21);
+            if (revised)
+                invalid.Add(j => j["synergies"][0]["summary"] = "Unexpected summary");
             Dictionary<string, string> baseline = Snapshot(output);
             foreach (Action<JObject> mutate in invalid)
             {
@@ -142,6 +164,68 @@ public static class BoundaryInventoryImporterRegression
             string tempRoot = Path.GetFullPath(Path.GetTempPath());
             if (Directory.Exists(scratch) && Path.GetFullPath(scratch).StartsWith(tempRoot, StringComparison.OrdinalIgnoreCase)
                 && Path.GetFileName(scratch) == "BoundaryInventoryRegression-" + suffix) Directory.Delete(scratch, true);
+        }
+    }
+
+    private static void CheckRevisedEffects(ItemCatalog catalog)
+    {
+        Check(catalog.synergies.All(set => set.summary == string.Empty), "no synergy summaries");
+        Check(catalog.items.All(item => !item.effectText.Contains("치명타 피해 배율"))
+            && catalog.synergies.All(set => set.tiers.All(t => !t.text.Contains("치명타 피해 배율"))),
+            "critical damage wording");
+        Check(catalog.items.SelectMany(item => item.boundaryEffects).All(e =>
+            e.trigger != BoundaryItemTrigger.CombatEntered && e.trigger != BoundaryItemTrigger.FirstLowHealth
+            && !e.firstTargetHit && !e.firstIncomingAttack && !e.firstRewardKill), "no once-per-combat item effects");
+        Check(new[] { "I90", "I93", "I94", "I121" }.All(id => catalog.Find(id) == null), "retired items excluded");
+        Check(ItemEffect("I46", BoundaryItemStat.DamageRatio, .10f).family == BoundaryAttackFamily.Any,
+            "I46 unconditional attack damage");
+        ItemEffect("I56", BoundaryItemStat.AttackRatio, .06f);
+        ItemEffect("I56", BoundaryItemStat.NormalAttackRateRatio, .06f);
+        ItemEffect("I102", BoundaryItemStat.CriticalDamagePoints, 15);
+        ItemEffect("I77", BoundaryItemStat.IncomingDamageReductionRatio, .04f);
+        var shield = ItemEffect("I50", BoundaryItemStat.ShieldMaxHpRatio, .06f);
+        Check(shield.trigger == BoundaryItemTrigger.DamageTaken && shield.selfHpMax == .40f
+            && shield.durationSeconds == 5 && shield.cooldownSeconds == 15, "I50 shield trigger, threshold and cooldown");
+        Check(ItemEffect("I89", BoundaryItemStat.GoldFlat, 8).trigger == BoundaryItemTrigger.RoomCleared, "I89 room gold");
+        ItemEffect("I91", BoundaryItemStat.GoldGainRatio, .05f);
+        ItemEffect("I122", BoundaryItemStat.GoldGainRatio, .15f);
+        Check(catalog.Find("I92").synergyIds.SequenceEqual(new[] { "S15" }), "I92 only belongs to S15");
+
+        var penetration = Synergy("S14");
+        foreach (string id in penetration.members)
+        {
+            float[] gradeAmounts = { .03f, .05f, .08f, .12f };
+            CheckUnconditionalPenetration(ItemEffect(id, BoundaryItemStat.IgnoreDefenseRatio, gradeAmounts[catalog.Find(id).grade - 1]));
+        }
+        foreach (var tier in penetration.tiers)
+            CheckUnconditionalPenetration(tier.effects.Single());
+        var bigGame = Synergy("S15");
+        Check(bigGame.members.Select(id => catalog.Find(id).boundaryEffects.Single(e => e.stat == BoundaryItemStat.DamageRatio))
+            .Concat(bigGame.tiers.Select(t => t.effects.Single())).All(e =>
+                e.eliteOrBossOnly && e.family == BoundaryAttackFamily.Any && e.targetHpMin < 0 && e.targetHpMax < 0
+                && e.trigger == BoundaryItemTrigger.WhileOwned), "elite-only damage covers all attacks");
+        foreach (var (id, amount) in new[] { ("I62", .03f), ("I71", .03f), ("I72", .05f), ("I120", .05f) })
+            ItemEffect(id, BoundaryItemStat.SkillCooldownReductionRatio, amount);
+        Check(Synergy("S16").tiers.Select(t => t.effects.Single(e => e.stat == BoundaryItemStat.SkillCooldownReductionRatio).amount)
+            .SequenceEqual(new[] { .03f, .06f, .09f, .12f }), "S16 cooldown reduction per tier");
+        Check(Synergy("S19").tiers.Select(t => t.effects.Single()).Select(e => (e.stat, e.trigger, e.amount))
+            .SequenceEqual(new[] { .05f, .10f, .20f }.Select(amount =>
+                (BoundaryItemStat.GoldGainRatio, BoundaryItemTrigger.WhileOwned, amount))), "S19 gold gain per tier");
+
+        ItemSynergyDefinition Synergy(string id) => catalog.synergies.Single(set => set.id == id);
+
+        BoundaryItemEffect ItemEffect(string id, BoundaryItemStat stat, float amount)
+        {
+            var effect = catalog.Find(id).boundaryEffects.Single(e => e.stat == stat);
+            Check(effect.amount == amount, id + " amount: " + stat);
+            return effect;
+        }
+
+        void CheckUnconditionalPenetration(BoundaryItemEffect effect)
+        {
+            Check(effect.stat == BoundaryItemStat.IgnoreDefenseRatio && effect.family == BoundaryAttackFamily.Any
+                && !effect.eliteOrBossOnly && effect.targetHpMin < 0 && effect.targetHpMax < 0,
+                "unconditional penetration: " + effect.effectId);
         }
     }
 

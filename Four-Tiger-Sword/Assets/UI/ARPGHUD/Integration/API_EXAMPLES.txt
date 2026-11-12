@@ -12,12 +12,12 @@ public sealed class PentaHudBridge : MonoBehaviour
     [SerializeField] private HudController hud;
 
     // 플레이어 생성/로드 후 실제 초기 상태로 호출합니다.
-    public void InitializeHud(float hp, float maxHp, float resource, float maxResource,
+    public void InitializeHud(float hp, float maxHp, float ultimateCharge, float maxUltimateCharge,
         int form, float eRemaining, float eDuration, float rRemaining, float rDuration)
     {
         if (hud == null) return;
         hud.SetHealth(hp, maxHp);
-        hud.SetAuxiliary(resource, maxResource);
+        hud.SetUltimateCharge(ultimateCharge, maxUltimateCharge);
         hud.SetForm(form);
         hud.SetCooldownE(eRemaining, eDuration);
         hud.SetCooldownR(rRemaining, rDuration);
@@ -29,9 +29,9 @@ public sealed class PentaHudBridge : MonoBehaviour
         if (hud != null) hud.SetHealth(current, maximum);
     }
 
-    public void ResourceChanged(float current, float maximum)
+    public void UltimateChargeChanged(float current, float maximum)
     {
-        if (hud != null) hud.SetAuxiliary(current, maximum);
+        if (hud != null) hud.SetUltimateCharge(current, maximum);
     }
 
     public void FormChanged(HudElement form)
@@ -54,7 +54,7 @@ public sealed class PentaHudBridge : MonoBehaviour
 호출 값 예시 (HudController 참조가 hud일 때)
 
 hud.SetHealth(75f, 100f);          // 체력 75%
-hud.SetAuxiliary(30f, 60f);        // 보조 자원 50%
+hud.SetUltimateCharge(30f, 60f);   // 필살기 충전량 50%
 hud.SetForm(HudElement.Water);    // 수 속성, 아이콘/테두리 자동 변경
 hud.SetForm(3);                   // 목 속성 (번호는 1부터 시작)
 hud.SetCooldownE(8f, 8f);         // E 시전이 승인된 직후

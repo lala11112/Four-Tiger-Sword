@@ -314,6 +314,7 @@ namespace Baekho.Generated.a3a3ce55a4e264cb9b2b31dc53f788381
 
         private void Launch(Sphere sphere)
         {
+            EndAttackWarning();
             sphere.Launched = true;
             sphere.Age = 0f;
             sphere.Target = _target;

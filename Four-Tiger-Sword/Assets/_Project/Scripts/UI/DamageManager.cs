@@ -20,9 +20,10 @@ public static class DamageManager
         var targetStats = targetGO.GetComponent<EnemyStat>();
         var family = ItemDamageContext.Family(info.Category);
         bool canTrigger = info.Origin == DamageOrigin.AuthoredAction && family != BoundaryAttackFamily.Any;
+        // Secondary damage still uses passives that apply to any attack family.
         if (!canTrigger) family = BoundaryAttackFamily.Any;
         var hitContext = new ItemHitContext(targetGO.GetInstanceID(), targetStats != null ? targetStats.CurrentHp : 0f,
-            targetStats != null ? targetStats.MaxHp : 0f, targetEnemy != null && targetEnemy.Rank != EnemyRank.Normal,
+            targetStats != null ? targetStats.MaxHp : 0f, targetEnemy != null && (targetEnemy.Rank == EnemyRank.Elite || targetEnemy.Rank == EnemyRank.Boss),
             family, info.Element, canTrigger, info.CastId);
         var itemRuntime = sourcePlayer != null && targetEnemy != null ? sourcePlayer.ItemRuntime : null;
         var itemModifiers = itemRuntime != null ? itemRuntime.EvaluateOutgoing(hitContext)

@@ -32,6 +32,8 @@ public sealed partial class PlayerItemRuntime
     public IReadOnlyList<ItemSynergyState> SynergyStates => _synergyStates.AsReadOnly();
     public float NormalAttackRateMultiplier => Mathf.Max(0.1f,
         1f + PassiveBoundaryStat(BoundaryItemStat.NormalAttackRateRatio));
+    public float SkillCooldownReductionRatio => Mathf.Clamp(
+        PassiveBoundaryStat(BoundaryItemStat.SkillCooldownReductionRatio), 0f, .40f);
     public double GoldFractionRemainder => _goldFraction;
 
     private bool BoundaryAvailable => _initialized && !_suspended && _stats != null && _stats.CurrentHp > 0f;

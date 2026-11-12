@@ -39,7 +39,7 @@ namespace BoundaryZero.Inventory.Editor
             public int populatedScrollAreas;
             public int bakedGlyphs;
             public string[] i02Synergies;
-            public string[] eightPieceSynergies;
+            public string[] maximumTierSynergies;
             public string[] checks;
             public string[] exportedPaths;
             public long packageBytes;
@@ -180,6 +180,21 @@ namespace BoundaryZero.Inventory.Editor
             }
         }
 
+        public static void RefreshInstalledCatalog()
+        {
+            var catalog = AssetDatabase.LoadAssetAtPath<InventoryCatalog>(CatalogPath);
+            Require(catalog, "Installed presentation catalog is missing.");
+            InventoryData data = catalog.ReadData();
+            ValidateData(data);
+            var bindings = catalog.itemIcons.ToDictionary(binding => binding.id, StringComparer.Ordinal);
+            SpriteBinding[] activeBindings = data.items.Select(item => bindings[item.id]).ToArray();
+            ValidateBindings(activeBindings, data.items.Select(item => item.id), 512);
+            catalog.font = CreateFont(data);
+            catalog.itemIcons = activeBindings;
+            EditorUtility.SetDirty(catalog);
+            AssetDatabase.SaveAssetIfDirty(catalog);
+        }
+
         private static InventoryCatalog CreateCatalog()
         {
             TextAsset json = AssetDatabase.LoadAssetAtPath<TextAsset>(Root + "/Catalog/catalog.json");
@@ -268,7 +283,7 @@ namespace BoundaryZero.Inventory.Editor
             if (!AssetDatabase.Contains(font.material))
                 AssetDatabase.AddObjectToAsset(font.material, font);
             EditorUtility.SetDirty(font);
-            AssetDatabase.SaveAssets();
+            AssetDatabase.SaveAssetIfDirty(font);
             return font;
         }
 
@@ -329,11 +344,17 @@ namespace BoundaryZero.Inventory.Editor
 
         private static void ValidateData(InventoryData data)
         {
-            Require(data != null && data.items?.Length == 81 && data.synergies?.Length == 11,
-                "Expected 81 items and 11 synergies in the catalog.");
+            Require(data != null && data.items?.Length == 77 && data.synergies?.Length == 11,
+                "Expected 77 items and 11 synergies in the catalog.");
             var itemIds = new HashSet<string>(data.items.Select(item => item.id), StringComparer.Ordinal);
             var synergyIds = new HashSet<string>(data.synergies.Select(synergy => synergy.id), StringComparer.Ordinal);
-            Require(itemIds.Count == 81 && synergyIds.Count == 11, "Catalog IDs must be unique.");
+            Require(itemIds.Count == data.items.Length && synergyIds.Count == data.synergies.Length, "Catalog IDs must be unique.");
+            Require(data.synergies.All(set => string.IsNullOrEmpty(set.summary)), "Synergy summaries must be empty.");
+            Require(data.synergies.All(set => set.tiers.Select(tier => tier.count)
+                .SequenceEqual(set.id == "S19" ? new[] { 1, 2, 3 } : new[] { 2, 4, 6, 8 })),
+                "Catalog tier thresholds differ from the current rules.");
+            Require(data.items.Where(item => item.synergies.Contains("S19")).Select(item => item.id).ToHashSet()
+                .SetEquals(new[] { "I89", "I91", "I122" }), "Harvest membership differs from the current rules.");
             Require(!synergyIds.Contains("S07"), "S07 is excluded from the handoff.");
             Require(data.items.All(item => item.synergies.All(synergyIds.Contains)), "Item has an unknown synergy.");
         }
@@ -446,38 +467,42 @@ namespace BoundaryZero.Inventory.Editor
             Require(view.OwnedItemCount == 0 && view.GetSynergyStates().All(state => state.Count == 0),
                 "Item removal must update all memberships.");
 
-            var reachedEight = new List<string>();
+            var reachedMaximumTier = new List<string>();
             foreach (var synergy in data.synergies)
             {
                 string[] members = data.items.Where(item => item.synergies.Contains(synergy.id))
                     .Select(item => item.id).ToArray();
-                Require(members.Length >= 8, "Eight-piece tier cannot be reached for " + synergy.id);
-                int[] expectedTiers = { 0, 0, 2, 2, 4, 4, 6, 6, 8 };
-                for (int count = 0; count < expectedTiers.Length; count++)
+                int[] expectedTiers = synergy.tiers.Select(tier => tier.count).ToArray();
+                int maximumTier = expectedTiers.Max();
+                Require(members.Length >= maximumTier, "Highest tier cannot be reached for " + synergy.id);
+                for (int count = 0; count <= members.Length; count++)
                 {
                     view.SetOwnedItems(members.Take(count));
                     var state = view.GetSynergyStates().Single(value => value.Id == synergy.id);
-                    Require(state.Count == count && state.ActiveTier == expectedTiers[count] && state.RequiredCount == 8
-                        && state.NextTier == (count < 8 ? expectedTiers[count] + 2 : 0),
+                    int expectedActive = expectedTiers.LastOrDefault(tier => tier <= count);
+                    int expectedNext = expectedTiers.FirstOrDefault(tier => tier > count);
+                    Require(state.Count == count && state.ActiveTier == expectedActive && state.RequiredCount == maximumTier
+                        && state.NextTier == expectedNext,
                         "Tier update failed for " + synergy.id + " at " + count + " owned items.");
                 }
-                reachedEight.Add(synergy.id);
+                reachedMaximumTier.Add(synergy.id);
             }
 
             view.SetOwnedItems(data.items.Select(item => item.id));
             report.distinctDemoItems = view.OwnedItemCount;
-            report.eightPieceSynergies = reachedEight.ToArray();
+            report.maximumTierSynergies = reachedMaximumTier.ToArray();
             var fullStates = view.GetSynergyStates();
-            Require(report.distinctDemoItems == 81 && fullStates.Count == 11 &&
-                fullStates.All(state => state.Id != "S07" && state.ActiveTier == 8 && state.DisplayCount == 8 &&
-                    state.Count == data.items.Count(item => item.synergies.Contains(state.Id))),
-                "Full demo catalog did not reach the expected 81 items and 11 eight-piece synergies.");
+            Require(report.distinctDemoItems == data.items.Length && fullStates.Count == data.synergies.Length &&
+                fullStates.All(state => state.Id != "S07" && state.ActiveTier == state.RequiredCount
+                    && state.DisplayCount == state.RequiredCount
+                    && state.Count == data.items.Count(item => item.synergies.Contains(state.Id))),
+                "Full demo inventory did not reach the highest tier of every synergy.");
 
             Canvas.ForceUpdateCanvases();
             Transform[] hierarchy = view.GetComponentsInChildren<Transform>(true);
             report.itemSlots = hierarchy.Count(child => child.name.StartsWith("Item_I", StringComparison.Ordinal));
             report.synergyRows = hierarchy.Count(child => child.name.StartsWith("Synergy_S", StringComparison.Ordinal));
-            Require(report.itemSlots == 81 && report.synergyRows == 11 &&
+            Require(report.itemSlots == data.items.Length && report.synergyRows == data.synergies.Length &&
                 hierarchy.All(child => child.name != "Synergy_S07"), "Rendered item/synergy hierarchy is incomplete.");
             var scrolls = view.GetComponentsInChildren<UnityEngine.UI.ScrollRect>(true);
             report.populatedScrollAreas = scrolls.Count(scroll => scroll.vertical && !scroll.horizontal &&

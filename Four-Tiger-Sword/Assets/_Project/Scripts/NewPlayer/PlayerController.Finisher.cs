@@ -87,6 +87,7 @@ public partial class PlayerController
 
     private void LateUpdate()
     {
+        UpdateDashAfterimages(ActionDeltaTime);
         if (!IsFinisherSelecting || _finisherResolving) return;
         // Evaluate after gameplay updates: death, interruption and timeout win over release.
         if ((Keyboard.current?.escapeKey.wasPressedThisFrame ?? false) || !FinisherSessionIsValid())

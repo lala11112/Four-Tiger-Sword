@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public enum RunItemChoiceKind { Starter, Room }
+public enum RunItemChoiceKind { Room }
 
 public sealed class RunItemChoiceSession
 {
     public string Id { get; internal set; }
     public RunItemChoiceKind Kind { get; internal set; }
-    public bool NeedsSynergy { get; internal set; }
     public string HeldId { get; internal set; }
     public int RerollIndex { get; internal set; }
     public bool Resolved { get; internal set; }
@@ -29,6 +28,11 @@ public sealed class RunItemChoiceService
     public int RerollsRemaining { get; private set; }
     public string LastError { get; private set; }
     public event Action Changed;
+    public event Action OwnedItemsChanged
+    {
+        add { if (_items != null) _items.OnOwnedItemsChanged += value; }
+        remove { if (_items != null) _items.OnOwnedItemsChanged -= value; }
+    }
     public RunItemChoiceSession Current
     {
         get { while (_pending.Count > 0 && _pending.Peek().Resolved) _pending.Dequeue(); return _pending.Count > 0 ? _pending.Peek() : null; }
@@ -45,27 +49,20 @@ public sealed class RunItemChoiceService
     private bool Ready => !_busy && _items != null && _items.IsInitialized && !_items.IsMutationInProgress
         && _items.Catalog != null && _wallet != null && _wallet.IsInitialized
         && _items.GetComponent<PlayerStatManager>() is { CurrentHp: > 0f };
-    public bool BeginStarterChoice()
-    {
-        if (!_snapshot.Has("heirloom")) return false;
-        return Begin("starter", RunItemChoiceKind.Starter);
-    }
     public bool BeginRoomReward(string receipt)
-        => !string.IsNullOrWhiteSpace(receipt) && Begin("room:" + receipt, RunItemChoiceKind.Room);
-    private bool Begin(string id, RunItemChoiceKind kind)
     {
-        if (!Ready || _receipts.ContainsKey(id)) return false;
-        var session = new RunItemChoiceSession { Id = id, Kind = kind, NeedsSynergy = kind == RunItemChoiceKind.Starter && _snapshot.Has("starterelement") };
-        if (session.NeedsSynergy && StarterSynergies().Count == 0) session.NeedsSynergy = false;
-        if (!session.NeedsSynergy)
-            session.candidates.AddRange(Draw(Pool(kind == RunItemChoiceKind.Starter ? 1 : 0), Count(session), RandomFor(session), kind == RunItemChoiceKind.Room));
-        if (kind == RunItemChoiceKind.Room && session.candidates.Count == 0)
+        if (string.IsNullOrWhiteSpace(receipt) || !Ready) return false;
+        string id = "room:" + receipt;
+        if (_receipts.ContainsKey(id)) return false;
+        var session = new RunItemChoiceSession { Id = id, Kind = RunItemChoiceKind.Room };
+        session.candidates.AddRange(Draw(Pool(), CandidateCount, RandomFor(session)));
+        if (session.candidates.Count == 0)
         {
             // A failed credit leaves the receipt available at the chest for a later attempt.
             _busy = true;
             try
             {
-                if (!_wallet.AddGold(_snapshot.EmptyRewardGold)) return Fail("대체 골드를 받을 수 없습니다.");
+                if (!_wallet.TryAddEarnedGold(_snapshot.EmptyRewardGold)) return Fail("대체 골드를 받을 수 없습니다.");
                 session.Resolved = true;
                 _receipts.Add(id, session);
             }
@@ -79,31 +76,10 @@ public sealed class RunItemChoiceService
         LastError = null; Notify();
         return true;
     }
-    public IReadOnlyList<ItemSynergyDefinition> StarterSynergies()
-    {
-        var pool = Pool(1);
-        var result = new List<ItemSynergyDefinition>();
-        foreach (var synergy in Catalog?.synergies ?? Array.Empty<ItemSynergyDefinition>())
-            if (synergy?.members != null && pool.Exists(item => Array.IndexOf(synergy.members, item.itemId) >= 0)) result.Add(synergy);
-        result.Sort((a, b) => StringComparer.Ordinal.Compare(a.id, b.id));
-        return result;
-    }
-    public bool TryChooseStarterSynergy(string sessionId, string synergyId)
-    {
-        var current = Current;
-        if (!Ready || current == null || current.Id != sessionId || !current.NeedsSynergy) return false;
-        ItemSynergyDefinition selected = null;
-        foreach (var synergy in StarterSynergies()) if (synergy.id == synergyId) selected = synergy;
-        if (selected == null) return Fail("선택할 수 없는 계통입니다.");
-        current.candidates.AddRange(Draw(Pool(1).FindAll(i => Array.IndexOf(selected.members, i.itemId) >= 0), Count(current), RandomFor(current), false));
-        current.NeedsSynergy = false; LastError = null;
-        if (current.candidates.Count == 1) return TryClaim(sessionId, current.candidates[0].itemId);
-        Notify(); return true;
-    }
     public bool TryClaim(string sessionId, string itemId)
     {
         var current = Current;
-        if (!Ready || current == null || current.Id != sessionId || current.NeedsSynergy || current.Resolved) return false;
+        if (!Ready || current == null || current.Id != sessionId || current.Resolved) return false;
         var candidate = current.candidates.Find(i => i != null && i.itemId == itemId);
         if (candidate == null || Catalog.Find(itemId) != candidate) return Fail("유효하지 않은 보상입니다.");
         _busy = true;
@@ -115,20 +91,13 @@ public sealed class RunItemChoiceService
         finally { _busy = false; }
         Notify(); return true;
     }
-    public bool TryClaimEmptyReward(string sessionId)
-    {
-        var current = Current;
-        if (!Ready || current == null || current.Id != sessionId || current.Kind != RunItemChoiceKind.Starter
-            || current.NeedsSynergy || current.candidates.Count != 0) return false;
-        return TrySkip(sessionId);
-    }
     public bool TrySkip(string sessionId)
     {
         var current = Current;
         if (!Ready || current == null || current.Id != sessionId) return false;
         current.Resolved = true; current.HeldId = null; LastError = null; Notify(); return true;
     }
-    public bool CanHold => _snapshot.Has("hold") && Current?.Kind == RunItemChoiceKind.Room;
+    public bool CanHold => _snapshot.Has("hold") && Current != null;
     public bool ToggleHeldCandidate(string sessionId, string itemId)
     {
         var current = Current;
@@ -140,9 +109,9 @@ public sealed class RunItemChoiceService
         get
         {
             var current = Current;
-            if (!Ready || current == null || current.Kind != RunItemChoiceKind.Room || current.NeedsSynergy || RerollsRemaining <= 0) return false;
+            if (!Ready || current == null || RerollsRemaining <= 0) return false;
             var currentIds = new HashSet<string>(current.candidates.ConvertAll(i => i.itemId), StringComparer.Ordinal);
-            return current.candidates.Count > (current.HeldId != null ? 1 : 0) && Pool(0).Exists(i => !currentIds.Contains(i.itemId));
+            return current.candidates.Count > (current.HeldId != null ? 1 : 0) && Pool().Exists(i => !currentIds.Contains(i.itemId));
         }
     }
     public bool TryReroll(string sessionId)
@@ -152,13 +121,13 @@ public sealed class RunItemChoiceService
         var old = new List<ItemDefinition>(current.candidates);
         var held = old.Find(i => i.itemId == current.HeldId);
         var ids = new HashSet<string>(old.ConvertAll(i => i.itemId), StringComparer.Ordinal);
-        var fresh = Pool(0).FindAll(i => !ids.Contains(i.itemId));
+        var fresh = Pool().FindAll(i => !ids.Contains(i.itemId));
         current.RerollIndex++;
         var random = RandomFor(current);
         var next = new List<ItemDefinition>();
         if (held != null) next.Add(held);
-        next.AddRange(Draw(fresh, Count(current) - next.Count, random, true));
-        if (next.Count < Count(current)) next.AddRange(Draw(old.FindAll(i => i != held && !Owned(i)), Count(current) - next.Count, random, true));
+        next.AddRange(Draw(fresh, CandidateCount - next.Count, random));
+        if (next.Count < CandidateCount) next.AddRange(Draw(old.FindAll(i => i != held && !Owned(i)), CandidateCount - next.Count, random));
         current.candidates.Clear(); current.candidates.AddRange(next);
         RerollsRemaining--; LastError = null; Notify(); return true;
     }
@@ -175,15 +144,14 @@ public sealed class RunItemChoiceService
         }
         return 1f;
     }
-    private int Count(RunItemChoiceSession session) => session.Kind == RunItemChoiceKind.Starter
-        ? Math.Max(1, _snapshot.Limit("heirloom")) : Math.Max(1, _snapshot.BaseRewardChoices + (int)_snapshot.Amount("choices"));
+    private int CandidateCount => Math.Max(1, _snapshot.BaseRewardChoices + (int)_snapshot.Amount("choices"));
     private bool Owned(ItemDefinition item)
     {
         foreach (var owned in _items.OwnedItems)
             if (owned != null && (owned.itemId == item.itemId || owned.candidateKey == item.candidateKey)) return true;
         return false;
     }
-    private List<ItemDefinition> Pool(int grade)
+    private List<ItemDefinition> Pool()
     {
         var result = new List<ItemDefinition>();
         var ids = new HashSet<string>(StringComparer.Ordinal); var keys = new HashSet<string>(StringComparer.Ordinal);
@@ -191,20 +159,20 @@ public sealed class RunItemChoiceService
         {
             if (item == null || string.IsNullOrWhiteSpace(item.itemId) || string.IsNullOrWhiteSpace(item.candidateKey)
                 || item.projectId != Catalog.projectId || Catalog.Find(item.itemId) != item || item.grade < 1 || item.grade > 4
-                || grade != 0 && item.grade != grade || Owned(item) || item.effects == null || item.boundaryEffects == null) continue;
+                || Owned(item) || item.effects == null || item.boundaryEffects == null) continue;
             if (item.effects.Any(e => e == null || !e.IsValid()) || item.boundaryEffects.Any(e => e == null || !e.IsValid())) continue;
             if (ids.Add(item.itemId) && keys.Add(item.candidateKey)) result.Add(item);
         }
         result.Sort((a, b) => StringComparer.Ordinal.Compare(a.itemId, b.itemId)); return result;
     }
-    private List<ItemDefinition> Draw(List<ItemDefinition> pool, int count, Random random, bool weighted)
+    private List<ItemDefinition> Draw(List<ItemDefinition> pool, int count, Random random)
     {
         var result = new List<ItemDefinition>();
         while (result.Count < count && pool.Count > 0)
         {
-            double total = 0; foreach (var item in pool) total += weighted ? RewardWeight(item) : 1;
+            double total = 0; foreach (var item in pool) total += RewardWeight(item);
             double roll = random.NextDouble() * total; int index = pool.Count - 1;
-            for (int i = 0; i < pool.Count; i++) { roll -= weighted ? RewardWeight(pool[i]) : 1; if (roll < 0) { index = i; break; } }
+            for (int i = 0; i < pool.Count; i++) { roll -= RewardWeight(pool[i]); if (roll < 0) { index = i; break; } }
             result.Add(pool[index]); pool.RemoveAt(index);
         }
         return result;

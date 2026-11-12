@@ -77,8 +77,6 @@ public sealed class DungeonMinimapView : MonoBehaviour
     private bool _hasLayout, _stylesDirty = true;
     private Func<int, string> _getTravelBlockReason;
     private int _hoveredAreaIndex = -1;
-    private RectTransform _hoverOutline;
-    private readonly List<UnityEngine.UI.Image> _hoverEdges = new List<UnityEngine.UI.Image>();
     private string _travelMessage;
     private Vector2 _pointerPosition;
     private Camera _pointerCamera;
@@ -263,8 +261,7 @@ public sealed class DungeonMinimapView : MonoBehaviour
         int index = _markers.FindIndex(marker => marker.Graphic == graphic);
         if (index < 0) return;
         _markers.RemoveAt(index);
-        graphic.gameObject.SetActive(false);
-        Destroy(graphic.gameObject);
+        Remove(graphic.rectTransform);
     }
 
     public void RefreshExploration(DungeonMinimapModel model)
@@ -276,7 +273,7 @@ public sealed class DungeonMinimapView : MonoBehaviour
         {
             var visual = _areas[i];
             visual.Rect.gameObject.SetActive(model.Areas[i].Visited);
-            visual.Image.color = i == model.CurrentAreaIndex ? currentColor : visitedColor;
+            visual.Image.color = RoomColor(i);
         }
         for (int i = 0; i < _stubs.Count; i++)
         {
@@ -286,6 +283,7 @@ public sealed class DungeonMinimapView : MonoBehaviour
         }
         _renderedRevision = model.Revision;
         UpdateMarkers();
+        if (_hasPointer) RefreshHover();
     }
 
     public void SetPose(Vector2 playerLocalXZ, Vector2 forwardLocalXZ)
@@ -368,9 +366,6 @@ public sealed class DungeonMinimapView : MonoBehaviour
         for (int i = 0; i < _markers.Count; i++) Remove(_markers[i].Rect);
         for (int i = 0; i < _enemyPool.Count; i++) Remove(_enemyPool[i].rectTransform);
         _enemyPool.Clear();
-        Remove(_hoverOutline);
-        _hoverOutline = null;
-        _hoverEdges.Clear();
         _hoveredAreaIndex = -1;
         _hasPointer = false;
         _travelMessage = null;
@@ -416,8 +411,9 @@ public sealed class DungeonMinimapView : MonoBehaviour
     public void ClearPointer()
     {
         _hasPointer = false;
+        if (_hoveredAreaIndex >= 0)
+            _areas[_hoveredAreaIndex].Image.color = RoomColor(_hoveredAreaIndex);
         _hoveredAreaIndex = -1;
-        if (_hoverOutline != null) _hoverOutline.gameObject.SetActive(false);
         RefreshTravelStatus();
     }
 
@@ -466,24 +462,26 @@ public sealed class DungeonMinimapView : MonoBehaviour
     {
         int previous = _hoveredAreaIndex;
         _hoveredAreaIndex = _hasPointer ? PickRoom(_pointerPosition, _pointerCamera) : -1;
-        if (_hoveredAreaIndex != previous) _travelMessage = null;
+        if (_hoveredAreaIndex != previous)
+        {
+            if (previous >= 0) _areas[previous].Image.color = RoomColor(previous);
+            _travelMessage = null;
+        }
         if (_hoveredAreaIndex < 0)
         {
-            if (_hoverOutline != null) _hoverOutline.gameObject.SetActive(false);
             RefreshTravelStatus();
             return;
         }
-        EnsureHoverOutline();
         var area = _model.Areas[_hoveredAreaIndex];
-        _hoverOutline.anchoredPosition = (area.Center - MapOrigin) * _pixelsPerMetre;
-        _hoverOutline.sizeDelta = area.Size * _pixelsPerMetre;
-        _hoverOutline.localRotation = Quaternion.Euler(0f, 0f, area.RotationDegrees);
         string reason = _getTravelBlockReason?.Invoke(area.RoomId);
+        Color normal = RoomColor(_hoveredAreaIndex);
         Color tint = string.IsNullOrEmpty(reason) ? availableTravelColor : blockedTravelColor;
-        for (int i = 0; i < _hoverEdges.Count; i++) _hoverEdges[i].color = tint;
-        _hoverOutline.gameObject.SetActive(true);
+        tint.a = normal.a;
+        _areas[_hoveredAreaIndex].Image.color = Color.Lerp(normal, tint, .3f);
         RefreshTravelStatus(reason);
     }
+
+    private Color RoomColor(int index) => index == _model.CurrentAreaIndex ? currentColor : visitedColor;
 
     private void RefreshTravelStatus(string hoverBlockReason = null)
     {
@@ -494,31 +492,6 @@ public sealed class DungeonMinimapView : MonoBehaviour
             ? string.IsNullOrEmpty(hoverBlockReason) ? "클릭하여 이 방으로 이동" : hoverBlockReason
             : "방문한 방을 클릭하면 이동합니다.";
         if (travelStatus.text != text) travelStatus.text = text;
-    }
-
-    private void EnsureHoverOutline()
-    {
-        if (_hoverOutline != null) return;
-        var root = new GameObject("TravelHighlight", typeof(RectTransform));
-        _hoverOutline = (RectTransform)root.transform;
-        _hoverOutline.SetParent(viewport, false);
-        Center(_hoverOutline);
-        _hoverOutline.SetSiblingIndex(mapContent.GetSiblingIndex() + 1);
-        CreateHoverEdge("Left", new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, .5f), new Vector2(2f, 0f));
-        CreateHoverEdge("Right", new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, .5f), new Vector2(2f, 0f));
-        CreateHoverEdge("Top", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(.5f, 1f), new Vector2(0f, 2f));
-        CreateHoverEdge("Bottom", new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(.5f, 0f), new Vector2(0f, 2f));
-    }
-
-    private void CreateHoverEdge(string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 size)
-    {
-        var edge = CreateArea(name, _hoverOutline);
-        edge.Rect.anchorMin = anchorMin;
-        edge.Rect.anchorMax = anchorMax;
-        edge.Rect.pivot = pivot;
-        edge.Rect.sizeDelta = size;
-        edge.Rect.gameObject.SetActive(true);
-        _hoverEdges.Add(edge.Image);
     }
 
     private void OnValidate()

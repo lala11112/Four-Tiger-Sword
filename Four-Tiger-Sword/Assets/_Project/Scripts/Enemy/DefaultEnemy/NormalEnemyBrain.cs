@@ -12,6 +12,9 @@ public sealed class NormalEnemyBrain : EnemyBrainBase
 
     public override void Tick(bool canAct)
     {
+        if (!canAct || Owner.IsHurt || Owner.IsRoot || Owner.IsGroggy || Owner.PendingGroggy
+            || Owner.IsDead || Owner.IsSelfDestructing || Owner.CombatLabPassive || Owner.EncounterPatrolOnly)
+            Owner.CombatGroup?.ClearIntent(Owner);
         if (!Owner.EncounterPatrolOnly || Owner.IsDead)
         {
             if (Owner.PendingGroggy && !Owner.IsGroggy && !Owner.IsDead && !Owner.IsSelfDestructing)
@@ -86,10 +89,21 @@ public sealed class NormalEnemyBrain : EnemyBrainBase
         Machine.AddTransition(trace, idle, () => Owner.DetectedTarget == null && !Owner.HasTargetMemory);
         Machine.AddTransition(combatIdle, trace, () => OutOfCombatRange);
         Machine.AddTransition(combatIdle, approach, () => Owner.HasSelectedAttack);
-        Machine.AddTransition(approach, attack, () => Owner.IsInExecuteRange);
+        Machine.AddTransition(approach, attack, TryStartAttack);
         Machine.AddTransition(approach, trace, () => OutOfCombatRange);
         Machine.AddTransition(approach, combatIdle, () => Owner.CurrentAction == null);
         Machine.AddTransition(attack, combatIdle, () => Owner.IsAttackFinished);
+    }
+
+    private bool TryStartAttack()
+    {
+        if (!Owner.IsInExecuteRange || !Owner.CanAttack || Owner.CurrentAction == null
+            || !Owner.IsSkillReady(Owner.CurrentAction.SkillData))
+        {
+            Owner.CombatGroup?.CancelAttackRequest(Owner);
+            return false;
+        }
+        return Owner.CombatGroup == null || Owner.CombatGroup.TryStartAttack(Owner);
     }
 
     private bool InCombatRange => Owner.DetectedTarget != null

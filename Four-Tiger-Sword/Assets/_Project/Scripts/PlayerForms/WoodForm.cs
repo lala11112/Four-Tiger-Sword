@@ -4,7 +4,6 @@ public class WoodForm : BaseForm
 {
     private readonly WoodFormActionDataSO _woodData;
     public override ElementType Element => ElementType.ELEMENT_WOOD;
-    public override float SkillSpCost => Mathf.Max(0f, _woodData.SkillSpiritCost);
     public override float SkillCooldown => Mathf.Max(0f, _woodData.SkillCooldownSeconds);
     public override bool CanUltimate => _woodData != null && UltimateResourcesReady;
     private bool _skillApplied, _skillActive;

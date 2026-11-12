@@ -66,7 +66,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     public string BackstepAnimationName = "Backstep";
     private float _dashCooldownTimer;
     public bool CanDash => !IsStageTransitioning && !IsGameplayModalPaused && _dashCooldownTimer <= 0f && StatManager != null
-        && StatManager.CurrentHp > 0f && StatManager.HasEnoughSp(DodgeSpCost);
+        && StatManager.CurrentHp > 0f;
     public bool IsDashing => StateMachine.CurrentState is PlayerDashState;
 
     [Header("Form Change / Parry Settings")]
@@ -94,7 +94,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     }
 
 
-    // CanSkill / CanUltimate 는 현재 폼의 쿨타임과 SP를 함께 검사합니다.
+    // 현재 폼의 동작 데이터와 쿨타임, 필살기는 게이지도 검사합니다.
     public bool CanSkill => !IsStageTransitioning && !IsGameplayModalPaused && (FormManager?.CurrentForm?.CanSkill ?? false);
     public bool CanUltimate => !IsStageTransitioning && !IsGameplayModalPaused && (FormManager?.CurrentForm?.CanUltimate ?? false);
 
@@ -190,6 +190,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     private void Update()
     {
         if (IsStageTransitioning) return;
+        if (UpdateFallRecovery()) return;
         if (IsGameplayModalPaused)
         {
             // A scripted lethal hit must still terminate the run while a gameplay modal owns world time.
@@ -202,8 +203,6 @@ public partial class PlayerController : MonoBehaviour, IDamageable
         UpdateDashCooldown();
         UpdateFormChangeCooldown();
         ItemRuntime?.Tick(Time.deltaTime);
-        StatManager.UpdateSpRegen(Time.deltaTime);
-        FormManager.UpdateFormSp(Time.deltaTime);
         FormManager.UpdateChainReadiness(Time.deltaTime);
         bool canAct = ActionDeltaTime > 0f;
         if (canAct) TryDeactivateUltimate();
@@ -289,7 +288,8 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     public bool IsGround() //자체 isGround. 일반적인 Controller는 바닥으로 Ray하나만 쏴서 한쪽 발이 걸려있어도 떨어지는걸로 판명되어 직접 작성함
     {
         Vector3 sphereCenter = transform.position + Controller.center + Vector3.down * (Controller.height / 2f - Controller.radius);
-        RaycastHit[] hits = Physics.SphereCastAll(sphereCenter, Controller.radius, Vector3.down, 0.1f, _groundLayer);
+        RaycastHit[] hits = Physics.SphereCastAll(sphereCenter, Controller.radius, Vector3.down, 0.1f,
+            _groundLayer, QueryTriggerInteraction.Ignore);
 
         foreach (var hit in hits)
         {
@@ -301,7 +301,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
 
     public DamageResult TakeDamage(float damage, ElementType damageType = ElementType.ELEMENT_NONE, bool isCritical = false, Vector3 power = default, float poiseDamage = 20f, StaggerResistLevel staggerResistLevel = StaggerResistLevel.NONE, bool isParryable = true, object source = null)
     {
-        if (!isActiveAndEnabled || IsStageTransitioning || StatManager.CurrentHp <= 0f
+        if (!isActiveAndEnabled || IsStageTransitioning || IsFallProtected || StatManager.CurrentHp <= 0f
             || damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return default;
         if (Engravings?.IsInvulnerable == true) return default;
         if (StateMachine.CurrentState is PlayerDashState dash)
@@ -373,6 +373,12 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     {
         // Damage and camera feedback still apply, but a committed down/get-up is never restarted.
         if (IsKnockedDown || !CanReactToHit(attackLevel))
+            return;
+
+        // Skill armor suppresses ordinary reactions throughout the action, but authored knockdowns still interrupt.
+        if (!knockdown && (StateMachine.CurrentState is PlayerSkillState
+            || StateMachine.CurrentState is PlayerSwitchAttackState
+            || StateMachine.CurrentState is PlayerUltimateState))
             return;
 
         Vector3 velocity = GetKnockbackVelocity(power);
@@ -465,6 +471,9 @@ public partial class PlayerController : MonoBehaviour, IDamageable
 
     private void OnDisable()
     {
+        DisposeDashAfterimages();
+        CancelFallRecovery();
+        _fallRecovery?.ResetHistory();
         if (StateMachine?.CurrentState is PlayerHitState activeReaction) activeReaction.Cancel();
         if (StateMachine?.CurrentState is PlayerAttackState attack) attack.CancelSkillReservation();
         CancelFinisherSelection();

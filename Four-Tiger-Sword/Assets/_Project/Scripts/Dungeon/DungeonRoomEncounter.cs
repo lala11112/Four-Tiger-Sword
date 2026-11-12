@@ -27,6 +27,7 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
         && _members.Count > 0 && _confirmedDefeats == _members.Count;
     public IReadOnlyList<DungeonEncounterMember> Members => _members;
     public IReadOnlyList<DungeonEncounterGate> Gates => _gates;
+    public EnemyCombatGroup CombatGroup { get; private set; }
     public event Action<DungeonRoomEncounter> Cleared;
     public event Action<DungeonEncounterMember> MemberSpawned;
     private const float ReinforcementDelay = 1.5f;
@@ -124,6 +125,7 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
             // Navigation is prepared before adding dynamic gate geometry.
             CreateGates(module, usedSockets, director.doorPrefab, _isBoss ? bossExitSocketIndex : -1);
             if (_waves.Count == 0) { State = DungeonEncounterState.Cleared; return; }
+            EnsureCombatGroup();
             _enemyRoot = new GameObject("EncounterEnemies");
             _enemyRoot.transform.SetParent(transform, false);
             if (!TryPlanNextWave(out var placements, out var placementError))
@@ -145,6 +147,13 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
             }
             Fail(exception.Message);
         }
+    }
+
+    private void EnsureCombatGroup()
+    {
+        if (_isBoss || CombatGroup != null) return;
+        CombatGroup = GetComponent<EnemyCombatGroup>() ?? gameObject.AddComponent<EnemyCombatGroup>();
+        CombatGroup.Initialize(_director.normalEnemyAI);
     }
 
     private bool TryPlanNextWave(out List<DungeonEnemyPlacement> placements, out string error)
@@ -207,8 +216,6 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
                 continue;
             }
             member.Enemy.SetEncounterPatrolOnly(false);
-            if (_director.Player != null)
-                member.Enemy.RememberEncounterPosition(_director.Player.transform.position);
             if (!member.Activate(out var error)) throw new InvalidOperationException(error);
         }
     }
@@ -237,6 +244,7 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
         if (_alive.Count == 0 && !HasMoreWaves) { Complete(); return false; }
         foreach (var member in _alive)
             if (!member.CanActivate(out var error)) { Fail(error); return false; }
+        EnsureCombatGroup();
         foreach (var gate in _gates) gate.Lock();
         WasEntered = true;
         State = DungeonEncounterState.Fighting;

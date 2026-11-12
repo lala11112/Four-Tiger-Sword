@@ -8,6 +8,8 @@ public class PlayerStateMachineSetup
     {
         var stateMachine = new StateMachine();
         var idle = new PlayerIdleState(_playerController);
+        // Use the same Idle transitions while the landing animation plays.
+        var landingIdle = new PlayerIdleState(_playerController, playLandingAnimation: true);
         var move = new PlayerRunState(_playerController);
         var jump = new PlayerJumpState(_playerController);
         var fall = new PlayerFallState(_playerController);
@@ -28,7 +30,7 @@ public class PlayerStateMachineSetup
         // The F reservation wins over locomotion and normal actions; death/hit reactions still win.
         ChainSkillTransitions(stateMachine, idle, move, attack, dash, switchAttack);
         GroundTransitions(stateMachine, idle, move, jump, fall, dash, attack);
-        AirTransitions(stateMachine, idle, move, jump, fall);
+        AirTransitions(stateMachine, idle, landingIdle, move, jump, fall);
         DashTransitions(stateMachine, idle, move, dash);
         AttackTransitions(stateMachine, idle, move, jump, attack, dash, skill, ultimate);
         AirAttackTransitions(stateMachine, idle, move, jump, fall, airAttack);
@@ -57,7 +59,8 @@ public class PlayerStateMachineSetup
     }
 
     //점프 및 공중
-    private void AirTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerRunState move, PlayerJumpState jump, PlayerFallState fall)
+    private void AirTransitions(StateMachine stateMachine, PlayerIdleState idle, PlayerIdleState landingIdle,
+        PlayerRunState move, PlayerJumpState jump, PlayerFallState fall)
     {
         // 코요테 타임 포함한 점프 조건
         stateMachine.AddTransition(idle, jump, () => _playerController.Input.JumpBuffer.IsActive && _playerController.CanJump());
@@ -72,7 +75,7 @@ public class PlayerStateMachineSetup
         //stateMachine.AddTransition(jump, idle, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         //ㅉstateMachine.AddTransition(jump, move, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
 
-        stateMachine.AddTransition(fall, idle, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
+        stateMachine.AddTransition(fall, landingIdle, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude <= 0.01f);
         stateMachine.AddTransition(fall, move, () => _playerController.IsGround() && _playerController.Input.MoveInput.sqrMagnitude > 0.01f);
     }
 

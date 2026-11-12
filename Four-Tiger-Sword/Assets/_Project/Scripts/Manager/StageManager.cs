@@ -9,6 +9,7 @@ public class StageManager : MonoBehaviour
 {
     [SerializeField] private BaekhoDungeonGenerator generator;
     [SerializeField] private DungeonEncounterDirector encounters;
+    [SerializeField] private StageExit exitPrefab;
     public BaekhoDungeonGenerator Generator => generator;
     public DungeonEncounterDirector Encounters => encounters;
     public BaekhoDungeonResult Result { get; private set; }
@@ -19,6 +20,7 @@ public class StageManager : MonoBehaviour
     public StageExit Exit { get; private set; }
     public Vector3 PlayerSpawnPosition { get; private set; }
     public Quaternion PlayerSpawnRotation { get; private set; }
+    public DungeonFallRecovery FallRecovery { get; private set; }
     public event Action OnStageClear;
     public event Action OnStageStart;
     public event Action ExitRequested;
@@ -41,6 +43,8 @@ public class StageManager : MonoBehaviour
     public void Configure(BaekhoDungeonGenerator source, DungeonEncounterDirector director)
     { generator = source; encounters = director; generator.generateOnStart = false; }
 
+    public void ConfigureExitPrefab(StageExit prefab) => exitPrefab = prefab;
+
     public IEnumerator Prepare(StageDefinition definition, bool bossStage, int stageSeed, int layoutSeed, PlayerController player)
     {
         int generation = ++_generation;
@@ -53,6 +57,8 @@ public class StageManager : MonoBehaviour
         _endEncounter = _bossEncounter = null;
         if (generator == null || encounters == null || player == null)
         { SetError("Stage requires a generator, encounter director and player."); yield break; }
+        if (exitPrefab == null)
+        { SetError("Stage requires a StageExitPortal prefab."); yield break; }
         if (definition == null || !definition.Validate(bossStage, out _))
         { SetError(definition == null ? "Stage Definition is missing." : GetValidationError(definition, bossStage)); yield break; }
         if (_runtimeSettings != null) Destroy(_runtimeSettings);
@@ -97,11 +103,10 @@ public class StageManager : MonoBehaviour
         GameObject exitObject = null;
         try
         {
-            exitObject = new GameObject("StageExit");
-            exitObject.transform.SetParent(result.endRoom.transform, false);
-            exitObject.transform.SetPositionAndRotation(end.exitPoint.position, end.exitPoint.rotation);
-            Exit = exitObject.AddComponent<StageExit>();
-            Exit.Initialize(this, player, end.exitSize, generation);
+            Exit = Instantiate(exitPrefab, end.exitPoint.position, end.exitPoint.rotation, result.endRoom.transform);
+            exitObject = Exit.gameObject;
+            exitObject.name = "StageExitPortal";
+            Exit.Initialize(this, player, generation);
         }
         catch (Exception exception)
         {
@@ -110,6 +115,11 @@ public class StageManager : MonoBehaviour
             SetError("Stage exit preparation failed: " + exception.Message);
         }
         if (Error != null) yield break;
+        var fallRecovery = new DungeonFallRecovery(this, player);
+        if (!fallRecovery.TryPrepare(out string recoveryError))
+        { SetError("Fall recovery preparation failed: " + recoveryError); yield break; }
+        FallRecovery = fallRecovery;
+        player.BindFallRecovery(fallRecovery);
         IsReady = true;
     }
 
@@ -121,6 +131,7 @@ public class StageManager : MonoBehaviour
     public void Suspend()
     {
         IsReady = false;
+        ClearFallRecovery();
         GetComponent<StageShopService>()?.SuspendStage();
         if (Exit != null) Exit.SetAvailable(false);
         encounters?.SuspendEncounters();
@@ -138,20 +149,30 @@ public class StageManager : MonoBehaviour
     {
         if (!IsReady) return;
         if (!string.IsNullOrEmpty(encounters.Error)) { SetError(encounters.Error); Failed?.Invoke(Error); return; }
-        bool objectiveComplete = _endEncounter != null && _endEncounter.State == DungeonEncounterState.Cleared
+        bool objectiveComplete = _endEncounter != null && _endEncounter.WasEntered && _endEncounter.State == DungeonEncounterState.Cleared
             && (!_isBossStage || (_bossEncounter != null && _bossEncounter.BossDefeated && _bossEncounter.State == DungeonEncounterState.Cleared));
         Exit?.SetAvailable(objectiveComplete);
         // Empty end rooms are Cleared at initialization: arrival, not a missed event, completes them.
-        if (objectiveComplete && _endEncounter.WasEntered) MarkClear();
+        if (objectiveComplete) MarkClear();
+    }
+
+    internal bool CanUseExit(PlayerController player, int generation)
+    {
+        var run = GetComponent<RunManager>();
+        if (!IsReady || _exitRequested || generation != _generation || player == null || player != _player
+            || !player.isActiveAndEnabled || player.Controller == null || !player.Controller.enabled
+            || player.IsStageTransitioning || player.IsGameplayModalPaused
+            || (run != null && (run.State != RunState.Playing || run.HasPendingItemChoice || run.IsRewardOpen || run.IsUpgradeSaveBlocked))
+            || Exit == null || !Exit.IsAvailable
+            || player.StatManager == null || player.StatManager.CurrentHp <= 0 || _endEncounter == null
+            || !_endEncounter.WasEntered || _endEncounter.State != DungeonEncounterState.Cleared
+            || (_isBossStage && (_bossEncounter == null || !_bossEncounter.BossDefeated || _bossEncounter.State != DungeonEncounterState.Cleared))) return false;
+        return true;
     }
 
     public bool TryUseExit(PlayerController player, int generation)
     {
-        if (!IsReady || _exitRequested || generation != _generation || player != _player || player.IsStageTransitioning || player.IsGameplayModalPaused
-            || GetComponent<RunManager>()?.HasPendingItemChoice == true
-            || Exit == null || !Exit.ContainsPlayer(player)
-            || player.StatManager.CurrentHp <= 0 || _endEncounter == null || _endEncounter.State != DungeonEncounterState.Cleared
-            || (_isBossStage && (_bossEncounter == null || !_bossEncounter.BossDefeated || _bossEncounter.State != DungeonEncounterState.Cleared))) return false;
+        if (!CanUseExit(player, generation) || !Exit.HasVerifiedTraversal(player) || !Exit.ContainsPlayer(player)) return false;
         _exitRequested = true;
         MarkClear();
         ExitRequested?.Invoke();
@@ -164,6 +185,18 @@ public class StageManager : MonoBehaviour
     private void SetError(string message)
     { Error = message; Suspend(); Debug.LogWarning("[Stage] " + message, this); }
 
+    internal void ReportFallRecoveryFailure(string message)
+    {
+        SetError("Fall recovery failed: " + message);
+        Failed?.Invoke(Error);
+    }
+
+    private void ClearFallRecovery()
+    {
+        if (FallRecovery != null && _player != null) _player.UnbindFallRecovery(FallRecovery);
+        FallRecovery = null;
+    }
+
     private void OnDestroy()
-    { if (_runtimeSettings != null) Destroy(_runtimeSettings); }
+    { ClearFallRecovery(); if (_runtimeSettings != null) Destroy(_runtimeSettings); }
 }

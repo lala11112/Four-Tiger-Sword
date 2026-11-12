@@ -24,7 +24,7 @@ public static class HubEngravingSetup
         EnsureTreeGlyphs(settings);
         HubWorkshopSetup.ApplyReadability();
         AssetDatabase.SaveAssetIfDirty(settings);
-        return "PASS: workshop prefab has Basic/Engraving tabs, 40 nodes and 39 preserved connections; scenes were not saved.";
+        return "PASS: workshop prefab has Basic/Engraving tabs, 38 nodes and 37 connections; scenes were not saved.";
     }
 
     public static EngravingSettingsSO EnsureSettings()

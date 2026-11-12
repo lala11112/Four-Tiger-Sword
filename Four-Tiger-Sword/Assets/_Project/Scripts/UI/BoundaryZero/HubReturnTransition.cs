@@ -224,7 +224,11 @@ public sealed class HubReturnTransition : MonoBehaviour
 
         var loadingArt = source != null && source.ModalRoot != null
             ? source.ModalRoot.transform.Find("ReferenceFrame/Loading") : null;
-        var font = source != null && source.Details != null ? source.Details.font : TMP_Settings.defaultFontAsset;
+        var details = source != null ? source.Details : null;
+        var sourceFont = details != null ? details.font : null;
+        var font = sourceFont != null ? sourceFont
+            : Resources.Load<TMP_FontAsset>("BoundaryUI/Fonts/BoundaryFont") ?? TMP_Settings.defaultFontAsset;
+        var material = sourceFont != null ? details.fontSharedMaterial : null;
         if (loadingArt != null)
         {
             // Copy only the authored loading artwork. It has no references to the outgoing run.
@@ -234,12 +238,12 @@ public sealed class HubReturnTransition : MonoBehaviour
             _rotor = art.transform.Find("Seal/Rotor") as RectTransform;
             _pulse = art.transform.Find("Seal/Pulse")?.GetComponent<UnityEngine.UI.Image>();
             _activity = art.transform.Find("ProgressTrack/Activity") as RectTransform;
-            LoadingHeading = AddLabel(frameRect, "Title", "이동 중...", font, 36f, new Rect(160, 1168, 1100, 60));
+            LoadingHeading = AddLabel(frameRect, "Title", "이동 중...", font, material, 36f, new Rect(160, 1168, 1100, 60));
         }
         else
         {
             string text = "이동 중...";
-            LoadingHeading = AddLabel(frameRect, "Title", text, font, 52f, new Rect(680, 656, 1200, 128));
+            LoadingHeading = AddLabel(frameRect, "Title", text, font, material, 52f, new Rect(680, 656, 1200, 128));
             LoadingHeading.alignment = TextAlignmentOptions.Center;
         }
         LoadingHeading.fontStyle = FontStyles.Bold;
@@ -263,7 +267,8 @@ public sealed class HubReturnTransition : MonoBehaviour
         }
     }
 
-    private static TMP_Text AddLabel(RectTransform parent, string name, string text, TMP_FontAsset font, float size, Rect layout)
+    private static TMP_Text AddLabel(RectTransform parent, string name, string text, TMP_FontAsset font,
+        Material material, float size, Rect layout)
     {
         var label = new GameObject(name, typeof(RectTransform)).AddComponent<TextMeshProUGUI>();
         var rect = label.rectTransform;
@@ -271,7 +276,12 @@ public sealed class HubReturnTransition : MonoBehaviour
         rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0f, 1f);
         rect.anchoredPosition = new Vector2(layout.x, -layout.y);
         rect.sizeDelta = layout.size;
-        if (font != null) label.font = font;
+        if (font != null)
+        {
+            label.font = font;
+            label.fontSharedMaterial = material != null && material.mainTexture == font.atlasTexture
+                ? material : font.material;
+        }
         label.text = text;
         label.fontSize = size;
         label.color = new Color(.9f, .94f, .98f, 1f);

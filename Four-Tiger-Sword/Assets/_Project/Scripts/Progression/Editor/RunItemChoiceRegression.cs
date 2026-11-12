@@ -15,7 +15,6 @@ public static class RunItemChoiceRegression
     {
         if (Application.isPlaying) throw new InvalidOperationException("Run item-choice checks in Edit Mode.");
         _checks = 0;
-        StarterPoolsAndSynergy();
         RoomCandidateCounts();
         GlobalRerollsAndOneHeldCandidate();
         OwnedSynergiesFollowClaims();
@@ -25,52 +24,7 @@ public static class RunItemChoiceRegression
         PendingReceiptRecovery();
         NextTierWeights();
         GrantReentrancy();
-        return $"PASS: item reward choices ({_checks} checks: installed catalog, starter pools, 3/4 choices, global rerolls, held candidate, empty reward, retries, synergy and reentry).";
-    }
-
-    private static void StarterPoolsAndSynergy()
-    {
-        using (var f = new Fixture("heirloom", "starterelement", "reroll"))
-        {
-            bool expanded = f.Catalog.Find("I103") != null;
-            Check(f.Catalog.items.Length == (expanded ? 81 : 59)
-                && f.Catalog.items.Count(i => i.grade == 1) == (expanded ? 19 : 13),
-                "Installed source has an unexpected item or starter count.");
-            var categories = expanded
-                ? new[] { "S01", "S02", "S03", "S10", "S15", "S16", "S19" }
-                : new[] { "S01", "S03", "S10", "S15", "S16", "S19" };
-            Check(f.Service.StarterSynergies().Select(s => s.id).SequenceEqual(categories),
-                "Starter categories must match the synergies with eligible grade-one items.");
-            Check(f.Service.BeginStarterChoice() && f.Service.Current.NeedsSynergy, "Starter did not request a category.");
-            string receipt = f.Service.Current.Id;
-            Check(!f.Service.TryReroll(receipt) && f.Service.RerollsRemaining == 3, "Starter consumed a normal-reward reroll.");
-            Check(!f.Service.TryChooseStarterSynergy(receipt, "S04") && f.Service.Current.NeedsSynergy,
-                "An empty grade-one category was accepted.");
-            string singleCategory = expanded ? "S02" : "S01";
-            string singleItem = expanded ? "I103" : "I13";
-            Check(f.Service.TryChooseStarterSynergy(receipt, singleCategory) && f.Items.Contains(singleItem)
-                && f.Service.Current == null && f.Items.OwnedItems.Count == 1, "Single-candidate starter did not resolve once.");
-            Check(!f.Service.BeginStarterChoice() && !f.Service.TryClaim(receipt, singleItem), "Starter receipt paid twice.");
-        }
-        using (var f = new Fixture("heirloom", "starterelement"))
-        {
-            f.Service.BeginStarterChoice(); string receipt = f.Service.Current.Id;
-            Check(f.Service.TryChooseStarterSynergy(receipt, "S19"), "Valid starter category failed.");
-            var current = f.Service.Current;
-            Check(current != null && current.Candidates.Count == 3
-                && current.Candidates.All(i => i.grade == 1 && f.Catalog.synergies.First(s => s.id == "S19").members.Contains(i.itemId)),
-                "Starter candidates escaped their selected synergy or grade.");
-            Distinct(current);
-            Check(f.Service.TryClaim(receipt, current.Candidates[0].itemId) && f.Items.OwnedItems.Count == 1,
-                "Starter granted more than the selected item.");
-        }
-        using (var f = new Fixture("heirloom"))
-        {
-            Check(f.Service.BeginStarterChoice() && !f.Service.Current.NeedsSynergy
-                && f.Service.Current.Candidates.Count == 3 && f.Service.Current.Candidates.All(i => i.grade == 1),
-                "Basic starter should draw three distinct grade-one candidates.");
-            Distinct(f.Service.Current);
-        }
+        return $"PASS: item reward choices ({_checks} checks: installed catalog, 3/4 choices, global rerolls, held candidate, empty reward, retries, synergy and reentry).";
     }
 
     private static void RoomCandidateCounts()
@@ -128,9 +82,10 @@ public static class RunItemChoiceRegression
             "A reward candidate counted as an owned item in an empty inventory.");
 
         var current = f.Service.Current;
-        string selected = current.Candidates[0].itemId;
+        string selected = current.Candidates.First(item => item.synergyIds.Any(id =>
+            f.Catalog.synergies.First(set => set.id == id).tiers[0].count == 2)).itemId;
         var candidateIds = current.Candidates.Select(item => item.itemId).ToHashSet();
-        var set = f.Catalog.synergies.First(synergy => synergy.members.Contains(selected));
+        var set = f.Catalog.synergies.First(synergy => synergy.members.Contains(selected) && synergy.tiers[0].count == 2);
         string prerequisite = set.members.First(id => !candidateIds.Contains(id));
         Check(f.Items.TryAddItem(prerequisite), "Could not grant an owned item outside the current candidates.");
         ItemSynergyState TargetSet() => f.Service.OwnedSynergies.Single(state => state.Definition.id == set.id);
@@ -171,14 +126,14 @@ public static class RunItemChoiceRegression
         foreach (var item in f.Catalog.items) Check(f.Items.TryAddItem(item.itemId), "Full-catalog fixture grant failed.");
         int gained = 0;
         f.Wallet.GoldGained += amount => gained += amount;
-        Check(f.Service.BeginRoomReward("empty") && f.Wallet.Gold == 10 && gained == 10 && f.Service.Current == null,
-            "An exhausted chest did not credit ten gold through the HUD event without opening a choice.");
-        Check(!f.Service.TryClaimEmptyReward("room:empty") && !f.Service.BeginRoomReward("empty") && f.Wallet.Gold == 10,
+        Check(f.Service.BeginRoomReward("empty") && f.Wallet.Gold == 14 && gained == 14 && f.Service.Current == null,
+            "An exhausted chest did not apply the owned 40% gold gain to its ten base gold without opening a choice.");
+        Check(!f.Service.BeginRoomReward("empty") && f.Wallet.Gold == 14,
             "An empty receipt paid again.");
-        Check(f.Wallet.AddGold(int.MaxValue - 10), "Overflow fixture funding failed.");
+        Check(f.Wallet.AddGold(int.MaxValue - 14), "Overflow fixture funding failed.");
         Check(!f.Service.BeginRoomReward("overflow") && f.Wallet.Gold == int.MaxValue && f.Service.Current == null,
             "Overflow unexpectedly credited gold or opened a reward choice.");
-        f.Wallet.TrySpend(10);
+        f.Wallet.TrySpend(14);
         Check(f.Service.BeginRoomReward("overflow") && f.Wallet.Gold == int.MaxValue && f.Service.Current == null
             && !f.Service.BeginRoomReward("overflow"), "Retrying an empty reward did not settle once.");
     }
@@ -209,7 +164,12 @@ public static class RunItemChoiceRegression
             float expected = count % 2 == 1 ? 3f : 1f;
             Check(f.Service.RewardWeight(members[count]) == expected, "Completion weight does not follow the next set threshold.");
         }
-        Check(f.Service.RewardWeight(f.Catalog.Find("I89")) == 1f, "Completion weighting affected an unrelated item.");
+        Check(f.Service.RewardWeight(f.Catalog.Find("I18")) == 1f, "Completion weighting affected an unrelated item.");
+        foreach (var id in new[] { "I91", "I89", "I122" })
+        {
+            Check(f.Service.RewardWeight(f.Catalog.Find(id)) == 3f, "Harvest's 1/2/3 thresholds must each be a completion.");
+            Check(f.Items.TryAddItem(id), "Harvest fixture grant failed.");
+        }
     }
 
     private static void PendingReceiptRecovery()
@@ -240,7 +200,7 @@ public static class RunItemChoiceRegression
             foreach (var item in f.Catalog.items) f.Items.TryAddItem(item.itemId);
             bool blocked = false;
             f.Wallet.GoldChanged += _ => blocked = !f.Service.BeginRoomReward("gold-grant") && !f.Service.BeginRoomReward("nested-gold");
-            Check(f.Service.BeginRoomReward("gold-grant") && blocked && f.Wallet.Gold == 10 && f.Service.Current == null,
+            Check(f.Service.BeginRoomReward("gold-grant") && blocked && f.Wallet.Gold == 14 && f.Service.Current == null,
                 "Gold fulfillment observers reentered an empty reward grant.");
         }
     }

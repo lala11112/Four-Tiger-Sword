@@ -25,7 +25,8 @@ public sealed partial class RunManager
         if (!isActiveAndEnabled || !OwnerIsAvailable(owner) || State != RunState.Playing || _transition != null
             || IsMapOpen || IsInventoryOpen || IsRewardOpen || HasPendingItemChoice || IsPauseMenuOpen
             || player == null || !player.isActiveAndEnabled || player.IsStageTransitioning
-            || player.IsMapPaused || player.IsInventoryPaused || player.IsPauseMenuPaused
+            || player.IsMapPaused || player.IsInventoryPaused || player.IsStatsOpen
+            || player.IsPauseMenuPaused || player.IsFallRecovering
             || player.StatManager == null || player.StatManager.CurrentHp <= 0f
             || stageManager == null || !stageManager.IsReady || stageManager.Result == null
             || stageManager.Result.root == null) return false;
@@ -142,6 +143,7 @@ public sealed partial class RunManager
 
     private void SuspendPlayerAndCloseShop()
     {
+        _playerStats?.Close();
         CloseItemChoiceModal();
         bool wasOpen = IsShopOpen;
         bool mapWasOpen = IsMapOpen;
@@ -171,8 +173,8 @@ public sealed partial class RunManager
     private void RefreshRunCursor()
     {
         if (player != null && player.IsFinisherSelecting) return;
-        bool playing = isActiveAndEnabled && State == RunState.Playing
-            && !IsShopOpen && !IsMapOpen && !IsInventoryOpen && !IsRewardOpen && !IsPauseMenuOpen;
+        bool playing = isActiveAndEnabled && State == RunState.Playing && !IsShopOpen && !IsMapOpen
+            && !IsInventoryOpen && !IsRewardOpen && !IsPauseMenuOpen && player?.IsStatsOpen != true;
         Cursor.visible = !playing;
         Cursor.lockState = playing ? CursorLockMode.Locked : CursorLockMode.None;
     }
@@ -204,7 +206,8 @@ public sealed partial class RunManager
     }
     private void OnDisable()
     {
-        if (_pauseMenu != null) _pauseMenu.CloseForHostShutdown();
+        _pauseMenu?.CloseForHostShutdown();
+        _playerStats?.Close();
         CloseItemChoiceModal();
         CancelStagePresentation();
         ReleaseUpgradeSavePause();

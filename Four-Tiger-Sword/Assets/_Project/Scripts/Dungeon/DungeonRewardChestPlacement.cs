@@ -17,6 +17,7 @@ internal static class DungeonRewardChestPlacement
         new Vector3(1, 0, -1).normalized, new Vector3(-1, 0, -1).normalized
     };
     private static readonly float[] Rings = { 2f, 3f };
+    private static readonly float[] FallbackRings = { 1.5f, 2.5f, 3.5f, 4f, 5f };
     private static readonly Vector3[] FloorSamples =
     {
         new(-.72f, 0, -.38f), new(-.72f, 0, .38f), new(.72f, 0, -.38f), new(.72f, 0, .38f)
@@ -56,12 +57,17 @@ internal static class DungeonRewardChestPlacement
         foreach (var marker in markers)
             if (TryCandidate(marker.transform.position, out position, out rotation)) return true;
 
-        // The authored teleport floor is a last resort. The chest has no solid collider,
-        // so even this fallback cannot trap a player traveling to the room.
-        if (!hasAnchor) return false;
-        position = anchorFloor;
-        rotation = teleport.rotation;
-        return true;
+        // The solid crate must leave the teleport landing clear, even in a tight room.
+        if (hasAnchor)
+        {
+            foreach (float radius in FallbackRings)
+                foreach (Vector3 direction in Directions)
+                {
+                    Vector3 desired = anchorFloor + room.transform.TransformDirection(direction) * radius;
+                    if (TryCandidate(desired, out position, out rotation)) return true;
+                }
+        }
+        return false;
 
         bool TryCandidate(Vector3 desired, out Vector3 floor, out Quaternion facing)
         {

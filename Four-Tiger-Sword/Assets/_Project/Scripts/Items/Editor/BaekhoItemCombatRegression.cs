@@ -138,7 +138,7 @@ public static class BaekhoItemCombatRegression
     {
         Require(!Application.isPlaying, "Run requires Edit Mode; use RunPlayMode while playing.");
         using (var fixture = new Fixture(false)) Verify(fixture);
-        return "PASS: damage category exclusions, one item multiplier, origin snapshots, five switch lifecycles, independent E costs/cooldowns/buffs, five R resource paths and Water collision cleanup.";
+        return "PASS: damage category exclusions, one item multiplier, origin snapshots, five switch lifecycles, independent E cooldowns/buffs, five R resource paths and Water collision cleanup.";
     }
 
     public static string RunPlayMode()
@@ -208,12 +208,10 @@ public static class BaekhoItemCombatRegression
         {
             fixture.Bind(candidate);
             typeof(BaseForm).GetField("_skillCooldownTimer", Hidden).SetValue(candidate, 2f);
-            float sp = fixture.Stats.CurrentSp;
             float attack = fixture.Stats.GetStat(StatType.ST_ATK);
             LayerMask mask = fixture.Player.Controller.excludeLayers;
             Require(candidate.CanSwitchAttack, candidate.GetType().Name + " unexpectedly requires E readiness.");
             candidate.BeginSwitchAttack();
-            Near(fixture.Stats.CurrentSp, sp, "Switch attack spent E SP.");
             Near(fixture.Stats.GetStat(StatType.ST_ATK), attack, "Switch attack applied an E attack buff.");
             Near(candidate.SkillCooldownRemaining, 2f, "Switch attack changed the independent E cooldown.");
             Require(!fire.IsSkillBuffActive && !water.IsSkillBuffActive && earth.SkillShield == 0f,
@@ -224,32 +222,27 @@ public static class BaekhoItemCombatRegression
         }
         VerifyPreservedSkillsAndUltimates(fixture, new BaseForm[] {
             fire, water, new WoodForm(data), earth, new IronForm(ironData)
-        }, new[] { 20f, 15f, 18f, 15f, 20f });
+        });
         data.SkillSteps[0].Duration = float.NaN;
         Require(form.CanSwitchAttack, "Malformed E data disabled the independently authored switch attack.");
         data.SwitchAttackSteps[0].Duration = float.NaN;
         Require(!form.CanSwitchAttack, "Malformed duration was accepted as a switch attack.");
     }
 
-    private static void VerifyPreservedSkillsAndUltimates(Fixture fixture, BaseForm[] forms, float[] expectedCosts)
+    private static void VerifyPreservedSkillsAndUltimates(Fixture fixture, BaseForm[] forms)
     {
-        for (int i = 0; i < forms.Length; i++)
+        foreach (BaseForm form in forms)
         {
-            BaseForm form = forms[i];
             fixture.Bind(form);
             string name = form.GetType().Name;
             typeof(BaseForm).GetField("_skillCooldownTimer", Hidden).SetValue(form, 0f);
             var data = (WeaponActionDataSO)typeof(BaseForm).GetField("_weaponActionData", Hidden).GetValue(form);
             data.UltimateSteps = new List<WeaponActionData> { Step() };
-            fixture.Stats.AddSp(fixture.Stats.MaxSp);
-            float beforeSp = fixture.Stats.CurrentSp;
             float beforeAttack = fixture.Stats.GetStat(StatType.ST_ATK);
             float beforeWaterGauge = form is WaterForm beforeWater ? beforeWater.WaterGauge : 0f;
             LayerMask beforeMask = fixture.Player.Controller.excludeLayers;
-            Near(form.SkillSpCost, expectedCosts[i], name + " E cost is not on the 100-SP scale.");
-            Require(form.CanSkill, name + " cannot use E with full SP and ready cooldown.");
+            Require(form.CanSkill, name + " cannot use E with authored steps and ready cooldown.");
             form.BeginSkill();
-            Near(fixture.Stats.CurrentSp, beforeSp - expectedCosts[i], name + " E did not consume exactly its own cost.");
             HitInfo eHit = Hit(form);
             Require(eHit.Category == PlayerAttackCategory.Skill, name + " E was classified as a switch attack.");
             Near(eHit.ItemDamageMultiplier, 1f, name + " E inherited an item normal/switch bonus.");
@@ -270,10 +263,8 @@ public static class BaekhoItemCombatRegression
 
             fixture.Stats.AddUltimateGauge(fixture.Stats.MaxUltimateGauge);
             Require(form.CanUltimate, name + " R did not become available at full ultimate gauge.");
-            float spBeforeR = fixture.Stats.CurrentSp;
             form.BeginUltimate();
             Near(fixture.Stats.CurrentUltimateGauge, 0f, name + " R did not consume its ultimate gauge.");
-            Near(fixture.Stats.CurrentSp, spBeforeR, name + " R incorrectly spent SP.");
             Near(form.UltimateCooldownRemaining, form.UltimateCooldownDuration, name + " R lost its cooldown.");
             HitInfo rHit = Hit(form);
             Require(rHit.Category == PlayerAttackCategory.Ultimate, name + " R lost its attack category.");

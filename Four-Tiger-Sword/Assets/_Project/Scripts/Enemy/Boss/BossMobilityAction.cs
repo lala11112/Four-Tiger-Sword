@@ -24,9 +24,27 @@ public sealed class BossMobilityAction : EnemyAction
     public string FailureReason { get; private set; } = "";
     public bool IsAirborne => _data.IsJump && _phase == Phase.Travel && IsActive;
     public float MovementProgress { get; private set; }
+    public float WarningProgress
+    {
+        get
+        {
+            bool landingWarning = Kind == BossMobilityKind.JumpSlam;
+            bool inFlight = landingWarning && _phase == Phase.Travel;
+            if (!IsActive || IsFinished || WasParried || !CanContinueAction || !DealsDamage || Failed
+                || (_phase != Phase.Startup && !inFlight))
+                return 0f;
+
+            float duration = _data.startupTime + (landingWarning ? _data.jumpDuration : 0f);
+            float elapsed = _phaseElapsed + (inFlight ? _data.startupTime : 0f);
+            if (!(duration > 0f) || float.IsInfinity(duration) || float.IsNaN(elapsed)) return 0f;
+            return Mathf.Clamp01(elapsed / duration);
+        }
+    }
+
     public override bool SupportsBossPolicy => true;
     protected override float BossInitialStartupDuration => _data.startupTime;
     protected override bool UsesTimedTelegraph => false;
+    protected override bool StartsAttackWarningOnEnter => DealsDamage;
 
     public BossMobilityAction(BossMobilitySkillSO data, Boss owner, BossMobilityNavigation.Plan plan)
         : base(data, owner)
@@ -91,7 +109,11 @@ public sealed class BossMobilityAction : EnemyAction
         Animate(_data.IsJump && !string.IsNullOrWhiteSpace(_data.liftAnimName) ? _data.liftAnimName : _data.animName);
         _previousHitCenter = HitCenter();
         if (DealsDamage) PlaySwingSound();
-        if (Kind == BossMobilityKind.DashSlash) EndTelegraph();
+        if (Kind == BossMobilityKind.DashSlash)
+        {
+            EndAttackWarning();
+            EndTelegraph();
+        }
     }
 
     private void TickJump()

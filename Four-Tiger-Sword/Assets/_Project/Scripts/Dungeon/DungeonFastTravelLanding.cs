@@ -4,12 +4,14 @@ using StudioBaekho;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>Checks an authored player-root pose against live room geometry; NavMesh is not required.</summary>
+/// <summary>Checks a player-root pose against live dungeon geometry without a NavMesh.</summary>
 public static class DungeonFastTravelLanding
 {
     public const float LandingLift = .06f;
     private const float GroundTolerance = .18f;
     private const float DoorDepth = 2.5f;
+    private static readonly Vector3[] SupportDirections =
+        { Vector3.zero, Vector3.right, Vector3.left, Vector3.forward, Vector3.back };
 
     public static bool ValidateAnchor(BaekhoMapModule room, Transform rootPoint, out string reason)
     {
@@ -30,29 +32,48 @@ public static class DungeonFastTravelLanding
         position = default;
         rotation = Quaternion.identity;
         if (!ValidateAnchor(room, rootPoint, out reason)) return false;
-        if (!TryCapsule(controller, out float radius, out float halfHeight, out var scaledCenter))
-            return Fail("플레이어의 충돌 크기를 확인할 수 없습니다.", out reason);
         position = rootPoint.position;
         rotation = rootPoint.rotation.normalized;
-        var center = position + rotation * scaledCenter;
-        var bottom = center - Vector3.up * halfHeight;
         var groundRoots = GroundRoots(room);
         if (groundRoots.Count == 0) return Fail("이 방의 바닥 정보를 확인할 수 없습니다.", out reason);
-        var physics = room.gameObject.scene.GetPhysicsScene();
+        return ValidatePose(room.gameObject.scene.GetPhysicsScene(), room, groundRoots, null, controller,
+            new Pose(position, rotation), new Collider[128], ~0, 0f, out reason);
+    }
+
+    internal static bool ValidateRecoveryPose(PhysicsScene physics, BaekhoMapModule room, HashSet<Transform> groundRoots,
+        Transform dungeonRoot, CharacterController controller, Pose pose, Collider[] overlaps, int groundMask,
+        out string reason)
+    {
+        if (room != null && !room.localBounds.Contains(room.transform.InverseTransformPoint(pose.position)))
+            return Fail("안전지점이 현재 방 밖에 있습니다.", out reason);
+        return ValidatePose(physics, room, groundRoots, dungeonRoot, controller, pose, overlaps,
+            groundMask, .25f, out reason);
+    }
+
+    private static bool ValidatePose(PhysicsScene physics, BaekhoMapModule room, HashSet<Transform> groundRoots,
+        Transform dungeonRoot, CharacterController controller, Pose pose, Collider[] overlaps, int groundMask,
+        float extraSupport, out string reason)
+    {
+        reason = null;
+        if (!TryCapsule(controller, out float radius, out float halfHeight, out var scaledCenter))
+            return Fail("플레이어의 충돌 크기를 확인할 수 없습니다.", out reason);
         if (!physics.IsValid()) return Fail("이 방의 충돌 공간을 확인할 수 없습니다.", out reason);
-        float supportRadius = radius * .8f;
-        Vector3[] offsets = { Vector3.zero, Vector3.right * supportRadius, Vector3.left * supportRadius,
-            Vector3.forward * supportRadius, Vector3.back * supportRadius };
-        foreach (var offset in offsets)
+        if (!Finite(pose.position) || !Finite(pose.rotation) || Vector3.Dot(pose.rotation * Vector3.up, Vector3.up) < .999f)
+            return Fail("안전지점의 위치 또는 방향이 올바르지 않습니다.", out reason);
+        var center = pose.position + pose.rotation * scaledCenter;
+        var bottom = center - Vector3.up * halfHeight;
+        float supportRadius = extraSupport > 0f ? radius + extraSupport : radius * .8f;
+        foreach (var direction in SupportDirections)
         {
-            if (!physics.Raycast(bottom + offset + Vector3.up * .3f, Vector3.down, out var hit, .65f,
-                ~0, QueryTriggerInteraction.Ignore) || !OwnsGround(hit.collider.transform, room.transform, groundRoots)
+            if (!physics.Raycast(bottom + direction * supportRadius + Vector3.up * .3f, Vector3.down,
+                out var hit, .65f, groundMask, QueryTriggerInteraction.Ignore)
+                || (room != null ? !OwnsGround(hit.collider.transform, room.transform, groundRoots)
+                    : !hit.collider.transform.IsChildOf(dungeonRoot))
                 || Vector3.Angle(hit.normal, Vector3.up) > Mathf.Min(controller.slopeLimit, 45f)
                 || Mathf.Abs(hit.point.y - bottom.y) > GroundTolerance)
                 return Fail("안전지점 아래에 충분한 바닥이 없습니다.", out reason);
         }
-        if (NearDoorOrExit(room, bottom, radius, out reason)) return false;
-        var overlaps = new Collider[128];
+        if (room != null && NearDoorOrExit(room, bottom, radius, out reason)) return false;
         int count = physics.OverlapCapsule(center - Vector3.up * (halfHeight - radius),
             center + Vector3.up * (halfHeight - radius), radius, overlaps, ~0, QueryTriggerInteraction.Ignore);
         if (count >= overlaps.Length) return Fail("도착 공간을 확인할 수 없습니다.", out reason);
@@ -65,12 +86,32 @@ public static class DungeonFastTravelLanding
         return true;
     }
 
-    /// <summary>Used only by the authoring tool; runtime keeps the exact authored root pose.</summary>
+    /// <summary>Builds a root pose with the capsule just above a supported floor.</summary>
     public static Vector3 PlayerRootAtFloor(Vector3 floor, Quaternion rotation, CharacterController controller)
     {
         if (!TryCapsule(controller, out _, out float halfHeight, out var scaledCenter))
             throw new ArgumentException("A valid upright CharacterController is required.");
         return floor + Vector3.up * (halfHeight + LandingLift) - rotation * scaledCenter;
+    }
+
+    internal static bool TryGetCapsuleBottom(CharacterController controller, Pose pose, out Vector3 bottom)
+    {
+        bottom = default;
+        if (!TryCapsule(controller, out _, out float halfHeight, out var scaledCenter)) return false;
+        bottom = pose.position + pose.rotation * scaledCenter - Vector3.up * halfHeight;
+        return Finite(bottom);
+    }
+
+    internal static bool TryGetCapsuleSegment(CharacterController controller, Pose pose,
+        out Vector3 lower, out Vector3 upper, out float radius)
+    {
+        lower = upper = default;
+        if (!TryCapsule(controller, out radius, out float halfHeight, out var scaledCenter)) return false;
+        var center = pose.position + pose.rotation * scaledCenter;
+        var extent = Vector3.up * (halfHeight - radius);
+        lower = center - extent;
+        upper = center + extent;
+        return Finite(lower) && Finite(upper);
     }
 
     public static HashSet<Transform> GroundRoots(BaekhoMapModule room)

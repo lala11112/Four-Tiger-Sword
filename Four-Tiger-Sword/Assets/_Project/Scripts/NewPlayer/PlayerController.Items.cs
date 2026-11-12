@@ -3,15 +3,13 @@ using UnityEngine;
 public partial class PlayerController
 {
     public PlayerItemRuntime ItemRuntime { get; private set; }
-    public float DodgeSpCost => ItemRuntime != null && ItemRuntime.isActiveAndEnabled ? ItemRuntime.DodgeSpCost : 20f;
-    public float SwitchSpCost => ItemRuntime != null && ItemRuntime.isActiveAndEnabled ? ItemRuntime.SwitchSpCost : 10f;
     public bool HasPendingSwitchAttack => _pendingSwitchAttack != null
         && FormManager?.CurrentForm == _pendingSwitchAttack && StatManager != null && StatManager.CurrentHp > 0f;
 
     private BaseForm _pendingSwitchAttack;
     internal PlayerSwitchAttackState SwitchAttackState { get; set; }
 
-    public bool TryBeginDash() => CanDash && StatManager.TryConsumeSp(DodgeSpCost);
+    public bool TryBeginDash() => CanDash;
 
     internal void QueueSwitchAttack(BaseForm form) => _pendingSwitchAttack = form;
 

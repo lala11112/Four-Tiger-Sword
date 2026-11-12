@@ -39,9 +39,11 @@ public static class DungeonStageEncounterRegression
             UnexpectedBossRemoval(true);
             UnconfirmedZeroHpDoesNotDefeat();
             SuspensionDoesNotClear();
+            FirstWaveActivatesWithoutPlayerPosition(false);
+            FirstWaveActivatesWithoutPlayerPosition(true);
             EmptyEndRoomTracksArrival();
             return $"Stage encounters: {_checks} checks passed (preparation errors, missing anchors, downstream lock, " +
-                "actual lethal death, destroyed/deactivated boss rejection, unconfirmed HP, suspension and empty-room arrival). " +
+                "actual lethal death, destroyed/deactivated boss rejection, unconfirmed HP, suspension, first-wave activation and combat group membership, and empty-room arrival). " +
                 "Native fixed spawn and NavMeshAgent binding require Play Mode verification.";
         }
         finally
@@ -151,6 +153,67 @@ public static class DungeonStageEncounterRegression
         Check(f.room.State == DungeonEncounterState.Fighting && f.room.AliveCount == 1 &&
             !f.room.BossDefeated && cleared == 0 && f.director.Error == null,
             "Transition suspension disposed members, failed the room or granted a clear.");
+    }
+
+    private static void FirstWaveActivatesWithoutPlayerPosition(bool boss)
+    {
+        var director = Director(boss ? "Boss activation" : "Group activation");
+        director.normalEnemyAI.alertRadius = 7.5f;
+        var player = new GameObject("Hidden player").AddComponent<CharacterController>();
+        player.transform.position = new Vector3(7100f, 1000f, 7100f);
+        Set(director, "player", player);
+        var room = new GameObject("Activation room").AddComponent<DungeonRoomEncounter>();
+        Set(room, "_director", director);
+        Set(room, "_isBoss", boss);
+        var members = (List<DungeonEncounterMember>)Get(room, "_members");
+        var alive = (HashSet<DungeonEncounterMember>)Get(room, "_alive");
+        for (int i = 0; i < (boss ? 1 : 3); i++)
+        {
+            var actor = new GameObject("First-wave actor " + i);
+            actor.SetActive(false);
+            actor.transform.SetParent(room.transform, false);
+            // Model an already awake patrol member; native agent activation is covered in Play Mode.
+            actor.AddComponent<NavMeshAgent>().enabled = false;
+            var enemy = actor.AddComponent<Enemy>();
+            enemy.EnemyStat = actor.GetComponent<EnemyStat>();
+            enemy.EnemyStat.CurrentHp = 10f;
+            var member = actor.AddComponent<DungeonEncounterMember>();
+            member.Initialize(room);
+            actor.SetActive(true);
+            typeof(DungeonEncounterMember).GetProperty("IsAwake").SetValue(member, true);
+            enemy.enabled = true;
+            enemy.SetEncounterPatrolOnly(true);
+            members.Add(member);
+            alive.Add(member);
+            Check(!enemy.HasTargetMemory && enemy.CombatGroup == null,
+                "A waiting first-wave member already knew the player position or joined the combat group.");
+        }
+        typeof(DungeonRoomEncounter).GetProperty("State").SetValue(room, DungeonEncounterState.Waiting);
+        Check(room.BeginEncounter(), "The first-wave encounter did not begin.");
+        Check(boss ? room.CombatGroup == null : room.CombatGroup != null,
+            "Combat groups must belong to ordinary encounters only.");
+        if (!boss)
+            Check(Mathf.Approximately(room.CombatGroup.Settings.alertRadius, 7.5f),
+                "The room did not use the director's AI settings.");
+        foreach (var member in members)
+        {
+            var enemy = member.Enemy;
+            Check(!enemy.EncounterPatrolOnly && !enemy.HasTargetMemory,
+                "Entry must allow the first wave to detect the player without revealing the player's position.");
+            Check(enemy.CombatGroup == room.CombatGroup,
+                "An active member's group did not match its room's group.");
+            Check(enemy.DetectedTarget == null && enemy.CurrentAction == null && !enemy.IsInExecuteRange,
+                "Entry granted vision or an executable attack without ordinary detection.");
+        }
+        player.transform.position += Vector3.right * 10f;
+        Check(!room.BeginEncounter(), "An active encounter accepted a repeated entry.");
+        foreach (var member in members)
+            Check(!member.Enemy.HasTargetMemory, "Repeated entry revealed the hidden player's position.");
+
+        room.SuspendEncounter();
+        foreach (var member in members)
+            Check(!member.IsAwake && member.Enemy.CombatGroup == null,
+                "Suspension did not remove the frozen member from group coordination.");
     }
 
     private static void EmptyEndRoomTracksArrival()

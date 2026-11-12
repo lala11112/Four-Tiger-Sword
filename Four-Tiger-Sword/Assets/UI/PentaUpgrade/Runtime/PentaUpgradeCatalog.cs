@@ -11,7 +11,7 @@ namespace Penta.Upgrade
         public string Description { get; }
         public string Family { get; }
         public IReadOnlyList<string> ParentIds { get; }
-        /// <summary>Candidate relationship depth from the origin, not the vertical screen row.</summary>
+        /// <summary>Candidate tier within the graph, independent of the vertical screen row.</summary>
         public int Tier { get; }
         /// <summary>Legacy concept ordering within a relationship depth; layout uses PentaUpgradeVerticalLayout.</summary>
         public int Row { get; }
@@ -38,7 +38,6 @@ namespace Penta.Upgrade
             new PentaUpgradeNode("hp", "최대 체력", "최대 체력이 증가한다. 공격을 버틸 여유를 늘려 도전을 이어 간다.", "체력", new[] { "origin" }, 1, 1),
             new PentaUpgradeNode("footwork", "가벼운 발걸음", "이동 속도가 증가한다. 적의 공격 범위를 벗어나고 유리한 자리를 잡기 쉬워진다.", "회피", new[] { "origin" }, 1, 2),
             new PentaUpgradeNode("gold", "시작 골드", "출격할 때 받는 골드가 늘어난다. 첫 상점에서 필요한 물건을 준비할 여유를 만든다.", "상점", new[] { "origin" }, 1, 3),
-            new PentaUpgradeNode("heirloom", "출격 유품", "출격할 때 무작위 아이템 후보 중에서 골라 받는다. 첫 아이템을 바탕으로 조합을 시작한다.", "전리품", new[] { "origin" }, 1, 4),
             new PentaUpgradeNode("crit", "치명타 확률", "공격의 치명타 확률이 증가한다. 강한 일격이 나올 기회를 늘린다.", "치명타", new[] { "atk" }, 2, 0),
             new PentaUpgradeNode("bossdmg", "대물 사냥", "보스에게 주는 피해가 증가한다. 보스의 빈틈에 가하는 공격을 더 강하게 만든다.", "보스 사냥", new[] { "atk" }, 2, 1),
             new PentaUpgradeNode("speed", "공격 속도", "공격 속도가 증가한다. 적의 빈틈에 공격을 이어 넣기 쉬워진다.", "검술", new[] { "atk" }, 2, 2),
@@ -52,9 +51,8 @@ namespace Penta.Upgrade
             new PentaUpgradeNode("firstblood", "처치 골드", "일반 적을 처치할 때 얻는 골드가 증가한다. 전투를 통해 상점에서 쓸 자금을 모은다.", "처치", new[] { "gold" }, 2, 10),
             new PentaUpgradeNode("discount", "단골 할인", "상점의 아이템 구매 가격이 낮아진다. 모은 골드로 필요한 조합을 마련하기 쉬워진다.", "상점", new[] { "gold" }, 2, 11),
             new PentaUpgradeNode("sell", "매각 협상", "아이템을 팔 때 받는 골드가 증가한다. 쓰지 않는 물건을 다음 구매의 밑천으로 바꾼다.", "탐색", new[] { "gold" }, 2, 12),
-            new PentaUpgradeNode("reroll", "보상 재선택", "보상 후보를 새로 뽑을 기회를 얻는다. 현재 조합에 맞는 아이템을 다시 찾아본다.", "탐색", new[] { "heirloom" }, 2, 13),
-            new PentaUpgradeNode("starterelement", "유품의 계통: 시너지 선택", "1등급 출격 유품이 있는 시너지 계통을 선택한다. 해당 계통의 후보 중 하나를 받는다.", "전리품", new[] { "heirloom" }, 2, 14),
-            new PentaUpgradeNode("choices", "넓어진 선택", "일반 전투 보상의 아이템 후보가 늘어난다. 받을 아이템을 고를 폭을 넓힌다.", "전리품", new[] { "heirloom" }, 2, 15),
+            new PentaUpgradeNode("reroll", "보상 재선택", "보상 후보를 새로 뽑을 기회를 얻는다. 현재 조합에 맞는 아이템을 다시 찾아본다.", "탐색", new[] { "origin" }, 2, 13),
+            new PentaUpgradeNode("choices", "넓어진 선택", "일반 전투 보상의 아이템 후보가 늘어난다. 받을 아이템을 고를 폭을 넓힌다.", "전리품", new[] { "origin" }, 2, 15),
             new PentaUpgradeNode("severe", "치명타 피해", "치명타로 주는 피해가 증가한다. 치명타가 적중했을 때 적의 체력을 더 크게 깎는다.", "치명타", new[] { "crit" }, 3, 0),
             new PentaUpgradeNode("pity", "예리한 감각", "치명타가 아닌 공격이 적중하면 치명타 확률이 쌓인다. 치명타가 적중하면 쌓인 효과가 사라진다.", "치명타", new[] { "crit" }, 3, 1),
             new PentaUpgradeNode("reach", "검격 범위", "근접 기본 공격이 닿는 범위가 늘어난다. 조금 떨어진 적도 검격으로 압박한다.", "검술", new[] { "speed" }, 3, 2),

@@ -105,6 +105,7 @@ public static class MapRefreshBuilder
         var report = new BuildReport { sourcePath = sourcePath, prefabPath = entry.prefabPath };
         try
         {
+            BaekhoCoplanarVisualRepair.RestoreSources(room, entry.prefabPath);
             room.name = AssetDatabase.LoadAssetAtPath<GameObject>(entry.sourcePath).name + "_V3Refresh";
             // Deleted legacy dependencies leave missing nested-prefab records even after geometry is repaired.
             // Unpack those records on the derivative only, retaining their objects and every local reference.
@@ -160,6 +161,7 @@ public static class MapRefreshBuilder
             foreach (var skin in room.GetComponentsInChildren<BaekhoWallAppearanceInstance>(true)) Modifier(skin.gameObject, true, false);
             Bake(room, entry.guid);
             report.colliderCount = room.GetComponentsInChildren<Collider>(true).Count(c => c.enabled && c.gameObject.activeInHierarchy);
+            BaekhoCoplanarVisualRepair.Repair(room, entry.prefabPath);
             PrefabUtility.SaveAsPrefabAsset(room, entry.prefabPath);
             File.WriteAllText(Root + "/Reports/" + entry.guid + ".json", JsonUtility.ToJson(report, true));
             AssetDatabase.SaveAssets();
@@ -209,7 +211,8 @@ public static class MapRefreshBuilder
             var settings = AssetDatabase.LoadAssetAtPath<BaekhoDungeonSettings>(path);
             var pool = settings.maps.Select(m => Replace(m, replacements)).ToList();
             foreach (var room in ordinary) if (!pool.Contains(room)) pool.Add(room);
-            if (pool.Distinct().Count() != 39) throw new InvalidDataException("Expected 39 unique ordinary rooms: " + path);
+            pool.RemoveAll(BaekhoDungeonSetup.HasTwoByThreeDoor);
+            if (pool.Distinct().Count() != 32) throw new InvalidDataException("Expected 32 unique ordinary rooms after excluding 2 x 3 doorways: " + path);
             settings.maps = pool.ToArray();
             settings.startRoom = Replace(settings.startRoom, replacements); settings.endRoom = Replace(settings.endRoom, replacements);
             settings.shopRoom = Replace(settings.shopRoom, replacements); settings.bossRoom = Replace(settings.bossRoom, replacements);
@@ -217,7 +220,7 @@ public static class MapRefreshBuilder
             EditorUtility.SetDirty(settings); AssetDatabase.SaveAssetIfDirty(settings);
         }
         BuildShopCounter();
-        return "Registered 17 refreshed + 22 V3 ordinary rooms and refreshed dedicated rooms in four settings assets.";
+        return "Registered 32 eligible ordinary rooms and refreshed dedicated rooms in four settings assets.";
     }
     private static BaekhoMapModule Replace(BaekhoMapModule module, Dictionary<string, BaekhoMapModule> replacements)
         => module && replacements.TryGetValue(AssetDatabase.GetAssetPath(module), out var replacement) ? replacement : module;
@@ -276,7 +279,9 @@ public static class MapRefreshBuilder
                 if (kind == "Straight") panel("Panel", new Vector3(0,1.5f,0), new Vector3(2,3,.25f));
                 if (kind == "Corner") { panel("PanelX",new Vector3(0,1.5f,0),new Vector3(2,3,.25f)); panel("PanelZ",new Vector3(.875f,1.5f,1),new Vector3(.25f,3,2)); }
                 if (kind == "Doorway") { panel("Left",new Vector3(-1.25f,1.5f,0),new Vector3(.5f,3,.25f)); panel("Right",new Vector3(1.25f,1.5f,0),new Vector3(.5f,3,.25f)); panel("Lintel",new Vector3(0,2.75f,0),new Vector3(2,.5f,.25f)); }
-                var asset = PrefabUtility.SaveAsPrefabAsset(go, Root + "/Prefabs/WallKit/" + go.name + ".prefab");
+                var path = Root + "/Prefabs/WallKit/" + go.name + ".prefab";
+                BaekhoCoplanarVisualRepair.Repair(go, path);
+                var asset = PrefabUtility.SaveAsPrefabAsset(go, path);
                 var field = typeof(BaekhoArchitectureProfile).GetField(char.ToLowerInvariant(kind[0]) + kind.Substring(1) + "Module");
                 field?.SetValue(profile,asset);
             }

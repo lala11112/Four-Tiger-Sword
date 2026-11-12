@@ -11,7 +11,7 @@ namespace ArpgHud
     {
         [SerializeField] HudView view;
         HudState state = new HudState {
-            Hp = new MeterState(100, 100), Auxiliary = new MeterState(0, 100),
+            Hp = new MeterState(100, 100),
             ActiveFormIndex = (int)HudElement.Fire
         };
 
@@ -27,8 +27,6 @@ namespace ArpgHud
         public void SetState(HudState value) { state = value; Refresh(); }
         public void SetHealth(float current, float maximum)
         { state.Hp = new MeterState(current, maximum); Refresh(); }
-        public void SetAuxiliary(float current, float maximum)
-        { state.Auxiliary = new MeterState(current, maximum); Refresh(); }
         public void SetUltimateCharge(float current, float maximum)
         { state.UltimateCharge = new MeterState(current, maximum); Refresh(); }
         public void SetForm(HudElement element) { SetForm((int)element); }

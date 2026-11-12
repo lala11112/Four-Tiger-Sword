@@ -1,15 +1,6 @@
 using System;
 using UnityEngine;
 
-[Serializable]
-public sealed class ItemPolicy
-{
-    public float maxSpCap = 200f;
-    public float regenCap = 40f;
-    public float minDodgeCost = 8f;
-    public float minSwitchCost = 4f;
-}
-
 [CreateAssetMenu(fileName = "ItemCatalog", menuName = "Four Tiger Sword/Items/Item Catalog")]
 public sealed class ItemCatalog : ScriptableObject
 {
@@ -22,7 +13,6 @@ public sealed class ItemCatalog : ScriptableObject
     public string manifestSha256;
     public ItemDefinition[] items = Array.Empty<ItemDefinition>();
     public ItemSynergyDefinition[] synergies = Array.Empty<ItemSynergyDefinition>();
-    public ItemPolicy policy = new ItemPolicy();
 
     public ItemDefinition Find(string itemId)
     {

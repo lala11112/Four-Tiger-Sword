@@ -4,11 +4,11 @@ Source: 플레이어 무기 폼(Form) 스킬 상세 명세 및 모션, 5 pages.
 
 ## 조건부 교체 스킬 (F)
 
-숫자키/Q는 기존 SP 비용과 공유 2초 쿨타임을 사용하는 폼 교체만 수행합니다. 자동 공격과 숫자키 패링 전환은 제거했으며 토 폼의 방어/반격은 유지합니다.
+숫자키/Q는 공유 2초 쿨타임을 사용하는 폼 교체만 수행합니다. 자동 공격과 숫자키 패링 전환은 제거했으며 토 폼의 방어/반격은 유지합니다.
 
 - 화: 다른 폼의 일반 콤보 마지막 단계 또는 피니셔가 실제 적중하면 5초 동안 준비됩니다. F 사용 시 공격력 +30%를 20초 부여합니다.
 - 수: 대시 무적 구간에 실제 적 공격을 피하면 5초 동안 준비됩니다. F 사용 시 공격속도 +25%를 20초 부여하고, 교체 공격에 맞은 적에게 받는 피해 +15%를 적중 시점부터 20초 부여합니다. 목 취약과 독립적으로 곱하며 보스 취약 면역을 따릅니다.
-- F는 준비된 비현재 폼 중 가장 최근의 사용 가능한 대상을 선택합니다. 준비는 폼별 1회이며 재충족 시 5초로 갱신됩니다. SP와 E 자원/쿨타임, 일반 교체 쿨타임을 사용하지 않습니다.
+- F는 준비된 비현재 폼 중 가장 최근의 사용 가능한 대상을 선택합니다. 준비는 폼별 1회이며 재충족 시 5초로 갱신됩니다. E와 일반 교체 쿨타임을 사용하지 않습니다.
 - 플레이어 버프는 다른 폼에서도 유지되고 동일 효과는 중첩 대신 시간을 갱신합니다. 게임 시간 기준이며 지도/상점 일시정지 중에는 멈춥니다. 사망/비활성화는 정리하고, 스테이지 이동은 준비만 초기화합니다.
 - F 입력은 0.15초 버퍼를 사용합니다. 대기/이동, 완료된 회피, 일반 공격의 행동 취소 가능 후딜과 완료된 피니셔에서 실행합니다. 이전 상태를 종료한 뒤 폼을 교체하고 새 공격을 시작합니다.
 - 상점 상호작용도 F를 사용하므로 상점 열기를 전투 입력 처리보다 먼저 실행합니다. 상점이 열리면 같은 입력으로 교체 스킬이 발동하지 않고 준비 기회는 보존됩니다.
@@ -24,7 +24,7 @@ HUD는 기존 오행 표시 아래에서 준비된 화/수의 남은 시간을 �
 This update fills missing mechanics and empty attack data. Existing Fire/Wood basic attack timings, damage and thrust curves, Fire skill's authored three-hit sequence, and Water's existing first combo step and dash initial damage are retained. They are not a full rebalance to the PDF's numerical tables.
 
 - Fire: per-target six-hit stack explosion (2.5 ATK, configurable `FireExplosionDelay`, default 0.15 seconds realtime). Stacks reset immediately; independent pending explosions are cancelled on target death/disable. Delayed ground explosion remains 3.5 ATK, one second after impact.
-- Water: existing WaterFlowGauge now drives the 100-point, five-second attack/movement-speed buff. Skill cost/cooldown 150/6, delayed five hits of 0.5 ATK. Two missing combo inputs added. Ultimate ten hits of 1.2 ATK, invulnerability and renderer restoration, collision-aware attempt to move behind target.
+- Water: existing WaterFlowGauge now drives the 100-point, five-second attack/movement-speed buff. Skill cooldown 6 seconds, delayed five hits of 0.5 ATK. Two missing combo inputs added. Ultimate ten hits of 1.2 ATK, invulnerability and renderer restoration, collision-aware attempt to move behind target.
 - Wood: existing five-stack bind duration corrected to 1.5 seconds; missing 1.5 ATK skill and poison field (0.5 ATK/second); 4 ATK ultimate, airborne and healing field.
 - Iron: missing three-hit basic attack (1/1.2/1.8 ATK), 3 ATK skill, five-hit 2 ATK laser. Independent 15%/5-second basic and 30%/10-second skill debuffs, refreshed rather than stacked.
 - Earth: missing shield bash/slash (0.8/1.2 ATK), frontal guard window, 3.5 ATK counter, 2.5 ATK shockwave/shield, five-second full absorption and 4 ATK + 80% absorbed-damage release.
@@ -50,17 +50,13 @@ Damage/healing fields and delayed hits finish after form changes, but stop when 
 
 Missing motion/VFX assets are not generated. The water ultimate has functional disappearance/hits/reappearance, but no new cinematic slash animation; requested new animations remain comments.
 
-## 폼 유지 SP
+## 전투 자원과 쿨타임
 
-기존 공용 영력 SP와 별개의 자원이며, HUD는 아직 연결하지 않는다. 각 폼의 액션 에셋에서 `공통 밸런스 (Balance) > 폼 유지 SP`를 조정한다. 기본값은 최대 100, 전투 중 완전 소모 30초, 비활성 상태 완전 회복 20초, 고갈 해제 20%, 공격력·공격속도 배율 각각 0.8이다.
+공용 SP와 폼 유지 SP를 제거했습니다. E는 액션 데이터와 폼별 쿨타임을 확인하며 쿨타임은 동작 종료 시 시작합니다. 대시·백스텝과 숫자키/Q 전환은 각자의 쿨타임을 적용합니다. R은 기존 궁극기 게이지와 쿨타임을 사용합니다.
 
-- 활성 폼은 담당 던전의 방 전투가 진행 중일 때만 소모한다. 복도·상점·빈 방·클리어한 방에서는 현재 값을 유지한다. 비활성 폼은 전투 여부와 관계없이 즉시 회복한다.
-- SP 0에서 고갈이 유지되며, 비활성 상태에서 20%까지 회복해야 해제된다. 20% 미만에서 다시 활성화하면 페널티가 남는다. 스킬·회피·교체의 공용 SP 비용과 아이템의 SP 효과는 이 자원을 변경하지 않는다.
-- 상태는 `BaseForm.CurrentFormSp`, `MaxFormSp`, `IsFormSpExhausted`로 조회하며, `OnFormSpChanged`는 변경된 폼을 전달한다. 일반·패링·강화 3타 전환은 같은 폼 객체를 유지하므로 자원이 초기화되지 않는다.
-- 공격력은 해당 폼의 공격력 계산에만 곱한다. 기존 공격 스냅샷과 생성된 지연 피해는 유지하고 고정 추가 피해에는 곱하지 않는다. 공격속도 하한은 0.1이다. 토 돌진과 수 궁극기의 고정 시간에는 고갈 배율만 적용하며, 총 돌진 거리와 궁극기 10타는 유지한다.
-- `Time.deltaTime`으로 공격 상태 갱신 전에 처리한다. 사망·비활성화·상점 일시정지·층 이동 중에는 멈추고, 방·층 이동 후에도 값을 유지한다. 새 플레이어의 폼은 완충 상태로 생성한다.
+공격 스냅샷과 지연 피해의 고정 추가 피해, 공격속도 하한 0.1, 토 돌진과 수 궁극기의 고정 시간은 각각 기존 전투 규칙을 따릅니다. 방 전투 상태는 담당 던전이 추적하며 빠른 이동과 각인 보상에 사용합니다.
 
-검증 진입점: Edit Mode의 `FormSpRegression.Run()` 및 `FormSpEncounterRegression.Run()`. 실제 Game Scene Play Mode에서는 Pipeline `run_script`로 `Tools/FormSpPlayModeRegression.cs`의 `Start()`를 실행하고 `SessionState` 키 `FormSp.PlayModeRegression`으로 결과를 확인한다.
+검증 진입점은 Edit Mode의 `CombatActionStatRegression.Run()`과 `RoomCombatEncounterRegression.Run()`입니다. 실제 Game Scene의 방 입장과 클리어는 Play Mode의 `Tools/DungeonEncounterPlayModeRegression.cs`에서 확인합니다.
 
 ## Elemental finisher — first playable implementation
 
@@ -68,7 +64,7 @@ Based on [finisher design v0.3](https://github.com/lala11112/Four-Tiger-Sword/bl
 
 - LMB retains each form's normal 1/2/3 combo. As soon as the second attack's final hit window ends, a fresh RMB press opens the wheel, even before the ordinary LMB combo transition time; holding RMB before the final hit ends does not open it automatically. One selection is allowed per combo, including attacks that miss.
 - Selection slows the world, player and remaining combo time to 5%, rather than pausing. The existing second attack duration remains the deadline; there is no extra selection timer. `PlayerController > Finisher Selection > Finisher Time Scale` tunes the default `0.05` value.
-- Release over another form equips it and starts its third attack directly. Center/current form starts the current normal third attack without switching or rewarding a switch. The transformed path has no SP cost, does not read/reset the existing switch cooldown, and never queues an E attack or a fourth combo hit. Existing number/Q switching, parry and Water heavy attack remain separate.
+- Release over another form equips it and starts its third attack directly. Center/current form starts the current normal third attack without switching or rewarding a switch. The transformed path leaves the existing switch cooldown untouched and never queues an E attack or a fourth combo hit. Existing number/Q switching, parry and Water heavy attack remain separate.
 - The runtime uGUI wheel starts at the center, with Fire at the top then Earth, Gold, Water and Wood clockwise. Logical radii are 250/90 at the 1920×1080 reference size. Mouse delta moves a virtual cursor while player-facing and camera mouse input are locked. Cancellation and release consume remaining combat input until buttons are neutral.
 - Timeout, Esc, hit/state exit, death, focus loss, shop entry, scene transition and disable cancel the session. The wheel removes only its own world-time lease; shop pause and hitstop compose through `CombatHitStopService`. Realtime Fire explosion delays follow the selection multiplier while continuing to ignore ordinary hitstop.
 - `WeaponActionDataSO.Actions.FinisherStep` is optional and editable in the custom Actions Inspector. Empty slots reuse the existing third attack. A populated slot applies only when changing form. The common damage multiplier is 1.0; the proposed 1.15 multiplier and all five dedicated elemental effects are deferred.

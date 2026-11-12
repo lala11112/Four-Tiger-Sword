@@ -19,8 +19,9 @@ public static class EngravingProgressionRegression
         AtomicFailureAndReentry();
         LegacyTracksRemainIndependent();
         LegacyFileMigrationAndMissingArrays();
+        RetiredStarterEngravingsMigrateOnce();
         UnknownIdsAndBackupRecovery();
-        string result = $"Engraving progression: 6 scenarios passed; {_checks} checks.";
+        string result = $"Engraving progression: 7 scenarios passed; {_checks} checks.";
         Debug.Log(result); return result;
     }
 
@@ -32,9 +33,9 @@ public static class EngravingProgressionRegression
         int[] counts = new int[5];
         foreach (var node in f.Engravings.nodes)
         { counts[node.tier]++; total += f.Engravings.Cost(node.id); if (node.id != "origin") paid++; }
-        Check(paid == 39 && total == 1290, "39 unlocks cost exactly1290");
-        Check(counts[0] == 1 && counts[1] == 5 && counts[2] == 16 && counts[3] == 13 && counts[4] == 5,
-            "Semantic stage counts remain1/5/16/13/5");
+        Check(paid == 37 && total == 1260, "37 unlocks cost exactly1260");
+        Check(counts[0] == 1 && counts[1] == 4 && counts[2] == 15 && counts[3] == 13 && counts[4] == 5,
+            "Semantic stage counts remain1/4/15/13/5");
         Check(f.Service.IsNodeUnlocked("origin") && !f.Service.GetNodePurchaseState("origin").CanPurchase,
             "Origin starts free and cannot be purchased");
         Check(f.Service.TryGrantReward("tree-fund", total, out _), "Fund complete tree");
@@ -49,7 +50,7 @@ public static class EngravingProgressionRegression
             Check(f.Service.Balance == before - f.Engravings.Cost(node.id), "Exact node charge " + node.id);
             purchased++;
         }
-        Check(purchased == 39 && f.Service.Balance == 0 && f.Store.Profile.unlockedNodeIds.Length == 39,
+        Check(purchased == 37 && f.Service.Balance == 0 && f.Store.Profile.unlockedNodeIds.Length == 37,
             "All single unlocks stored with zero remaining balance");
         int writes = f.Store.Writes;
         foreach (var node in nodes)
@@ -149,6 +150,83 @@ public static class EngravingProgressionRegression
         var blocked = new PlayerUpgradeService(f.Settings, new PlayerUpgradeFileStore(files.Path), f.Engravings);
         Check(!blocked.IsReady && !blocked.TryGrantReward("do-not-wipe", 10, out _) && File.ReadAllText(files.Path) == broken,
             "V2 missing ownership array blocks writes and preserves file");
+    }
+
+    private static void RetiredStarterEngravingsMigrateOnce()
+    {
+        using var f = new Fixture(); using var files = new TemporaryFiles();
+        var profile = PlayerUpgradeProfile.New();
+        profile.currency = 7;
+        profile.healthLevel = 1;
+        profile.attackLevel = 2;
+        profile.defenseLevel = 3;
+        profile.unlockedNodeIds = new[] { "heirloom", "starterelement", "reroll", "hold", "choices", "synergy", "fusion" };
+        string original = JsonUtility.ToJson(profile, true);
+        string backupPath = files.Path + ".bak";
+        var older = PlayerUpgradeProfile.New();
+        older.currency = 2;
+        string oldBackup = JsonUtility.ToJson(older, true);
+        File.WriteAllText(files.Path, original);
+        File.WriteAllText(backupPath, oldBackup);
+        var store = new PlayerUpgradeFileStore(files.Path, f.Engravings);
+        var service = new PlayerUpgradeService(f.Settings, store, f.Engravings);
+        Check(service.IsReady && service.Balance == 37 && service.GetLevel(StatType.ST_HP) == 1
+            && service.GetLevel(StatType.ST_ATK) == 2 && service.GetLevel(StatType.ST_DEF) == 3,
+            "Valid legacy primary takes priority over an older backup and preserves stat levels with one refund");
+        Check(!service.IsNodeUnlocked("heirloom") && !service.TryUnlockNode("starterelement", out _)
+            && service.IsNodeUnlocked("hold") && service.IsNodeUnlocked("fusion")
+            && service.CreateEngravingSnapshot().Limit("reroll") == 3,
+            "Retired nodes are removed and combat reward descendants are preserved");
+        var reloaded = new PlayerUpgradeService(f.Settings, new PlayerUpgradeFileStore(files.Path, f.Engravings), f.Engravings);
+        Check(reloaded.IsReady && reloaded.Balance == 37 && File.ReadAllText(files.Path) == original
+            && File.ReadAllText(backupPath) == oldBackup, "Repeated loading neither pays again nor rewrites either file");
+
+        File.Delete(backupPath);
+        Directory.CreateDirectory(backupPath);
+        try
+        {
+            Check(!service.TryUnlockNode("atk", out _) && service.Balance == 37 && !service.IsNodeUnlocked("atk")
+                && service.IsNodeUnlocked("hold") && File.ReadAllText(files.Path) == original,
+                "Failed atomic replacement preserves the legacy primary and in-memory migration");
+        }
+        finally { Directory.Delete(backupPath); }
+        File.WriteAllText(backupPath, oldBackup);
+        Check(service.TryUnlockNode("atk", out _) && service.Balance == 27,
+            "Next successful purchase saves the migration atomically");
+        var saved = JsonUtility.FromJson<PlayerUpgradeProfile>(File.ReadAllText(files.Path));
+        var persisted = new PlayerUpgradeService(f.Settings, new PlayerUpgradeFileStore(files.Path, f.Engravings), f.Engravings);
+        Check(File.ReadAllText(backupPath) == original && saved.currency == 27
+            && Array.IndexOf(saved.unlockedNodeIds, "heirloom") < 0 && Array.IndexOf(saved.unlockedNodeIds, "starterelement") < 0
+            && persisted.IsReady && persisted.Balance == 27 && persisted.IsNodeUnlocked("atk") && persisted.IsNodeUnlocked("fusion"),
+            "Primary stores both sides of the migration and reload does not credit the retained backup");
+        var heirloomOnly = profile.Copy();
+        heirloomOnly.unlockedNodeIds = new[] { "heirloom" };
+        var memory = new MemoryStore { Profile = heirloomOnly };
+        var migrated = new PlayerUpgradeService(f.Settings, memory, f.Engravings);
+        Check(migrated.IsReady && migrated.Balance == 17 && memory.Profile.currency == 7,
+            "Other store implementations credit just the retired node that was owned");
+        Check(f.Engravings.Cost("reroll") == 20 && f.Engravings.Cost("choices") == 20
+            && f.Engravings.Find("reroll").parentId == "origin" && f.Engravings.Find("choices").parentId == "origin",
+            "Combat reward branches remain directly accessible at their original costs");
+        var orphan = profile.Copy();
+        orphan.unlockedNodeIds = new[] { "starterelement" };
+        Check(!new PlayerUpgradeService(f.Settings, new MemoryStore { Profile = orphan }, f.Engravings).IsReady,
+            "The removed synergy purchase still requires a valid legacy parent");
+        File.Delete(backupPath);
+        File.WriteAllText(files.Path, JsonUtility.ToJson(orphan));
+        Check(!store.TryLoad(out _, out _), "File store rejects the removed synergy purchase without its legacy parent");
+        var unknown = profile.Copy();
+        unknown.unlockedNodeIds = new[] { "heirloom", "unknown-node" };
+        File.WriteAllText(files.Path, JsonUtility.ToJson(unknown));
+        Check(!store.TryLoad(out _, out _)
+            && !new PlayerUpgradeService(f.Settings, new MemoryStore { Profile = unknown }, f.Engravings).IsReady,
+            "Migration does not make other unknown ownership IDs valid");
+
+        var nearLimit = profile.Copy();
+        nearLimit.currency = int.MaxValue - 5;
+        var capped = new PlayerUpgradeService(f.Settings, new MemoryStore { Profile = nearLimit }, f.Engravings);
+        Check(capped.IsReady && capped.Balance == int.MaxValue && !capped.IsNodeUnlocked("heirloom"),
+            "Refund at the balance limit does not overflow or retain the retired purchase");
     }
 
     private static void UnknownIdsAndBackupRecovery()

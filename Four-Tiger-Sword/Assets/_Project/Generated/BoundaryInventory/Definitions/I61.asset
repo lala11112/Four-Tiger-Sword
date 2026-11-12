@@ -18,8 +18,7 @@ MonoBehaviour:
   displayName: "\uC410\uAE30 \uACBD\uB3C4\uD3B8"
   description: "\uB05D\uC744 \uC0BC\uAC01\uC73C\uB85C \uAE4E\uC740 \uACE0\uACBD\uB3C4
     \uC2DC\uD3B8."
-  effectText: "\uD3C9\uD0C0 \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uB300\uC0C1\uC758 \uC591\uC218
-    \uC720\uD6A8 \uBC29\uC5B4\uB825\uC744 12% \uBB34\uC2DC\uD55C\uB2E4."
+  effectText: "\uC801 \uBC29\uC5B4\uB825 5% \uAD00\uD1B5"
   synergyIds:
   - S14
   synergyNames:
@@ -28,15 +27,15 @@ MonoBehaviour:
   primarySynergyName: "\uAD00\uD1B5"
   primarySynergyIcon: {fileID: 21300000, guid: 9fac5d8b6848b5a4483ff48eb719037a, type: 3}
   element: 0
-  grade: 3
-  purchasePrice: 80
+  grade: 2
+  purchasePrice: 40
   effects: []
   boundaryEffects:
   - effectId: I61
     stat: 7
-    amount: 0.12
+    amount: 0.05
     trigger: 0
-    family: 1
+    family: 0
     element: 0
     eliteOrBossOnly: 0
     targetHpMin: -1
@@ -55,9 +54,7 @@ MonoBehaviour:
     cooldownSeconds: 0
   icon: {fileID: 21300000, guid: 838b30f9e00439c469a0d21dd908f34f, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I61\",\"name\":\"\uC410\uAE30 \uACBD\uB3C4\uD3B8\",\"description\":\"\uB05D\uC744
-    \uC0BC\uAC01\uC73C\uB85C \uAE4E\uC740 \uACE0\uACBD\uB3C4 \uC2DC\uD3B8.\",\"effect\":\"\uD3C9\uD0C0
-    \uD53C\uD574 \uACC4\uC0B0 \uC2DC \uB300\uC0C1\uC758 \uC591\uC218 \uC720\uD6A8
-    \uBC29\uC5B4\uB825\uC744 12% \uBB34\uC2DC\uD55C\uB2E4.\",\"synergies\":[\"S14\"],\"primarySynergy\":\"S14\",\"designIntent\":\"\uD3C9\uD0C0
-    \uC704\uC8FC\uB85C \uBC29\uC5B4\uB825\uC774 \uC788\uB294 \uC801\uC744 \uC0C1\uB300\uD55C\uB2E4.\",\"origin\":\"new\",\"image\":\"Art/Items/I61.png\"}"
+    \uC0BC\uAC01\uC73C\uB85C \uAE4E\uC740 \uACE0\uACBD\uB3C4 \uC2DC\uD3B8.\",\"effect\":\"\uC801
+    \uBC29\uC5B4\uB825 5% \uAD00\uD1B5\",\"synergies\":[\"S14\"],\"primarySynergy\":\"S14\",\"origin\":\"new\",\"image\":\"Art/Items/I61.png\",\"grade\":2}"

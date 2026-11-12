@@ -13,6 +13,7 @@ public static class HubWorldSetup
 {
     private const string HubPath = "Assets/_Project/Scenes/Hub Scene.unity";
     private const string GamePath = "Assets/_Project/Scenes/Game Scene.unity";
+    private const string HubModelPath = "Assets/EasternLab_ModelOnly/Models/EasternLab.fbx";
     private const string UndoName = "Set Up Hub World Player";
 
     [MenuItem("Tools/Studio Baekho/Progression/Set Up Hub World Player")]
@@ -316,6 +317,11 @@ public static class HubWorldSetup
 
     private static int AddWorldColliders(GameObject map, int groundLayer)
     {
+        var sourceModel = AssetDatabase.LoadAssetAtPath<GameObject>(HubModelPath);
+        var sourceMeshes = sourceModel?.GetComponentsInChildren<MeshFilter>(true)
+            .Where(filter => filter.sharedMesh != null)
+            .ToDictionary(filter => filter.name, filter => filter.sharedMesh, StringComparer.Ordinal);
+
         int count = 0;
         foreach (var filter in map.GetComponentsInChildren<MeshFilter>(true))
         {
@@ -324,7 +330,12 @@ public static class HubWorldSetup
             var collider = filter.GetComponent<MeshCollider>();
             if (collider == null) collider = Undo.AddComponent<MeshCollider>(filter.gameObject);
             Undo.RecordObject(collider, UndoName);
-            collider.sharedMesh = filter.sharedMesh;
+            // Architecture can use repaired render meshes while keeping its original collision surfaces.
+            if (sourceMeshes != null && sourceMeshes.TryGetValue(filter.name, out var sourceMesh))
+            {
+                if (collider.sharedMesh == null) collider.sharedMesh = sourceMesh;
+            }
+            else collider.sharedMesh = filter.sharedMesh;
             collider.convex = false;
             collider.isTrigger = false;
             collider.enabled = true;

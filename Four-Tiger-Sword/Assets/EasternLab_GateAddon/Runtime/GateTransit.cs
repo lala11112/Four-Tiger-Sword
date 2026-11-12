@@ -15,7 +15,10 @@ public sealed class GateTransit : MonoBehaviour {
  public string targetScene;
  [Tooltip("Let an onTraverse listener own destination scene loading instead of loading it here.")]
  public bool externalSceneLoading;
- public bool HasDestination => !string.IsNullOrWhiteSpace(targetScene)?Application.CanStreamedLevelBeLoaded(targetScene):(portalExitFrame||demoExit);
+ [Tooltip("Dispatch a walking traversal to its owner without loading a scene or teleporting the actor.")]
+ public bool eventOnlyTraversal;
+ public Func<Transform,bool> TraversalFilter {get;set;}
+ public bool HasDestination => eventOnlyTraversal||(!string.IsNullOrWhiteSpace(targetScene)?Application.CanStreamedLevelBeLoaded(targetScene):(portalExitFrame||demoExit));
  public bool IsDestinationConfigured => HasDestination;
  public Transform demoExit;
  public Transform portalExitFrame;
@@ -64,6 +67,7 @@ public sealed class GateTransit : MonoBehaviour {
   if(!s.actor){tracks.Remove(id);return;}float d=SignedDistance(s.actor);
   if(!HasDestination){s.previous=d;s.armed=false;LastResult="목적지를 연결한 뒤 통과할 수 있습니다.";return;}
   if(activation&&!activation.CanTraverse){s.previous=d;s.armed=false;return;}
+  if(TraversalFilter!=null&&!TraversalFilter(s.actor)){s.previous=d;s.armed=false;return;}
   if(IsCooling(id)){s.previous=d;s.armed=false;return;}
   if(d>=armDistance)s.armed=true;
   if(s.armed&&d<=-crossingThreshold&&d<s.previous){
@@ -80,6 +84,7 @@ public sealed class GateTransit : MonoBehaviour {
  bool SphereFits(Vector3 center,float radius){var q=transform.InverseTransformPoint(center);return Mathf.Sqrt(q.x*q.x+q.y*q.y)+radius/Mathf.Max(.0001f,Mathf.Min(Mathf.Abs(transform.lossyScale.x),Mathf.Abs(transform.lossyScale.y)))<=apertureRadius-.001f;}
  void Traverse(Track s){
   TraversalCount++;LastTraveller=s.actor;
+  if(eventOnlyTraversal){LastResult="통과 이벤트를 전달했습니다.";onTraverse.Invoke();return;}
   if(playConversionEffect)CyberTransition.PlayOn(s.actor,transitionMaterial);
   if(!string.IsNullOrWhiteSpace(targetScene)&&Application.CanStreamedLevelBeLoaded(targetScene)){LastResult="연결된 목적지로 이동합니다.";onTraverse.Invoke();if(!externalSceneLoading)SceneManager.LoadScene(targetScene);return;}
   if(portalExitFrame&&preservePortalPose){

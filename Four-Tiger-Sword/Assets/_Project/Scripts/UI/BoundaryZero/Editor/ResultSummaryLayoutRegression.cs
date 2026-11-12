@@ -7,7 +7,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-/// <summary>Fits the real result prefab against three virtual viewports without changing the Game view.</summary>
+/// <summary>Fits the real result prefab against virtual viewports without changing the Game view.</summary>
 public static class ResultSummaryLayoutRegression
 {
     private const float Epsilon = 1f;
@@ -45,7 +45,12 @@ public static class ResultSummaryLayoutRegression
             var stress = new RunResultSummary("12-34  |  경계선 외곽 지역 심층 조사와 생존자 수색 작전",
                 9_876_543_210L, 123_456_789, 12_345, "강화석", int.MaxValue, int.MaxValue, int.MaxValue / 10);
 
-            foreach (var resolution in new[] { new Vector2Int(1280, 720), new Vector2Int(1920, 1080), new Vector2Int(3440, 1440) })
+            var resolutions = new[]
+            {
+                new Vector2Int(1280, 720), new Vector2Int(1920, 1080),
+                new Vector2Int(2404, 1017), new Vector2Int(3440, 1440)
+            };
+            foreach (var resolution in resolutions)
             {
                 float widthRatio = resolution.x / scaler.referenceResolution.x;
                 float heightRatio = resolution.y / scaler.referenceResolution.y;
@@ -63,7 +68,7 @@ public static class ResultSummaryLayoutRegression
             overlay.ShowError();
             Check(!overlay.ResultSummaryRoot.activeSelf && overlay.Details.gameObject.activeSelf
                 && Mathf.Approximately(overlay.Details.fontSize, 27f), "Result rows or enlarged text leaked into error mode.");
-            return "PASS: result glyph bounds, distinct rows, and action fit at 1280x720, 1920x1080 and 3440x1440; both results, large values, long chapter, loading/error reset.";
+            return "PASS: result glyph bounds, distinct rows, and action fit at 1280x720, 1920x1080, 2404x1017 and 3440x1440; both results, large values, long chapter, loading/error reset.";
         }
         finally
         {

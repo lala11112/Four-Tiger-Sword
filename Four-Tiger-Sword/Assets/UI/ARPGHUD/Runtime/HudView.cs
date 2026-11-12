@@ -9,11 +9,9 @@ namespace ArpgHud
         [Tooltip("Optional component implementing IHudStateSource. May also be bound from code.")]
         [SerializeField] MonoBehaviour stateSource;
         [SerializeField] UnityEngine.UI.Image hpFill;
-        [SerializeField] UnityEngine.UI.Image auxiliaryFill;
         [SerializeField] UnityEngine.UI.Image ultimateChargeFill;
         [SerializeField] TMP_Text ultimateChargeText;
         [SerializeField] TMP_Text hpText;
-        [SerializeField] TMP_Text auxiliaryText;
         [SerializeField] HudEnergyImage ultimateEnergy;
         [SerializeField] GameObject[] selectedOverlays = new GameObject[5];
         [SerializeField] UnityEngine.UI.Image[] formArtwork;
@@ -36,13 +34,11 @@ namespace ArpgHud
         public HudSkillView SkillE => skillE;
         public HudSkillView SkillR => skillR;
         public float HpRatio => hpFill != null ? hpFill.fillAmount : 0;
-        public float AuxiliaryRatio => auxiliaryFill != null ? auxiliaryFill.fillAmount : 0;
         public float UltimateChargeRatio => ultimateEnergy != null ? ultimateEnergy.Charge
             : ultimateChargeFill != null ? ultimateChargeFill.fillAmount : 0;
 
-        public void Configure(UnityEngine.UI.Image hp, UnityEngine.UI.Image aux, GameObject[] overlays,
-            HudSkillView e, HudSkillView r)
-        { hpFill = hp; auxiliaryFill = aux; selectedOverlays = overlays; skillE = e; skillR = r; }
+        public void Configure(UnityEngine.UI.Image hp, GameObject[] overlays, HudSkillView e, HudSkillView r)
+        { hpFill = hp; selectedOverlays = overlays; skillE = e; skillR = r; }
 
         public void ConfigureFormArtwork(UnityEngine.UI.Image[] images) { formArtwork=images; }
         public void ConfigureFormLocks(GameObject[] locks, GameObject[] keys)
@@ -51,8 +47,7 @@ namespace ArpgHud
         public void ConfigureUltimateCharge(UnityEngine.UI.Image fill, TMP_Text text)
         { ultimateChargeFill = fill; ultimateChargeText = text; previousChargePercent = -1; }
         public void ConfigureUltimateEnergy(HudEnergyImage energy) { ultimateEnergy = energy; }
-        public void ConfigureVitalsText(TMP_Text hp, TMP_Text auxiliary)
-        { hpText = hp; auxiliaryText = auxiliary; }
+        public void ConfigureHealthText(TMP_Text hp) { hpText = hp; }
         public void ConfigureChainSkills(GameObject root, TMP_Text fire, TMP_Text water,
             GameObject fireSelected, GameObject waterSelected, TMP_Text hint)
         {
@@ -95,7 +90,6 @@ namespace ArpgHud
         public void Render(HudState value)
         {
             bool invalid = !HudMath.IsFinite(value.Hp.Current) || !HudMath.IsFinite(value.Hp.Maximum)
-                || !HudMath.IsFinite(value.Auxiliary.Current) || !HudMath.IsFinite(value.Auxiliary.Maximum)
                 || !HudMath.IsFinite(value.UltimateCharge.Current) || !HudMath.IsFinite(value.UltimateCharge.Maximum)
                 || !HudMath.IsFinite(value.E.Remaining) || !HudMath.IsFinite(value.E.Duration)
                 || !HudMath.IsFinite(value.R.Remaining) || !HudMath.IsFinite(value.R.Duration)
@@ -103,11 +97,8 @@ namespace ArpgHud
             if (invalid && !warnedInvalid) Debug.LogWarning("HUD received non-finite state; safe display values used.", this);
             warnedInvalid = invalid;
             if (hpFill != null) hpFill.fillAmount = HudMath.Ratio(value.Hp);
-            if (auxiliaryFill != null) auxiliaryFill.fillAmount = HudMath.Ratio(value.Auxiliary);
             if (hpText != null)
                 hpText.SetText("{0:0} / {1:0}", SafeNumber(value.Hp.Current), SafeNumber(value.Hp.Maximum));
-            if (auxiliaryText != null)
-                auxiliaryText.SetText("기력 {0:0} / {1:0}", SafeNumber(value.Auxiliary.Current), SafeNumber(value.Auxiliary.Maximum));
             float chargeRatio = HudMath.Ratio(value.UltimateCharge);
             if (ultimateChargeFill != null) ultimateChargeFill.fillAmount = chargeRatio;
             if (ultimateChargeText != null)

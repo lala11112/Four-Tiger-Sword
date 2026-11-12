@@ -18,8 +18,7 @@ MonoBehaviour:
   displayName: "\uC751\uC218 \uD2C0"
   description: "\uC751\uC218 \uB3D9\uC791\uB9C8\uB2E4 \uB2E4\uB978 \uC704\uCE58\uB97C
     \uC9DA\uB3C4\uB85D \uD648 \uC5EC\uC12F \uAC1C\uB97C \uB6AB\uC5C8\uB2E4."
-  effectText: "HP\uAC00 70% \uC774\uC0C1\uC778 \uC801\uC5D0\uAC8C \uC8FC\uB294 \uC2A4\uD0AC
-    \uD53C\uD574\uAC00 9% \uC99D\uAC00\uD55C\uB2E4."
+  effectText: "\uC2A4\uD0AC \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 \u22125%"
   synergyIds:
   - S16
   synergyNames:
@@ -28,18 +27,18 @@ MonoBehaviour:
   primarySynergyName: "\uC219\uB828"
   primarySynergyIcon: {fileID: 21300000, guid: 576f373fee8b00f4287fdcb49863d6c9, type: 3}
   element: 0
-  grade: 3
-  purchasePrice: 80
+  grade: 2
+  purchasePrice: 40
   effects: []
   boundaryEffects:
   - effectId: I120
-    stat: 6
-    amount: 0.09
+    stat: 14
+    amount: 0.05
     trigger: 0
-    family: 2
+    family: 0
     element: 0
     eliteOrBossOnly: 0
-    targetHpMin: 0.7
+    targetHpMin: -1
     targetHpMax: -1
     selfHpMin: -1
     selfHpMax: -1
@@ -55,8 +54,8 @@ MonoBehaviour:
     cooldownSeconds: 0
   icon: {fileID: 21300000, guid: 6681bac307024e747a115069b4ec7d9d, type: 3}
   contentStatus: draft
-  contentRevision: 20261110
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I120\",\"name\":\"\uC751\uC218 \uD2C0\",\"description\":\"\uC751\uC218
     \uB3D9\uC791\uB9C8\uB2E4 \uB2E4\uB978 \uC704\uCE58\uB97C \uC9DA\uB3C4\uB85D \uD648
-    \uC5EC\uC12F \uAC1C\uB97C \uB6AB\uC5C8\uB2E4.\",\"effect\":\"HP\uAC00 70% \uC774\uC0C1\uC778
-    \uC801\uC5D0\uAC8C \uC8FC\uB294 \uC2A4\uD0AC \uD53C\uD574\uAC00 9% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S16\"],\"primarySynergy\":\"S16\",\"image\":\"Art/Items/I120.png\",\"origin\":\"expansion\"}"
+    \uC5EC\uC12F \uAC1C\uB97C \uB6AB\uC5C8\uB2E4.\",\"effect\":\"\uC2A4\uD0AC \uC7AC\uC0AC\uC6A9
+    \uB300\uAE30\uC2DC\uAC04 \u22125%\",\"synergies\":[\"S16\"],\"primarySynergy\":\"S16\",\"image\":\"Art/Items/I120.png\",\"origin\":\"expansion\",\"grade\":2}"

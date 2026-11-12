@@ -1,15 +1,11 @@
 using TMPro;
 using UnityEngine;
 
-/// <summary>A brief screen-space notice shown once when a room's chest can be opened.</summary>
+/// <summary>A screen-space notice for unopened room reward chests.</summary>
 [DisallowMultipleComponent]
 public sealed class DungeonRewardNotice : MonoBehaviour
 {
-    private const float HoldSeconds = 2.5f;
-    private const float FadeSeconds = .28f;
     private Canvas _canvas;
-    private CanvasGroup _group;
-    private float _shownAt;
 
     internal static DungeonRewardNotice Create()
     {
@@ -29,7 +25,7 @@ public sealed class DungeonRewardNotice : MonoBehaviour
         rect.anchorMin = rect.anchorMax = new Vector2(.5f, 1f);
         rect.pivot = new Vector2(.5f, 1f);
         rect.anchoredPosition = new Vector2(0f, -106f);
-        rect.sizeDelta = new Vector2(392f, 46f);
+        rect.sizeDelta = new Vector2(490f, 57.5f);
         var plate = panel.GetComponent<UnityEngine.UI.Image>();
         plate.color = new Color32(10, 18, 30, 242);
         plate.raycastTarget = false;
@@ -39,8 +35,8 @@ public sealed class DungeonRewardNotice : MonoBehaviour
         var icon = accent.rectTransform;
         icon.SetParent(rect, false);
         icon.anchorMin = icon.anchorMax = new Vector2(0f, .5f);
-        icon.anchoredPosition = new Vector2(64f, 0f);
-        icon.sizeDelta = new Vector2(24f, 24f);
+        icon.anchoredPosition = new Vector2(80f, 0f);
+        icon.sizeDelta = new Vector2(30f, 30f);
         accent.SetSymbol(DungeonMinimapIconGraphic.Symbol.RewardChest);
         accent.color = new Color32(255, 207, 100, 255);
 
@@ -49,11 +45,11 @@ public sealed class DungeonRewardNotice : MonoBehaviour
         label.rectTransform.SetParent(rect, false);
         label.rectTransform.anchorMin = Vector2.zero;
         label.rectTransform.anchorMax = Vector2.one;
-        label.rectTransform.offsetMin = new Vector2(90f, 0f);
-        label.rectTransform.offsetMax = new Vector2(-22f, 0f);
+        label.rectTransform.offsetMin = new Vector2(112.5f, 0f);
+        label.rectTransform.offsetMax = new Vector2(-27.5f, 0f);
         label.font = Resources.Load<TMP_FontAsset>("BoundaryUI/Fonts/BoundaryFont") ?? TMP_Settings.defaultFontAsset;
         label.text = "보상 상자 잠금 해제";
-        label.fontSize = 24f;
+        label.fontSize = 30f;
         label.fontStyle = FontStyles.Bold;
         label.alignment = TextAlignmentOptions.MidlineLeft;
         label.color = new Color32(255, 235, 193, 255);
@@ -61,21 +57,22 @@ public sealed class DungeonRewardNotice : MonoBehaviour
 
         var notice = root.GetComponent<DungeonRewardNotice>();
         notice._canvas = canvas;
-        notice._group = root.GetComponent<CanvasGroup>();
-        notice._group.interactable = false;
-        notice._group.blocksRaycasts = false;
+        var group = root.GetComponent<CanvasGroup>();
+        group.interactable = false;
+        group.blocksRaycasts = false;
         notice.Hide();
         return notice;
     }
 
     internal void Show()
     {
-        _shownAt = Time.unscaledTime;
-        _group.alpha = 1f;
-        gameObject.SetActive(true);
+        if (!gameObject.activeSelf) gameObject.SetActive(true);
     }
 
-    internal void Hide() => gameObject.SetActive(false);
+    internal void Hide()
+    {
+        if (gameObject.activeSelf) gameObject.SetActive(false);
+    }
 
     private void OnEnable()
     {
@@ -88,12 +85,5 @@ public sealed class DungeonRewardNotice : MonoBehaviour
     private void SetCaptureVisibility(bool capturing)
     {
         if (_canvas != null) _canvas.enabled = !capturing;
-    }
-
-    private void Update()
-    {
-        float elapsed = Time.unscaledTime - _shownAt;
-        _group.alpha = 1f - Mathf.Clamp01((elapsed - HoldSeconds) / FadeSeconds);
-        if (_group.alpha <= 0f) Hide();
     }
 }

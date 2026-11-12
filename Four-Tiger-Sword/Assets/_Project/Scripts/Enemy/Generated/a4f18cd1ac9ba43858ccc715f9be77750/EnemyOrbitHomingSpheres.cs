@@ -243,6 +243,7 @@ namespace Baekho.Generated.a4f18cd1ac9ba43858ccc715f9be77750
 
             _phase = Phase.Homing;
             _phaseTime = 0f;
+            EndAttackWarning();
             EndTelegraph();
             if (!IsActive || _exiting || !CanContinueAction) return;
             PlaySwingSound();

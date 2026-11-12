@@ -39,21 +39,21 @@ HUD를 선택하고 Tools > PENTA HUD > Validate Selected HUD를 실행하면
 3. 게임 데이터 연결
 자신의 MonoBehaviour에 [SerializeField] HudController hud;를 선언하고,
 프리팹의 HudController 컴포넌트를 Inspector 슬롯에 연결하세요.
-API_EXAMPLES.txt의 예제를 복사해서 실제 체력/자원/속성/쿨다운 데이터와 연결합니다.
+API_EXAMPLES.txt의 예제를 복사해서 실제 체력/필살기 충전량/속성/쿨다운 데이터와 연결합니다.
 프리팹의 HudView 및 그래픽 참조는 이미 연결되어 있습니다.
 게임 코드가 별도 .asmdef를 사용한다면 해당 Assembly Definition의 References에
 Penta.ArpgHud.Runtime을 추가하세요. 일반 Assembly-CSharp 스크립트는 바로 사용할 수 있습니다.
 
 호출할 함수
 • SetHealth(current, maximum): 체력
-• SetAuxiliary(current, maximum): 보조 자원
+• SetUltimateCharge(current, maximum): 필살기 충전량
 • SetForm(HudElement) 또는 SetForm(int): Fire=1, Water=2, Wood=3, Metal=4, Earth=5
 • SetCooldownE(remainingSeconds, durationSeconds): E 남은 시간과 전체 재사용 시간
 • SetCooldownR(remainingSeconds, durationSeconds): R 남은 시간과 전체 재사용 시간
 • Refresh(): 보관 중인 상태로 다시 표시
 • CurrentState: 현재 보관된 상태의 복사본 / View: 연결된 HudView
 
-체력과 자원은 화면에서 0~100%로 제한됩니다. 최대값이 0 이하이면 빈 막대로
+체력과 필살기 충전량은 화면에서 0~100%로 제한됩니다. 최대값이 0 이하이면 빈 막대로
 표시됩니다. CurrentState는 전달받은 원본 값을 보관합니다.
 1~5 밖의 속성 번호는 무시하고 직전 속성을 유지합니다.
 속성 변경 시 E/R 아이콘과 테두리 색도 자동으로 바뀌며 쿨다운 시간은 유지됩니다.
@@ -69,7 +69,7 @@ HUD는 자체 타이머나 스킬 입력을 실행하지 않습니다. 실제로
 선택 사항: 연결 샘플
 Integration/Samples/HUD_ConnectionDemo.unity를 열어 표시를 살펴볼 수 있습니다.
 기존 Input Manager가 활성화되어 있으면 1~5 속성, E/R 스킬,
-H/J 체력 감소/증가, K/L 보조 자원 감소/증가를 사용합니다.
+H/J 체력 감소/증가를 사용합니다.
 새 Input System만 활성화된 프로젝트에서는 샘플 키보드 입력이 동작하지 않습니다.
 Play 중 HudConnectionExample 컴포넌트 메뉴의 Sample/Use E, Sample/Use R,
 Sample/Reset 또는 공개 메서드 UseE(), UseR(), ResetSample()을 사용하세요.

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using EasternLab.GateAddon;
 using StudioBaekho;
 using UnityEditor;
 using UnityEngine;
@@ -19,6 +20,8 @@ public static class RunProgressionPlayModeRegression
     public const string DeathRestartKey = "RunProgression.DeathRestartRegression";
     public const string TitleKey = "RunProgression.TitleRegression";
     private const BindingFlags Hidden = BindingFlags.Instance | BindingFlags.NonPublic;
+    private const string NormalSettings = "Assets/_Game/RunProgression/Settings/NormalStage.asset";
+    private const string BossSettings = "Assets/_Game/RunProgression/Settings/BossStage.asset";
     private static bool running;
     private static int checks;
     private static int previousGeneration = -1;
@@ -47,6 +50,8 @@ public static class RunProgressionPlayModeRegression
         ItemCatalog originalCatalog = null;
         string[] originalOwned = Array.Empty<string>();
         PlayerController player = null;
+        IDisposable accountScope = null;
+        PlayerUpgradeService previousRunService = null;
         bool modifierAdded = false, catalogReplaced = false;
         var temporary = new List<Object>();
         var pristine = new Dictionary<Object, string>();
@@ -57,6 +62,16 @@ public static class RunProgressionPlayModeRegression
             await Ready(run);
             Check(run.CurrentChapterIndex == 0 && run.CurrentStageIndex == 0,
                 "Start this regression in a fresh run, before using the first exit.");
+            previousRunService = GetField<PlayerUpgradeService>(run, "_upgradeService");
+            var originalAccount = previousRunService ?? PlayerUpgradeService.Instance;
+            Check(originalAccount.IsReady && originalAccount.Settings != null, "The live progression account is unavailable.");
+            var profile = GetField<PlayerUpgradeProfile>(originalAccount, "_profile");
+            var isolatedAccount = new PlayerUpgradeService(originalAccount.Settings, new MemoryUpgradeStore(profile),
+                originalAccount.EngravingSettings);
+            Check(isolatedAccount.IsReady, "The isolated progression account failed to load.");
+            // All stage rewards, final gold conversion and supply-depot settlement use this copy.
+            accountScope = PlayerUpgradeService.OverrideForTesting(isolatedAccount);
+            SetField(run, "_upgradeService", isolatedAccount);
             player = run.player;
             Check(player != null && player.Controller != null && player.StatManager != null,
                 "Run has no initialized player.");
@@ -72,12 +87,36 @@ public static class RunProgressionPlayModeRegression
                     Remember(pristine, stage.enemyCatalog);
                 }
 
-            // A deep, disposable runtime definition permits fault injection without editing assets.
-            var definition = CloneDefinition(originalDefinition, temporary);
-            Check(definition.chapters.Length >= 2 && definition.chapters[0].stages.Length >= 2,
-                "The fixture needs two chapters and a nonfinal first stage.");
+            // A fixed, disposable two-chapter run covers ordinary, chapter-ending, and final exits
+            // even when the installed campaign only contains a single authored boss stage.
+            var normalSettings = AssetDatabase.LoadAssetAtPath<BaekhoDungeonSettings>(NormalSettings);
+            var bossSettings = AssetDatabase.LoadAssetAtPath<BaekhoDungeonSettings>(BossSettings);
+            var installedBoss = originalDefinition.chapters.SelectMany(chapter => chapter.stages)
+                .FirstOrDefault(stage => stage.bossPrefab != null);
+            Check(normalSettings != null && bossSettings != null && installedBoss != null && installedBoss.enemyCatalog != null,
+                "The authored normal/boss settings, boss prefab, or enemy catalog are missing.");
+            Remember(pristine, normalSettings);
+            Remember(pristine, bossSettings);
+            var normal = new StageDefinition { displayName = "QA Normal", dungeonSettings = normalSettings,
+                enemyCatalog = installedBoss.enemyCatalog, mapCountVariation = 0 };
+            var bossFixture = new StageDefinition { displayName = "QA Boss", dungeonSettings = bossSettings,
+                enemyCatalog = installedBoss.enemyCatalog, bossPrefab = installedBoss.bossPrefab, mapCountVariation = 0 };
+            var chapters = new[]
+            {
+                new ChapterDefinition { displayName = "QA Chapter 1", stages = new[] { normal, bossFixture } },
+                new ChapterDefinition { displayName = "QA Chapter 2", stages = new[] { normal, bossFixture } }
+            };
+            var definition = CloneDefinition(chapters, temporary);
             Check(definition.Validate(out string definitionError), definitionError);
             run.definition = definition;
+
+            var installedRoot = run.stageManager.Result.root;
+            typeof(RunManager).GetMethod("OnStageFailure", Hidden).Invoke(run, new object[] { "Preparing the regression fixture." });
+            Check(run.State == RunState.Error, "The live run did not suspend for fixture preparation.");
+            run.RetryPendingStage();
+            await Ready(run);
+            Check(run.CurrentChapterIndex == 0 && run.CurrentStageIndex == 0 && run.stageManager.Result.bossRoom == null
+                && run.stageManager.Result.root != installedRoot, "Retry did not prepare the fixture's first normal stage.");
             CheckRoomCountSampling(definition.chapters[0].stages[0]);
             CheckCurrentStage(run);
 
@@ -107,7 +146,6 @@ public static class RunProgressionPlayModeRegression
             player.StatManager.AddModifier(StatType.ST_ATK, 3f, 0f);
             modifierAdded = true;
             player.StatManager.ConsumeHealth(Mathf.Min(17f, player.StatManager.CurrentHp * 0.25f));
-            Check(player.StatManager.TryConsumeSp(13f), "Not enough SP for the resource retention probe.");
             player.StatManager.AddUltimateGauge(23f);
             SetField(player, "_dashCooldownTimer", 7f);
             SetField(player, "_formChangeCooldownTimer", 9f);
@@ -144,10 +182,9 @@ public static class RunProgressionPlayModeRegression
                         break;
                     }
                     bool failThis = !testedFailure;
-                    bool automatic = testedFailure && !testedAutomaticExit;
-                    await Transition(run, nextChapter, nextStage, failThis, automatic);
+                    await Transition(run, nextChapter, nextStage, failThis);
                     testedFailure |= failThis;
-                    testedAutomaticExit |= automatic;
+                    testedAutomaticExit = true;
                     transitions++;
                     if (nextChapter != chapter) chaptersCrossed++;
                 }
@@ -167,7 +204,7 @@ public static class RunProgressionPlayModeRegression
                 await Frames(3);
                 Check(run.State == RunState.Won && completed == transitions, "Error retry restarted a completed run.");
                 SessionState.SetString(ResultKey, "PASS: " + checks + " checks; " + definition.TotalStages
-                    + " actual stages; optional rooms, empty exit arrival, fixed bosses, physical gate locks, real lethal damage, chapter advance, failure/retry, duplicate/stale exits, retained player/resources/items/all-form timers, old roots/NavMesh/transient cleanup, final victory.");
+                    + " actual stages; optional rooms, arrival-opened portals, directional aperture traversal, fixed bosses, physical gate locks, real lethal damage, chapter advance, failure/retry, duplicate/stale exits, retained player/resources/items/all-form timers, old roots/NavMesh/portal/transient cleanup, final victory.");
             }
             finally
             {
@@ -178,7 +215,16 @@ public static class RunProgressionPlayModeRegression
                 }
             }
         }
-        catch (Exception exception) { SessionState.SetString(ResultKey, "FAIL: " + exception); }
+        catch (Exception exception)
+        {
+            SessionState.SetString(ResultKey, "FAIL: " + exception);
+            if (run != null && originalDefinition != null && run.definition != originalDefinition && run.State == RunState.Preparing)
+            {
+                // Stop nested generation before finally destroys the runtime definitions and room templates.
+                typeof(RunManager).GetMethod("ShowError", Hidden).Invoke(run, new object[] { "Regression aborted during stage preparation." });
+                run.stageManager.Cancel();
+            }
+        }
         finally
         {
             try
@@ -198,12 +244,17 @@ public static class RunProgressionPlayModeRegression
                         throw new Exception("Regression changed a source asset: " + asset.Key.name);
             }
             catch (Exception exception) { SessionState.SetString(ResultKey, "FAIL during restoration: " + exception); }
+            finally
+            {
+                if (run != null && accountScope != null) SetField(run, "_upgradeService", previousRunService);
+                accountScope?.Dispose();
+            }
             foreach (Object obj in temporary) if (obj != null) Object.Destroy(obj);
             running = false;
         }
     }
 
-    private static RunDefinitionSO CloneDefinition(RunDefinitionSO source, List<Object> temporary)
+    private static RunDefinitionSO CloneDefinition(ChapterDefinition[] chapters, List<Object> temporary)
     {
         var copy = ScriptableObject.CreateInstance<RunDefinitionSO>();
         copy.hideFlags = HideFlags.DontSave;
@@ -212,7 +263,7 @@ public static class RunProgressionPlayModeRegression
         templates.hideFlags = HideFlags.DontSave;
         templates.SetActive(false);
         temporary.Add(templates);
-        copy.chapters = source.chapters.Select(chapter => new ChapterDefinition
+        copy.chapters = chapters.Select(chapter => new ChapterDefinition
         {
             displayName = chapter.displayName,
             stages = chapter.stages.Select(stage =>
@@ -273,15 +324,20 @@ public static class RunProgressionPlayModeRegression
         Check(run.player != null && !run.player.IsStageTransitioning && run.player.Controller.enabled,
             "Committed player remained frozen.");
         Check(!Cursor.visible && Cursor.lockState == CursorLockMode.Locked, "Playing did not restore the locked cursor.");
+        Check(stage.Exit != null && stage.Exit.Activation != null && stage.Exit.Transit != null && stage.Exit.PortalView != null,
+            "The generated stage has no complete hub-style portal.");
+        Check(!stage.Exit.IsAvailable && stage.Exit.Activation.State == GateState.Closed && !stage.IsCleared,
+            "The portal opened before actual end-room arrival.");
     }
 
     private static async Task CompleteObjective(RunManager run, bool bossStage)
     {
         var stage = run.stageManager;
-        stage.Exit.enabled = false; // Retain real arrival detection while controlling the exact transition instant.
         var end = stage.Result.endRoom.GetComponent<DungeonRoomEncounter>();
         Check(end.State == DungeonEncounterState.Cleared && end.Members.Count == 0,
             "This fixture expects the installed empty exit room.");
+        Check(!stage.Exit.IsAvailable && !end.WasEntered, "The fresh end-room portal was already available.");
+        Check(!stage.TryUseExit(run.player, Generation(stage.Exit)), "A direct request bypassed the unopened portal.");
         var optional = stage.Encounters.Rooms.Where(room => room.State == DungeonEncounterState.Waiting
             && room != stage.Result.bossRoom?.GetComponent<DungeonRoomEncounter>()).ToArray();
         if (!bossStage) Check(optional.Length > 0, "No untouched optional combat room was generated.");
@@ -316,24 +372,70 @@ public static class RunProgressionPlayModeRegression
             var member = boss.Members[0];
             Check(member.IsAwake && member.Enemy.enabled && member.GetComponent<NavMeshAgent>().isOnNavMesh,
                 "The fixed boss did not activate on its native NavMesh.");
-            var hit = member.Enemy.TakeDamage(member.GetComponent<EnemyStat>().CurrentHp + 1000f, poiseDamage: 0f);
-            Check(hit.Applied && member.HasDied && boss.BossDefeated && boss.State == DungeonEncounterState.Cleared,
-                "Real lethal Enemy.TakeDamage did not confirm boss defeat.");
+            var player = run.player;
+            MoveCenter(player, stage.PlayerSpawnPosition + player.transform.TransformVector(player.Controller.center));
+            stage.Encounters.ResetPlayerMotionHistory();
+            await DefeatBoss(run, boss, member);
             Check(boss.Gates.All(gate => !gate.IsLocked), "Defeating the boss left a route locked.");
             await Frames(2);
         }
         else await Frames(2);
-        Check(stage.IsCleared && stage.Exit.IsAvailable, "A completed exit objective did not activate its exit.");
+        Check(stage.IsCleared && stage.Exit.Activation.State == GateState.Opening && !stage.Exit.IsAvailable,
+            "End-room arrival did not start the portal opening while keeping traversal blocked.");
+        Check(stage.Exit.Activation.apertureBlocker != null && stage.Exit.Activation.apertureBlocker.enabled,
+            "The portal opening animation left its aperture physically unblocked.");
+        Check(!stage.TryUseExit(run.player, Generation(stage.Exit)), "A direct request bypassed portal opening.");
+        await Wait(() => stage.Exit.IsAvailable, "The portal did not finish its opening animation.", 10);
+        Check(stage.Exit.Activation.State == GateState.Open && !stage.Exit.Activation.apertureBlocker.enabled,
+            "The opened portal still blocks its aperture.");
         foreach (var room in optional) Check(room.State == DungeonEncounterState.Waiting,
             "Optional room " + room.name + " was entered by the fixture: " + room.State + "; target=" + end.name);
         Check(run.State == RunState.Playing, "Clearing a room advanced without using the exit.");
+        await RejectInvalidPortalPassages(run);
     }
 
-    private static async Task Transition(RunManager run, int nextChapter, int nextStage, bool injectFailure, bool automatic)
+    private static async Task DefeatBoss(RunManager run, DungeonRoomEncounter room, DungeonEncounterMember member)
+    {
+        var enemy = member.Enemy;
+        var phased = enemy as Boss;
+        var stats = enemy.GetComponent<EnemyStat>();
+        var shield = enemy.GetComponent<BossShield>();
+        int hitLimit = Mathf.Max(1, phased?.PhaseConfiguration.Count ?? 1) + 4;
+        for (int attempt = 0; attempt < hitLimit && !member.HasDied; attempt++)
+        {
+            await Wait(() => run.State != RunState.Playing || (!enemy.IsSpawning && stats.CurrentHp > 0f
+                && (phased == null || !phased.IsInvulnerable)), "The actual boss never became vulnerable.", 30);
+            Check(run.State == RunState.Playing && room.State == DungeonEncounterState.Fighting,
+                "The run or boss encounter ended before a confirmed defeat.");
+            int phase = phased != null ? phased.PhaseIndex : -1;
+            float hitSize = 2f * (stats.CurrentHp + (shield != null ? shield.CurrentAbsorption : 0f)) + 1000f;
+            var hit = enemy.TakeDamage(hitSize, poiseDamage: 0f);
+            Check(hit.Applied || hit.ShieldDamage > 0f, "A vulnerable boss ignored the actual damage call.");
+            if (member.HasDied)
+            {
+                Check(hit.Killed, "The final hit did not report the actual boss death.");
+                break;
+            }
+            Check(!hit.Killed && !room.BossDefeated && room.State == DungeonEncounterState.Fighting
+                && !run.stageManager.Exit.IsAvailable, "An intermediate boss health bar unlocked the portal.");
+            if (phased != null && phased.IsTransitioning)
+            {
+                await Wait(() => run.State != RunState.Playing || (!phased.IsTransitioning && phased.PhaseIndex > phase),
+                    "The actual boss did not finish its phase revival.", 30);
+                Check(run.State == RunState.Playing && phased.PhaseIndex == phase + 1,
+                    "The boss did not revive into the next authored phase.");
+            }
+        }
+        Check(member.HasDied && room.BossDefeated && room.State == DungeonEncounterState.Cleared,
+            "Real lethal Enemy.TakeDamage did not confirm final boss defeat.");
+    }
+
+    private static async Task Transition(RunManager run, int nextChapter, int nextStage, bool injectFailure)
     {
         var stage = run.stageManager;
         var oldRoot = stage.Generator.CurrentRoot;
         var oldExit = stage.Exit;
+        var oldTransit = oldExit.Transit;
         var oldRooms = stage.Encounters.Rooms.ToArray();
         var oldEnemies = oldRoot.GetComponentsInChildren<Enemy>(true);
         var oldNavigation = OwnedNavigation(oldRooms);
@@ -343,26 +445,27 @@ public static class RunProgressionPlayModeRegression
         var nextDefinition = run.definition.chapters[nextChapter].stages[nextStage];
         var savedStyle = nextDefinition.dungeonSettings.style;
         Snapshot resumed = null, preparing = null;
+        int traversalsAtFreeze = 0;
         Action<RunState> onState = state =>
         {
             if (state == RunState.Playing) resumed = Snapshot.Capture(run.player);
-            if (state == RunState.Preparing) preparing = Snapshot.Capture(run.player);
+            if (state == RunState.Preparing)
+            {
+                preparing = Snapshot.Capture(run.player);
+                if (oldTransit != null) traversalsAtFreeze = oldTransit.TraversalCount;
+            }
         };
         run.StateChanged += onState;
         try
         {
-            MoveFeet(run.player, oldExit.transform.position);
             if (previousGeneration >= 0)
                 Check(!stage.TryUseExit(run.player, previousGeneration), "A previous map's late exit request was accepted.");
-            var before = Snapshot.Capture(run.player);
+            Check(!stage.TryUseExit(run.player, generation), "A direct request bypassed verified portal passage.");
             if (injectFailure) nextDefinition.dungeonSettings.style = null;
-            if (automatic)
-            {
-                oldExit.enabled = true;
-                await Wait(() => run.State != RunState.Playing || run.CurrentChapterIndex != chapter || run.CurrentStageIndex != index,
-                    "Actual StageExit.Update did not notice the player in its area.");
-            }
-            else Check(stage.TryUseExit(run.player, generation), "A valid exit request was rejected.");
+            await WalkPortal(run, oldExit, true, fastCrossing: chapter == 0 && index == 1);
+            await Wait(() => run.State != RunState.Playing || run.CurrentChapterIndex != chapter || run.CurrentStageIndex != index,
+                "Physical portal passage did not request stage progression.");
+            Check(traversalsAtFreeze == 1, "The actual portal did not dispatch exactly one walking traversal.");
             Check(!stage.TryUseExit(run.player, generation), "A duplicate exit request was accepted.");
             Check(transient == null || !transient.activeSelf, "Transition did not immediately deactivate the old projectile.");
             if (injectFailure)
@@ -387,9 +490,8 @@ public static class RunProgressionPlayModeRegression
             Check(run.CurrentChapterIndex == nextChapter && run.CurrentStageIndex == nextStage,
                 "Transition committed the wrong stage or advanced twice.");
             Check(resumed != null, "No Playing event accompanied the successful transition.");
-            // Automatic exit runs later in the player loop; legitimate playing time may elapse
-            // between the teleport and StageExit.Update. Compare its actual freeze instant.
-            (automatic ? preparing : before).AssertSame(resumed);
+            // Real walking and portal evaluation consume playing time before the freeze.
+            preparing.AssertSame(resumed);
             Check(run.CurrentStageSeed == RunDefinitionSO.GetStageSeed(run.RunSeed, nextChapter, nextStage),
                 "Transition committed the wrong deterministic stage seed.");
             await Frames(3);
@@ -413,11 +515,95 @@ public static class RunProgressionPlayModeRegression
     {
         var stage = run.stageManager;
         int generation = Generation(stage.Exit);
-        MoveFeet(run.player, stage.Exit.transform.position);
         if (previousGeneration >= 0)
             Check(!stage.TryUseExit(run.player, previousGeneration), "A stale final-stage request was accepted.");
-        Check(stage.TryUseExit(run.player, generation), "The last valid exit request was rejected.");
+        Check(!stage.TryUseExit(run.player, generation), "A direct request bypassed the final portal.");
+        await WalkPortal(run, stage.Exit, true);
+        await Wait(() => run.State != RunState.Playing, "The final physical portal passage was rejected.");
         Check(!stage.TryUseExit(run.player, generation), "The final exit was accepted twice.");
+        await Frames(2);
+    }
+
+    private static async Task RejectInvalidPortalPassages(RunManager run)
+    {
+        var exit = run.stageManager.Exit;
+        var transit = exit.Transit;
+        int traversals = transit.TraversalCount;
+        await WalkPortal(run, exit, false);
+        Check(run.State == RunState.Playing && transit.TraversalCount == traversals,
+            "Walking backwards through the portal advanced the run.");
+        float outsideAperture = transit.apertureRadius + 2f;
+        PositionAtPortal(run.player, exit, true, outsideAperture);
+        Check(!transit.FitsAperture(run.player.Controller), "The off-center portal probe still fits the aperture.");
+        await Frames(3);
+        await MoveThroughPortal(run, transit, true);
+        Check(run.State == RunState.Playing && transit.TraversalCount == traversals,
+            "A body outside the circular portal aperture advanced the run.");
+
+        PositionAtPortal(run.player, exit, true, 0f);
+        await Frames(3);
+        Check(run.TryOpenInventory(exit), "Could not open the real inventory for the portal modal guard.");
+        try
+        {
+            await MoveThroughPortal(run, transit, true);
+            Check(exit.ContainsPlayer(run.player), "The modal portal probe did not enter the physical aperture.");
+            Check(run.State == RunState.Playing && run.IsInventoryOpen && transit.TraversalCount == traversals,
+                "A gameplay modal allowed or consumed a portal traversal.");
+            Check(!run.stageManager.TryUseExit(run.player, Generation(exit)), "A modal allowed a direct exit request.");
+        }
+        finally { run.CloseInventory(); }
+        Check(exit.IsAvailable, "Closing the modal left the completed portal unavailable.");
+        Check(!run.stageManager.TryUseExit(run.player, Generation(exit)),
+            "Occupying the open aperture without a verified walk-through triggered progression.");
+    }
+
+    private static async Task WalkPortal(RunManager run, StageExit exit, bool forward, bool fastCrossing = false)
+    {
+        var transit = exit.Transit;
+        PositionAtPortal(run.player, exit, forward, 0f);
+        await Frames(3); // Let the real CharacterController register with the portal trigger.
+        if (!fastCrossing)
+        {
+            await MoveThroughPortal(run, transit, forward);
+            return;
+        }
+
+        float fixedTimeAtApproach = Time.fixedTime;
+        await Wait(() => Time.fixedTime > fixedTimeAtApproach, "The portal approach did not receive a physics step.", 5);
+        var player = run.player;
+        var trigger = transit.GetComponent<BoxCollider>();
+        float startZ = transit.transform.InverseTransformPoint(player.transform.position).z;
+        float pastRearZ = trigger.center.z - trigger.size.z * .5f - player.Controller.radius;
+        player.Controller.Move(transit.transform.TransformVector(new Vector3(0f, 0f, pastRearZ - startZ - .25f)));
+        Check(transit.transform.InverseTransformPoint(player.transform.position).z < pastRearZ,
+            "The fast portal probe did not cross the entire trigger in one movement.");
+        await Frames(2);
+    }
+
+    private static void PositionAtPortal(PlayerController player, StageExit exit, bool forward, float horizontal)
+    {
+        var transit = exit.Transit;
+        var floor = transit.transform.TransformPoint(new Vector3(horizontal, 0f,
+            transit.crossingPlaneOffset + (forward ? 1f : -.55f)));
+        floor.y = exit.transform.position.y;
+        var facing = Quaternion.LookRotation((forward ? -1f : 1f) * transit.transform.forward, Vector3.up);
+        GateTransit.Teleport(player.transform, player.Controller, null,
+            DungeonFastTravelLanding.PlayerRootAtFloor(floor, facing, player.Controller), facing);
+        player.VerticalVelocity = 0f;
+        player.Controller.Move(Vector3.down * .01f);
+    }
+
+    private static async Task MoveThroughPortal(RunManager run, GateTransit transit, bool forward)
+    {
+        int chapter = run.CurrentChapterIndex, stage = run.CurrentStageIndex;
+        var direction = (forward ? -1f : 1f) * transit.transform.forward;
+        for (int step = 0; step < 18; step++)
+        {
+            if (run.State != RunState.Playing || run.CurrentChapterIndex != chapter || run.CurrentStageIndex != stage) return;
+            Check(run.player.Controller.enabled, "The portal approach unexpectedly disabled the CharacterController.");
+            run.player.Controller.Move(direction * .1f);
+            await Frames(1);
+        }
         await Frames(2);
     }
 
@@ -485,20 +671,29 @@ public static class RunProgressionPlayModeRegression
     private static void Remember(Dictionary<Object, string> assets, Object asset)
     { if (asset != null && !assets.ContainsKey(asset)) assets.Add(asset, EditorJsonUtility.ToJson(asset)); }
 
+    private sealed class MemoryUpgradeStore : IPlayerUpgradeStore
+    {
+        private PlayerUpgradeProfile _profile;
+        public MemoryUpgradeStore(PlayerUpgradeProfile profile) => _profile = profile.Copy();
+        public bool TryLoad(out PlayerUpgradeProfile value, out string error)
+        { value = _profile.Copy(); error = null; return true; }
+        public bool TrySave(PlayerUpgradeProfile value, out string error)
+        { _profile = value.Copy(); error = null; return true; }
+    }
+
     private sealed class Snapshot
     {
         public PlayerController Player;
         private IForm form;
         private ItemDefinition[] items;
-        private float hp, sp, gauge, attack, maxHp, maxSp, dash, formChange, regen;
+        private float hp, gauge, attack, maxHp, dash, formChange;
         private Dictionary<BaseForm, Vector2> timers;
         public static Snapshot Capture(PlayerController player) => new Snapshot
         {
             Player = player, form = player.FormManager.CurrentForm, items = player.ItemRuntime.OwnedItems.ToArray(),
-            hp = player.StatManager.CurrentHp, sp = player.StatManager.CurrentSp, gauge = player.StatManager.CurrentUltimateGauge,
-            attack = player.StatManager.GetStat(StatType.ST_ATK), maxHp = player.StatManager.MaxHp, maxSp = player.StatManager.MaxSp,
+            hp = player.StatManager.CurrentHp, gauge = player.StatManager.CurrentUltimateGauge,
+            attack = player.StatManager.GetStat(StatType.ST_ATK), maxHp = player.StatManager.MaxHp,
             dash = GetField<float>(player, "_dashCooldownTimer"), formChange = GetField<float>(player, "_formChangeCooldownTimer"),
-            regen = GetField<float>(player.StatManager, "_spRegenTimer"),
             timers = Forms(player).ToDictionary(candidate => candidate, candidate => new Vector2(candidate.SkillCooldownRemaining,
                 GetField<float>(candidate, "_ultimateCooldownTimer")))
         };
@@ -507,9 +702,9 @@ public static class RunProgressionPlayModeRegression
             Check(other.Player == Player, "Transition replaced the live player instance.");
             Check(ReferenceEquals(other.form, form), "Transition reset the selected form.");
             Check(items.SequenceEqual(other.items), "Transition reset item ownership or item identities.");
-            Near(hp, other.hp, "HP"); Near(sp, other.sp, "SP"); Near(gauge, other.gauge, "ultimate resource");
-            Near(attack, other.attack, "growth modifier"); Near(maxHp, other.maxHp, "max HP"); Near(maxSp, other.maxSp, "max SP");
-            Near(dash, other.dash, "dash cooldown"); Near(formChange, other.formChange, "form cooldown"); Near(regen, other.regen, "SP regeneration delay");
+            Near(hp, other.hp, "HP"); Near(gauge, other.gauge, "ultimate resource");
+            Near(attack, other.attack, "growth modifier"); Near(maxHp, other.maxHp, "max HP");
+            Near(dash, other.dash, "dash cooldown"); Near(formChange, other.formChange, "form cooldown");
             Check(timers.Count == other.timers.Count, "Transition replaced registered forms.");
             foreach (var timer in timers)
             {

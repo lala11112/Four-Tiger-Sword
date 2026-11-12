@@ -92,11 +92,18 @@ public sealed class PlayerEngravingRuntime : MonoBehaviour
         {
             // The account snapshot remains this run's permanent basis while a component or its
             // GameObject is temporarily disabled. Removing max HP here would irreversibly clamp HP.
-            float Permanent(string id) => _initialized ? Snapshot.Amount(id) : 0f;
-            _stats.SetEngravingBonuses(Permanent("hp"), Permanent("atk"), Permanent("crit") * 100f,
-                Permanent("severe") * 100f, Permanent("speed") + (_haste > 0f ? Value("haste") : 0f), refill);
+            ApplySnapshotStats(_stats, _initialized ? Snapshot : EngravingSnapshot.Empty,
+                _haste > 0f ? Value("haste") : 0f, refill);
         }
         finally { _applyingStats = false; }
+    }
+
+    internal static void ApplySnapshotStats(PlayerStatManager stats, EngravingSnapshot snapshot,
+        float temporaryAttackSpeedRatio = 0f, bool refillHealth = false)
+    {
+        snapshot ??= EngravingSnapshot.Empty;
+        stats.SetEngravingBonuses(snapshot.Amount("hp"), snapshot.Amount("atk"), snapshot.Amount("crit") * 100f,
+            snapshot.Amount("severe") * 100f, snapshot.Amount("speed") + temporaryAttackSpeedRatio, refillHealth);
     }
 
     public static bool IsDirect(HitInfo hit) => hit.IsDirectPlayerHit

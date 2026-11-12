@@ -12,6 +12,7 @@ namespace Penta.Upgrade
         [SerializeField] private Style mode;
         [SerializeField] private bool selected;
         [SerializeField] private bool linked;
+        private float treeNodeFocus;
         private VertexHelper mesh;
         private float w, h;
         private static readonly Color Navy = new Color32(13, 21, 33, 255);
@@ -19,6 +20,25 @@ namespace Penta.Upgrade
         private static readonly Color GlassBottom = new Color32(8, 17, 30, 255);
         private static readonly Color Steel = new Color32(232, 238, 245, 255);
         private static readonly Color Red = new Color32(231, 43, 70, 255);
+        private static readonly Color FocusRim = new Color32(255, 225, 232, 255);
+        private const float TreeNodeCenterFromTop = 75f;
+
+        public bool IsTreeNode => mode == Style.TreeNode;
+        public Vector2 TreeNodeCenter
+        {
+            get
+            {
+                Rect rect = rectTransform.rect;
+                return new Vector2(rect.center.x, rect.yMax - TreeNodeCenterFromTop);
+            }
+        }
+
+        public void SetTreeNodeFocus(float amount)
+        {
+            if (treeNodeFocus == amount) return;
+            treeNodeFocus = amount;
+            SetVerticesDirty();
+        }
 
         public void Configure(Style mode, bool selected = false, bool linked = false)
         {
@@ -133,13 +153,15 @@ namespace Penta.Upgrade
         }
         private void TreeNode()
         {
-            float x = w * .5f, y = 75, radius = 62;
+            float x = w * .5f, y = TreeNodeCenterFromTop, radius = 62;
             if (selected)
                 Poly(A(Red,.10f),V(x,y-71),V(x+71,y),V(x,y+71),V(x-71,y));
             Poly(A(Navy,.98f),V(x,y-radius),V(x+radius,y),V(x,y+radius),V(x-radius,y));
             Poly(A(GlassTop,.88f),V(x,y-54),V(x+54,y),V(x,y+54),V(x-54,y));
             Poly(A(GlassBottom,.90f),V(x-54,y),V(x,y+54),V(x+54,y),V(x,y+25));
-            Stroke(2f,A(selected?Red:Steel,selected?1f:linked?.78f:.56f),
+            Color rim = A(selected ? Red : Steel, selected ? 1f : linked ? .78f : .56f);
+            Color focusedRim = selected ? Color.Lerp(Red, FocusRim, .35f) : FocusRim;
+            Stroke(Mathf.Lerp(2f, 3f, treeNodeFocus), Color.Lerp(rim, focusedRim, treeNodeFocus),
                 V(x,y-radius),V(x+radius,y),V(x,y+radius),V(x-radius,y),V(x,y-radius));
             Stroke(1f,A(Steel,.20f),V(x,y-53),V(x+53,y),V(x,y+53),V(x-53,y),V(x,y-53));
             if (!selected) return;

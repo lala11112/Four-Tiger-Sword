@@ -295,7 +295,7 @@ public static class ShopTabsRegression
             var playerHost = new GameObject("Player"); playerHost.transform.SetParent(_root.transform, false);
             var player = playerHost.AddComponent<PlayerController>();
             var stats = playerHost.GetComponent<PlayerStatManager>();
-            var data = Own(ScriptableObject.CreateInstance<PlayerStatData>()); data.baseHP = data.baseSP = 100;
+            var data = Own(ScriptableObject.CreateInstance<PlayerStatData>()); data.baseHP = 100;
             stats.Initialize(data); SetProperty(player, "StatManager", stats);
             var wallet = playerHost.AddComponent<PlayerWallet>(); wallet.Initialize(0);
             var catalog = Own(ScriptableObject.CreateInstance<ItemCatalog>()); catalog.projectId = "tabs-regression";

@@ -27,7 +27,7 @@ public static class InventoryIntegrationRegression
             var view = root.GetComponent<InventoryView>();
             Check(view != null && view.Catalog != null, "The prefab is not bound to its presentation catalog.");
             var data = view.Catalog.ReadData();
-            Check(data.items.Length == 81 && data.synergies.Length == 11, "The shipped content count changed.");
+            Check(data.items.Length == 77 && data.synergies.Length == 11, "The shipped content count changed.");
             var ids = new List<string>();
             var distinct = new HashSet<string>(StringComparer.Ordinal);
             foreach (var item in data.items)
@@ -37,11 +37,12 @@ public static class InventoryIntegrationRegression
             view.SetOwnedItems(new[] { "I16", "I16", "missing", null });
             Check(view.OwnedItemCount == 1, "Duplicates or unknown IDs became owned slots.");
             view.SetOwnedItems(ids);
-            Check(view.OwnedItemCount == 81, "The view dropped a real catalog ID.");
+            Check(view.OwnedItemCount == 77, "The view dropped a real catalog ID.");
             var states = view.GetSynergyStates();
             Check(states.Count == 11, "The view omitted an inactive/active synergy state.");
             foreach (var state in states)
-                Check(state.IsActive && state.ActiveTier == 8 && state.DisplayCount == 8 && state.RequiredCount == 8,
+                Check(state.IsActive && state.ActiveTier == (state.Id == "S19" ? 3 : 8)
+                    && state.DisplayCount == (state.Id == "S19" ? 3 : 8) && state.RequiredCount == (state.Id == "S19" ? 3 : 8),
                     "The full catalog did not produce the highest exclusive synergy tier: " + state.Id);
             var renderedIds = new HashSet<string>(StringComparer.Ordinal);
             foreach (var target in root.GetComponentsInChildren<BoundaryZero.Inventory.InventoryHoverTarget>(true))
@@ -53,7 +54,7 @@ public static class InventoryIntegrationRegression
             view.Open(); view.Open();
             Check(view.IsOpen && opens == 1, "Repeated open published duplicate events.");
             view.Close(); view.Close();
-            Check(!view.IsOpen && closes == 1 && view.OwnedItemCount == 81, "Close erased ownership or published duplicate events.");
+            Check(!view.IsOpen && closes == 1 && view.OwnedItemCount == 77, "Close erased ownership or published duplicate events.");
             view.SetOwnedItems(null);
             foreach (var state in view.GetSynergyStates())
                 Check(state.ActiveTier == 0 && state.Count == 0, "Removing items retained a synergy.");
@@ -141,7 +142,7 @@ public static class InventoryIntegrationRegression
             check(!tooltip.text.Contains(changedItem.description) && !shopText.Contains(changedItem.description),
                 "Item flavor text appeared in an effect-only tooltip.");
             var frame = target.GetComponentInChildren<ItemRarityFrame>();
-            check(tooltip.text.Contains(changedItem.grade + "등급") && frame != null && frame.enabled
+            check(tooltip.text.Contains(ItemDisplayText.Stars(changedItem.grade)) && frame != null && frame.enabled
                 && !frame.raycastTarget && frame.color == ItemRarityFrame.ColorFor(changedItem.grade),
                 "The replacement runtime grade did not update the tooltip and passive border.");
             bool matchedTier = false;
@@ -214,9 +215,12 @@ public static class InventoryIntegrationRegression
             sample.OnPointerEnter(null);
             var tooltip = (TMPro.TMP_Text)typeof(InventoryView)
                 .GetField("tooltipText", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(codex);
-            check(tooltip.gameObject.activeInHierarchy && tooltip.text.Contains("2세트")
-                && tooltip.text.Contains("4세트") && tooltip.text.Contains("6세트") && tooltip.text.Contains("8세트"),
-                "The codex did not expose the authored set tiers on hover.");
+            check(tooltip.gameObject.activeInHierarchy && tooltip.text.Contains("2 / 4 / 6 / 8세트")
+                && tooltip.text.Contains("(8 / 16 / 25 / 34)%") && tooltip.text.Contains("(10 / 20 / 30 / 40)%"),
+                "The codex lost a set threshold, stat, or unit while compacting tier effects.");
+            var starLabel = sample.transform.Find("Stars")?.GetComponent<TMPro.TMP_Text>();
+            check(starLabel != null && starLabel.text == ItemDisplayText.Stars(source.Find("I01").grade),
+                "The codex card did not show its runtime rarity as stars.");
             check(codex.OwnedItemCount == 0 && inventory.OwnedItemCount == 0,
                 "Browsing the codex changed item ownership.");
             foreach (var state in codex.GetSynergyStates())

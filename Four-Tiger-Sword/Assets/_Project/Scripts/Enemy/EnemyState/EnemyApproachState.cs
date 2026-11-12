@@ -1,10 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-/// <summary>
-/// 공격이 선택된 후, 해당 공격의 실행 사거리(executeRange)까지 플레이어에게 접근하는 상태.
-/// IsInExecuteRange가 true가 되면 EnemyAttackState로 전환된다.
-/// </summary>
+/// <summary>Moves within range of the selected attack and holds position until it can start.</summary>
 public class EnemyApproachState : IPlayerState
 {
     private readonly Enemy _enemy;
@@ -27,6 +24,17 @@ public class EnemyApproachState : IPlayerState
         _progressPosition = _enemy.transform.position;
         _previousStoppingDistance = _nav.stoppingDistance;
         if (_nav.enabled && _nav.isOnNavMesh) _nav.ResetPath();
+        if (_enemy is not Boss)
+        {
+            var positioning = _enemy.TacticalPositioning;
+            positioning.Navigation.RefreshAnimation();
+            positioning.Reset();
+            var skill = _enemy.CurrentAction?.SkillData;
+            if (skill != null)
+                _nav.stoppingDistance = Mathf.Min(Mathf.Min(_previousStoppingDistance, .1f),
+                    Mathf.Max(0f, (skill.executeRange - skill.minimumRange) * .125f));
+            return;
+        }
         if (_enemy.CurrentAction != null)
             _nav.stoppingDistance = Mathf.Min(_previousStoppingDistance,
                 Mathf.Max(0f, _enemy.CurrentAction.SkillData.executeRange * 0.8f));
@@ -35,16 +43,44 @@ public class EnemyApproachState : IPlayerState
 
     public void Update()
     {
-        if (_enemy.DetectedTarget == null || _enemy.CurrentAction == null) return;
-        _elapsed += _enemy.ActionDeltaTime;
-        _stuckTime += _enemy.ActionDeltaTime;
-        if ((_enemy.transform.position - _progressPosition).sqrMagnitude >= 0.01f)
+        if (_enemy is Boss) UpdateBossApproach();
+        else UpdateNormalApproach();
+    }
+
+    private void UpdateNormalApproach()
+    {
+        var target = _enemy.DetectedTarget;
+        var skill = _enemy.CurrentAction?.SkillData;
+        if (target == null || skill == null) return;
+        var positioning = _enemy.TacticalPositioning;
+        if (_enemy.IsSilenced || !_enemy.IsSkillReady(skill))
         {
-            _progressPosition = _enemy.transform.position;
-            _stuckTime = 0f;
+            _enemy.CancelCurrentAction();
+            return;
         }
-        if (!_nav.enabled || !_nav.isOnNavMesh
-            || _elapsed >= _enemy.ApproachTimeout || _stuckTime >= _enemy.ApproachStuckTimeout)
+        if (_enemy.IsInExecuteRange)
+        {
+            // Waiting for the room's next attack start is progress, not a blocked approach.
+            _stuckTime = 0f;
+            _progressPosition = _enemy.transform.position;
+            positioning.HoldForAttack(target);
+            return;
+        }
+
+        _enemy.CombatGroup?.CancelAttackRequest(_enemy);
+        if (_enemy.IsKnockbacking) return;
+        if (!positioning.Navigation.Available || ApproachTimedOut())
+        {
+            _enemy.CancelFailedApproach();
+            return;
+        }
+        positioning.UpdateVisibleTarget(target, skill, true);
+    }
+
+    private void UpdateBossApproach()
+    {
+        if (_enemy.DetectedTarget == null || _enemy.CurrentAction == null) return;
+        if (!_nav.enabled || !_nav.isOnNavMesh || ApproachTimedOut())
         {
             _enemy.CancelFailedApproach();
             return;
@@ -71,9 +107,27 @@ public class EnemyApproachState : IPlayerState
         if (!_nav.SetDestination(destination)) _enemy.CancelFailedApproach();
     }
 
+    private bool ApproachTimedOut()
+    {
+        _elapsed += _enemy.ActionDeltaTime;
+        _stuckTime += _enemy.ActionDeltaTime;
+        if ((_enemy.transform.position - _progressPosition).sqrMagnitude >= 0.01f)
+        {
+            _progressPosition = _enemy.transform.position;
+            _stuckTime = 0f;
+        }
+        return _elapsed >= _enemy.ApproachTimeout || _stuckTime >= _enemy.ApproachStuckTimeout;
+    }
+
     public void Exit()
     {
         _nav.stoppingDistance = _previousStoppingDistance;
-        if (_nav.enabled && _nav.isOnNavMesh) _nav.ResetPath();
+        if (_enemy is Boss)
+        {
+            if (_nav.enabled && _nav.isOnNavMesh) _nav.ResetPath();
+            return;
+        }
+        _enemy.CombatGroup?.CancelAttackRequest(_enemy);
+        _enemy.TacticalPositioning.Reset();
     }
 }

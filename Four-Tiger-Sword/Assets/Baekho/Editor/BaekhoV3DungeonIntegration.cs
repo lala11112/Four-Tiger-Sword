@@ -135,6 +135,7 @@ namespace StudioBaekho
             var root = PrefabUtility.LoadPrefabContents(record.prefab);
             try
             {
+                BaekhoCoplanarVisualRepair.RestoreSources(root, record.prefab);
                 RoomCollisionV3.EnsureEquipmentCollision(root);
                 var source = AssetDatabase.LoadAssetAtPath<GameObject>(record.sourcePrefabPath);
                 var sourceModule = source != null ? source.GetComponent<BaekhoMapModule>() : null;
@@ -144,6 +145,7 @@ namespace StudioBaekho
                     module.encounterBudget = sourceModule.encounterBudget;
                 BakeNavigation(root, record.sourcePrefabGuid);
                 EnsureEnemyMarkers(module);
+                BaekhoCoplanarVisualRepair.Repair(root, record.prefab);
                 PrefabUtility.SaveAsPrefabAsset(root, record.prefab, out bool saved);
                 if (!saved) throw new IOException("Could not save V3 dungeon module: " + record.prefab);
                 return record.prefab;
@@ -390,6 +392,7 @@ namespace StudioBaekho
                     var module = replacements[record.sourcePrefabGuid];
                     if (!dedicated.Contains(module) && !dedicatedGuids.Contains(record.sourcePrefabGuid) && !pool.Contains(module)) pool.Add(module);
                 }
+                pool.RemoveAll(BaekhoDungeonSetup.HasTwoByThreeDoor);
                 if (settings.maps != null && settings.maps.SequenceEqual(pool)) continue;
                 Undo.RecordObject(settings, "Register V3 dungeon rooms");
                 settings.maps = pool.ToArray();

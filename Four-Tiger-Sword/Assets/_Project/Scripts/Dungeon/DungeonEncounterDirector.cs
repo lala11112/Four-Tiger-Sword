@@ -15,6 +15,7 @@ public sealed class DungeonEncounterDirector : MonoBehaviour
     public int targetCostPerWave = 20;
     [Min(1), Tooltip("Maximum enemies allocated to one wave.")]
     public int maxEnemiesPerWave = 6;
+    public NormalEnemyAISettings normalEnemyAI = new();
     [SerializeField] private CharacterController player;
     public CharacterController Player => player;
     internal GameObject RewardChestPrefab => rewardChestPrefab;

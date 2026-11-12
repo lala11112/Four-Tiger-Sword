@@ -24,9 +24,13 @@ public static class PlayerHitReactionRegression
     private sealed class ProbeForm : BaseForm
     {
         public bool Block;
-        public ProbeForm(WeaponActionDataSO data) : base(data) { }
-        public override void BeginAttack() { }
-        public override void EndAttack() { }
+        public int SkillExits { get; private set; }
+        public override ElementType Element { get; }
+        public ProbeForm(WeaponActionDataSO data, ElementType element = ElementType.ELEMENT_NONE) : base(data)
+            => Element = element;
+        public override void EndSkill() { SkillExits++; base.EndSkill(); }
+        public override void EndSwitchAttack() { SkillExits++; base.EndSwitchAttack(); }
+        public override void EndUltimate() { SkillExits++; base.EndUltimate(); }
         public override void BeginAirAttack() { }
         public override void EndAirAttack() { }
         public override void BeginParry() { }
@@ -65,11 +69,18 @@ public static class PlayerHitReactionRegression
         {
             var statsData = ScriptableObject.CreateInstance<PlayerStatData>();
             var formData = ScriptableObject.CreateInstance<FireFormActionDataSO>();
+            var waterData = ScriptableObject.CreateInstance<WaterFormActionDataSO>();
             var normalData = ScriptableObject.CreateInstance<MonsterDefaultAttackSO>();
             var downData = ScriptableObject.CreateInstance<MonsterDefaultAttackSO>();
             var comboData = ScriptableObject.CreateInstance<MonsterComboAttackSO>();
-            objects.AddRange(new Object[] { statsData, formData, normalData, downData, comboData });
+            objects.AddRange(new Object[] { statsData, formData, waterData, normalData, downData, comboData });
             statsData.baseHP = 10000f;
+            formData.ComboSteps = new List<WeaponActionData> { ActionStep() };
+            formData.SkillSteps = new List<WeaponActionData> { ActionStep() };
+            formData.UltimateSteps = new List<WeaponActionData> { ActionStep() };
+            formData.SwitchAttackSteps.Add(ActionStep());
+            waterData.HeavyAttackStep = ActionStep("Heavy");
+            waterData.UltimateSteps = new List<WeaponActionData> { ActionStep("WaterUltimate") };
             downData.playerHitReaction = EnemyPlayerHitReaction.Knockdown;
             var normal = new ProbeAttack(normalData);
             var strong = new ProbeAttack(downData);
@@ -135,10 +146,11 @@ public static class PlayerHitReactionRegression
             controller.AddLayer("Base Layer");
             var animationStates = controller.layers[0].stateMachine;
             objects.Add(animationStates);
-            foreach (string name in new[] { "Idle", "Run", "Hit", "Knockdown", "GetUp", "Dash", "Backstep", "Die" })
+            foreach (string name in new[] { "Idle", "Run", "Hit", "Knockdown", "GetUp", "Dash", "Backstep", "Die", "Heavy", "WaterUltimate" })
             {
                 var clip = new AnimationClip { name = name };
-                clip.SetCurve("Pose", typeof(Transform), "localPosition.x", AnimationCurve.Linear(0f, 0f, 1f, 0f));
+                float length = name == "WaterUltimate" ? 4f : 1f;
+                clip.SetCurve("Pose", typeof(Transform), "localPosition.x", AnimationCurve.Linear(0f, 0f, length, 0f));
                 var state = animationStates.AddState(name);
                 state.motion = clip;
                 objects.Add(clip); objects.Add(state);
@@ -148,9 +160,11 @@ public static class PlayerHitReactionRegression
             Property(player, "Animator", animator);
             var forms = new FormManager(player);
             var form = new ProbeForm(formData);
-            form.Equip(player);
-            Property(forms, "CurrentForm", form);
+            var chainForm = new ProbeForm(formData, ElementType.ELEMENT_FIRE);
+            var water = new WaterForm(waterData);
+            forms.AddTransition(chainForm, () => false);
             Property(player, "FormManager", forms);
+            forms.ChangeForm(form);
             var impulse = host.AddComponent<CinemachineImpulseSource>();
             impulse.DefaultVelocity = Vector3.down;
             impulse.ImpulseDefinition.ImpulseChannel = 1 << 30;
@@ -174,6 +188,7 @@ public static class PlayerHitReactionRegression
             {
                 machine.ChangeState(neutral);
                 player.ConsumeHitReaction(); player.StopParryKnockback(); player.CancelHitStops();
+                forms.ChangeForm(form);
                 stats.Initialize(statsData);
                 player.Controller.enabled = input.enabled = player.Movement.enabled = true;
                 Field(player, "_dashCooldownTimer", 0f);
@@ -184,8 +199,8 @@ public static class PlayerHitReactionRegression
                 machine.ChangeState(new PlayerIdleState(player));
             }
             DamageResult Damage(EnemyAction source, Vector3 power = default, float amount = 1f,
-                StaggerResistLevel level = StaggerResistLevel.LOW)
-                => player.TakeDamage(amount, power: power, staggerResistLevel: level, source: source);
+                StaggerResistLevel level = StaggerResistLevel.LOW, float poise = 20f)
+                => player.TakeDamage(amount, power: power, poiseDamage: poise, staggerResistLevel: level, source: source);
             PlayerHitState EnterHit(EnemyAction source, Vector3 power = default)
             {
                 Check(Damage(source, power).Applied, "The fixture attack applies actual damage.");
@@ -319,14 +334,138 @@ public static class PlayerHitReactionRegression
             var shielded = Damage(normal);
             Check(shielded.ShieldDamage > 0f && stats.CurrentHp == hp && Shakes() == beforeShake + 1,
                 "A shield-absorbed hit produces one incoming-hit shake.");
+
+            void StartSkill()
+            {
+                Field(form, "_skillCooldownTimer", 0f);
+                input.SkillBuffer.Set();
+                machine.Update(true, false);
+                Check(machine.CurrentState is PlayerSkillState && form.SkillCooldownRemaining == 0f,
+                    "E starts an authored skill and defers its cooldown until exit.");
+            }
+
+            foreach (string action in new[] { "E", "F", "R" })
+            {
+                Ready();
+                switch (action)
+                {
+                    case "E": StartSkill(); break;
+                    case "F":
+                        forms.NotifyFinalComboHit(form.Element);
+                        input.ChainSkillBuffer.Set();
+                        machine.Update(true, false);
+                        Check(machine.CurrentState is PlayerSwitchAttackState chain && !chain.IsComplete
+                            && forms.CurrentForm == chainForm && forms.GetChainReadyRemaining(chainForm.Element) == 0f,
+                            "F consumes a ready chain and starts its dedicated attack.");
+                        break;
+                    case "R":
+                        stats.AddUltimateGauge(stats.MaxUltimateGauge);
+                        input.UltimateBuffer.Set();
+                        machine.Update(true, false);
+                        Check(machine.CurrentState is PlayerUltimateState && stats.CurrentUltimateGauge == 0f
+                            && form.UltimateCooldownRemaining == form.UltimateCooldownDuration,
+                            "R starts its authored action and commits the gauge and cooldown.");
+                        break;
+                }
+
+                var cast = machine.CurrentState;
+                var castingForm = (ProbeForm)forms.CurrentForm;
+                int exits = castingForm.SkillExits;
+                hp = stats.CurrentHp;
+                beforeShake = Shakes();
+                Check(Damage(normal, poise: 0f).HealthDamage == 1f, action + " still takes ordinary HP damage.");
+                Check(Damage(normal, level: StaggerResistLevel.HIGH).HealthDamage == 1f,
+                    action + " still takes HP damage from a high stagger hit.");
+                stats.GrantShield(new object(), 2f, 30f);
+                var pushed = Damage(normal, Vector3.right * 8f, level: StaggerResistLevel.HIGH);
+                Check(pushed.ShieldDamage == 1f && stats.CurrentHp == hp - 2f && Shakes() == beforeShake + 3,
+                    action + " consumes shield and shows feedback for an ordinary knockback hit.");
+                machine.Update(false, false);
+                Check(player.PendingHitReaction == PlayerHitReaction.None && machine.CurrentState == cast
+                    && castingForm.SkillExits == exits,
+                    action + " continues through ordinary hit, stagger, and knockback.");
+
+                Check(Damage(strong, Vector3.right * 8f).ShieldDamage == 1f
+                    && player.PendingHitReaction == PlayerHitReaction.Knockdown,
+                    action + " can be interrupted by a down attack absorbed by the shield.");
+                Damage(normal, Vector3.left * 16f);
+                Check(player.PendingHitReaction == PlayerHitReaction.Knockdown && Shakes() == beforeShake + 5,
+                    action + " retains the pending down through a same-frame ordinary hit.");
+                machine.Update(false, false);
+                Check(machine.CurrentState is PlayerKnockdownState && castingForm.SkillExits == exits + 1,
+                    action + " enters knockdown and runs its normal exit once.");
+                if (action == "E")
+                    Near(form.SkillCooldownRemaining, form.SkillCooldownDuration, "Interrupted E starts cooldown.");
+                if (action == "F")
+                    Check(chainForm.SkillCooldownRemaining == 0f && forms.GetChainReadyRemaining(chainForm.Element) == 0f,
+                        "Interrupted F leaves the chain spent without starting an E cooldown.");
+                if (action == "R")
+                    Check(stats.CurrentUltimateGauge == 0f && form.UltimateCooldownRemaining == form.UltimateCooldownDuration,
+                        "Interrupted R leaves the committed gauge and cooldown in place.");
+            }
+
             Ready();
+            StartSkill();
+            Field(form, "_timer", formData.SkillSteps[0].Duration);
+            machine.Update(false, true);
+            machine.Update(true, false);
+            Check(machine.CurrentState is PlayerIdleState && EnterHit(normal) is PlayerStaggerState,
+                "Ordinary hits can interrupt again after E completes.");
+
+            Ready();
+            input.AttackBuffer.Set();
+            machine.Update(true, false);
+            Check(machine.CurrentState is PlayerAttackState attack && !attack.IsHeavyAttack
+                && EnterHit(normal, Vector3.right * 8f) is PlayerKnockbackState,
+                "An authored normal attack can still be interrupted by ordinary knockback.");
+
+            Ready();
+            forms.ChangeForm(water);
+            int originalExclusions = player.Controller.excludeLayers;
+            ((WaterFlowGauge)Field(water, "_flow")).Charge(water.WaterGaugePerSegment);
+            Property(input, "IsAttackHeld", true);
+            Property(input, "AttackHeldTime", water.HeavyAttackHoldTime);
+            input.AttackBuffer.Set();
+            machine.Update(true, false);
+            machine.Update(false, true);
+            Check(machine.CurrentState is PlayerAttackState heavy && heavy.IsHeavyAttack,
+                "The held attack input enters the Water heavy attack.");
+            Check(EnterHit(normal, Vector3.right * 8f) is PlayerKnockbackState
+                && player.Controller.excludeLayers == originalExclusions,
+                "Ordinary knockback still interrupts a heavy attack and restores its collision exclusions.");
+            Property(input, "IsAttackHeld", false);
+            Property(input, "AttackHeldTime", 0f);
+
+            Ready();
+            forms.ChangeForm(water);
+            var waterRenderer = host.AddComponent<MeshRenderer>();
+            stats.AddUltimateGauge(stats.MaxUltimateGauge);
+            input.UltimateBuffer.Set();
+            machine.Update(true, false);
+            beforeShake = Shakes(); hp = stats.CurrentHp;
+            Check(machine.CurrentState is PlayerUltimateState && !waterRenderer.enabled
+                && Damage(normal).Outcome == DamageOutcome.Blocked && Damage(strong).Outcome == DamageOutcome.Blocked
+                && stats.CurrentHp == hp && player.PendingHitReaction == PlayerHitReaction.None && Shakes() == beforeShake,
+                "Water R retains its existing damage block through the ten-hit execution.");
+            animator.Update(.02f);
+            var advance = new object[] { 2.01f, false };
+            typeof(WaterForm).GetMethod("AdvanceUltimate", Hidden).Invoke(water, advance);
+            Check(water.IsCurrentActionExecutionComplete && !(bool)advance[1] && waterRenderer.enabled,
+                "Water R finishes its execution and restores visibility before the animation ends.");
+            Check(Damage(normal).HealthDamage == 1f && player.PendingHitReaction == PlayerHitReaction.None,
+                "The Water R animation tail takes ordinary damage without interruption.");
+            Check(EnterHit(strong) is PlayerKnockdownState && waterRenderer.enabled && stats.CurrentUltimateGauge == 0f,
+                "A down attack interrupts the vulnerable Water R tail and leaves its cleanup and spent gauge intact.");
+
+            Ready();
+            StartSkill();
             beforeShake = Shakes();
             var lethal = Damage(strong, amount: 100000f);
             Check(lethal.Killed && Shakes() == beforeShake + 1 && player.PendingHitReaction == PlayerHitReaction.None,
                 "A lethal hit shakes once without queuing a living reaction.");
             machine.Update(false, false);
-            Check(machine.CurrentState is PlayerDieState, "Death wins over down on the transition pass.");
-            return $"PASS: player hit reaction ({checks} checks: authored strength, 30/60/120 FPS recovery and movement, down follow-ups, input reservation, shake, armor, zero, block, dodge, parry, shields and death).";
+            Check(machine.CurrentState is PlayerDieState, "Death wins over knockdown and skill armor on the transition pass.");
+            return $"PASS: player hit reaction ({checks} checks: authored strength, 30/60/120 FPS recovery and movement, down follow-ups, input reservation, shake, skill armor, Water ultimate protection, zero, block, dodge, parry, shields and death).";
         }
         finally
         {
@@ -339,6 +478,11 @@ public static class PlayerHitReactionRegression
             Time.timeScale = worldScale;
         }
     }
+
+    private static WeaponActionData ActionStep(string animation = "") => new WeaponActionData
+    {
+        AnimationName = animation, Duration = 1f, HitStartTime = .2f, HitDuration = .1f, DisableTrail = true
+    };
 
     private static void Tick(PlayerHitState state, float deltaTime)
         => state.GetType().GetMethod("UpdateReaction", Hidden).Invoke(state, new object[] { deltaTime });

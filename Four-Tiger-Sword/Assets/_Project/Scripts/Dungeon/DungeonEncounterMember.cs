@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.AI;
 
-/// <summary>Owns the spawned enemy's dormant/active state and death subscription.</summary>
+/// <summary>Owns the spawned enemy's activation, combat group membership, and death subscription.</summary>
 [DisallowMultipleComponent]
 public sealed class DungeonEncounterMember : MonoBehaviour
 {
@@ -93,11 +93,13 @@ public sealed class DungeonEncounterMember : MonoBehaviour
             if (_colliders[i] != null) _colliders[i].enabled = restoreColliders && _colliderStates[i];
         Enemy.enabled = _enemyEnabled;
         IsAwake = true;
+        JoinCombatGroup();
         return true;
     }
 
     public void Freeze()
     {
+        LeaveCombatGroup();
         if (Enemy != null) Enemy.enabled = false;
         if (_agent != null) _agent.enabled = false;
         if (_colliders != null)
@@ -109,14 +111,35 @@ public sealed class DungeonEncounterMember : MonoBehaviour
     {
         if (_released) return;
         _released = true;
+        LeaveCombatGroup();
         if (Enemy != null) Enemy.OnDied -= OnDied;
         _room = null;
     }
+
+    private void JoinCombatGroup()
+    {
+        if (_released || !IsAwake || !isActiveAndEnabled || IsDead || !Enemy.isActiveAndEnabled
+            || Enemy.EncounterPatrolOnly || Enemy.Rank == EnemyRank.Boss || _room == null) return;
+        var group = _room.CombatGroup;
+        if (group != null) group.Register(Enemy);
+    }
+
+    private void LeaveCombatGroup()
+    {
+        if (Enemy == null || _room == null) return;
+        var group = _room.CombatGroup;
+        if (group != null) group.Unregister(Enemy);
+    }
+
+    private void OnEnable() => JoinCombatGroup();
+
+    private void OnDisable() => LeaveCombatGroup();
 
     private void OnDied()
     {
         if (_released) return;
         HasDied = true;
+        LeaveCombatGroup();
         _room?.NotifyEnemyRemoved(this);
     }
     private void OnDestroy()

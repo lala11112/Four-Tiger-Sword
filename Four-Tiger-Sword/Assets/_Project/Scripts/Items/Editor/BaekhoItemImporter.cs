@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -25,7 +26,6 @@ public static class BaekhoItemImporter
     {
         public string projectId, status, json, manifestJson, jsonHash, manifestHash;
         public int revision;
-        public ItemPolicy policy;
         public readonly List<Entry> items = new List<Entry>();
     }
 
@@ -36,6 +36,8 @@ public static class BaekhoItemImporter
         public ElementType element;
         public ItemEffect[] effects;
         public byte[] png;
+        public bool droppedSp;
+        public bool Retained => !droppedSp || effects.Length > 0;
     }
 
     [MenuItem("Tools/Studio Baekho/Items/Import Item Package")]
@@ -73,7 +75,7 @@ public static class BaekhoItemImporter
             transaction.EnsureFolder(folder + "/Icons");
             transaction.Capture(catalogPath);
             var definitions = new List<ItemDefinition>();
-            foreach (Entry entry in source.items)
+            foreach (Entry entry in source.items.Where(entry => entry.Retained))
             {
                 string definitionPath = folder + "/Definitions/" + entry.key + ".asset";
                 transaction.Capture(definitionPath);
@@ -112,6 +114,7 @@ public static class BaekhoItemImporter
                 definition.itemId = entry.id;
                 definition.displayName = entry.name;
                 definition.description = entry.description;
+                definition.effectText = entry.droppedSp ? entry.description : string.Empty;
                 definition.element = entry.element;
                 definition.grade = entry.grade;
                 definition.purchasePrice = entry.price;
@@ -124,6 +127,15 @@ public static class BaekhoItemImporter
                 AssetDatabase.SaveAssetIfDirty(definition);
                 definitions.Add(definition);
                 AfterItemImported?.Invoke(definitions.Count);
+            }
+
+            foreach (Entry entry in source.items.Where(entry => !entry.Retained))
+            {
+                string definitionPath = folder + "/Definitions/" + entry.key + ".asset";
+                if (!File.Exists(definitionPath)) continue;
+                transaction.Capture(definitionPath);
+                if (!AssetDatabase.DeleteAsset(definitionPath))
+                    throw new IOException("폐기된 아이템 정의를 삭제하지 못했습니다: " + definitionPath);
             }
 
             ItemCatalog catalog = AssetDatabase.LoadAssetAtPath<ItemCatalog>(catalogPath);
@@ -140,7 +152,6 @@ public static class BaekhoItemImporter
             catalog.manifestJson = source.manifestJson;
             catalog.catalogSha256 = source.jsonHash;
             catalog.manifestSha256 = source.manifestHash;
-            catalog.policy = source.policy;
             catalog.items = definitions.ToArray();
             EditorUtility.SetDirty(catalog);
             AssetDatabase.SaveAssetIfDirty(catalog);
@@ -213,15 +224,14 @@ public static class BaekhoItemImporter
         Equal(Bool(policy, "removeOnItemLoss"), true, "removeOnItemLoss");
         Equal(Bool(policy, "refillOnMaxIncrease"), false, "refillOnMaxIncrease");
         Equal(Bool(policy, "clampOnMaxDecrease"), true, "clampOnMaxDecrease");
+        Positive(policy, "maxSpCap");
+        Positive(policy, "regenCap");
+        Nonnegative(policy, "minDodgeCost");
+        Nonnegative(policy, "minSwitchCost");
         var result = new Package
         {
             projectId = projectId, revision = revision, status = status, json = json,
-            manifestJson = manifestJson, jsonHash = Hash(catalogBytes), manifestHash = Hash(manifestBytes),
-            policy = new ItemPolicy
-            {
-                maxSpCap = Positive(policy, "maxSpCap"), regenCap = Positive(policy, "regenCap"),
-                minDodgeCost = Nonnegative(policy, "minDodgeCost"), minSwitchCost = Nonnegative(policy, "minSwitchCost")
-            }
+            manifestJson = manifestJson, jsonHash = Hash(catalogBytes), manifestHash = Hash(manifestBytes)
         };
         var keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -240,12 +250,20 @@ public static class BaekhoItemImporter
             if (!string.IsNullOrWhiteSpace(Text(item, "unsupportedEffectNotes", 12000, true))) Fail("지원하지 않는 효과 메모가 있습니다: " + id);
             Bool(item, "descriptionStale");
             var effects = new List<ItemEffect>();
-            foreach (JToken effectValue in Array(item, "effects", 0, 20)) effects.Add(Effect(AsObject(effectValue, id + ".effects[]")));
+            bool droppedSp = false;
+            foreach (JToken effectValue in Array(item, "effects", 0, 20))
+            {
+                ItemEffect effect = Effect(AsObject(effectValue, id + ".effects[]"));
+                if (effect != null) effects.Add(effect);
+                else droppedSp = true;
+            }
+            string description = Text(item, "description", 12000, true);
             var entry = new Entry
             {
-                key = key, id = id, name = Text(item, "name", 200, true), description = Text(item, "description", 12000, true),
+                key = key, id = id, name = Text(item, "name", 200, true),
+                description = droppedSp ? string.Join(", ", effects.Select(DescribeEffect)) : description,
                 grade = grade, price = price, revision = Int(item, "contentRevision", 1), element = element,
-                effects = effects.ToArray(), json = item.ToString(Formatting.None)
+                effects = effects.ToArray(), droppedSp = droppedSp, json = item.ToString(Formatting.None)
             };
             JToken iconPathToken = Required(item, "iconPath");
             if (iconPathToken.Type != JTokenType.Null)
@@ -307,10 +325,39 @@ public static class BaekhoItemImporter
             targets = ((JArray)forms).Select(t => t.Type == JTokenType.String ? Element((string)t) : throw new InvalidDataException("targetForms는 문자열 배열이어야 합니다.")).ToArray();
             if (targets.Distinct().Count() != targets.Length) Fail("targetForms에 중복 오행이 있습니다.");
         }
+        float amount = Number(source, "amount");
+        // v1 packages include retired resource effects. Validate those before discarding them.
+        if (!ratio) return null;
         var stat = (ItemStat)Enum.Parse(typeof(ItemStat), char.ToUpperInvariant(statName[0]) + statName.Substring(1));
-        return new ItemEffect { stat = stat, amount = Number(source, "amount"), trigger = trigger == "whileOwned" ? ItemEffectTrigger.WhileOwned : ItemEffectTrigger.FormSwitchSucceeded,
+        return new ItemEffect { stat = stat, amount = amount, trigger = trigger == "whileOwned" ? ItemEffectTrigger.WhileOwned : ItemEffectTrigger.FormSwitchSucceeded,
             allForms = all, targetForms = targets, durationSeconds = seconds };
     }
+
+    private static string DescribeEffect(ItemEffect effect)
+    {
+        string stat = effect.stat switch
+        {
+            ItemStat.MaxHp => "최대 체력",
+            ItemStat.NormalDamage => "기본 공격 피해",
+            ItemStat.SwitchDamage => "전환 강화 스킬 피해",
+            _ => throw new ArgumentOutOfRangeException(nameof(effect))
+        };
+        string scope = effect.allForms ? "모든 폼" : string.Join("·", effect.targetForms.Select(FormName)) + " 폼";
+        string trigger = effect.trigger == ItemEffectTrigger.WhileOwned ? "보유 중"
+            : $"전환 성공 후 {effect.durationSeconds.ToString("0.####", CultureInfo.InvariantCulture)}초 동안";
+        string amount = ((double)effect.amount * 100).ToString("+0.####;-0.####;0", CultureInfo.InvariantCulture);
+        return $"{trigger} {scope} {stat} {amount}%";
+    }
+
+    private static string FormName(ElementType form) => form switch
+    {
+        ElementType.ELEMENT_WOOD => "목",
+        ElementType.ELEMENT_FIRE => "화",
+        ElementType.ELEMENT_EARTH => "토",
+        ElementType.ELEMENT_GOLD => "금",
+        ElementType.ELEMENT_WATER => "수",
+        _ => throw new ArgumentOutOfRangeException(nameof(form))
+    };
 
     private static ElementType Element(string name)
     {

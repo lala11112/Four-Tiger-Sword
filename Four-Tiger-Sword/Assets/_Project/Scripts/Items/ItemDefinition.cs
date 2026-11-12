@@ -3,13 +3,9 @@ using UnityEngine;
 
 public enum ItemStat
 {
-    MaxHp,
-    MaxSp,
-    SpRegen,
-    NormalDamage,
-    SwitchDamage,
-    DodgeSpCost,
-    SwitchSpCost
+    MaxHp = 0,
+    NormalDamage = 3,
+    SwitchDamage = 4
 }
 
 public enum ItemEffectTrigger

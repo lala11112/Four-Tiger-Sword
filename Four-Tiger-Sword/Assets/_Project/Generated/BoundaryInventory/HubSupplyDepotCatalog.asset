@@ -1,0 +1,1166 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fce5900f3909c6b48accf1589a605edb, type: 3}
+  m_Name: HubSupplyDepotCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::BoundaryZero.SupplyDepot.SupplyDepotCatalog
+  items:
+  - id: I01
+    name: "\uC0C8\uC2F9 \uBD80\uC801"
+    effect: "\uCD5C\uB300 HP +5%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 35595f7bec6ab0c4ebaa03bb21b7e348, type: 3}
+    synergies:
+    - id: S03
+      name: "\uCCA0\uBCBD"
+      icon: {fileID: 21300000, guid: 356b4a7791059524a89f4e7f8acbc2cc, type: 3}
+      compactLines:
+      - "\uCD5C\uB300 HP +(8 / 16 / 25 / 34)%"
+      - "\uBC29\uC5B4\uB825 +(10 / 20 / 30 / 40)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I02
+    name: "\uC228\uACB0 \uB9E4\uB4ED"
+    effect: "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9
+      \uCE58\uBA85\uD0C0 \uD655\uB960 +8%p"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: 1c1caba4dd4c9574ba408fa93c3b7861, type: 3}
+    synergies:
+    - id: S01
+      name: "\uCE58\uBA85"
+      icon: {fileID: 21300000, guid: 304cfc208f00d3a4295c6e20f5e9861a, type: 3}
+      compactLines:
+      - "\uCE58\uBA85\uD0C0 \uD655\uB960 +(5 / 10 / 15 / 20)%p"
+      - "\uCE58\uBA85\uD0C0 \uD53C\uD574 +(10 / 20 / 35 / 50)%p"
+      thresholds: 02000000040000000600000008000000
+    - id: S10
+      name: "\uB9C8\uBB34\uB9AC"
+      icon: {fileID: 21300000, guid: e242e1bfa4075de44b865b526f506c52, type: 3}
+      compactLines:
+      - "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I04
+    name: "\uB2E4\uC2DC \uD53C\uB294 \uAC00\uC9C0"
+    effect: "\uD654 \uC18D\uC131 \uAE30\uBCF8 \uACF5\uACA9\xB7\uC2A4\uD0AC \uD53C\uD574
+      +4%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 79bd82951692e4b478d69d91834e24ea, type: 3}
+    synergies:
+    - id: S05
+      name: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+      icon: {fileID: 21300000, guid: 6b4f687bf95b86c4e93ee4be174e5361, type: 3}
+      compactLines:
+      - "\uD654 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I05
+    name: "\uBD88\uC528 \uC7A5\uC2DD"
+    effect: "\uD654 \uC18D\uC131 \uAE30\uBCF8 \uACF5\uACA9 \uD53C\uD574 +8%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 43d424aaea32614408fca74ca410dcfb, type: 3}
+    synergies:
+    - id: S02
+      name: "\uB9F9\uACF5"
+      icon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+      compactLines:
+      - "\uACF5\uACA9\uB825 +(5 / 10 / 18 / 26)%"
+      - "\uAE30\uBCF8 \uACF5\uACA9 \uC18D\uB3C4 +(4 / 8 / 15 / 22)%"
+      thresholds: 02000000040000000600000008000000
+    - id: S05
+      name: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+      icon: {fileID: 21300000, guid: 6b4f687bf95b86c4e93ee4be174e5361, type: 3}
+      compactLines:
+      - "\uD654 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I06
+    name: "\uBD89\uC740 \uC778\uC7A5"
+    effect: "\uCE58\uBA85\uD0C0 \uD53C\uD574 +10%p"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: 014fdeee1b690944f9ad1635bfbe769a, type: 3}
+    synergies:
+    - id: S01
+      name: "\uCE58\uBA85"
+      icon: {fileID: 21300000, guid: 304cfc208f00d3a4295c6e20f5e9861a, type: 3}
+      compactLines:
+      - "\uCE58\uBA85\uD0C0 \uD655\uB960 +(5 / 10 / 15 / 20)%p"
+      - "\uCE58\uBA85\uD0C0 \uD53C\uD574 +(10 / 20 / 35 / 50)%p"
+      thresholds: 02000000040000000600000008000000
+  - id: I07
+    name: "\uD0C0\uC624\uB974\uB294 \uB9E4\uB4ED"
+    effect: "\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD654 \uC18D\uC131 \uD53C\uD574
+      +8%"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: a5527b38ed1a83f4981771f015fac2b6, type: 3}
+    synergies:
+    - id: S05
+      name: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+      icon: {fileID: 21300000, guid: 6b4f687bf95b86c4e93ee4be174e5361, type: 3}
+      compactLines:
+      - "\uD654 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I08
+    name: "\uC774\uC5B4\uC9C0\uB294 \uBD88\uAF43"
+    effect: "\uD654 \uC18D\uC131 \uC2A4\uD0AC \uD53C\uD574 +7%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: fbca2ed7a89ac5841927334cf5573165, type: 3}
+    synergies:
+    - id: S05
+      name: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+      icon: {fileID: 21300000, guid: 6b4f687bf95b86c4e93ee4be174e5361, type: 3}
+      compactLines:
+      - "\uD654 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I09
+    name: "\uD759\uBE5B \uBD80\uC801"
+    effect: "\uCD5C\uB300 HP +8%"
+    grade: 4
+    color: {r: 0.54509807, g: 0.8862745, b: 0.85490197, a: 1}
+    icon: {fileID: 21300000, guid: 290d845a4e94076459a13fd775f6b08a, type: 3}
+    synergies:
+    - id: S03
+      name: "\uCCA0\uBCBD"
+      icon: {fileID: 21300000, guid: 356b4a7791059524a89f4e7f8acbc2cc, type: 3}
+      compactLines:
+      - "\uCD5C\uB300 HP +(8 / 16 / 25 / 34)%"
+      - "\uBC29\uC5B4\uB825 +(10 / 20 / 30 / 40)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I100
+    name: "\uB9C8\uAC10 \uB798\uCE6B"
+    effect: "HP 25% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9
+      \uCE58\uBA85\uD0C0 \uD53C\uD574 +15%p"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: a999460d25fe0284fabcd2a76c87eb3f, type: 3}
+    synergies:
+    - id: S01
+      name: "\uCE58\uBA85"
+      icon: {fileID: 21300000, guid: 304cfc208f00d3a4295c6e20f5e9861a, type: 3}
+      compactLines:
+      - "\uCE58\uBA85\uD0C0 \uD655\uB960 +(5 / 10 / 15 / 20)%p"
+      - "\uCE58\uBA85\uD0C0 \uD53C\uD574 +(10 / 20 / 35 / 50)%p"
+      thresholds: 02000000040000000600000008000000
+    - id: S10
+      name: "\uB9C8\uBB34\uB9AC"
+      icon: {fileID: 21300000, guid: e242e1bfa4075de44b865b526f506c52, type: 3}
+      compactLines:
+      - "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I13
+    name: "\uBE5B\uB098\uB294 \uC870\uAC01"
+    effect: "\uCE58\uBA85\uD0C0 \uD655\uB960 +2%p"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 1ee44769094262540a9c78fae3409988, type: 3}
+    synergies:
+    - id: S01
+      name: "\uCE58\uBA85"
+      icon: {fileID: 21300000, guid: 304cfc208f00d3a4295c6e20f5e9861a, type: 3}
+      compactLines:
+      - "\uCE58\uBA85\uD0C0 \uD655\uB960 +(5 / 10 / 15 / 20)%p"
+      - "\uCE58\uBA85\uD0C0 \uD53C\uD574 +(10 / 20 / 35 / 50)%p"
+      thresholds: 02000000040000000600000008000000
+  - id: I14
+    name: "\uB9DE\uBB3C\uB9B0 \uACE0\uB9AC"
+    effect: "\uAE30\uBCF8 \uACF5\uACA9 \uC18D\uB3C4 +5%"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: da93bee6c8ca3994a828b77453301254, type: 3}
+    synergies:
+    - id: S02
+      name: "\uB9F9\uACF5"
+      icon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+      compactLines:
+      - "\uACF5\uACA9\uB825 +(5 / 10 / 18 / 26)%"
+      - "\uAE30\uBCF8 \uACF5\uACA9 \uC18D\uB3C4 +(4 / 8 / 15 / 22)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I15
+    name: "\uC815\uB828\uB41C \uC778\uC7A5"
+    effect: "HP 80% \uC774\uC0C1\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9
+      \uD53C\uD574 +12%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: b56c31e6a10362a44a5609d3620fb4de, type: 3}
+    synergies:
+    - id: S01
+      name: "\uCE58\uBA85"
+      icon: {fileID: 21300000, guid: 304cfc208f00d3a4295c6e20f5e9861a, type: 3}
+      compactLines:
+      - "\uCE58\uBA85\uD0C0 \uD655\uB960 +(5 / 10 / 15 / 20)%p"
+      - "\uCE58\uBA85\uD0C0 \uD53C\uD574 +(10 / 20 / 35 / 50)%p"
+      thresholds: 02000000040000000600000008000000
+  - id: I16
+    name: "\uC624\uC0C9 \uC5F0\uACB0\uACE0\uB9AC"
+    effect: "\uC218\xB7\uD654 \uC18D\uC131 \uD53C\uD574 \uAC01\uAC01 +4%"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: 0c9508e2c9a308446a33fa2ef9d96a9b, type: 3}
+    synergies:
+    - id: S04
+      name: "\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0"
+      icon: {fileID: 21300000, guid: f8d9839b28f4fc64b9c4f55629b3072e, type: 3}
+      compactLines:
+      - "\uC218 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+    - id: S05
+      name: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+      icon: {fileID: 21300000, guid: 6b4f687bf95b86c4e93ee4be174e5361, type: 3}
+      compactLines:
+      - "\uD654 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I17
+    name: "\uBB3C\uBC29\uC6B8 \uC7A5\uC2DD"
+    effect: "\uC218 \uC18D\uC131 \uAE30\uBCF8 \uACF5\uACA9 \uD53C\uD574 +8%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: c4a13e32a5acf4f4dbf51d1dd18384a7, type: 3}
+    synergies:
+    - id: S04
+      name: "\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0"
+      icon: {fileID: 21300000, guid: f8d9839b28f4fc64b9c4f55629b3072e, type: 3}
+      compactLines:
+      - "\uC218 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I18
+    name: "\uAE4A\uC740 \uBB3C\uBCD1"
+    effect: "\uC218 \uC18D\uC131 \uC2A4\uD0AC \uD53C\uD574 +7%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 8bd3c25de00c3e84da5e4b7a35f75f60, type: 3}
+    synergies:
+    - id: S04
+      name: "\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0"
+      icon: {fileID: 21300000, guid: f8d9839b28f4fc64b9c4f55629b3072e, type: 3}
+      compactLines:
+      - "\uC218 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I19
+    name: "\uD750\uB974\uB294 \uB9E4\uB4ED"
+    effect: "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uC218 \uC18D\uC131 \uD53C\uD574
+      +10%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 35385d542d5a239469b48a11cac9e0af, type: 3}
+    synergies:
+    - id: S04
+      name: "\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0"
+      icon: {fileID: 21300000, guid: f8d9839b28f4fc64b9c4f55629b3072e, type: 3}
+      compactLines:
+      - "\uC218 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I20
+    name: "\uB04A\uC784\uC5C6\uB294 \uBB3C\uACB0"
+    effect: "\uC218 \uC18D\uC131 \uD53C\uD574 +5%"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: 2b1e325f0d15211498100471a3452d62, type: 3}
+    synergies:
+    - id: S04
+      name: "\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0"
+      icon: {fileID: 21300000, guid: f8d9839b28f4fc64b9c4f55629b3072e, type: 3}
+      compactLines:
+      - "\uC218 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I21
+    name: "\uACBD\uB7C9 \uBC1C\uBAA9\uC1E0"
+    effect: "\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uC218 \uC18D\uC131 \uD53C\uD574
+      +8%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 45e5e2cf0c694894a923866694b68af1, type: 3}
+    synergies:
+    - id: S04
+      name: "\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0"
+      icon: {fileID: 21300000, guid: f8d9839b28f4fc64b9c4f55629b3072e, type: 3}
+      compactLines:
+      - "\uC218 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I22
+    name: "\uD0C4\uC131 \uB4A4\uCD95\uD3B8"
+    effect: "HP 80% \uC774\uC0C1\uC778 \uC801\uC5D0\uAC8C \uD654 \uC18D\uC131 \uD53C\uD574
+      +10%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 08d702f8d373e1d41a3032ea733ec551, type: 3}
+    synergies:
+    - id: S05
+      name: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+      icon: {fileID: 21300000, guid: 6b4f687bf95b86c4e93ee4be174e5361, type: 3}
+      compactLines:
+      - "\uD654 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I30
+    name: "\uD68C\uBCF5 \uC644\uCDA9\uAD00"
+    effect: "\uC801 \uCC98\uCE58 \uC2DC \uCD5C\uB300 HP\uC758 3%\uB9CC\uD07C \uBCF4\uD638\uB9C9
+      (4\uCD08)\n\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 5\uCD08"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: a0520db0435495247a017f144f1aecc1, type: 3}
+    synergies:
+    - id: S08
+      name: "\uC218\uD638"
+      icon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
+      compactLines:
+      - "HP \uC190\uC2E4 \uC2DC 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 (3 / 4 / 5 /
+        6)% \uBCF4\uD638\uB9C9, \uCFE8\uD0C0\uC784 10\uCD08"
+      thresholds: 02000000040000000600000008000000
+  - id: I31
+    name: "\uCDA9\uACA9 \uBCF4\uC874\uD310"
+    effect: "\uC801 \uACF5\uACA9 \uD55C \uBC88\uC73C\uB85C \uCD5C\uB300 HP\uC758
+      15% \uC774\uC0C1\uC744 \uC783\uC73C\uBA74 \uCD5C\uB300 HP\uC758 4%\uB9CC\uD07C
+      \uBCF4\uD638\uB9C9 (4\uCD08)\n\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 10\uCD08"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 9990576ce0455174b91075d296260f9f, type: 3}
+    synergies:
+    - id: S08
+      name: "\uC218\uD638"
+      icon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
+      compactLines:
+      - "HP \uC190\uC2E4 \uC2DC 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 (3 / 4 / 5 /
+        6)% \uBCF4\uD638\uB9C9, \uCFE8\uD0C0\uC784 10\uCD08"
+      thresholds: 02000000040000000600000008000000
+  - id: I32
+    name: "\uAC1C\uC804 \uBD09\uC778\uD328"
+    effect: "\uD53C\uACA9\uC73C\uB85C HP\uB97C \uC783\uC73C\uBA74 \uCD5C\uB300 HP\uC758
+      6%\uB9CC\uD07C \uBCF4\uD638\uB9C9 (5\uCD08)\n\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04
+      15\uCD08"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: 3da70ee8c43bebd4d96fe49669b969cc, type: 3}
+    synergies:
+    - id: S08
+      name: "\uC218\uD638"
+      icon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
+      compactLines:
+      - "HP \uC190\uC2E4 \uC2DC 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 (3 / 4 / 5 /
+        6)% \uBCF4\uD638\uB9C9, \uCFE8\uD0C0\uC784 10\uCD08"
+      thresholds: 02000000040000000600000008000000
+  - id: I33
+    name: "\uACA9\uBCBD \uC811\uCC29\uD540"
+    effect: "\uBCF4\uD638\uB9C9 \uD68D\uB4DD\uB7C9 +10%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: b45d3b376a66ed3458186c4c6fbf33ff, type: 3}
+    synergies:
+    - id: S08
+      name: "\uC218\uD638"
+      icon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
+      compactLines:
+      - "HP \uC190\uC2E4 \uC2DC 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 (3 / 4 / 5 /
+        6)% \uBCF4\uD638\uB9C9, \uCFE8\uD0C0\uC784 10\uCD08"
+      thresholds: 02000000040000000600000008000000
+  - id: I34
+    name: "\uC608\uC555 \uACA9\uB9C9"
+    effect: "\uC2A4\uD0AC \uC801\uC911 \uC2DC \uCD5C\uB300 HP\uC758 3%\uB9CC\uD07C
+      \uBCF4\uD638\uB9C9 (3\uCD08)\n\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 8\uCD08"
+    grade: 4
+    color: {r: 0.54509807, g: 0.8862745, b: 0.85490197, a: 1}
+    icon: {fileID: 21300000, guid: 09f78e0564b4e3c4ea711dc82834a622, type: 3}
+    synergies:
+    - id: S08
+      name: "\uC218\uD638"
+      icon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
+      compactLines:
+      - "HP \uC190\uC2E4 \uC2DC 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 (3 / 4 / 5 /
+        6)% \uBCF4\uD638\uB9C9, \uCFE8\uD0C0\uC784 10\uCD08"
+      thresholds: 02000000040000000600000008000000
+    - id: S16
+      name: "\uC219\uB828"
+      icon: {fileID: 21300000, guid: 576f373fee8b00f4287fdcb49863d6c9, type: 3}
+      compactLines:
+      - "\uC2A4\uD0AC \uD53C\uD574 +(4 / 8 / 12 / 16)%"
+      - "\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \u2212(3 / 6 / 9 / 12)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I41
+    name: "\uC808\uB2E8 \uAC01\uC778\uC790"
+    effect: "HP 20% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9
+      \uD53C\uD574 +14%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 9439bc1c3bd28ba4d8b7ccf74659fae6, type: 3}
+    synergies:
+    - id: S10
+      name: "\uB9C8\uBB34\uB9AC"
+      icon: {fileID: 21300000, guid: e242e1bfa4075de44b865b526f506c52, type: 3}
+      compactLines:
+      - "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I42
+    name: "\uD3D0\uC1C4 \uB9C8\uAC1C"
+    effect: "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uC2A4\uD0AC \uD53C\uD574
+      +13%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 633961cd0b90d8344954c4ef4dd70733, type: 3}
+    synergies:
+    - id: S10
+      name: "\uB9C8\uBB34\uB9AC"
+      icon: {fileID: 21300000, guid: e242e1bfa4075de44b865b526f506c52, type: 3}
+      compactLines:
+      - "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I43
+    name: "\uB9C8\uAC10 \uC800\uC6B8\uCD94"
+    effect: "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9\xB7\uC2A4\uD0AC
+      \uD53C\uD574 +6%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 5296b36b8d8c1dd40b33e72adb59ed9e, type: 3}
+    synergies:
+    - id: S10
+      name: "\uB9C8\uBB34\uB9AC"
+      icon: {fileID: 21300000, guid: e242e1bfa4075de44b865b526f506c52, type: 3}
+      compactLines:
+      - "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I44
+    name: "\uC885\uACB0 \uC811\uC810"
+    effect: "HP 30% \uC774\uD558\uC778 \uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uAE30\uBCF8
+      \uACF5\uACA9\xB7\uC2A4\uD0AC \uD53C\uD574 +12%"
+    grade: 4
+    color: {r: 0.54509807, g: 0.8862745, b: 0.85490197, a: 1}
+    icon: {fileID: 21300000, guid: 759c0de93757beb4288bcdce44003028, type: 3}
+    synergies:
+    - id: S10
+      name: "\uB9C8\uBB34\uB9AC"
+      icon: {fileID: 21300000, guid: e242e1bfa4075de44b865b526f506c52, type: 3}
+      compactLines:
+      - "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I46
+    name: "\uC2DC\uB8CC \uAC1C\uBD09\uC1E0"
+    effect: "\uACF5\uACA9 \uD53C\uD574 +10%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: fa778bca896f25f46ab509b1f0c3be40, type: 3}
+    synergies:
+    - id: S02
+      name: "\uB9F9\uACF5"
+      icon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+      compactLines:
+      - "\uACF5\uACA9\uB825 +(5 / 10 / 18 / 26)%"
+      - "\uAE30\uBCF8 \uACF5\uACA9 \uC18D\uB3C4 +(4 / 8 / 15 / 22)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I47
+    name: "\uCD08\uC555 \uC810\uD654\uD540"
+    effect: "HP 90% \uC774\uC0C1\uC778 \uC801\uC5D0\uAC8C \uC2A4\uD0AC \uD53C\uD574
+      +15%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 5adee4800e4902343ba947dbdbab935e, type: 3}
+    synergies:
+    - id: S16
+      name: "\uC219\uB828"
+      icon: {fileID: 21300000, guid: 576f373fee8b00f4287fdcb49863d6c9, type: 3}
+      compactLines:
+      - "\uC2A4\uD0AC \uD53C\uD574 +(4 / 8 / 12 / 16)%"
+      - "\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \u2212(3 / 6 / 9 / 12)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I48
+    name: "\uAC1C\uC804 \uB3C4\uB7C9\uD3B8"
+    effect: "\uC790\uC2E0\uC758 HP 80% \uC774\uC0C1\uC77C \uB54C \uAE30\uBCF8 \uACF5\uACA9
+      \uD53C\uD574 +6%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: a239da1f7daa2234ba54395627388194, type: 3}
+    synergies:
+    - id: S02
+      name: "\uB9F9\uACF5"
+      icon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+      compactLines:
+      - "\uACF5\uACA9\uB825 +(5 / 10 / 18 / 26)%"
+      - "\uAE30\uBCF8 \uACF5\uACA9 \uC18D\uB3C4 +(4 / 8 / 15 / 22)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I50
+    name: "\uC120\uBD09 \uBCF4\uD638\uD328"
+    effect: "\uD53C\uACA9\uC73C\uB85C HP\uB97C \uC783\uC740 \uB4A4 \uC790\uC2E0\uC758
+      HP\uAC00 40% \uC774\uD558\uC77C \uB54C \uCD5C\uB300 HP\uC758 6%\uB9CC\uD07C
+      \uBCF4\uD638\uB9C9 (5\uCD08)\n\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 15\uCD08"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 74438725041a7eb4981885d038f45a14, type: 3}
+    synergies:
+    - id: S08
+      name: "\uC218\uD638"
+      icon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
+      compactLines:
+      - "HP \uC190\uC2E4 \uC2DC 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 (3 / 4 / 5 /
+        6)% \uBCF4\uD638\uB9C9, \uCFE8\uD0C0\uC784 10\uCD08"
+      thresholds: 02000000040000000600000008000000
+  - id: I51
+    name: "\uD55C\uACC4 \uC7A0\uAE08\uD310"
+    effect: "\uC790\uC2E0\uC758 HP 30% \uC774\uD558\uC77C \uB54C \uC801\uC758 \uACF5\uACA9
+      \uD53C\uD574 \u22127%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: d0832c197272f214f8a674f239db3bba, type: 3}
+    synergies:
+    - id: S03
+      name: "\uCCA0\uBCBD"
+      icon: {fileID: 21300000, guid: 356b4a7791059524a89f4e7f8acbc2cc, type: 3}
+      compactLines:
+      - "\uCD5C\uB300 HP +(8 / 16 / 25 / 34)%"
+      - "\uBC29\uC5B4\uB825 +(10 / 20 / 30 / 40)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I56
+    name: "\uBC15\uC790 \uD074\uB9AD\uC1E0"
+    effect: "\uACF5\uACA9\uB825 +6% \xB7 \uACF5\uACA9 \uC18D\uB3C4 +6%"
+    grade: 4
+    color: {r: 0.54509807, g: 0.8862745, b: 0.85490197, a: 1}
+    icon: {fileID: 21300000, guid: 7e1483ebc75cadf46bac8ab630bb9979, type: 3}
+    synergies:
+    - id: S02
+      name: "\uB9F9\uACF5"
+      icon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+      compactLines:
+      - "\uACF5\uACA9\uB825 +(5 / 10 / 18 / 26)%"
+      - "\uAE30\uBCF8 \uACF5\uACA9 \uC18D\uB3C4 +(4 / 8 / 15 / 22)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I57
+    name: "\uC0AC\uC5F0 \uB204\uB984\uC1E0"
+    effect: "\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9 \uCE58\uBA85\uD0C0
+      \uD655\uB960 +5%p"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 940ad3ea9a8cbdb42a88a85de5a0b25a, type: 3}
+    synergies:
+    - id: S01
+      name: "\uCE58\uBA85"
+      icon: {fileID: 21300000, guid: 304cfc208f00d3a4295c6e20f5e9861a, type: 3}
+      compactLines:
+      - "\uCE58\uBA85\uD0C0 \uD655\uB960 +(5 / 10 / 15 / 20)%p"
+      - "\uCE58\uBA85\uD0C0 \uD53C\uD574 +(10 / 20 / 35 / 50)%p"
+      thresholds: 02000000040000000600000008000000
+  - id: I60
+    name: "\uD30C\uC1C4 \uACC4\uC218\uD3B8"
+    effect: "\uC801 \uBC29\uC5B4\uB825 3% \uAD00\uD1B5"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 13ce712e61e870a49b93bae267b18a1a, type: 3}
+    synergies:
+    - id: S14
+      name: "\uAD00\uD1B5"
+      icon: {fileID: 21300000, guid: 9fac5d8b6848b5a4483ff48eb719037a, type: 3}
+      compactLines:
+      - "\uC801 \uBC29\uC5B4\uB825 (6 / 9 / 12 / 15)% \uAD00\uD1B5"
+      thresholds: 02000000040000000600000008000000
+  - id: I61
+    name: "\uC410\uAE30 \uACBD\uB3C4\uD3B8"
+    effect: "\uC801 \uBC29\uC5B4\uB825 5% \uAD00\uD1B5"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 87c01ff10dc953c448419f5a175417a9, type: 3}
+    synergies:
+    - id: S14
+      name: "\uAD00\uD1B5"
+      icon: {fileID: 21300000, guid: 9fac5d8b6848b5a4483ff48eb719037a, type: 3}
+      compactLines:
+      - "\uC801 \uBC29\uC5B4\uB825 (6 / 9 / 12 / 15)% \uAD00\uD1B5"
+      thresholds: 02000000040000000600000008000000
+  - id: I62
+    name: "\uCE68\uD22C \uACF5\uCC28\uD540"
+    effect: "\uC801 \uBC29\uC5B4\uB825 5% \uAD00\uD1B5 \xB7 \uC2A4\uD0AC \uCFE8\uD0C0\uC784
+      \u22123%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 3bcdce44a63e368428d3deafd95102ba, type: 3}
+    synergies:
+    - id: S14
+      name: "\uAD00\uD1B5"
+      icon: {fileID: 21300000, guid: 9fac5d8b6848b5a4483ff48eb719037a, type: 3}
+      compactLines:
+      - "\uC801 \uBC29\uC5B4\uB825 (6 / 9 / 12 / 15)% \uAD00\uD1B5"
+      thresholds: 02000000040000000600000008000000
+    - id: S16
+      name: "\uC219\uB828"
+      icon: {fileID: 21300000, guid: 576f373fee8b00f4287fdcb49863d6c9, type: 3}
+      compactLines:
+      - "\uC2A4\uD0AC \uD53C\uD574 +(4 / 8 / 12 / 16)%"
+      - "\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \u2212(3 / 6 / 9 / 12)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I63
+    name: "\uC2EC\uCE35 \uCD94\uC801\uAE30"
+    effect: "\uC801 \uBC29\uC5B4\uB825 3% \uAD00\uD1B5"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: addd85d102b48ed4f80c63b32673c912, type: 3}
+    synergies:
+    - id: S14
+      name: "\uAD00\uD1B5"
+      icon: {fileID: 21300000, guid: 9fac5d8b6848b5a4483ff48eb719037a, type: 3}
+      compactLines:
+      - "\uC801 \uBC29\uC5B4\uB825 (6 / 9 / 12 / 15)% \uAD00\uD1B5"
+      thresholds: 02000000040000000600000008000000
+  - id: I64
+    name: "\uCE35\uBD84\uB9AC \uC2DC\uD3B8"
+    effect: "\uC801 \uBC29\uC5B4\uB825 8% \uAD00\uD1B5"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: 04b7195419692fa4faf7339c60a41c7c, type: 3}
+    synergies:
+    - id: S14
+      name: "\uAD00\uD1B5"
+      icon: {fileID: 21300000, guid: 9fac5d8b6848b5a4483ff48eb719037a, type: 3}
+      compactLines:
+      - "\uC801 \uBC29\uC5B4\uB825 (6 / 9 / 12 / 15)% \uAD00\uD1B5"
+      thresholds: 02000000040000000600000008000000
+  - id: I65
+    name: "\uC911\uAC11 \uCC9C\uACF5\uC2EC"
+    effect: "\uC801 \uBC29\uC5B4\uB825 8% \uAD00\uD1B5 \xB7 \uC815\uC608 \uC774\uC0C1
+      \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574 +6%"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: c7eac307ee2eb744b958895705c3d7ee, type: 3}
+    synergies:
+    - id: S14
+      name: "\uAD00\uD1B5"
+      icon: {fileID: 21300000, guid: 9fac5d8b6848b5a4483ff48eb719037a, type: 3}
+      compactLines:
+      - "\uC801 \uBC29\uC5B4\uB825 (6 / 9 / 12 / 15)% \uAD00\uD1B5"
+      thresholds: 02000000040000000600000008000000
+    - id: S15
+      name: "\uAC70\uBB3C\uC0AC\uB0E5"
+      icon: {fileID: 21300000, guid: ea13f41cbb31a694f917a34c7bf61f48, type: 3}
+      compactLines:
+      - "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574
+        +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I66
+    name: "\uC704\uD611 \uD45C\uC2DD\uD310"
+    effect: "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0
+      \uD53C\uD574 +4%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 0262ef72a51086944af4c74c54c8871d, type: 3}
+    synergies:
+    - id: S15
+      name: "\uAC70\uBB3C\uC0AC\uB0E5"
+      icon: {fileID: 21300000, guid: ea13f41cbb31a694f917a34c7bf61f48, type: 3}
+      compactLines:
+      - "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574
+        +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I67
+    name: "\uB300\uD615 \uC555\uB825\uC790"
+    effect: "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0
+      \uD53C\uD574 +4%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 4327af60f4897b94585c0d41c36b398e, type: 3}
+    synergies:
+    - id: S15
+      name: "\uAC70\uBB3C\uC0AC\uB0E5"
+      icon: {fileID: 21300000, guid: ea13f41cbb31a694f917a34c7bf61f48, type: 3}
+      compactLines:
+      - "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574
+        +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I68
+    name: "\uD1A0\uBC8C \uAC80\uCCB4\uAD00"
+    effect: "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0
+      \uD53C\uD574 +4%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: cd06c4a58512a4f4a8fec0ec5bc8f9ef, type: 3}
+    synergies:
+    - id: S15
+      name: "\uAC70\uBB3C\uC0AC\uB0E5"
+      icon: {fileID: 21300000, guid: ea13f41cbb31a694f917a34c7bf61f48, type: 3}
+      compactLines:
+      - "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574
+        +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I69
+    name: "\uD3EC\uC704 \uCC28\uB2E8\uD328"
+    effect: "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0
+      \uD53C\uD574 +7%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 6a146598ffe94c24fbf2e5a32ef39d64, type: 3}
+    synergies:
+    - id: S15
+      name: "\uAC70\uBB3C\uC0AC\uB0E5"
+      icon: {fileID: 21300000, guid: ea13f41cbb31a694f917a34c7bf61f48, type: 3}
+      compactLines:
+      - "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574
+        +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I71
+    name: "\uCD08\uC810 \uC410\uAE30"
+    effect: "\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \u22123%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: f9462c61968c68044b0e850b2fabeff2, type: 3}
+    synergies:
+    - id: S16
+      name: "\uC219\uB828"
+      icon: {fileID: 21300000, guid: 576f373fee8b00f4287fdcb49863d6c9, type: 3}
+      compactLines:
+      - "\uC2A4\uD0AC \uD53C\uD574 +(4 / 8 / 12 / 16)%"
+      - "\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \u2212(3 / 6 / 9 / 12)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I72
+    name: "\uD751\uC5F0 \uC2DC\uCE68"
+    effect: "\uC2A4\uD0AC \uD53C\uD574 +5% \xB7 \uC2A4\uD0AC \uCFE8\uD0C0\uC784 \u22125%"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: 24f5b21ea82a19d40bdef5c48d071393, type: 3}
+    synergies:
+    - id: S16
+      name: "\uC219\uB828"
+      icon: {fileID: 21300000, guid: 576f373fee8b00f4287fdcb49863d6c9, type: 3}
+      compactLines:
+      - "\uC2A4\uD0AC \uD53C\uD574 +(4 / 8 / 12 / 16)%"
+      - "\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \u2212(3 / 6 / 9 / 12)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I73
+    name: "\uC5C7\uB208\uAE08 \uCD94"
+    effect: "\uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uC2A4\uD0AC \uD53C\uD574 +8%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 5159c4fa327e76540bb3b379896e3124, type: 3}
+    synergies:
+    - id: S16
+      name: "\uC219\uB828"
+      icon: {fileID: 21300000, guid: 576f373fee8b00f4287fdcb49863d6c9, type: 3}
+      compactLines:
+      - "\uC2A4\uD0AC \uD53C\uD574 +(4 / 8 / 12 / 16)%"
+      - "\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \u2212(3 / 6 / 9 / 12)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I75
+    name: "\uC885\uACB0 \uD540"
+    effect: "HP 25% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD53C\uD574 +9%"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: 9fc7420bcad88254f817c0323483188f, type: 3}
+    synergies:
+    - id: S16
+      name: "\uC219\uB828"
+      icon: {fileID: 21300000, guid: 576f373fee8b00f4287fdcb49863d6c9, type: 3}
+      compactLines:
+      - "\uC2A4\uD0AC \uD53C\uD574 +(4 / 8 / 12 / 16)%"
+      - "\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \u2212(3 / 6 / 9 / 12)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I77
+    name: "\uAC1C\uB9C9 \uD749\uD310"
+    effect: "\uC801\uC5D0\uAC8C \uBC1B\uB294 \uD53C\uD574 \u22124%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 348c97b98fe44ce47b8b7d4d966b88d3, type: 3}
+    synergies:
+    - id: S03
+      name: "\uCCA0\uBCBD"
+      icon: {fileID: 21300000, guid: 356b4a7791059524a89f4e7f8acbc2cc, type: 3}
+      compactLines:
+      - "\uCD5C\uB300 HP +(8 / 16 / 25 / 34)%"
+      - "\uBC29\uC5B4\uB825 +(10 / 20 / 30 / 40)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I78
+    name: "\uC751\uAE09 \uAC01\uCCA0"
+    effect: "\uC801 \uACF5\uACA9 \uD55C \uBC88\uC73C\uB85C \uCD5C\uB300 HP\uC758
+      20% \uC774\uC0C1\uC744 \uC783\uC73C\uBA74 \uD53C\uACA9 \uD6C4 \uC801\uC5D0\uAC8C
+      \uBC1B\uB294 \uD53C\uD574 \u22128% (3\uCD08)\n\uC7AC\uBC1C\uB3D9 \uC2DC \uC9C0\uC18D\uC2DC\uAC04
+      \uAC31\uC2E0"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: dd97ed8461c371541b0efa156716fdb6, type: 3}
+    synergies:
+    - id: S03
+      name: "\uCCA0\uBCBD"
+      icon: {fileID: 21300000, guid: 356b4a7791059524a89f4e7f8acbc2cc, type: 3}
+      compactLines:
+      - "\uCD5C\uB300 HP +(8 / 16 / 25 / 34)%"
+      - "\uBC29\uC5B4\uB825 +(10 / 20 / 30 / 40)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I81
+    name: "\uC804\uC9C4 \uACA9\uC790"
+    effect: "\uAE30\uBCF8 \uACF5\uACA9 \uC801\uC911 \uC2DC \uC801\uC758 \uACF5\uACA9\uC73C\uB85C
+      \uBC1B\uB294 \uD53C\uD574 \u22125% (1.5\uCD08)\n\uC7AC\uBC1C\uB3D9 \uC2DC \uC9C0\uC18D\uC2DC\uAC04
+      \uAC31\uC2E0"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: e8feb4055aaac3e4e8db32e1eb62e8f3, type: 3}
+    synergies:
+    - id: S03
+      name: "\uCCA0\uBCBD"
+      icon: {fileID: 21300000, guid: 356b4a7791059524a89f4e7f8acbc2cc, type: 3}
+      compactLines:
+      - "\uCD5C\uB300 HP +(8 / 16 / 25 / 34)%"
+      - "\uBC29\uC5B4\uB825 +(10 / 20 / 30 / 40)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I89
+    name: "\uB0B1\uAE08 \uCCB4"
+    effect: "\uC804\uD22C \uBC29 \uD074\uB9AC\uC5B4 \uC2DC \uACE8\uB4DC +8"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: ae312fa2a5a9e4541b1a93b7856bdc08, type: 3}
+    synergies:
+    - id: S19
+      name: "\uC218\uD655"
+      icon: {fileID: 21300000, guid: 84ef614b15c1b134c93a6e74e5980a5d, type: 3}
+      compactLines:
+      - "\uACE8\uB4DC \uD68D\uB4DD\uB7C9 +(5 / 10 / 20)%"
+      thresholds: 010000000200000003000000
+  - id: I91
+    name: "\uC774\uC911 \uC7A5\uBD80"
+    effect: "\uACE8\uB4DC \uD68D\uB4DD\uB7C9 +5%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: aaeacadb600ec904da2de469dcc26220, type: 3}
+    synergies:
+    - id: S19
+      name: "\uC218\uD655"
+      icon: {fileID: 21300000, guid: 84ef614b15c1b134c93a6e74e5980a5d, type: 3}
+      compactLines:
+      - "\uACE8\uB4DC \uD68D\uB4DD\uB7C9 +(5 / 10 / 20)%"
+      thresholds: 010000000200000003000000
+  - id: I92
+    name: "\uC2ED\uAE08 \uBD84\uB3D9"
+    effect: "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0
+      \uD53C\uD574 +7%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: c5552eefb277c054598ccf865f4a670e, type: 3}
+    synergies:
+    - id: S15
+      name: "\uAC70\uBB3C\uC0AC\uB0E5"
+      icon: {fileID: 21300000, guid: ea13f41cbb31a694f917a34c7bf61f48, type: 3}
+      compactLines:
+      - "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574
+        +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I95
+    name: "\uC410\uAE30 \uC6B8\uB9BC\uC1E0"
+    effect: "\uAE30\uBCF8 \uACF5\uACA9 \uD53C\uD574 +7%"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: fcddeacf76e190242a5c95aa9c232247, type: 3}
+    synergies:
+    - id: S02
+      name: "\uB9F9\uACF5"
+      icon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+      compactLines:
+      - "\uACF5\uACA9\uB825 +(5 / 10 / 18 / 26)%"
+      - "\uAE30\uBCF8 \uACF5\uACA9 \uC18D\uB3C4 +(4 / 8 / 15 / 22)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I101
+    name: "\uC30D\uB0A0 \uCE68"
+    effect: "\uC2A4\uD0AC \uCE58\uBA85\uD0C0 \uD655\uB960 +4%p"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 34860a6c07089714fbcf82adabc4ac27, type: 3}
+    synergies:
+    - id: S01
+      name: "\uCE58\uBA85"
+      icon: {fileID: 21300000, guid: 304cfc208f00d3a4295c6e20f5e9861a, type: 3}
+      compactLines:
+      - "\uCE58\uBA85\uD0C0 \uD655\uB960 +(5 / 10 / 15 / 20)%p"
+      - "\uCE58\uBA85\uD0C0 \uD53C\uD574 +(10 / 20 / 35 / 50)%p"
+      thresholds: 02000000040000000600000008000000
+  - id: I102
+    name: "\uB099\uB8B0 \uACE0\uB9AC"
+    effect: "\uCE58\uBA85\uD0C0 \uD53C\uD574 +15%p"
+    grade: 4
+    color: {r: 0.54509807, g: 0.8862745, b: 0.85490197, a: 1}
+    icon: {fileID: 21300000, guid: 31eb3972ced674b4f995f407681488b7, type: 3}
+    synergies:
+    - id: S01
+      name: "\uCE58\uBA85"
+      icon: {fileID: 21300000, guid: 304cfc208f00d3a4295c6e20f5e9861a, type: 3}
+      compactLines:
+      - "\uCE58\uBA85\uD0C0 \uD655\uB960 +(5 / 10 / 15 / 20)%p"
+      - "\uCE58\uBA85\uD0C0 \uD53C\uD574 +(10 / 20 / 35 / 50)%p"
+      thresholds: 02000000040000000600000008000000
+  - id: I103
+    name: "\uC0BC\uB048 \uB9E4\uB4ED"
+    effect: "\uACF5\uACA9\uB825 +3%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 0453645662d2bb8469211ca155460009, type: 3}
+    synergies:
+    - id: S02
+      name: "\uB9F9\uACF5"
+      icon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+      compactLines:
+      - "\uACF5\uACA9\uB825 +(5 / 10 / 18 / 26)%"
+      - "\uAE30\uBCF8 \uACF5\uACA9 \uC18D\uB3C4 +(4 / 8 / 15 / 22)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I104
+    name: "\uB3CC\uACA9 \uB0A0\uBD99\uC774"
+    effect: "\uAE30\uBCF8 \uACF5\uACA9 \uC18D\uB3C4 +4%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 8ff319b3912b0614295438d51b0ec9e0, type: 3}
+    synergies:
+    - id: S02
+      name: "\uB9F9\uACF5"
+      icon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
+      compactLines:
+      - "\uACF5\uACA9\uB825 +(5 / 10 / 18 / 26)%"
+      - "\uAE30\uBCF8 \uACF5\uACA9 \uC18D\uB3C4 +(4 / 8 / 15 / 22)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I105
+    name: "\uC11D\uBB38 \uD328\uD3B8"
+    effect: "\uBC29\uC5B4\uB825 +5%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 46e466385b3c3124b94d6b3aa3b67d3f, type: 3}
+    synergies:
+    - id: S03
+      name: "\uCCA0\uBCBD"
+      icon: {fileID: 21300000, guid: 356b4a7791059524a89f4e7f8acbc2cc, type: 3}
+      compactLines:
+      - "\uCD5C\uB300 HP +(8 / 16 / 25 / 34)%"
+      - "\uBC29\uC5B4\uB825 +(10 / 20 / 30 / 40)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I106
+    name: "\uACB9\uBE44\uB298 \uCCA0\uD3B8"
+    effect: "\uCD5C\uB300 HP +4% \xB7 \uBC29\uC5B4\uB825 +4%"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: 311be170899bc3d4c934445fbd13f7a5, type: 3}
+    synergies:
+    - id: S03
+      name: "\uCCA0\uBCBD"
+      icon: {fileID: 21300000, guid: 356b4a7791059524a89f4e7f8acbc2cc, type: 3}
+      compactLines:
+      - "\uCD5C\uB300 HP +(8 / 16 / 25 / 34)%"
+      - "\uBC29\uC5B4\uB825 +(10 / 20 / 30 / 40)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I107
+    name: "\uBB3C\uC548\uAC1C \uB9E4\uB4ED"
+    effect: "\uC218 \uC18D\uC131 \uAE30\uBCF8 \uACF5\uACA9\xB7\uC2A4\uD0AC \uD53C\uD574
+      +6%"
+    grade: 4
+    color: {r: 0.54509807, g: 0.8862745, b: 0.85490197, a: 1}
+    icon: {fileID: 21300000, guid: 7378a527dbe7d6c4b9038aa7f5aaea8d, type: 3}
+    synergies:
+    - id: S04
+      name: "\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0"
+      icon: {fileID: 21300000, guid: f8d9839b28f4fc64b9c4f55629b3072e, type: 3}
+      compactLines:
+      - "\uC218 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I108
+    name: "\uAD7D\uC774\uBB3C \uBCD1"
+    effect: "HP 80% \uC774\uC0C1\uC778 \uC801\uC5D0\uAC8C \uC218 \uC18D\uC131 \uD53C\uD574
+      +11%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: e9c6a7c296782f14589d70e2b31d2c34, type: 3}
+    synergies:
+    - id: S04
+      name: "\uC1C4\uB3C4\uD558\uB294 \uBB3C\uACB0"
+      icon: {fileID: 21300000, guid: f8d9839b28f4fc64b9c4f55629b3072e, type: 3}
+      compactLines:
+      - "\uC218 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I109
+    name: "\uC794\uBD88 \uACE0\uB9AC"
+    effect: "\uD654 \uC18D\uC131 \uD53C\uD574 +5%"
+    grade: 4
+    color: {r: 0.54509807, g: 0.8862745, b: 0.85490197, a: 1}
+    icon: {fileID: 21300000, guid: 2d9c83ec761275446a81fe9f646e1c86, type: 3}
+    synergies:
+    - id: S05
+      name: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+      icon: {fileID: 21300000, guid: 6b4f687bf95b86c4e93ee4be174e5361, type: 3}
+      compactLines:
+      - "\uD654 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I110
+    name: "\uD64D\uC5FC \uBD09\uC778"
+    effect: "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uD654 \uC18D\uC131 \uD53C\uD574
+      +11%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 3c96856e64b28394d861d8d3c2406bce, type: 3}
+    synergies:
+    - id: S05
+      name: "\uD0C0\uC624\uB974\uB294 \uBD88\uC528"
+      icon: {fileID: 21300000, guid: 6b4f687bf95b86c4e93ee4be174e5361, type: 3}
+      compactLines:
+      - "\uD654 \uC18D\uC131 \uD53C\uD574 +(5 / 10 / 15 / 20)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I111
+    name: "\uC751\uAE09 \uD638\uD328"
+    effect: "\uD53C\uACA9\uC73C\uB85C HP\uB97C \uC783\uC73C\uBA74 \uCD5C\uB300 HP\uC758
+      4%\uB9CC\uD07C \uBCF4\uD638\uB9C9 (4\uCD08)\n\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04
+      12\uCD08"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 1ffbbd149d277cf44805b1f1aef14200, type: 3}
+    synergies:
+    - id: S08
+      name: "\uC218\uD638"
+      icon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
+      compactLines:
+      - "HP \uC190\uC2E4 \uC2DC 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 (3 / 4 / 5 /
+        6)% \uBCF4\uD638\uB9C9, \uCFE8\uD0C0\uC784 10\uCD08"
+      thresholds: 02000000040000000600000008000000
+  - id: I112
+    name: "\uD68C\uCCAD \uACB0\uACC4\uCD94"
+    effect: "\uBCF4\uD638\uB9C9 \uD68D\uB4DD\uB7C9 +14%"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: 7c18063f35fc5484abea63f6a5e5a979, type: 3}
+    synergies:
+    - id: S08
+      name: "\uC218\uD638"
+      icon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
+      compactLines:
+      - "HP \uC190\uC2E4 \uC2DC 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 (3 / 4 / 5 /
+        6)% \uBCF4\uD638\uB9C9, \uCFE8\uD0C0\uC784 10\uCD08"
+      thresholds: 02000000040000000600000008000000
+  - id: I113
+    name: "\uD30C\uB2E8 \uC1A1\uACF3"
+    effect: "HP 25% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9
+      \uD53C\uD574 +10%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 617cb4dc29d412048876389595c05844, type: 3}
+    synergies:
+    - id: S10
+      name: "\uB9C8\uBB34\uB9AC"
+      icon: {fileID: 21300000, guid: e242e1bfa4075de44b865b526f506c52, type: 3}
+      compactLines:
+      - "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I114
+    name: "\uC885\uACB0 \uC778\uC7A5"
+    effect: "HP 20% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9\xB7\uC2A4\uD0AC
+      \uD53C\uD574 +11%"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: 3a0d8e87ee701304b9146f3e024ab6e8, type: 3}
+    synergies:
+    - id: S10
+      name: "\uB9C8\uBB34\uB9AC"
+      icon: {fileID: 21300000, guid: e242e1bfa4075de44b865b526f506c52, type: 3}
+      compactLines:
+      - "HP 30% \uC774\uD558\uC778 \uC801\uC5D0\uAC8C \uAE30\uBCF8 \uACF5\uACA9\xB7\uC2A4\uD0AC
+        \uD53C\uD574 +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I115
+    name: "\uC591\uB0A0 \uC7A5\uC2DD"
+    effect: "\uC801 \uBC29\uC5B4\uB825 3% \uAD00\uD1B5"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 631b5ec62827ef74989cec947a63be70, type: 3}
+    synergies:
+    - id: S14
+      name: "\uAD00\uD1B5"
+      icon: {fileID: 21300000, guid: 9fac5d8b6848b5a4483ff48eb719037a, type: 3}
+      compactLines:
+      - "\uC801 \uBC29\uC5B4\uB825 (6 / 9 / 12 / 15)% \uAD00\uD1B5"
+      thresholds: 02000000040000000600000008000000
+  - id: I116
+    name: "\uACB0\uC808 \uD30C\uC1C4\uD3B8"
+    effect: "\uC801 \uBC29\uC5B4\uB825 12% \uAD00\uD1B5"
+    grade: 4
+    color: {r: 0.54509807, g: 0.8862745, b: 0.85490197, a: 1}
+    icon: {fileID: 21300000, guid: db6bdd5f3161d2240b439bcb5226b4f7, type: 3}
+    synergies:
+    - id: S14
+      name: "\uAD00\uD1B5"
+      icon: {fileID: 21300000, guid: 9fac5d8b6848b5a4483ff48eb719037a, type: 3}
+      compactLines:
+      - "\uC801 \uBC29\uC5B4\uB825 (6 / 9 / 12 / 15)% \uAD00\uD1B5"
+      thresholds: 02000000040000000600000008000000
+  - id: I117
+    name: "\uCD94\uC801 \uD45C\uC2DD"
+    effect: "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0
+      \uD53C\uD574 +10%"
+    grade: 3
+    color: {r: 0.9843137, g: 0.8117647, b: 0.40392157, a: 1}
+    icon: {fileID: 21300000, guid: 76ae5f4001ce3ee469d142d58396b845, type: 3}
+    synergies:
+    - id: S15
+      name: "\uAC70\uBB3C\uC0AC\uB0E5"
+      icon: {fileID: 21300000, guid: ea13f41cbb31a694f917a34c7bf61f48, type: 3}
+      compactLines:
+      - "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574
+        +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I118
+    name: "\uB9F9\uC218 \uC5C4\uB2C8\uD2C0"
+    effect: "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0
+      \uD53C\uD574 +15%"
+    grade: 4
+    color: {r: 0.54509807, g: 0.8862745, b: 0.85490197, a: 1}
+    icon: {fileID: 21300000, guid: 98156901ac9658e45ba36ca2fdb1df23, type: 3}
+    synergies:
+    - id: S15
+      name: "\uAC70\uBB3C\uC0AC\uB0E5"
+      icon: {fileID: 21300000, guid: ea13f41cbb31a694f917a34c7bf61f48, type: 3}
+      compactLines:
+      - "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574
+        +(4 / 6 / 8 / 10)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I119
+    name: "\uC5F0\uC2B5 \uC7A5\uCE58"
+    effect: "\uC2A4\uD0AC \uD53C\uD574 +3%"
+    grade: 1
+    color: {r: 0.85490197, g: 0.5921569, b: 0.4117647, a: 1}
+    icon: {fileID: 21300000, guid: 3bb2b382c17e7e545b69a877463c1d66, type: 3}
+    synergies:
+    - id: S16
+      name: "\uC219\uB828"
+      icon: {fileID: 21300000, guid: 576f373fee8b00f4287fdcb49863d6c9, type: 3}
+      compactLines:
+      - "\uC2A4\uD0AC \uD53C\uD574 +(4 / 8 / 12 / 16)%"
+      - "\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \u2212(3 / 6 / 9 / 12)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I120
+    name: "\uC751\uC218 \uD2C0"
+    effect: "\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \u22125%"
+    grade: 2
+    color: {r: 0.7764706, g: 0.827451, b: 0.8862745, a: 1}
+    icon: {fileID: 21300000, guid: 31c5e9211fa01df44a4becc8152b82cc, type: 3}
+    synergies:
+    - id: S16
+      name: "\uC219\uB828"
+      icon: {fileID: 21300000, guid: 576f373fee8b00f4287fdcb49863d6c9, type: 3}
+      compactLines:
+      - "\uC2A4\uD0AC \uD53C\uD574 +(4 / 8 / 12 / 16)%"
+      - "\uC2A4\uD0AC \uCFE8\uD0C0\uC784 \u2212(3 / 6 / 9 / 12)%"
+      thresholds: 02000000040000000600000008000000
+  - id: I122
+    name: "\uC218\uAE08 \uACC4\uC218\uAE30"
+    effect: "\uACE8\uB4DC \uD68D\uB4DD\uB7C9 +15%"
+    grade: 3
+    color: {r: 0.54509807, g: 0.8862745, b: 0.85490197, a: 1}
+    icon: {fileID: 21300000, guid: 4c71275c315a5524b8111faf5fc6dad5, type: 3}
+    synergies:
+    - id: S19
+      name: "\uC218\uD655"
+      icon: {fileID: 21300000, guid: 84ef614b15c1b134c93a6e74e5980a5d, type: 3}
+      compactLines:
+      - "\uACE8\uB4DC \uD68D\uB4DD\uB7C9 +(5 / 10 / 20)%"
+      thresholds: 010000000200000003000000
+  currencyIcon: {fileID: 21300000, guid: 9260afde0435b3949a83376dd1130191, type: 3}
+  frameSprite: {fileID: 21300000, guid: 356a259e269545c4fb0f2e5b29310017, type: 3}
+  backdrop: {fileID: 21300000, guid: cc7909533a443804a92e98ccbd5d90fa, type: 3}
+  font: {fileID: 11400000, guid: e08dba2d3c1f4ba42ba5d3d3184116a4, type: 2}
+  price: 100
+  drawDuration: 4.2

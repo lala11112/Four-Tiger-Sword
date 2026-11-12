@@ -139,9 +139,7 @@ public static class FormChainRegression
 
             int events = 0;
             forms.OnFormSwitchSucceeded += (_, __) => events++;
-            float sp = stats.CurrentSp;
             Check(forms.TrySwitchForm(fire), "Plain switch accepts authored form.");
-            Near(stats.CurrentSp, sp - player.SwitchSpCost, "Plain switch retains SP cost.");
             Check(machine.CurrentState is PlayerIdleState && fire.Starts == 0 && !player.HasPendingSwitchAttack,
                 "Plain switch does not attack or reserve an attack.");
             Near(forms.GetChainReadyRemaining(fire.Element), 5, "Plain switch does not spend chain token.");
@@ -149,13 +147,11 @@ public static class FormChainRegression
             Check(!forms.TrySwitchForm(water, FormManager.SwitchReason.Parry), "Old numeric parry path is disabled.");
 
             forms.ChangeForm(wood);
-            stats.TryConsumeSp(stats.CurrentSp);
             float cooldown = (float)GetField(player, "_formChangeCooldownTimer");
             machine.ChangeState(new OutgoingState(fire));
             machine.ChangeState(new PlayerSwitchAttackState(player));
             Check(forms.CurrentForm == fire && fire.Starts == 1 && fire.SawExit,
                 "F commits after outgoing Exit and starts only the new form.");
-            Near(stats.CurrentSp, 0, "F succeeds with zero SP and spends none.");
             Near((float)GetField(player, "_formChangeCooldownTimer"), cooldown, "F leaves shared cooldown unchanged.");
             Near(forms.GetChainReadyRemaining(fire.Element), 0, "Successful F consumes one ready token.");
             Check(events == 2, "F emits exactly one switch success.");
@@ -211,9 +207,7 @@ public static class FormChainRegression
         machine.ChangeState(idle);
         stats.Initialize(statsData);
         Field(player, "_formChangeCooldownTimer", 0f);
-        float sp = stats.CurrentSp;
-        Check(player.CanChangeForm && stats.HasEnoughSp(player.SwitchSpCost),
-            "The test player has enough SP and no switch cooldown.");
+        Check(player.CanChangeForm, "The test player has no switch cooldown.");
         int changes = 0, switches = 0;
         forms.OnFormChanged += _ => changes++;
         forms.OnFormSwitchSucceeded += (_, __) => switches++;
@@ -253,7 +247,6 @@ public static class FormChainRegression
         machine.ChangeState(idle);
         Check(changes == 0 && switches == 0 && player.CanChangeForm,
             "Denied switches emit no events and never start the switch cooldown.");
-        Near(stats.CurrentSp, sp, "Denied switches spend no SP.");
 
         forms.ChangeForm(water);
         Check(forms.CurrentForm == water && !forms.IsElementAvailable(water.Element),

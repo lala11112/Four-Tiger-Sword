@@ -1,4 +1,5 @@
 using StudioBaekho;
+using Penta.BossUI;
 using UnityEngine;
 
 /// <summary>Displays the current generated stage's boss after entering its active encounter.</summary>
@@ -10,6 +11,7 @@ public sealed class BossHealthHud : MonoBehaviour
     [SerializeField] private UnityEngine.UI.Image fill;
     [SerializeField] private UnityEngine.UI.Image trail;
     [SerializeField] private TMPro.TMP_Text bossName;
+    [SerializeField] private BossGroggyHPIntegration groggy;
     [SerializeField] private float lerpSpeed = 8f;
     [SerializeField, Min(0f)] private float trailDelay = .35f;
     [SerializeField, Min(.01f)] private float trailSpeed = .6f;
@@ -21,6 +23,7 @@ public sealed class BossHealthHud : MonoBehaviour
     private Enemy _enemy;
     private Boss _boss;
     private EnemyStat _stats;
+    private PoiseHandler _poise;
     private float _currentHp = float.NaN;
     private float _maxHp = float.NaN;
     private float _targetFill;
@@ -55,6 +58,13 @@ public sealed class BossHealthHud : MonoBehaviour
         if (bossName != null && bossName != targetName) bossName.text = string.Empty;
         bossName = targetName;
         RefreshName();
+    }
+
+    public void ConfigureGroggy(BossGroggyHPIntegration targetGroggy)
+    {
+        ClearGroggy();
+        groggy = targetGroggy;
+        RefreshGroggy();
     }
 
     public void Bind(RunManager targetRun)
@@ -200,6 +210,7 @@ public sealed class BossHealthHud : MonoBehaviour
         _enemy = _member != null ? _member.Enemy : null;
         if (_enemy == null) return;
         _stats = _enemy.GetComponent<EnemyStat>();
+        _poise = _enemy.GetComponent<PoiseHandler>();
         _boss = _enemy as Boss;
         _enemy.OnDied += OnBossDied;
         if (_boss != null) _boss.OnPhaseDepleted += OnPhaseDepleted;
@@ -231,6 +242,32 @@ public sealed class BossHealthHud : MonoBehaviour
         // Do not leave the old phase's delayed damage trail behind during the down animation.
         SetMeterImmediate(0f);
         _showingTransition = true;
+        if (groggy != null) groggy.SetRemaining(0f);
+    }
+
+    private void RefreshGroggy()
+    {
+        if (groggy == null) return;
+        float remaining = _poise != null ? _poise.PoiseRatio : float.NaN;
+        if (!IsVisible || _enemy == null || _poise == null || !IsFinitePositive(_poise.MaxPoise)
+            || !IsFiniteNonnegative(remaining))
+        {
+            ClearGroggy();
+            return;
+        }
+
+        // Poise's break timer can end before the enemy's actual groggy animation/state.
+        if (_enemy.PendingGroggy || _enemy.IsGroggy || (_boss != null && _boss.IsTransitioning))
+            remaining = 0f;
+        groggy.SetRemaining(Mathf.Clamp01(remaining));
+        groggy.gameObject.SetActive(true);
+    }
+
+    private void ClearGroggy()
+    {
+        if (groggy == null) return;
+        groggy.SetRemaining(0f);
+        groggy.gameObject.SetActive(false);
     }
 
     private void SetMeterImmediate(float amount)
@@ -255,6 +292,8 @@ public sealed class BossHealthHud : MonoBehaviour
         _enemy = null;
         _boss = null;
         _stats = null;
+        _poise = null;
+        ClearGroggy();
         if (bossName != null) bossName.text = string.Empty;
         _showingTransition = false;
         _currentHp = _maxHp = float.NaN;
@@ -274,6 +313,7 @@ public sealed class BossHealthHud : MonoBehaviour
     private void SetVisible(bool value)
     {
         IsVisible = value && visibility != null;
+        RefreshGroggy();
         if (visibility == null) return;
         visibility.alpha = IsVisible ? 1f : 0f;
         visibility.interactable = false;

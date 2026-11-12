@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using BoundaryZero.Inventory;
 
@@ -45,15 +46,73 @@ public static class ItemDisplayText
         => item == null ? string.Empty : Meta(item.grade, item.primarySynergyName);
 
     public static string Meta(int grade, string primarySynergyName)
-        => string.IsNullOrWhiteSpace(primarySynergyName) ? $"{grade}등급" : $"{grade}등급 · {primarySynergyName}";
+        => string.IsNullOrWhiteSpace(primarySynergyName) ? Stars(grade) : $"{Stars(grade)} · {primarySynergyName}";
+
+    public static string Stars(int grade) => ItemPresentationText.Stars(grade);
+
+    public static string Effect(ItemDefinition item) => item == null ? string.Empty : LiteralEffect(item.effectText);
+
+    public static string SynergyMembership(ItemDefinition item, ItemCatalog catalog)
+    {
+        if (item == null) return string.Empty;
+        var names = MatchingSets(item, catalog).Select(s => s.displayName).ToArray();
+        if (names.Length == 0) names = item.synergyNames?.Length > 0 ? item.synergyNames : new[] { item.primarySynergyName };
+        return LiteralEffect(string.Join(" · ", names.Where(n => !string.IsNullOrWhiteSpace(n)).Distinct()));
+    }
+
+    public static string SynergyDescription(ItemDefinition item, ItemCatalog catalog)
+        => SynergyDescription(item, catalog, null, false);
+
+    public static string SynergyDescription(ItemDefinition item, ItemCatalog catalog, IEnumerable<ItemSynergyState> ownedStates)
+        => SynergyDescription(item, catalog, ownedStates, true);
+
+    private static string SynergyDescription(ItemDefinition item, ItemCatalog catalog,
+        IEnumerable<ItemSynergyState> ownedStates, bool showActivation)
+    {
+        if (item == null) return string.Empty;
+        var states = (ownedStates ?? Array.Empty<ItemSynergyState>()).ToArray();
+        var blocks = MatchingSets(item, catalog).Select(set =>
+        {
+            var tiers = (set.tiers ?? Array.Empty<ItemSynergyTier>()).Where(t => t != null)
+                .Select(t => new SynergyTier { count = t.count, text = t.text }).ToArray();
+            if (showActivation)
+            {
+                var state = states.FirstOrDefault(s => s.Definition != null && s.Definition.id == set.id);
+                bool active = tiers.Any(t => t.count > 0 && t.count <= state.OwnedCount);
+                return "<b>" + ItemPresentationText.StateText(set.displayName, active) + "</b>\n"
+                    + SynergyEffectDescription(set, state.OwnedCount);
+            }
+            return "<color=#F4B976><b>" + LiteralEffect(set.displayName) + "</b></color>\n"
+                + "<size=85%><color=#BCCEE0>" + ItemPresentationText.TierCounts(tiers) + "</color></size>\n"
+                + LiteralEffect(ItemPresentationText.CompactSynergy(tiers));
+        }).ToArray();
+        return blocks.Length > 0 ? string.Join("\n\n", blocks) : SynergyMembership(item, catalog);
+    }
+
+    public static string SynergyEffectDescription(ItemSynergyDefinition set, int ownedCount)
+    {
+        if (set == null) return string.Empty;
+        var tiers = (set.tiers ?? Array.Empty<ItemSynergyTier>()).Where(t => t != null)
+            .Select(t => new SynergyTier { count = t.count, text = t.text }).ToArray();
+        return "<size=85%>" + ItemPresentationText.TierCounts(tiers, ownedCount) + "</size>\n"
+            + ItemPresentationText.CompactSynergy(tiers, ownedCount);
+    }
+
+    private static IEnumerable<ItemSynergyDefinition> MatchingSets(ItemDefinition item, ItemCatalog catalog)
+        => (catalog?.synergies ?? Array.Empty<ItemSynergyDefinition>())
+            .Where(set => set?.members != null && Array.IndexOf(set.members, item.itemId) >= 0);
 
     public static string Description(ItemDefinition item, ItemCatalog catalog = null)
         => Describe(item, catalog, false);
 
+    public static string Description(ItemDefinition item, ItemCatalog catalog, IEnumerable<ItemSynergyState> ownedStates)
+        => Describe(item, catalog, false, ownedStates, true);
+
     internal static string RewardDescription(ItemDefinition item, ItemCatalog catalog)
         => Describe(item, catalog, true);
 
-    private static string Describe(ItemDefinition item, ItemCatalog catalog, bool reward)
+    private static string Describe(ItemDefinition item, ItemCatalog catalog, bool reward,
+        IEnumerable<ItemSynergyState> ownedStates = null, bool showActivation = false)
     {
         if (item == null) return string.Empty;
         var text = new StringBuilder();
@@ -65,31 +124,11 @@ public static class ItemDisplayText
             text.Append(LiteralEffect(item.effectText).TrimEnd());
         }
 
-        bool hasSynergy = false;
-        foreach (var set in catalog?.synergies ?? Array.Empty<ItemSynergyDefinition>())
-        {
-            if (set?.members == null || Array.IndexOf(set.members, item.itemId) < 0) continue;
-            if (!hasSynergy)
-            {
-                AppendSynergyHeading(text, reward);
-                hasSynergy = true;
-            }
-            else text.Append('\n');
-            text.Append(reward ? "<color=#F4B976><b>" : "<b>")
-                .Append(LiteralEffect(set.displayName)).Append(reward ? "</b></color>\n" : "</b>\n");
-            foreach (var tier in set.tiers ?? Array.Empty<ItemSynergyTier>())
-                if (tier != null)
-                {
-                    if (reward) text.Append("<color=#BCCEE0><b>");
-                    text.Append(tier.count).Append("세트");
-                    if (reward) text.Append("</b></color>");
-                    text.Append(" · ").Append(LiteralEffect(tier.text)).Append('\n');
-                }
-        }
-        if (!hasSynergy && item.synergyNames?.Length > 0)
+        var synergy = showActivation ? SynergyDescription(item, catalog, ownedStates) : SynergyDescription(item, catalog);
+        if (!string.IsNullOrWhiteSpace(synergy))
         {
             AppendSynergyHeading(text, reward);
-            text.Append(LiteralEffect(string.Join(" · ", item.synergyNames)));
+            text.Append(synergy);
         }
         return text.ToString().TrimEnd();
     }
@@ -106,7 +145,7 @@ public static class ItemDisplayText
     }
 
     private static string NormalizeCombatTerms(string text) => text?.Replace("평타 공격속도", "기본 공격 속도")
-        .Replace("평타", "기본 공격");
+        .Replace("평타", "기본 공격").Replace("스킬 재사용 대기시간", "스킬 쿨타임");
 
     internal static string LiteralEffect(string text) => (NormalizeCombatTerms(text) ?? string.Empty)
         .Replace("<", "<noparse><</noparse>");

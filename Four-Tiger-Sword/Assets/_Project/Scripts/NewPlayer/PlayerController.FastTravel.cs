@@ -6,7 +6,7 @@ public partial class PlayerController
     /// <summary>Moves within this stage without resetting resources, cooldowns or world effects.</summary>
     public bool TryFastTravel(Vector3 position, Quaternion rotation)
     {
-        if (!isActiveAndEnabled || IsStageTransitioning || IsShopPaused || IsInventoryPaused || IsFinisherSelecting || IsInRoomCombat
+        if (!isActiveAndEnabled || IsStageTransitioning || IsShopPaused || IsInventoryPaused || IsStatsOpen || IsFinisherSelecting || IsInRoomCombat
             || StatManager == null || StatManager.CurrentHp <= 0f || Controller == null || !Controller.enabled
             || !KnockbackMotion.IsFinite(position.sqrMagnitude) || !KnockbackMotion.IsFinite(rotation.x)
             || !KnockbackMotion.IsFinite(rotation.y) || !KnockbackMotion.IsFinite(rotation.z)
@@ -30,14 +30,23 @@ public partial class PlayerController
             Input.ConsumeFormInput();
         }
 
+        WarpPlayerAndCamera(position, rotation);
+        return true;
+    }
+
+    private void WarpPlayerAndCamera(Vector3 position, Quaternion rotation)
+    {
         var delta = position - transform.position;
-        Controller.enabled = false;
+        var controller = Controller;
+        bool restoreController = controller != null && controller.enabled;
+        if (restoreController) controller.enabled = false;
         try
         {
             transform.SetPositionAndRotation(position, rotation.normalized);
             Physics.SyncTransforms();
         }
-        finally { Controller.enabled = true; }
+        finally { if (restoreController) controller.enabled = true; }
+
         foreach (var camera in FindObjectsByType<CinemachineCamera>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             if (!TracksPlayer(camera)) continue;
@@ -46,6 +55,5 @@ public partial class PlayerController
             camera.PreviousStateIsValid = false;
             if (camera.isActiveAndEnabled) camera.UpdateCameraState(Vector3.up, -1f);
         }
-        return true;
     }
 }

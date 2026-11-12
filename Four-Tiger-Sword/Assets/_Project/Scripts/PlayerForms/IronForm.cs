@@ -3,7 +3,6 @@ using UnityEngine;
 public class IronForm : BaseForm
 {
     public override ElementType Element => ElementType.ELEMENT_GOLD;
-    public override float SkillSpCost => 20f;
     public override float SkillCooldown => 10f;
     protected override bool DealsTrueDamage => _currentAction == ActionType.Ultimate;
     public IronForm(IronFormActionDataSO data) : base(data) { }

@@ -5,7 +5,6 @@ public class FireForm : BaseForm, IToggleUltimateForm
     private readonly FireFormActionDataSO _fireData;
 
     public override ElementType Element => ElementType.ELEMENT_FIRE;
-    public override float SkillSpCost => 20f;
     public override float SkillCooldown => 8f;
     public bool IsUltimateActive { get; private set; }
     public override bool CanUltimate => !IsUltimateActive && _weaponActionData != null && UltimateResourcesReady;

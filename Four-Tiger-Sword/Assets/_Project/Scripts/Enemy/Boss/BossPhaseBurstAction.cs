@@ -23,6 +23,7 @@ public sealed class BossPhaseBurstAction : EnemyAction
         ? Mathf.Max(0f, _data.chargeDuration + _data.activeDuration + _data.recoveryTime - _timer) / _data.attackSpeed : 0f;
     public override bool SupportsBossPolicy => true;
     protected override float BossInitialStartupDuration => _data.chargeDuration;
+    protected override bool StartsAttackWarningOnEnter => false;
 
     public BossPhaseBurstAction(BossPhaseBurstSkillSO data, Enemy enemy) : base(data, enemy)
     {
@@ -60,6 +61,7 @@ public sealed class BossPhaseBurstAction : EnemyAction
         else
         {
             WarningStarted = true;
+            BeginAttackWarning();
             PlayAnimation(0f);
         }
     }
@@ -78,6 +80,7 @@ public sealed class BossPhaseBurstAction : EnemyAction
             if (!_flight.TryBeginWarning()) { CancelFlight(); return; }
             Center = _flight.Center;
             WarningStarted = true;
+            BeginAttackWarning();
             _heldPose = true;
         }
         float previousTime = _timer;
@@ -111,9 +114,11 @@ public sealed class BossPhaseBurstAction : EnemyAction
             {
                 if (_flight != null && !_flight.TryLand()) { CancelFlight(); return; }
                 _burstPlayed = true;
+                EndAttackWarning();
                 _enemy.SetAnimationSpeed(_data.attackSpeed);
                 PlaySwingSound();
                 PlaySound(_data.LandingAudio, Center);
+                PlayBurstCameraShake();
             }
             ExecuteBurst();
             if (_flight != null) _flight.FinishLanding();
@@ -121,6 +126,19 @@ public sealed class BossPhaseBurstAction : EnemyAction
         }
         if (_timer >= activeEnd) SetBossStage(BossAttackStage.Recovery);
         if (_timer >= activeEnd + _data.recoveryTime) IsFinished = true;
+    }
+
+    private void PlayBurstCameraShake()
+    {
+        if (!BossCombatValidation.Positive(_data.burstCameraShakeStrength)) return;
+        var target = ((Boss)_enemy).CombatTarget;
+        if (target == null) return;
+        var player = target.GetComponentInParent<PlayerController>();
+        if (player == null) return;
+        var source = player.ImpulseSource;
+        if (source == null) source = player.GetComponent<Unity.Cinemachine.CinemachineImpulseSource>();
+        if (source == null || !BossCombatValidation.Positive(source.DefaultVelocity.sqrMagnitude)) return;
+        source.GenerateImpulseWithForce(_data.burstCameraShakeStrength);
     }
 
     private void ExecuteBurst()

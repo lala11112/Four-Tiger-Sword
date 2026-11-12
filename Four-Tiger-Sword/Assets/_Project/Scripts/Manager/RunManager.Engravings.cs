@@ -31,7 +31,6 @@ public sealed partial class RunManager
         if (wallet == null || !wallet.IsInitialized || items == null || !items.IsInitialized || items.Catalog == null) return;
         ItemChoices = new RunItemChoiceService(items, wallet, _runEngravings, RunSeed);
         _itemChoiceView = RunItemChoiceView.Ensure(this, ItemChoices);
-        ItemChoices.BeginStarterChoice();
     }
 
     private bool CanPlayItemChoices => isActiveAndEnabled && State == RunState.Playing && _transition == null && !IsUpgradeSaveBlocked

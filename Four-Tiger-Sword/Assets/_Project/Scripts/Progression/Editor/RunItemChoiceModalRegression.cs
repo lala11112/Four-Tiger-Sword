@@ -49,6 +49,17 @@ public static class RunItemChoiceModalRegression
             var wallet = player.GetComponent<PlayerWallet>() ?? player.gameObject.AddComponent<PlayerWallet>(); wallet.Initialize(0);
             var choices = new RunItemChoiceService(items, wallet, EngravingSnapshot.Empty, 781);
             run = Host("Run", root.transform).AddComponent<RunManager>(); run.player = player; run.stageManager = stage;
+            typeof(RunManager).GetField("_engravingsInitialized", Hidden).SetValue(run, true);
+            var engravingSettings = EngravingSettingsSO.Default;
+            typeof(RunManager).GetField("_runEngravings", Hidden).SetValue(run,
+                new EngravingSnapshot(engravingSettings, Array.ConvertAll(engravingSettings.nodes, node => node.id)));
+            Invoke(run, "EnsureRunItemChoices");
+            var initialView = (RunItemChoiceView)typeof(RunManager).GetField("_itemChoiceView", Hidden).GetValue(run);
+            Check(run.ItemChoices != null && !run.HasPendingItemChoice && !run.IsRewardOpen && !initialView.IsOpen,
+                "Starting a run must not enqueue or open an unsolicited item choice, even with every engraving.");
+            Check(items.OwnedItems.Count == 0 && wallet.Gold == 0, "Run initialization must not grant a starter item or replacement gold.");
+            Object.DestroyImmediate(initialView.gameObject);
+            typeof(RunManager).GetField("_itemChoiceView", Hidden).SetValue(run, null);
             Property(run, "State", RunState.Playing); Property(run, "ItemChoices", choices);
             var owner = Host("Owner", generation.transform);
             var camera = Host("Follow camera", root.transform).AddComponent<CinemachineCamera>(); camera.Follow = player.transform;

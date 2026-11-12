@@ -80,7 +80,7 @@ public static class PlayerStageTransitionRegression
             forms.ChangeForm(form);
 
             data = ScriptableObject.CreateInstance<PlayerStatData>();
-            data.baseHP = 250f; data.baseSP = 100f;
+            data.baseHP = 250f;
             player.StatManager.Initialize(data);
             catalog = ScriptableObject.CreateInstance<ItemCatalog>();
             catalog.projectId = "stage-transition-regression";
@@ -92,7 +92,6 @@ public static class PlayerStageTransitionRegression
             runtime.Initialize(player);
             Check(runtime.TryAddItem(item.itemId), "Fixture item ownership.");
             player.StatManager.TakeDamage(20f, ElementType.ELEMENT_NONE, false);
-            player.StatManager.TryConsumeSp(30f);
             player.StatManager.AddUltimateGauge(33f);
             var shield = new object();
             player.StatManager.GrantShield(shield, 40f, 5.5f);
@@ -124,9 +123,7 @@ public static class PlayerStageTransitionRegression
             Check(!player.StatManager.TakeDamage(9999f, ElementType.ELEMENT_NONE, false).Applied, "Direct stat damage is blocked while loading.");
             typeof(PlayerController).GetMethod("Update", Hidden).Invoke(player, null);
             typeof(PlayerStatManager).GetMethod("Update", Hidden).Invoke(player.StatManager, null);
-            player.StatManager.UpdateSpRegen(10f);
             Near(player.StatManager.CurrentHp, 230f, "Health retained");
-            Near(player.StatManager.CurrentSp, 70f, "SP retained");
             Near(player.StatManager.CurrentUltimateGauge, 33f, "Ultimate retained");
             Near(player.StatManager.GetShieldRemaining(shield), 5.5f, "Shield duration frozen");
             Near(Read(player, typeof(PlayerController), "_dashCooldownTimer"), 2f, "Dash cooldown frozen");
@@ -145,7 +142,6 @@ public static class PlayerStageTransitionRegression
             Check(player.StateMachine.CurrentState is PlayerIdleState && !animator.applyRootMotion, "Action resets to idle without root motion.");
             Near(player.VerticalVelocity, 0f, "Old falling velocity cleared");
             Near(player.StatManager.CurrentHp, 230f, "Completing transition does not heal");
-            Near(player.StatManager.CurrentSp, 70f, "Completing transition does not refill SP");
 
             var hudObject = new GameObject("Scene HUD");
             SceneManager.MoveGameObjectToScene(hudObject, scene);

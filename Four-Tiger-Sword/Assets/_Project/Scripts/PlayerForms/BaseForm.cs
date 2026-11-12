@@ -32,19 +32,22 @@ public abstract partial class BaseForm : IForm
     protected long ItemCastId { get; private set; }
     private void BeginItemCast() => ItemCastId = System.Threading.Interlocked.Increment(ref _nextItemCastId);
 
-    // ── SP 비용 & 쿨타임 ─────────────────────────────────────────────────────
-    public virtual float SkillSpCost => 0f;
+    // ── 쿨타임 ───────────────────────────────────────────────────────────────
     public virtual float SkillCooldown => 5f;
 
-    private float _skillCooldownTimer = 0f;
+    // Keep timers in base seconds so ownership changes preserve the progress of an active cooldown.
+    private float _skillCooldownTimer;
     private float _ultimateCooldownTimer;
-    public float SkillCooldownRemaining => _skillCooldownTimer;
-    public float UltimateCooldownRemaining => _ultimateCooldownTimer;
-    public float UltimateCooldownDuration => _weaponActionData != null ? _weaponActionData.UltimateCooldown : 30f;
+    private float SkillCooldownTimeScale => 1f - (_playerController?.ItemRuntime?.SkillCooldownReductionRatio ?? 0f);
+    private float BaseUltimateCooldown => Mathf.Max(0f, _weaponActionData != null ? _weaponActionData.UltimateCooldown : 30f);
+    public float SkillCooldownRemaining => _skillCooldownTimer * SkillCooldownTimeScale;
+    public float SkillCooldownDuration => Mathf.Max(0f, SkillCooldown) * SkillCooldownTimeScale;
+    public float UltimateCooldownRemaining => _ultimateCooldownTimer * SkillCooldownTimeScale;
+    public float UltimateCooldownDuration => BaseUltimateCooldown * SkillCooldownTimeScale;
 
-    /// <summary>스킬 사용 가능 여부: 쿨타임이 끝나고 SP가 충분한지 확인합니다.</summary>
+    /// <summary>스킬 동작 데이터가 유효하고 쿨타임이 끝났는지 확인합니다.</summary>
     public bool CanSkill => HasSteps(_weaponActionData?.SkillSteps)
-        && _skillCooldownTimer <= 0f && _playerController.StatManager.HasEnoughSp(SkillSpCost);
+        && _skillCooldownTimer <= 0f;
 
     public virtual bool CanSwitchAttack
     {
@@ -57,7 +60,7 @@ public abstract partial class BaseForm : IForm
         }
     }
 
-    /// <summary>필살기 사용 가능 여부: 필살기 게이지가 가득 찼는지 확인합니다 (SP/쿨타임 무관).</summary>
+    /// <summary>필살기 게이지가 가득 차고 쿨타임이 끝났는지 확인합니다.</summary>
     public virtual bool CanUltimate => HasSteps(_weaponActionData?.UltimateSteps)
         && UltimateResourcesReady;
     protected bool UltimateResourcesReady => _ultimateCooldownTimer <= 0f
@@ -65,14 +68,17 @@ public abstract partial class BaseForm : IForm
 
     /// <summary>공격 속도 배율. 1.0 = 기본, 2.0 = 2배 빠름. 스탯 시스템에서 읽어옵니다.</summary>
     protected float AttackSpeed => Mathf.Max(0.1f,
-        (_playerController?.StatManager?.GetStat(StatType.ST_ATK_SPD) ?? 1f) * FormSpAttackSpeedMultiplier
+        (_playerController?.StatManager?.GetStat(StatType.ST_ATK_SPD) ?? 1f)
         * (ItemDamageContext.Family(CurrentAttackCategory) == BoundaryAttackFamily.Normal
             ? _playerController?.ItemRuntime?.NormalAttackRateMultiplier ?? 1f : 1f));
+
+    protected float LiveAttackStat => _playerController.StatManager.GetStat(StatType.ST_ATK);
+    // Some authored actions use their fixed timeline instead of ordinary attack-speed buffs.
+    protected float FixedActionSpeed => 1f;
 
     public BaseForm(WeaponActionDataSO weaponActionData)
     {
         _weaponActionData = weaponActionData;
-        _currentFormSp = MaxFormSp;
     }
 
     public virtual void Equip(PlayerController playerController)
@@ -85,15 +91,22 @@ public abstract partial class BaseForm : IForm
 
     public void UpdateCooldowns()
     {
-        if (_skillCooldownTimer > 0f) _skillCooldownTimer -= Time.deltaTime;
-        if (_ultimateCooldownTimer > 0f) _ultimateCooldownTimer -= Time.deltaTime;
+        AdvanceSkillCooldowns(Time.deltaTime);
         UpdateChainBuff(Time.deltaTime);
         OnTick(Time.deltaTime);
     }
 
+    private void AdvanceSkillCooldowns(float deltaTime)
+    {
+        if (_skillCooldownTimer <= 0f && _ultimateCooldownTimer <= 0f) return;
+        float elapsed = deltaTime / SkillCooldownTimeScale;
+        _skillCooldownTimer = Mathf.Max(0f, _skillCooldownTimer - elapsed);
+        _ultimateCooldownTimer = Mathf.Max(0f, _ultimateCooldownTimer - elapsed);
+    }
+
     public void UpdateSkillCooldownUI()
     {
-        PlayerUIManager.Instance?.UpdateSkillCoolTime(_skillCooldownTimer, SkillCooldown);
+        PlayerUIManager.Instance?.UpdateSkillCoolTime(SkillCooldownRemaining, SkillCooldownDuration);
     }
 
     protected virtual void OnTick(float deltaTime) { }

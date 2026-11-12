@@ -18,9 +18,8 @@ MonoBehaviour:
   displayName: "\uC704\uD611 \uD45C\uC2DD\uD310"
   description: "\uAD75\uC740 \uD55C \uC904\uC744 \uC0C8\uAE34 \uB450\uAEBC\uC6B4
     \uD45C\uC2DD\uD310."
-  effectText: "\uC804\uD22C \uC911 \uAC01 \uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C
-    \uD3C9\uD0C0\uB098 \uC2A4\uD0AC\uB85C \uCC98\uC74C \uAC00\uD55C \uD53C\uD574\uAC00
-    18% \uC99D\uAC00\uD55C\uB2E4."
+  effectText: "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0
+    \uD53C\uD574 +4%"
   synergyIds:
   - S15
   synergyNames:
@@ -35,16 +34,16 @@ MonoBehaviour:
   boundaryEffects:
   - effectId: I66
     stat: 6
-    amount: 0.18
+    amount: 0.04
     trigger: 0
-    family: 3
+    family: 0
     element: 0
     eliteOrBossOnly: 1
     targetHpMin: -1
     targetHpMax: -1
     selfHpMin: -1
     selfHpMax: -1
-    firstTargetHit: 1
+    firstTargetHit: 0
     firstSkillHit: 0
     firstIncomingAttack: 0
     firstRewardKill: 0
@@ -56,10 +55,7 @@ MonoBehaviour:
     cooldownSeconds: 0
   icon: {fileID: 21300000, guid: 17184c52158da2249986d575a0d0c6ca, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I66\",\"name\":\"\uC704\uD611 \uD45C\uC2DD\uD310\",\"description\":\"\uAD75\uC740
-    \uD55C \uC904\uC744 \uC0C8\uAE34 \uB450\uAEBC\uC6B4 \uD45C\uC2DD\uD310.\",\"effect\":\"\uC804\uD22C
-    \uC911 \uAC01 \uC815\uC608\xB7\uBCF4\uC2A4\uC5D0\uAC8C \uD3C9\uD0C0\uB098 \uC2A4\uD0AC\uB85C
-    \uCC98\uC74C \uAC00\uD55C \uD53C\uD574\uAC00 18% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S15\"],\"primarySynergy\":\"S15\",\"designIntent\":\"\uC704\uD611\uB3C4\uAC00
-    \uB192\uC740 \uC801\uC5D0\uAC8C \uBA3C\uC800 \uAC15\uD55C \uD53C\uD574\uB97C
-    \uC900\uB2E4.\",\"origin\":\"new\",\"image\":\"Art/Items/I66.png\"}"
+    \uD55C \uC904\uC744 \uC0C8\uAE34 \uB450\uAEBC\uC6B4 \uD45C\uC2DD\uD310.\",\"effect\":\"\uC815\uC608
+    \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574 +4%\",\"synergies\":[\"S15\"],\"primarySynergy\":\"S15\",\"origin\":\"new\",\"image\":\"Art/Items/I66.png\",\"grade\":1}"

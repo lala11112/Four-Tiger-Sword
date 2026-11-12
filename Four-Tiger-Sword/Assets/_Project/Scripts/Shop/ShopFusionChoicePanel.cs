@@ -16,7 +16,7 @@ public sealed class ShopFusionChoicePanel : MonoBehaviour
     {
         public RectTransform Root;
         public UnityEngine.UI.Image Icon;
-        public TMP_Text Title, Description;
+        public TMP_Text Title, Grade, Description;
         public UnityEngine.UI.ScrollRect Scroll;
         public string Id;
     }
@@ -53,7 +53,10 @@ public sealed class ShopFusionChoicePanel : MonoBehaviour
             var position = card.Root.anchoredPosition;
             position.x = (_window.rect.width - (count * 500 - 20)) * .5f + i * 500;
             card.Root.anchoredPosition = position;
-            card.Title.text = item.Name + "\n" + ItemDisplayText.Meta(item.Grade, item.PrimarySynergyName);
+            card.Title.text = item.Name;
+            card.Grade.text = ItemDisplayText.Stars(item.Grade);
+            var rarity = ItemRarityFrame.ColorFor(item.Grade);
+            card.Grade.color = rarity.a > 0f ? rarity : card.Title.color;
             ItemRarityFrame.Show(card.Root, item.Grade);
             card.Icon.sprite = item.Icon; card.Icon.enabled = item.Icon != null;
             card.Description.text = item.Description ?? string.Empty;
@@ -69,9 +72,13 @@ public sealed class ShopFusionChoicePanel : MonoBehaviour
         var icon = Rect("OriginalItemIcon", card.Root, 20, 16, 108, 108);
         card.Icon = icon.gameObject.AddComponent<UnityEngine.UI.Image>();
         card.Icon.preserveAspect = true; card.Icon.raycastTarget = false;
-        card.Title = Label("Title", card.Root, string.Empty, 144, 20, 316, 104, 28);
+        card.Title = Label("Title", card.Root, string.Empty, 144, 20, 316, 66, 29);
         card.Title.richText = false;
+        card.Title.fontStyle = FontStyles.Bold;
         card.Title.alignment = TextAlignmentOptions.MidlineLeft;
+        card.Grade = Label("Grade", card.Root, string.Empty, 144, 88, 316, 34, 26);
+        card.Grade.fontStyle = FontStyles.Bold;
+        card.Grade.alignment = TextAlignmentOptions.MidlineLeft;
         var scroll = Rect("DescriptionScroll", card.Root, 20, 144, 440, 452);
         card.Scroll = scroll.gameObject.AddComponent<UnityEngine.UI.ScrollRect>();
         var viewport = Rect("Viewport", scroll, 0, 0, 440, 452);

@@ -69,7 +69,7 @@ public static class StagePresentationPlayModeRegression
 
             RegenerateCurrent(run, chapter, stage);
             await WaitForIntro(run);
-            status = "RUNNING: observing animated Idle during the locked 1.8-second stage intro.";
+            status = "RUNNING: observing the fade from black and animated Idle during the locked stage intro.";
             double began = Time.realtimeSinceStartupAsDouble;
             float lastIdle = await ObserveIntro(run, () => starts == 0);
             Check(Time.realtimeSinceStartupAsDouble - began >= 1.6d, "The intro completed before its authored duration.");
@@ -82,7 +82,8 @@ public static class StagePresentationPlayModeRegression
             Covered(run);
             Invoke(run, "ShowError", "Expected stage-introduction cancellation regression.");
             Check(run.State == RunState.Error && !run.resultUI.IsStageIntroPlaying
-                && Field<Coroutine>(run, "_transition") == null && Time.timeScale > .99f,
+                && Field<Coroutine>(run, "_transition") == null && Time.timeScale > .99f
+                && WorldCoverCleared(run.resultUI),
                 "Cancelling to Error retained the stage coroutine, black screen or world pause.");
             Check(!run.player.IsStageIdleReady && !animator.enabled && animator.updateMode == originalMode
                 && animator.cullingMode == originalCulling && run.player.IsStageTransitioning && !run.player.Input.enabled,
@@ -100,7 +101,7 @@ public static class StagePresentationPlayModeRegression
                 "Regeneration or presentation changed retained gold/items.");
             Check(store.Writes == 0 && !run.HasPendingUpgradeRewards,
                 "The presentation harness unexpectedly granted or persisted progression rewards.");
-            status = $"PASSED: {checks} checks; Idle prepared under loading and animated with world time paused; "
+            status = $"PASSED: {checks} checks; the world faded in from black and Idle animated with world time paused; "
                 + "two stage starts, one cancelled intro, gameplay and animator settings restored, no save writes.";
         }
         catch (Exception error)
@@ -145,22 +146,34 @@ public static class StagePresentationPlayModeRegression
             "The regenerated stage did not enter its intro: " + (run != null ? run.LastError : "run destroyed"));
         Check(readyUnderLoading && RevealIdleTime(run.player) > 0f,
             "The first stage reveal frame did not have an already-playing Idle animation.");
+        var cover = WorldCover(run.resultUI);
+        Check(cover != null && cover.gameObject.activeInHierarchy && cover.color == Color.black,
+            "Loading handed off to the stage without an opaque black first frame.");
     }
 
     private static async Task<float> ObserveIntro(RunManager run, Func<bool> expectedStarts)
     {
         float firstIdle = RevealIdleTime(run.player);
         float lastIdle = firstIdle;
+        float lastAlpha = 1f;
+        bool sawPartial = false, sawClear = false;
+        var cover = WorldCover(run.resultUI);
         while (run != null && run.resultUI.IsStageIntroPlaying)
         {
             Covered(run);
             Check(expectedStarts(), "OnStageStart was published before the introduction completed.");
+            float alpha = cover.color.a;
+            Check(alpha <= lastAlpha, "The stage cover became more opaque during the reveal.");
+            sawPartial |= alpha > 0f && alpha < 1f;
+            sawClear |= alpha == 0f;
+            lastAlpha = alpha;
             float currentIdle = RevealIdleTime(run.player);
             Check(currentIdle >= lastIdle, "The visible Idle state restarted or stopped during the stage intro.");
             lastIdle = currentIdle;
             await WaitOneTick();
         }
         Check(lastIdle > firstIdle + .01f, "Idle did not advance while world time was paused.");
+        Check(sawPartial && sawClear, "The world did not fade continuously from black while gameplay was locked.");
         await Wait(() => run == null || run.State != RunState.Preparing);
         return lastIdle;
     }
@@ -204,10 +217,20 @@ public static class StagePresentationPlayModeRegression
     {
         Check(run != null && run.State == RunState.Playing && run.stageManager.IsReady && !run.player.IsStageTransitioning
             && run.player.Input.enabled && run.player.Movement.enabled && run.player.Controller.enabled
-            && Time.timeScale > .99f && !run.resultUI.IsStageIntroPlaying && starts == expectedStarts,
+            && Time.timeScale > .99f && !run.resultUI.IsStageIntroPlaying && WorldCoverCleared(run.resultUI)
+            && starts == expectedStarts,
             "The completed intro did not resume gameplay and publish exactly one stage start.");
         Check(run.CurrentChapterIndex == chapter && run.CurrentStageIndex == stage && run.CurrentStageSeed == seed,
             "The presentation harness advanced progression or changed the stable stage seed.");
+    }
+
+    private static UnityEngine.UI.Image WorldCover(StageResultUI ui)
+        => ui.transform.Find("StageIntroCanvas/WorldReveal")?.GetComponent<UnityEngine.UI.Image>();
+
+    private static bool WorldCoverCleared(StageResultUI ui)
+    {
+        var cover = WorldCover(ui);
+        return cover != null && !cover.gameObject.activeInHierarchy && cover.color.a == 0f;
     }
 
     private static async Task Wait(Func<bool> condition)

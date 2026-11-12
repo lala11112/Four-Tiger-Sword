@@ -18,8 +18,7 @@ MonoBehaviour:
   displayName: "\uC2DC\uB8CC \uAC1C\uBD09\uC1E0"
   description: "\uB69C\uAED1 \uAC00\uC7A5\uC790\uB9AC\uC5D0 \uB07C\uC6B0\uB294 \uAC01\uC9C4
     \uAC08\uACE0\uB9AC."
-  effectText: "\uC804\uD22C \uC911 \uAC01 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\uB85C \uCC98\uC74C
-    \uAC00\uD55C \uD53C\uD574\uAC00 10% \uC99D\uAC00\uD55C\uB2E4."
+  effectText: "\uACF5\uACA9 \uD53C\uD574 +10%"
   synergyIds:
   - S02
   synergyNames:
@@ -28,22 +27,22 @@ MonoBehaviour:
   primarySynergyName: "\uB9F9\uACF5"
   primarySynergyIcon: {fileID: 21300000, guid: a7118651f7dcecd41b9cd1a28bf16bdb, type: 3}
   element: 0
-  grade: 2
-  purchasePrice: 40
+  grade: 1
+  purchasePrice: 20
   effects: []
   boundaryEffects:
   - effectId: I46
     stat: 6
     amount: 0.1
     trigger: 0
-    family: 1
+    family: 0
     element: 0
     eliteOrBossOnly: 0
     targetHpMin: -1
     targetHpMax: -1
     selfHpMin: -1
     selfHpMax: -1
-    firstTargetHit: 1
+    firstTargetHit: 0
     firstSkillHit: 0
     firstIncomingAttack: 0
     firstRewardKill: 0
@@ -55,9 +54,7 @@ MonoBehaviour:
     cooldownSeconds: 0
   icon: {fileID: 21300000, guid: 0e00e98605ccc1342bff269ac79794a6, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I46\",\"name\":\"\uC2DC\uB8CC \uAC1C\uBD09\uC1E0\",\"description\":\"\uB69C\uAED1
-    \uAC00\uC7A5\uC790\uB9AC\uC5D0 \uB07C\uC6B0\uB294 \uAC01\uC9C4 \uAC08\uACE0\uB9AC.\",\"effect\":\"\uC804\uD22C
-    \uC911 \uAC01 \uC801\uC5D0\uAC8C \uD3C9\uD0C0\uB85C \uCC98\uC74C \uAC00\uD55C
-    \uD53C\uD574\uAC00 10% \uC99D\uAC00\uD55C\uB2E4.\",\"synergies\":[\"S02\"],\"primarySynergy\":\"S02\",\"designIntent\":\"\uC5EC\uB7EC
-    \uC801\uC5D0\uAC8C \uD3C9\uD0C0\uB97C \uD55C \uBC88\uC529 \uB3CC\uB9B0\uB2E4.\",\"origin\":\"new\",\"image\":\"Art/Items/I46.png\"}"
+    \uAC00\uC7A5\uC790\uB9AC\uC5D0 \uB07C\uC6B0\uB294 \uAC01\uC9C4 \uAC08\uACE0\uB9AC.\",\"effect\":\"\uACF5\uACA9
+    \uD53C\uD574 +10%\",\"synergies\":[\"S02\"],\"primarySynergy\":\"S02\",\"origin\":\"new\",\"image\":\"Art/Items/I46.png\",\"grade\":1}"

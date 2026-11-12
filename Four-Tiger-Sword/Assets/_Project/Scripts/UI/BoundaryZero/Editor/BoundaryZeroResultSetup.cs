@@ -1,4 +1,5 @@
 using System;
+using Penta.BossUI;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -9,6 +10,7 @@ using UnityEngine.SceneManagement;
 public static class BoundaryZeroResultSetup
 {
     private const string PrefabPath = "Assets/_Project/Prefabs/UI/BoundaryZeroRunOverlay.prefab";
+    private const string BossPrefabPath = "Assets/UI/PentaBossGroggy/Prefabs/BossHPWithGroggy.prefab";
     private const string SpriteRoot = "Assets/_Project/Sprites/UI/BoundaryZERO/";
 
     public static string Apply()
@@ -226,6 +228,10 @@ public static class BoundaryZeroResultSetup
     {
         var overlay = root.GetComponent<BoundaryZeroRunOverlay>();
         if (overlay == null) throw new InvalidOperationException("A boss HUD requires the authored run overlay.");
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(BossPrefabPath);
+        var source = prefab != null ? prefab.GetComponent<BossHealthGroggyUI>() : null;
+        if (source == null || source.HealthFill == null || source.Groggy == null || source.BossName == null)
+            throw new InvalidOperationException("The integrated boss HP/groggy prefab is missing its bindings.");
         if (overlay.StageLabel != null) overlay.StageLabel.gameObject.SetActive(false);
 
         var bar = root.transform.Find("BossHealthBar") as RectTransform
@@ -237,80 +243,84 @@ public static class BoundaryZeroResultSetup
         // Keep the modal above gameplay UI even while its Canvas switches sorting order.
         if (overlay.ModalRoot != null && bar.GetSiblingIndex() > overlay.ModalRoot.transform.GetSiblingIndex())
             bar.SetSiblingIndex(overlay.ModalRoot.transform.GetSiblingIndex());
-        HealthImage(bar, "boss_background.png", false);
         var visibility = bar.GetComponent<CanvasGroup>();
         if (visibility == null) visibility = bar.gameObject.AddComponent<CanvasGroup>();
 
-        var oldTrack = bar.Find("Track");
-        var fillRect = bar.Find("Fill") as RectTransform;
-        if (fillRect == null && oldTrack != null) fillRect = oldTrack.Find("Fill") as RectTransform;
-        if (fillRect == null) fillRect = Rect("Fill", bar, 16, 44, 688, 12);
-        fillRect.SetParent(bar, false);
-        PlaceHealthFill(fillRect);
-        var fill = HealthImage(fillRect, "boss_fill.png", true);
-        // The supplied background already includes its own track.
-        if (oldTrack != null) oldTrack.gameObject.SetActive(false);
+        var view = bar.Find("BossHPWithGroggy")?.GetComponent<BossHealthGroggyUI>();
+        if (view == null)
+            view = ((GameObject)PrefabUtility.InstantiatePrefab(prefab, bar)).GetComponent<BossHealthGroggyUI>();
+        var viewRect = (RectTransform)view.transform;
+        viewRect.anchorMin = viewRect.anchorMax = viewRect.pivot = new Vector2(.5f, 1f);
+        viewRect.anchoredPosition = Vector2.zero;
+        viewRect.sizeDelta = new Vector2(640f, 54f);
+        viewRect.localScale = Vector3.one;
+        viewRect.localRotation = Quaternion.identity;
 
-        var trailRect = bar.Find("Trail") as RectTransform ?? Rect("Trail", bar, 16, 44, 688, 12);
-        PlaceHealthFill(trailRect);
-        var trail = HealthImage(trailRect, "boss_trail.png", true);
-        var frameRect = bar.Find("Frame") as RectTransform ?? Rect("Frame", bar, 0, 0, 720, 72);
-        frameRect.anchorMin = frameRect.anchorMax = frameRect.pivot = new Vector2(0, 1);
-        frameRect.anchoredPosition = Vector2.zero;
-        frameRect.sizeDelta = new Vector2(720, 72);
-        HealthImage(frameRect, "boss_frame.png", false);
-        trailRect.SetAsLastSibling();
-        fillRect.SetAsLastSibling();
-        frameRect.SetAsLastSibling();
-
-        var name = bar.Find("BossName")?.GetComponent<TMP_Text>()
-            ?? Label("BossName", bar, 0, 0, 720, 30, 24, string.Empty);
-        name.rectTransform.anchorMin = name.rectTransform.anchorMax = name.rectTransform.pivot = new Vector2(0, 1);
-        name.rectTransform.anchoredPosition = Vector2.zero;
-        name.rectTransform.sizeDelta = new Vector2(720, 30);
-        name.font = Font();
-        name.fontSharedMaterial = BoundaryZeroTypography.GetMaterial();
-        name.fontSize = 24;
+        var fill = view.HealthFill;
+        var trail = EnsureBossTrail(fill);
+        var name = view.BossName;
+        // General overlay typography also visits nested labels; retain this prefab's style.
+        name.font = source.BossName.font;
+        name.fontSharedMaterial = source.BossName.fontSharedMaterial;
+        name.fontStyle = source.BossName.fontStyle;
+        name.color = source.BossName.color;
+        name.fontSize = 20f;
         name.enableAutoSizing = false;
-        name.fontStyle = FontStyles.Bold;
-        name.color = new Color32(232, 238, 245, 255);
-        name.alignment = TextAlignmentOptions.Center;
-        // Noto's line metrics exceed 30px at 24pt; retain the authored box and allow its line to fit.
-        name.margin = new Vector4(0, -3, 0, -3);
         name.textWrappingMode = TextWrappingModes.NoWrap;
         name.overflowMode = TextOverflowModes.Ellipsis;
         name.richText = false;
-        name.raycastTarget = false;
-        name.transform.SetAsLastSibling();
+        foreach (var graphic in view.GetComponentsInChildren<UnityEngine.UI.Graphic>(true))
+            graphic.raycastTarget = false;
 
         var hud = root.GetComponent<BossHealthHud>() ?? root.AddComponent<BossHealthHud>();
-        hud.Configure(run, visibility, fill);
+        var boundRun = run != null ? run : new SerializedObject(hud).FindProperty("run").objectReferenceValue as RunManager;
+        hud.Configure(boundRun, visibility, fill);
         hud.ConfigureVisuals(trail, 8f, .35f, .6f);
         hud.ConfigureName(name);
+        hud.ConfigureGroggy(view.Groggy);
+
+        // Rebind first, then remove only the obsolete visual layers, keeping the visibility root.
+        foreach (string legacyName in new[] { "Track", "Fill", "Trail", "Frame", "BossName" })
+        {
+            var legacy = bar.Find(legacyName);
+            if (legacy != null) UnityEngine.Object.DestroyImmediate(legacy.gameObject);
+        }
+        var oldBackground = bar.GetComponent<UnityEngine.UI.Image>();
+        if (oldBackground != null) UnityEngine.Object.DestroyImmediate(oldBackground);
+
+        foreach (UnityEngine.Object changed in new UnityEngine.Object[]
+            { viewRect, name, fill, view.Groggy, view.Groggy.gameObject, view.Groggy.Fill })
+            PrefabUtility.RecordPrefabInstancePropertyModifications(changed);
         EditorUtility.SetDirty(hud);
         return hud;
     }
 
-    private static void PlaceHealthFill(RectTransform rect)
+    private static UnityEngine.UI.Image EnsureBossTrail(UnityEngine.UI.Image fill)
     {
-        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0, 1);
-        rect.anchoredPosition = new Vector2(16, -44);
-        rect.sizeDelta = new Vector2(688, 12);
+        var sourceRect = fill.rectTransform;
+        var rect = sourceRect.parent.Find("HP Trail") as RectTransform
+            ?? Rect("HP Trail", sourceRect.parent, 0, 0, 1, 1);
+        rect.anchorMin = sourceRect.anchorMin;
+        rect.anchorMax = sourceRect.anchorMax;
+        rect.pivot = sourceRect.pivot;
+        rect.anchoredPosition = sourceRect.anchoredPosition;
+        rect.sizeDelta = sourceRect.sizeDelta;
         rect.localScale = Vector3.one;
         rect.localRotation = Quaternion.identity;
-    }
-
-    private static UnityEngine.UI.Image HealthImage(RectTransform rect, string sprite, bool filled)
-    {
+        // Move behind HP after first moving to the end, so repeated setup preserves order.
+        rect.SetAsLastSibling();
+        rect.SetSiblingIndex(sourceRect.GetSiblingIndex());
         var image = rect.GetComponent<UnityEngine.UI.Image>();
         if (image == null) image = rect.gameObject.AddComponent<UnityEngine.UI.Image>();
-        image.sprite = BoundaryZeroEnemyHealthSetup.Sprite(sprite);
-        image.color = Color.white;
-        image.material = null;
-        image.type = filled ? UnityEngine.UI.Image.Type.Filled : UnityEngine.UI.Image.Type.Simple;
-        image.fillMethod = UnityEngine.UI.Image.FillMethod.Horizontal;
-        image.fillOrigin = (int)UnityEngine.UI.Image.OriginHorizontal.Left;
-        image.preserveAspect = false;
+        image.sprite = fill.sprite;
+        image.color = new Color32(255, 145, 150, 255);
+        image.material = fill.material;
+        image.type = fill.type;
+        image.fillMethod = fill.fillMethod;
+        image.fillOrigin = fill.fillOrigin;
+        image.fillClockwise = fill.fillClockwise;
+        image.preserveAspect = fill.preserveAspect;
+        image.maskable = fill.maskable;
         image.raycastTarget = false;
         return image;
     }

@@ -263,7 +263,6 @@ public static class FinisherSelectionRegression
             Check(input.FinisherPressedThisFrame && input.AttackBuffer.IsActive,
                 "Simultaneous left/right presses exist before controller priority handling. " + InputSnapshot(input, mouse));
             float remaining = source.FinisherSelectionWindowRemaining;
-            float sp = stats.CurrentSp;
             Invoke(player, "TryOpenFinisherFromInput");
             Check(player.IsFinisherSelecting && forms.CurrentForm == source && changes == 0,
                 "Opening keeps the equipped form and does not publish preview changes.");
@@ -273,7 +272,6 @@ public static class FinisherSelectionRegression
                 && !input.UltimateBuffer.IsActive && !input.IsForm5Pressed && !input.IsFastFormPressed,
                 "RMB priority clears simultaneous attacks, form requests, dash and ability reservations.");
             Near(source.FinisherSelectionWindowRemaining, remaining, "Opening does not refill or extend the connection window.");
-            Near(stats.CurrentSp, sp, "Preview does not consume SP.");
             Check(Wheel().SelectedElement == source.Element, "The virtual cursor starts at the current-form center.");
             int updates = source.Updates;
             float elapsed = source.Elapsed;
@@ -298,7 +296,6 @@ public static class FinisherSelectionRegression
                 "Selecting the current outer sector also executes normal stage three without rewards.");
 
             state = Ready();
-            Field(stats, "_currentSp", 0f);
             Open();
             float theta = 72f * Mathf.Deg2Rad;
             Field(player, "_finisherCursor", new Vector2(Mathf.Sin(theta), Mathf.Cos(theta)) * 180f);
@@ -308,7 +305,6 @@ public static class FinisherSelectionRegression
             Release();
             Check(forms.CurrentForm == target && target.CurrentComboStage == 2 && source.CurrentComboStage == -1
                 && changes == 1 && successes == 1, "Other-form release switches exactly once and starts its third hit directly.");
-            Near(stats.CurrentSp, 0f, "The finisher succeeds with zero SP.");
             Near((float)GetField(player, "_formChangeCooldownTimer"), .75f, "Finisher preserves the existing switch cooldown.");
             Check(!player.HasPendingSwitchAttack, "Finisher does not queue the separate E-style switch attack.");
             int targetUpdates = target.Updates;
@@ -334,7 +330,6 @@ public static class FinisherSelectionRegression
 
             fireOnly = true;
             Ready(); Open();
-            float lockedReleaseSp = stats.CurrentSp;
             Field(player, "_finisherCursor", new Vector2(Mathf.Sin(theta), Mathf.Cos(theta)) * 180f);
             Invoke(player, "LateUpdate");
             Check(Wheel().SelectedElement == ElementType.ELEMENT_NONE,
@@ -343,7 +338,6 @@ public static class FinisherSelectionRegression
             Check(!Wheel().IsVisible && !(bool)GetField(player, "_finisherOwnsCursor")
                 && forms.CurrentForm == source && source.CurrentComboStage == 1 && changes == 0 && successes == 0,
                 "Releasing over a locked sector closes the modal without committing a hit or a switch.");
-            Near(stats.CurrentSp, lockedReleaseSp, "Releasing over a locked sector consumes no SP.");
             Near((float)GetField(player, "_formChangeCooldownTimer"), .75f,
                 "Releasing over a locked sector preserves the existing switch cooldown.");
 
@@ -407,7 +401,7 @@ public static class FinisherSelectionRegression
             Invoke(player, "OnDisable");
             Check(!player.IsFinisherSelecting, "Player shutdown releases the session.");
             Near(Time.timeScale, savedScale, "All shutdown paths restore world speed.");
-            return $"PASS: finisher selection integration ({checks} checks: authored Player/FinisherSelect input, RMB opening immediately after the last hit before normal combo transition, input priority and preheld release, live attack timer, normal/transformed third hit, locked release and Fire-only selection, cooldown/SP independence, one-shot rewards, suppression, numeric/Q coexistence, timeout and cancellation precedence).";
+            return $"PASS: finisher selection integration ({checks} checks: authored Player/FinisherSelect input, RMB opening immediately after the last hit before normal combo transition, input priority and preheld release, live attack timer, normal/transformed third hit, locked release and Fire-only selection, cooldown independence, one-shot rewards, suppression, numeric/Q coexistence, timeout and cancellation precedence).";
         }
         finally
         {

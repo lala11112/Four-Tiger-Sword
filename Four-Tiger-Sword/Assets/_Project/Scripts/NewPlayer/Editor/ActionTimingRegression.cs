@@ -15,7 +15,6 @@ public static class ActionTimingRegression
     private sealed class ProbeForm : BaseForm
     {
         public int AttackStarts, AttackEnds, SkillStarts, SkillEnds, UltimateStarts, UltimateEnds, HitCalls;
-        public override float SkillSpCost => 10f;
         public override float SkillCooldown => 3f;
         public float Speed => AttackSpeed;
         public float Elapsed => _timer;
@@ -248,7 +247,6 @@ public static class ActionTimingRegression
                 Check(toUltimate ? f.Machine.CurrentState is PlayerUltimateState : f.Machine.CurrentState is PlayerSkillState,
                     "Normal attack directly enters the requested combat action at the gate.");
                 Check(f.Form.AttackEnds == oldEnds + 1, "Direct combat exit ends its source action exactly once.");
-                Near(f.Stats.CurrentSp, f.StatsData.baseSP - (toUltimate ? 0f : 10f), "Only the destination skill spends SP.");
                 Near(f.Stats.CurrentUltimateGauge, toUltimate ? 0f : f.StatsData.maxUltimateGauge,
                     "Only the destination ultimate consumes its gauge.");
             }
@@ -275,7 +273,7 @@ public static class ActionTimingRegression
             {
                 f.Ready(f.Skill);
                 int skillEnds = f.Form.SkillEnds;
-                Near(f.Stats.CurrentSp, f.StatsData.baseSP - 10f, "Skill entry spends its SP once.");
+                Near(f.Form.SkillCooldownRemaining, 0f, "Skill entry keeps cooldown inactive until exit.");
                 if (toUltimate) f.Input.UltimateBuffer.Set(); else f.Input.AttackBuffer.Set(.5f);
                 f.Form.SkillAt(0, .899f); f.Machine.Update(true, false);
                 Check(ReferenceEquals(f.Machine.CurrentState, f.Skill), "Skill combat exit remains locked before its action gate.");
@@ -283,8 +281,7 @@ public static class ActionTimingRegression
                 Check(toUltimate ? f.Machine.CurrentState is PlayerUltimateState : f.Machine.CurrentState is PlayerAttackState,
                     "Skill directly enters a different requested combat action.");
                 Check(f.Form.SkillEnds == skillEnds + 1, "Canceled skill runs its exit exactly once.");
-                Near(f.Form.SkillCooldownRemaining, f.Form.SkillCooldown, "Skill cancellation starts its normal cooldown.");
-                Near(f.Stats.CurrentSp, f.StatsData.baseSP - 10f, "Skill cancellation does not spend or refund SP again.");
+                Near(f.Form.SkillCooldownRemaining, f.Form.SkillCooldownDuration, "Skill cancellation starts its normal cooldown.");
             }
 
             foreach (bool toSkill in new[] { false, true })
@@ -429,8 +426,7 @@ public static class ActionTimingRegression
             water.UpdateSkill(out waterComplete);
             Check(waterComplete, "Water skill releases after the remaining animation finishes.");
             water.EndSkill();
-            Near(f.Stats.CurrentSp, f.StatsData.baseSP - water.SkillSpCost, "Water's tail never spends the skill cost again.");
-            Near(water.SkillCooldownRemaining, water.SkillCooldown, "Water cooldown begins once at the real state exit.");
+            Near(water.SkillCooldownRemaining, water.SkillCooldownDuration, "Water cooldown begins once at the real state exit.");
 
             target.SetActive(false);
             Physics.SyncTransforms();
@@ -569,13 +565,11 @@ public static class ActionTimingRegression
             }
             void MakeUnavailable(string reason)
             {
-                if (reason == "SP") f.Stats.TryConsumeSp(f.Stats.CurrentSp);
-                else if (reason == "cooldown") SetField(f.Form, "_skillCooldownTimer", 1f);
+                if (reason == "cooldown") SetField(f.Form, "_skillCooldownTimer", 1f);
                 else f.Data.SkillSteps.Clear();
             }
             void RestoreSkill()
             {
-                f.Stats.AddSp(f.StatsData.baseSP);
                 SetField(f.Form, "_skillCooldownTimer", 0f);
                 if (f.Data.SkillSteps.Count == 0) f.Data.SkillSteps.Add(Step());
             }
@@ -598,12 +592,11 @@ public static class ActionTimingRegression
             {
                 Ready(stage);
                 int attackStarts = f.Form.AttackStarts, skillStarts = f.Form.SkillStarts;
-                float sp = f.Stats.CurrentSp;
                 f.Input.AttackBuffer.Set(.5f);
                 Reserve();
                 Check(Queued() && !f.Input.SkillBuffer.IsActive && !f.Input.AttackBuffer.IsActive,
                     "Early E becomes one current-hit reservation and replaces an already buffered normal attack.");
-                Near(f.Stats.CurrentSp, sp, "Accepting an E reservation does not prepay SP.");
+                Near(f.Form.SkillCooldownRemaining, 0f, "Accepting an E reservation does not start cooldown.");
                 f.Input.SkillBuffer.Update(.6f);
                 f.Form.AttackAt(stage, .65f);
                 Prepare();
@@ -625,7 +618,6 @@ public static class ActionTimingRegression
                 Check(f.Machine.CurrentState is PlayerSkillState && f.Form.SkillStarts == skillStarts + 1
                     && !Queued() && !f.Input.SkillBuffer.IsActive && !f.Input.AttackBuffer.IsActive,
                     "The queued skill replaces the same hit at its action gate and consumes all duplicate reservations.");
-                Near(f.Stats.CurrentSp, sp - f.Form.SkillSpCost, "Repeated E starts one skill and spends SP once.");
                 f.Machine.Update(true, false);
                 Check(f.Form.SkillStarts == skillStarts + 1, "A consumed E reservation cannot replay on the following frame.");
             }
@@ -642,7 +634,7 @@ public static class ActionTimingRegression
             Transitions();
             Check(f.Machine.CurrentState is PlayerSkillState, "The reserved E becomes executable at the exact action boundary.");
 
-            foreach (string reason in new[] { "SP", "cooldown", "missing steps" })
+            foreach (string reason in new[] { "cooldown", "missing steps" })
             {
                 Ready();
                 MakeUnavailable(reason);
@@ -773,14 +765,14 @@ public static class ActionTimingRegression
             Property(f.Player, "ActorClock", clock);
             SetField(clock, "_animator", f.Animator);
             clock.Request(f.Player, 60f, 0f, HitStopStacking.Maximum);
-            float stoppedAt = f.Form.Elapsed, stoppedSp = f.Stats.CurrentSp;
+            float stoppedAt = f.Form.Elapsed;
             Reserve();
             f.Input.SkillBuffer.Update(f.Player.ActionDeltaTime);
             f.Machine.Update(false, false);
             Check(Queued() && clock.IsStopped && ReferenceEquals(f.Machine.CurrentState, f.Attack),
                 "An E pressed during actor hit stop can be reserved without starting a new action.");
             Near(f.Form.Elapsed, stoppedAt, "Hit stop does not advance the reserved attack's clock.");
-            Near(f.Stats.CurrentSp, stoppedSp, "Hit stop does not spend a reserved skill's SP.");
+            Near(f.Form.SkillCooldownRemaining, 0f, "Hit stop does not start a reserved skill's cooldown.");
             clock.ClearStops();
             float originalSpeed = f.Form.Speed;
             f.Stats.AddModifier(StatType.ST_ATK_SPD, 0f, 1f);
@@ -793,7 +785,6 @@ public static class ActionTimingRegression
             f.Form.AttackAt(0, .9f);
             Transitions();
             Check(f.Machine.CurrentState is PlayerSkillState && !Queued(), "The reserved E executes after hit stop at the normal action gate.");
-            Near(f.Stats.CurrentSp, stoppedSp - f.Form.SkillSpCost, "Hit stop and speed changes never duplicate the skill cost.");
         }
         return checks;
     }

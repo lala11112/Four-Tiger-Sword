@@ -29,10 +29,11 @@ public static class RunUpgradeRewardRegression
             GoldConversion();
             FailedClearResumesPendingExit();
             FailedDeathKeepsPendingReward();
+            SupplyDepotDeliveryAndSettlement();
             ObserverReentryCannotEvadeSettlement();
             GenuineCombatClearOnly();
             return $"Upgrade run rewards: {_checks} checks passed (stage/boss receipts, death cap, generation maxima, "
-                + "failed-save retry, pending exit, navigation guards and confirmed combat deaths).";
+                + "failed-save retry, pending exit, supply depot delivery, navigation guards and confirmed combat deaths).";
         }
         finally { Cursor.visible = cursorVisible; Cursor.lockState = cursorLock; }
     }
@@ -174,6 +175,65 @@ public static class RunUpgradeRewardRegression
             && f.Service.Balance == 2 && f.Run.DeathUpgradeRewardTotal == 2, "Death retry did not settle exactly once.");
         Call(f.Run, "EndRun", false);
         Check(f.Service.Balance == 2 && f.Store.Writes == 1, "Settled death was queued again.");
+    }
+
+    private static void SupplyDepotDeliveryAndSettlement()
+    {
+        foreach (bool won in new[] { false, true })
+        {
+            using var f = new Fixture();
+            Check(f.Service.TryGrantReward("supply funds", 200, out _), "Fund supply depot fixture.");
+            Check(f.Service.TryPurchaseSupplyDepot("depot", 100, out var receipt, out _),
+                "Purchase fixture supply before entering a run.");
+            var args = new object[] { null };
+            Check(!(bool)Call(f.Run, "TryApplySupplyDepotItem", args) && args[0] is string
+                && (bool)Call(f.Run, "TrySaveSupplyDepotExit")
+                && f.Service.CurrentSupplyDepotReceipt?.transactionId == receipt.transactionId,
+                "Failed start lost the pending depot receipt.");
+
+            var wallet = f.Wallet(20);
+            var actor = f.Run.player.gameObject;
+            var stats = actor.GetComponent<PlayerStatManager>();
+            stats.Initialize(f.Service.Settings.basePlayerStats);
+            var items = actor.AddComponent<PlayerItemRuntime>();
+            var item = f.Own(ScriptableObject.CreateInstance<ItemDefinition>());
+            item.itemId = "depot";
+            item.projectId = "depot-regression";
+            item.candidateKey = "depot-candidate";
+            item.effects = new[] { new ItemEffect { stat = ItemStat.MaxHp, amount = .25f } };
+            var catalog = f.Own(ScriptableObject.CreateInstance<ItemCatalog>());
+            catalog.projectId = item.projectId;
+            catalog.items = new[] { item };
+            items.Catalog = catalog;
+            items.Initialize(stats, () => ElementType.ELEMENT_NONE);
+            actor.SetActive(true);
+
+            Check((bool)Call(f.Run, "TryApplySupplyDepotItem", args) && items.Contains("depot")
+                && Mathf.Approximately(stats.MaxHp, 125f), "The depot receipt did not grant an active item effect.");
+            Check(items.TryRemoveItem("depot") && (bool)Call(f.Run, "TryApplySupplyDepotItem", args)
+                && !items.Contains("depot") && Mathf.Approximately(stats.MaxHp, 100f),
+                "Preparing another stage regranted an item the player removed.");
+            Check((bool)Call(f.Run, "CanLeaveUpgradeRewards")
+                && f.Service.CurrentSupplyDepotReceipt?.transactionId == receipt.transactionId,
+                "A normal stage transition cleared the depot receipt.");
+
+            f.Store.FailWrites = true;
+            Call(f.Run, "EndRun", won);
+            Check(f.Run.IsUpgradeSaveBlocked && f.Run.HasPendingUpgradeRewards && f.Service.Balance == 100
+                && wallet.Gold == 20 && f.Service.CurrentSupplyDepotReceipt?.transactionId == receipt.transactionId,
+                "A failed depot clear lost the receipt or settled terminal rewards.");
+            bool rewardBeforeClear = false;
+            f.Service.Changed += () =>
+                rewardBeforeClear |= f.Service.Balance > 100 && f.Service.CurrentSupplyDepotReceipt != null;
+            f.Store.FailWrites = false;
+            f.Run.TryRetryPendingRewards();
+            f.Run.TryRetryPendingRewards();
+            Check(!f.Run.IsUpgradeSaveBlocked && !f.Run.HasPendingUpgradeRewards && !rewardBeforeClear
+                && f.Service.CurrentSupplyDepotReceipt == null && f.Service.Balance == 102 && wallet.Gold == 0,
+                "The terminal retry did not clear the depot receipt before settling rewards once.");
+            Check(f.Service.TryPurchaseSupplyDepot("depot", 100, out var next, out _)
+                && next.transactionId != receipt.transactionId, "The next run could not purchase from the depot.");
+        }
     }
 
     private static void GenuineCombatClearOnly()

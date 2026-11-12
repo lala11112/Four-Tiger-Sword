@@ -16,19 +16,23 @@ public sealed class HubWorldController : MonoBehaviour
     private bool _previousCursorVisible;
     private CursorLockMode _previousCursorLock;
     private bool _ownsCursor;
+    private bool _cursorModal;
     private bool _modalOpen;
+    private bool _statsModalOpen;
     private PauseMenuPresenter _pauseMenu;
     private HubFieldHud _hud;
+    private PlayerStatsPresenter _playerStats;
     private InventoryView _codex;
     private PlayerUpgradeService _upgrades;
     private CombatHitStopService.WorldScaleLease _codexPause;
     private HubCodexInteraction _codexOwner;
     private readonly List<CinemachineInputAxisController> _cameraInputs = new();
 
-    public bool IsModalOpen => _modalOpen || _codexPause != null;
+    public bool IsModalOpen => _modalOpen || _codexPause != null || _statsModalOpen;
     public bool IsCodexOpen => _codex != null && _codex.IsOpen;
     public bool IsPauseMenuOpen => _pauseMenu != null && _pauseMenu.IsOpen;
-    internal PlayerController PauseMenuPlayer => player != null ? player : GetComponentInChildren<PlayerController>();
+    public PlayerController PauseMenuPlayer => player != null ? player : GetComponentInChildren<PlayerController>();
+    internal bool CanShowPlayerStats => isActiveAndEnabled && !_modalOpen && _codexPause == null;
 
     private bool HasCatalog => itemCatalog != null && inventoryArt != null;
     private bool PlayerAvailable => player != null && player.isActiveAndEnabled && !player.IsStageTransitioning
@@ -40,6 +44,7 @@ public sealed class HubWorldController : MonoBehaviour
         if (player == null) player = GetComponentInChildren<PlayerController>();
         _hud = new HubFieldHud(transform, inventoryArt);
         _pauseMenu = PauseMenuPresenter.Ensure(this);
+        _playerStats = PlayerStatsPresenter.Ensure(this);
     }
 
     private void OnEnable()
@@ -50,8 +55,8 @@ public sealed class HubWorldController : MonoBehaviour
         _modalOpen = false;
         _hud.Root.gameObject.SetActive(true);
         _upgrades = PlayerUpgradeService.Instance;
-        _upgrades.Changed += RefreshBalance;
-        RefreshBalance();
+        _upgrades.Changed += RefreshProgression;
+        RefreshProgression();
         RefreshCursor();
     }
 
@@ -63,18 +68,32 @@ public sealed class HubWorldController : MonoBehaviour
     internal void SetModalOpen(bool open)
     {
         _modalOpen = open;
+        if (open) _playerStats?.Close();
         if (_ownsCursor && isActiveAndEnabled) RefreshCursor();
+    }
+
+    internal void SetStatsModalOpen(bool open, bool refreshCursor = true)
+    {
+        _statsModalOpen = open;
+        if (refreshCursor && _ownsCursor && isActiveAndEnabled) RefreshCursor();
     }
 
     private void RefreshCursor()
     {
-        Cursor.visible = IsModalOpen;
-        Cursor.lockState = IsModalOpen ? CursorLockMode.None : CursorLockMode.Locked;
+        _cursorModal = IsModalOpen;
+        Cursor.visible = _cursorModal;
+        Cursor.lockState = _cursorModal ? CursorLockMode.None : CursorLockMode.Locked;
     }
 
-    private void RefreshBalance()
+    private void RefreshProgression()
     {
         _hud.SetBalance(_upgrades.Settings?.currencyName, _upgrades.IsReady ? _upgrades.Balance : null);
+        if (!_upgrades.IsReady || player == null) return;
+        // Hub purchases update the same stat contribution used by the next expedition,
+        // without starting a run or resetting its conditional combat effects.
+        var stats = player.GetComponent<PlayerStatManager>();
+        if (stats != null)
+            PlayerEngravingRuntime.ApplySnapshotStats(stats, _upgrades.CreateEngravingSnapshot());
     }
 
     private void Update()
@@ -172,17 +191,17 @@ public sealed class HubWorldController : MonoBehaviour
     private void OnDisable()
     {
         // A scene/menu that already changed the cursor has taken ownership.
-        bool modal = IsModalOpen;
-        var expectedLock = modal ? CursorLockMode.None : CursorLockMode.Locked;
-        if (_ownsCursor && Cursor.visible == modal && Cursor.lockState == expectedLock)
+        var expectedLock = _cursorModal ? CursorLockMode.None : CursorLockMode.Locked;
+        if (_ownsCursor && Cursor.visible == _cursorModal && Cursor.lockState == expectedLock)
         {
             Cursor.visible = _previousCursorVisible;
             Cursor.lockState = _previousCursorLock;
         }
         _ownsCursor = false;
-        if (_pauseMenu != null) _pauseMenu.CloseForHostShutdown();
+        _pauseMenu?.CloseForHostShutdown();
+        _playerStats?.Close();
         CloseCodex();
-        if (_upgrades != null) _upgrades.Changed -= RefreshBalance;
+        if (_upgrades != null) _upgrades.Changed -= RefreshProgression;
         if (_hud != null) _hud.Root.gameObject.SetActive(false);
     }
 }

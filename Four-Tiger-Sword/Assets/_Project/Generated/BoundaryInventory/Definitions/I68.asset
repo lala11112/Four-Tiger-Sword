@@ -18,9 +18,8 @@ MonoBehaviour:
   displayName: "\uD1A0\uBC8C \uAC80\uCCB4\uAD00"
   description: "\uCDA9\uACA9 \uD761\uC218 \uB0B4\uD53C\uAC00 \uB4E4\uC5B4\uAC04 \uC9E7\uC740
     \uAC80\uCCB4\uAD00."
-  effectText: "\uC815\uC608\xB7\uBCF4\uC2A4\uB97C \uCC98\uCE58\uD558\uBA74 \uCD5C\uB300
-    HP\uC758 0.5%\uB97C \uD68C\uBCF5\uD55C\uB2E4. \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04\uC740
-    20\uCD08\uB2E4."
+  effectText: "\uC815\uC608 \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0
+    \uD53C\uD574 +4%"
   synergyIds:
   - S15
   synergyNames:
@@ -34,9 +33,9 @@ MonoBehaviour:
   effects: []
   boundaryEffects:
   - effectId: I68
-    stat: 11
-    amount: 0.005
-    trigger: 1
+    stat: 6
+    amount: 0.04
+    trigger: 0
     family: 0
     element: 0
     eliteOrBossOnly: 1
@@ -53,12 +52,10 @@ MonoBehaviour:
     minimumBaseGold: 0
     maximumBaseGold: 0
     durationSeconds: 0
-    cooldownSeconds: 20
+    cooldownSeconds: 0
   icon: {fileID: 21300000, guid: 2072fd1c7931f504eb88cc92f8b5bba2, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I68\",\"name\":\"\uD1A0\uBC8C \uAC80\uCCB4\uAD00\",\"description\":\"\uCDA9\uACA9
-    \uD761\uC218 \uB0B4\uD53C\uAC00 \uB4E4\uC5B4\uAC04 \uC9E7\uC740 \uAC80\uCCB4\uAD00.\",\"effect\":\"\uC815\uC608\xB7\uBCF4\uC2A4\uB97C
-    \uCC98\uCE58\uD558\uBA74 \uCD5C\uB300 HP\uC758 0.5%\uB97C \uD68C\uBCF5\uD55C\uB2E4.
-    \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04\uC740 20\uCD08\uB2E4.\",\"synergies\":[\"S15\"],\"primarySynergy\":\"S15\",\"designIntent\":\"\uADF9\uC18C\uB7C9\uC758
-    HP\uB97C \uCC9C\uCC9C\uD788 \uBCF4\uCDA9\uD55C\uB2E4.\",\"origin\":\"revised\",\"image\":\"Art/Items/I68.png\"}"
+    \uD761\uC218 \uB0B4\uD53C\uAC00 \uB4E4\uC5B4\uAC04 \uC9E7\uC740 \uAC80\uCCB4\uAD00.\",\"effect\":\"\uC815\uC608
+    \uC774\uC0C1 \uBAAC\uC2A4\uD130\uC5D0\uAC8C \uBAA8\uB4E0 \uD53C\uD574 +4%\",\"synergies\":[\"S15\"],\"primarySynergy\":\"S15\",\"origin\":\"revised\",\"image\":\"Art/Items/I68.png\",\"grade\":1}"

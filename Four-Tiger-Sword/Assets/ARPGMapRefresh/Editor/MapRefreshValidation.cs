@@ -412,11 +412,13 @@ public static class MapRefreshValidation
         var v3 = JsonUtility.FromJson<RoomSetV3.SetReport>(File.ReadAllText(RoomSetV3.Root + "/Manifests/RoomSet_manifest.json"));
         var expected = new HashSet<string>(manifest.entries.Where(e => e.role == "normal").Select(e => e.prefabPath), StringComparer.Ordinal);
         expected.UnionWith(v3.rooms.Select(r => r.prefab));
+        expected.RemoveWhere(path => BaekhoDungeonSetup.HasTwoByThreeDoor(
+            AssetDatabase.LoadAssetAtPath<GameObject>(path)?.GetComponent<BaekhoMapModule>()));
         var refreshed = new HashSet<string>(manifest.entries.Where(e => e.role == "normal").Select(e => e.prefabPath), StringComparer.Ordinal);
         var v3Paths = new HashSet<string>(v3.rooms.Select(r => r.prefab), StringComparer.Ordinal);
         var replacement = manifest.entries.ToDictionary(e => e.sourcePath, e => e.prefabPath, StringComparer.Ordinal);
         var before = string.IsNullOrEmpty(beforeJson) ? null : JsonUtility.FromJson<AssetSnapshot>(beforeJson);
-        Check(report, expected.Count == 39, "Expected 39 unique ordinary modules (22 unchanged V3 plus 17 refreshed).");
+        Check(report, expected.Count == 32, "Expected 32 unique ordinary modules after excluding 2 x 3 doorways.");
         report.ordinaryPool = expected.Count;
         foreach (var path in SettingsPaths(manifest))
         {
@@ -424,7 +426,7 @@ public static class MapRefreshValidation
             if (!Check(report, settings, "Missing generator settings: " + path)) continue;
             var maps = settings.maps ?? Array.Empty<BaekhoMapModule>();
             var actual = new HashSet<string>(maps.Where(m => m).Select(AssetPath), StringComparer.Ordinal);
-            Check(report, maps.All(m => m) && actual.SetEquals(expected), path + ": the ordinary pool is not exactly 39 unique expected modules.");
+            Check(report, maps.All(m => m) && actual.SetEquals(expected), path + ": the ordinary pool is not exactly 32 unique expected modules.");
             Check(report, string.IsNullOrEmpty(manifest.stylePath) || AssetPath(settings.style) == manifest.stylePath, path + ": refreshed corridor style is not connected.");
             Check(report, BaekhoDungeonGenerator.ValidateStyle(settings.style, out var styleError), path + ": " + styleError);
             var roleAssets = new[] { settings.startRoom, settings.endRoom, settings.bossRoom, settings.shopRoom, settings.cornerRoom };
@@ -456,6 +458,7 @@ public static class MapRefreshValidation
                 if (!Check(report, BaekhoDungeonPlanner.TryPlan(settings, seed, out var plan, out var error), path + " seed " + seed + ": " + error)) continue;
                 report.generatedPlans++;
                 Check(report, plan.rooms.Count == settings.mapCount && plan.links.Count == Mathf.Max(0, settings.mapCount - 1), path + ": partial generation plan.");
+                Check(report, plan.rooms.All(r => !BaekhoDungeonSetup.HasTwoByThreeDoor(r.prefab)), path + " seed " + seed + ": generated a room with a 2 x 3 doorway.");
                 report.refreshedSelections += plan.rooms.Count(r => refreshed.Contains(AssetPath(r.prefab)));
                 report.v3Selections += plan.rooms.Count(r => v3Paths.Contains(AssetPath(r.prefab)));
             }

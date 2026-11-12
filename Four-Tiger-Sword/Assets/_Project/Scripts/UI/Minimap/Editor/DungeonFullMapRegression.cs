@@ -288,11 +288,15 @@ public static class DungeonFullMapRegression
                 viewport.TransformPoint(new Vector3(viewport.rect.xMin - 20f, viewport.rect.yMin - 20f, 0f)));
             Check(!full.TryGetRoomAtScreenPoint(outside, null, out roomId), "A point outside the clipped viewport selected a room.");
 
+            var shopImage = content.GetChild(shop).GetComponent<UnityEngine.UI.Image>();
+            var startImage = content.GetChild(start).GetComponent<UnityEngine.UI.Image>();
+            Color shopColor = shopImage.color;
+            Color startColor = startImage.color;
             full.UpdatePointer(shopPoint, null);
-            var outline = Field<RectTransform>(full, "_hoverOutline");
             var status = Field<TMPro.TMP_Text>(full, "travelStatus");
-            Check(outline != null && outline.gameObject.activeSelf && Field<int>(full, "_hoveredAreaIndex") == shop,
-                "Hover did not highlight the visited room.");
+            Check(shopImage.color != shopColor && Field<int>(full, "_hoveredAreaIndex") == shop,
+                "Hover did not tint the visited room's existing image.");
+            Check(viewport.Find("TravelHighlight") == null, "Hover created a separate rectangle over the room.");
             Check(status != null && status.text.Contains("검증용 이동 제한"), "Hover did not display its authoritative block reason.");
             full.ClickPointer(shopPoint, null);
             Check(clicks == 0, "A blocked room emitted a travel click.");
@@ -313,8 +317,10 @@ public static class DungeonFullMapRegression
 
             full.ClickPointer(startPoint, null);
             Check(clicks == 1 && clickedRoom == result.plan.startMapId, "An allowed room click was not emitted exactly once.");
+            Check(shopImage.color == shopColor && startImage.color != startColor,
+                "Moving the pointer did not restore the previous room and tint the new room.");
             full.ClearPointer();
-            Check(!outline.gameObject.activeSelf && Field<int>(full, "_hoveredAreaIndex") == -1,
+            Check(startImage.color == startColor && Field<int>(full, "_hoveredAreaIndex") == -1,
                 "Leaving the viewport retained its hover highlight.");
             Check(model.Revision == revision, "Pointer selection or highlighting mutated exploration.");
             Graphics(mini.gameObject);

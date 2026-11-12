@@ -34,6 +34,18 @@ public class Enemy : MonoBehaviour, IDamageable
     public bool HasSelectedAttack { get; set; }
 
     public IEnemyBrain Brain { get; private set; }
+    public EnemyCombatGroup CombatGroup { get; private set; }
+    internal NormalEnemyAISettings AISettings => CombatGroup != null ? CombatGroup.Settings : NormalEnemyAISettings.Default;
+    private EnemyTacticalPositioning _tacticalPositioning;
+    internal EnemyTacticalPositioning TacticalPositioning
+        => _tacticalPositioning ??= new EnemyTacticalPositioning(this);
+
+    internal void SetCombatGroup(EnemyCombatGroup group)
+    {
+        if (ReferenceEquals(CombatGroup, group)) return;
+        _tacticalPositioning?.Reset();
+        CombatGroup = group;
+    }
     public bool IsDead => _isDie;
     public bool IsSpawning => _spawnReveal != null && _spawnReveal.IsRevealing;
     [SerializeField] private EnemyRank enemyRank = EnemyRank.Normal;
@@ -271,9 +283,12 @@ public class Enemy : MonoBehaviour, IDamageable
 
         GetComponent<PoiseHandler>()?.TakePoiseDamage(poiseDamage);
 
-        // 피격 순간의 위치만 기억하고, 벽 뒤의 플레이어를 계속 추적하지 않습니다.
-        var attacker = GameObject.FindGameObjectWithTag("Player");
-        if (attacker != null) RememberTargetPosition(attacker.transform.position);
+        // Preserve legacy boss perception; normal enemies learn only from confirmed direct player hits.
+        if (this is Boss)
+        {
+            var attacker = GameObject.FindGameObjectWithTag("Player");
+            if (attacker != null) RememberTargetPosition(attacker.transform.position);
+        }
 
         bool awaitingNormalGroggy = !(this is Boss) && PendingGroggy && !IsSelfDestructing;
         bool inflictedStagger = !awaitingNormalGroggy && !ResistsOrdinaryHitReaction && !IsGroggy
@@ -287,6 +302,14 @@ public class Enemy : MonoBehaviour, IDamageable
 
         EnemyStat.CurrentHp = Mathf.Max(0f, EnemyStat.CurrentHp - damage);
         float healthDamage = hpBefore - EnemyStat.CurrentHp;
+        if (!(this is Boss) && healthDamage > 0f && hitContext.IsDirectPlayerHit && hitContext.Player != null)
+        {
+            Vector3 observedPosition = hitContext.Player.transform.position;
+            RememberTargetPosition(observedPosition);
+            CombatGroup?.ReportDirectHit(this, observedPosition);
+        }
+        if (inflictedStagger || PendingGroggy) CombatGroup?.ClearIntent(this);
+        else if (healthDamage > 0f) CombatGroup?.CancelAttackRequest(this);
         // Phase depletion also publishes callbacks; commit this contact before those can dispatch another hit.
         ItemDamageContext.CommitOutgoing(healthDamage, 0f);
         // A boss may consume this health bar without confirming the actor's death.
@@ -448,6 +471,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private void Die()
     {
         _isDie = true;
+        CombatGroup?.ClearIntent(this);
         if (_spawnReveal != null) _spawnReveal.EndSpawnReveal();
         ClearNormalHitChain();
         CombatHitStopService.ReleaseOwner(this);
@@ -459,6 +483,8 @@ public class Enemy : MonoBehaviour, IDamageable
 
     protected virtual void OnDisable()
     {
+        _tacticalPositioning?.Reset();
+        CombatGroup?.ClearIntent(this);
         if (_spawnReveal != null) _spawnReveal.EndSpawnReveal();
         ClearNormalHitChain();
         CombatHitStopService.ReleaseOwner(this);
@@ -468,6 +494,8 @@ public class Enemy : MonoBehaviour, IDamageable
         StopKnockback();
         OnTelegraphEnd(null);
     }
+
+    private void OnDestroy() => CombatGroup?.Unregister(this);
 
     private void StopKnockback(string reason = "interrupted")
     {
@@ -517,7 +545,13 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         if (EncounterPatrolOnly) return;
         _sensor?.DetectTarget();
-        if (DetectedTarget != null) RememberTargetPosition(DetectedTarget.position);
+        var target = DetectedTarget;
+        if (target != null)
+        {
+            RememberTargetPosition(target.position);
+            CombatGroup?.ReportSighting(this, target.position);
+        }
+        else CombatGroup?.CancelAttackRequest(this);
     }
 
     /// <summary>Lets the first encounter wave patrol safely before the player enters its room.</summary>
@@ -532,7 +566,7 @@ public class Enemy : MonoBehaviour, IDamageable
         (Brain as NormalEnemyBrain)?.ReturnToPatrol();
     }
 
-    /// <summary>Records an entry cue once. Attacking still requires ordinary target detection.</summary>
+    /// <summary>Records a reported position snapshot. This never grants sight or retransmits an alert.</summary>
     public void RememberEncounterPosition(Vector3 position)
     {
         if (EncounterPatrolOnly || !KnockbackMotion.IsFinite(position.x)
@@ -545,6 +579,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public void CancelCurrentAction()
     {
+        CombatGroup?.ClearIntent(this);
         if (CurrentAction?.IsActive == true) CurrentAction.Exit();
         CurrentAction = null;
         HasSelectedAttack = false;
@@ -613,12 +648,14 @@ public class Enemy : MonoBehaviour, IDamageable
     public void RecordAttackStarted(MonsterSkillData skill)
     {
         if (skill == null) return;
+        if (!(skill is MonsterSelfDestructSO)) CombatGroup?.NotifyAttackStarted(this);
         _lastAttack = skill;
         _skillReadyAt[_lastAttack] = Time.time + Mathf.Max(0f, _lastAttack.cooldown);
     }
 
     public void CancelFailedApproach()
     {
+        CombatGroup?.ClearIntent(this);
         if (CurrentAction != null)
             _skillReadyAt[CurrentAction.SkillData] = Time.time + Mathf.Max(0.1f, FailedAttackRetryDelay);
         CurrentAction = null;

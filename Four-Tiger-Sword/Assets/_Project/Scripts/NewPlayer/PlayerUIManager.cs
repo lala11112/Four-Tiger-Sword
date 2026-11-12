@@ -5,7 +5,6 @@ public class PlayerUIManager : MonoBehaviour
 {
     public static PlayerUIManager Instance;
     [SerializeField] private Image hpBarImage;
-    [SerializeField] private Image spBarImage;
     [SerializeField] private Image ultimateGaugeImage;
 
     public GameObject FireElement;
@@ -40,10 +39,8 @@ public class PlayerUIManager : MonoBehaviour
         if (controller == null || controller.StatManager == null) return;
         _statManager = controller.StatManager;
         _statManager.OnHpChanged             += UpdateHpBar;
-        _statManager.OnSpChanged             += UpdateSpBar;
         _statManager.OnUltimateGaugeChanged  += UpdateUltimateGaugeBar;
         UpdateHpBar(_statManager.CurrentHp, _statManager.MaxHp);
-        UpdateSpBar(_statManager.CurrentSp, _statManager.MaxSp);
         UpdateUltimateGaugeBar(_statManager.CurrentUltimateGauge, _statManager.MaxUltimateGauge);
     }
 
@@ -58,7 +55,6 @@ public class PlayerUIManager : MonoBehaviour
         if (_statManager != null)
         {
             _statManager.OnHpChanged            -= UpdateHpBar;
-            _statManager.OnSpChanged            -= UpdateSpBar;
             _statManager.OnUltimateGaugeChanged -= UpdateUltimateGaugeBar;
         }
         _statManager = null;
@@ -68,12 +64,6 @@ public class PlayerUIManager : MonoBehaviour
     {
         if (hpBarImage != null)
             hpBarImage.fillAmount = maxHp > 0f ? Mathf.Clamp01(currentHp / maxHp) : 0f;
-    }
-
-    private void UpdateSpBar(float currentSp, float maxSp)
-    {
-        if (spBarImage != null)
-            spBarImage.fillAmount = maxSp > 0f ? Mathf.Clamp01(currentSp / maxSp) : 0f;
     }
 
     private void UpdateUltimateGaugeBar(float current, float max)

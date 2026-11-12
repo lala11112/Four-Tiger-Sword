@@ -133,7 +133,7 @@ public static class BoundaryZeroTypography
             AssetDatabase.SaveAssetIfDirty(resources);
         }
         foreach (Role role in Enum.GetValues(typeof(Role))) SaveFontResources(GetFont(role));
-        return "BoundaryZERO fonts assigned to " + count + " prefab labels; Pretendard body, Black Han Sans titles, Chakra Petch result values.";
+        return $"BoundaryZERO fonts assigned to {count} prefab labels. Pretendard covers UI labels and result values, Black Han Sans covers result titles, and Chakra Petch covers stage intro numbers.";
     }
 
     public static string ApplyScene(string path)
@@ -169,10 +169,7 @@ public static class BoundaryZeroTypography
         {
             // Combat/world-space labels are outside the supplied UI typography guide.
             if (scene && label.GetComponentInParent<Canvas>(true) == null) continue;
-            bool menu = label.GetComponentInParent<TitleManager>(true) != null
-                && label.transform.parent != null
-                && new[] { "NewGame", "Continue", "Settings", "Quit" }.Contains(label.transform.parent.name);
-            if (Assign(label, menu ? Role.KoreanTitle : Role.Body)) count++;
+            if (Assign(label)) count++;
         }
         foreach (var overlay in root.GetComponentsInChildren<BoundaryZeroRunOverlay>(true))
         {

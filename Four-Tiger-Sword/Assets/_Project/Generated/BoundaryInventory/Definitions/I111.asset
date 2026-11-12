@@ -18,9 +18,9 @@ MonoBehaviour:
   displayName: "\uC751\uAE09 \uD638\uD328"
   description: "\uC811\uC5B4 \uD3EC\uAC20 \uD638\uD328 \uB450 \uC7A5\uC5D0 \uC9E7\uC740
     \uC218\uD638\uBB38\uC774 \uC0C8\uACA8\uC838 \uC788\uB2E4."
-  effectText: "\uC804\uD22C \uC9C4\uC785 \uC2DC 4\uCD08\uAC04 \uCD5C\uB300 HP\uC758
-    4%\uB9CC\uD07C \uBCF4\uD638\uB9C9\uC744 \uC5BB\uB294\uB2E4. \uC7AC\uC0AC\uC6A9
-    \uB300\uAE30\uC2DC\uAC04 12\uCD08."
+  effectText: "\uD53C\uACA9\uC73C\uB85C HP\uB97C \uC783\uC73C\uBA74 \uCD5C\uB300
+    HP\uC758 4%\uB9CC\uD07C \uBCF4\uD638\uB9C9 (4\uCD08)\n\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04
+    12\uCD08"
   synergyIds:
   - S08
   synergyNames:
@@ -29,14 +29,14 @@ MonoBehaviour:
   primarySynergyName: "\uC218\uD638"
   primarySynergyIcon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
   element: 0
-  grade: 2
-  purchasePrice: 40
+  grade: 1
+  purchasePrice: 20
   effects: []
   boundaryEffects:
   - effectId: I111
     stat: 8
     amount: 0.04
-    trigger: 3
+    trigger: 2
     family: 0
     element: 0
     eliteOrBossOnly: 0
@@ -56,9 +56,9 @@ MonoBehaviour:
     cooldownSeconds: 12
   icon: {fileID: 21300000, guid: 49b279dcce7991c4ba1f7021f072bfdc, type: 3}
   contentStatus: draft
-  contentRevision: 20261110
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I111\",\"name\":\"\uC751\uAE09 \uD638\uD328\",\"description\":\"\uC811\uC5B4
     \uD3EC\uAC20 \uD638\uD328 \uB450 \uC7A5\uC5D0 \uC9E7\uC740 \uC218\uD638\uBB38\uC774
-    \uC0C8\uACA8\uC838 \uC788\uB2E4.\",\"effect\":\"\uC804\uD22C \uC9C4\uC785 \uC2DC
-    4\uCD08\uAC04 \uCD5C\uB300 HP\uC758 4%\uB9CC\uD07C \uBCF4\uD638\uB9C9\uC744 \uC5BB\uB294\uB2E4.
-    \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 12\uCD08.\",\"synergies\":[\"S08\"],\"primarySynergy\":\"S08\",\"image\":\"Art/Items/I111.png\",\"origin\":\"expansion\"}"
+    \uC0C8\uACA8\uC838 \uC788\uB2E4.\",\"effect\":\"\uD53C\uACA9\uC73C\uB85C HP\uB97C
+    \uC783\uC73C\uBA74 \uCD5C\uB300 HP\uC758 4%\uB9CC\uD07C \uBCF4\uD638\uB9C9 (4\uCD08)\\n\uC7AC\uC0AC\uC6A9
+    \uB300\uAE30\uC2DC\uAC04 12\uCD08\",\"synergies\":[\"S08\"],\"primarySynergy\":\"S08\",\"image\":\"Art/Items/I111.png\",\"origin\":\"expansion\",\"grade\":1}"

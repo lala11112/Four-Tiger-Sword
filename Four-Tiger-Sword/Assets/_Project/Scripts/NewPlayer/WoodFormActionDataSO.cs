@@ -13,7 +13,6 @@ public class WoodFormActionDataSO : WeaponActionDataSO
     public float StackLifetime { get => FormBalance.StackLifetime; set => FormBalance.StackLifetime = value; }
     public float VulnerabilityDamageBonusPercent { get => FormBalance.VulnerabilityDamageBonusPercent; set => FormBalance.VulnerabilityDamageBonusPercent = value; }
     public float VulnerabilityDuration { get => FormBalance.VulnerabilityDuration; set => FormBalance.VulnerabilityDuration = value; }
-    public float SkillSpiritCost { get => FormBalance.SkillSpiritCost; set => FormBalance.SkillSpiritCost = value; }
     public float SkillCooldownSeconds { get => FormBalance.SkillCooldownSeconds; set => FormBalance.SkillCooldownSeconds = value; }
     public float SkillRadius { get => FormExecution.SkillRadius; set => FormExecution.SkillRadius = value; }
     public Vector3 SkillCenterOffset { get => FormExecution.SkillCenterOffset; set => FormExecution.SkillCenterOffset = value; }
@@ -39,7 +38,6 @@ public class WoodFormBalanceSettings
     [Min(0f)] public float VulnerabilityDamageBonusPercent = 20f;
     [Min(0.1f)] public float VulnerabilityDuration = 6f;
     [Header("Wood Skill - Gather")]
-    [Min(0f)] public float SkillSpiritCost = 18f;
     [Min(0f)] public float SkillCooldownSeconds = 12f;
     [Min(0f), Tooltip("공격력에 곱하는 스킬 피해 계수")]
     public float SkillDamageMultiplier = 0.5f;

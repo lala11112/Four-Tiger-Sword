@@ -411,6 +411,16 @@ public static class PlayerEngravingCombatRegression
             Items = go.AddComponent<PlayerItemRuntime>();
             var catalog = Object.Instantiate(AssetDatabase.LoadAssetAtPath<ItemCatalog>("Assets/_Project/Generated/BoundaryInventory/ItemCatalog.asset"));
             _objects.Add(catalog); catalog.synergies = Array.Empty<ItemSynergyDefinition>();
+            // Keep the combat ordering fixture's original effects when production item rules change.
+            catalog.items = (ItemDefinition[])catalog.items.Clone();
+            foreach (string id in new[] { "I50", "I56", "I77", "I89" })
+            {
+                int index = Array.FindIndex(catalog.items, item => item != null && item.itemId == id);
+                var definition = Object.Instantiate(catalog.items[index]);
+                _objects.Add(definition);
+                definition.boundaryEffects = BoundaryInventoryContent.Effects(id);
+                catalog.items[index] = definition;
+            }
             Items.Catalog = catalog; Items.Initialize(Stats, () => ElementType.ELEMENT_NONE);
             Set(Player, nameof(PlayerController.ItemRuntime), Items);
             Runtime = PlayerEngravingRuntime.Ensure(Player);

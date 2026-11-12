@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using BoundaryZero.SupplyDepot;
 using UnityEngine;
 
 /// <summary>One persistent progression account shared by the Hub and every newly created run.</summary>
@@ -42,6 +43,8 @@ public sealed class PlayerUpgradeService
     public PlayerUpgradeSettingsSO Settings { get; }
     public EngravingSettingsSO EngravingSettings { get; }
     public int Balance => _profile?.currency ?? 0;
+    public SupplyDepotReceipt CurrentSupplyDepotReceipt => string.IsNullOrEmpty(_profile?.supplyDepotTransactionId)
+        ? null : new SupplyDepotReceipt(_profile.supplyDepotTransactionId, _profile.supplyDepotItemId);
     public bool IsReady { get; private set; }
     public string LastError { get; private set; }
     public event Action Changed;
@@ -106,6 +109,8 @@ public sealed class PlayerUpgradeService
             if (loaded.healthLevel > Settings.maxLevel || loaded.attackLevel > Settings.maxLevel
                 || loaded.defenseLevel > Settings.maxLevel)
                 return Reject("저장된 강화 단계가 설정된 최대 단계를 초과합니다. 기존 파일은 보존됩니다.", out error);
+            if (!loaded.TryMigrateRetiredEngravings(out loaded))
+                return Reject("저장된 각인 또는 선행 조건이 유효하지 않습니다. 기존 파일은 보존됩니다.", out error);
             var owned = new HashSet<string>(loaded.unlockedNodeIds ?? Array.Empty<string>(), StringComparer.Ordinal);
             foreach (string id in owned)
             {
@@ -172,6 +177,38 @@ public sealed class PlayerUpgradeService
 
     public EngravingSnapshot CreateEngravingSnapshot() => new EngravingSnapshot(EngravingSettings,
         IsReady ? _profile.unlockedNodeIds : Array.Empty<string>());
+
+    public bool TryPurchaseSupplyDepot(string itemId, int cost, out SupplyDepotReceipt receipt, out string error)
+    {
+        receipt = null;
+        if (!CanMutate(out error)) return false;
+        if (string.IsNullOrWhiteSpace(itemId) || cost < 0)
+            return Reject("보급고 구매 정보가 유효하지 않습니다.", out error);
+        if (!string.IsNullOrEmpty(_profile.supplyDepotTransactionId))
+            return Reject("이번 탐사의 보급품을 이미 받았습니다.", out error);
+        if (Balance < cost) return Reject(Settings.currencyName + "이(가) 부족합니다.", out error);
+
+        var next = _profile.Copy();
+        next.currency -= cost;
+        next.supplyDepotItemId = itemId;
+        next.supplyDepotTransactionId = Guid.NewGuid().ToString("N");
+        if (!Commit(next, null, out error)) return false;
+        receipt = CurrentSupplyDepotReceipt;
+        return true;
+    }
+
+    public bool TryClearSupplyDepotReceipt(string expectedTransactionId, out string error)
+    {
+        if (!CanMutate(out error)) return false;
+        if (string.IsNullOrEmpty(_profile.supplyDepotTransactionId)) return true;
+        if (!string.Equals(_profile.supplyDepotTransactionId, expectedTransactionId, StringComparison.Ordinal))
+            return Reject("이번 탐사의 보급고 구매 기록과 일치하지 않습니다.", out error);
+
+        var next = _profile.Copy();
+        next.supplyDepotItemId = null;
+        next.supplyDepotTransactionId = null;
+        return Commit(next, null, out error);
+    }
 
     /// <summary>Repeated successful reward IDs are no-ops. Failed writes leave the ID retryable.</summary>
     public bool TryGrantReward(string uniqueId, int amount, out string error)

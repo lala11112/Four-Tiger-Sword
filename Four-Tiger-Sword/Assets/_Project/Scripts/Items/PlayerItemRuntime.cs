@@ -6,8 +6,6 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed partial class PlayerItemRuntime : MonoBehaviour
 {
-    public const float BaseDodgeSpCost = 20f;
-    public const float BaseSwitchSpCost = 10f;
 
     [SerializeField] private ItemCatalog catalog;
     private PlayerStatManager _stats;
@@ -62,10 +60,6 @@ public sealed partial class PlayerItemRuntime : MonoBehaviour
     internal bool IsInitialized => _initialized;
     internal bool IsMutationInProgress => _mutationInProgress;
     public IReadOnlyList<ItemDefinition> OwnedItems => _ownedView ??= _ownedItems.AsReadOnly();
-    public float DodgeSpCost => EffectiveCost(ItemStat.DodgeSpCost, BaseDodgeSpCost,
-        ValidMinimum(catalog != null ? catalog.policy?.minDodgeCost : null, 8f));
-    public float SwitchSpCost => EffectiveCost(ItemStat.SwitchSpCost, BaseSwitchSpCost,
-        ValidMinimum(catalog != null ? catalog.policy?.minSwitchCost : null, 4f));
 
     public void Initialize(PlayerController player)
     {
@@ -255,13 +249,14 @@ public sealed partial class PlayerItemRuntime : MonoBehaviour
         if (!_initialized || _stats == null) return;
         SyncBoundarySources();
         if (_suspended || catalog == null) { _stats.RemoveItemResourceModifiers(this); return; }
-        // Submit every resource delta as one replacement, then clamp current resources once.
+        // Replace the modifiers together so current HP is clamped only once.
         var form = CurrentForm;
-        _stats.SetItemResourceModifiers(this, Sum(ItemStat.MaxHp, form) + PassiveBoundaryStat(BoundaryItemStat.MaxHpRatio), Sum(ItemStat.MaxSp, form),
-            Sum(ItemStat.SpRegen, form), ValidPositive(catalog.policy?.maxSpCap, 200f),
-            ValidPositive(catalog.policy?.regenCap, 40f), PassiveBoundaryStat(BoundaryItemStat.AttackRatio),
-            PassiveBoundaryStat(BoundaryItemStat.DefenseRatio), PassiveBoundaryStat(BoundaryItemStat.CriticalChancePoints),
-            PassiveBoundaryStat(BoundaryItemStat.CriticalDamagePoints), PassiveBoundaryStat(BoundaryItemStat.ShieldGainRatio));
+        _stats.SetItemResourceModifiers(this, Sum(ItemStat.MaxHp, form) + PassiveBoundaryStat(BoundaryItemStat.MaxHpRatio),
+            attackRatio: PassiveBoundaryStat(BoundaryItemStat.AttackRatio),
+            defenseRatio: PassiveBoundaryStat(BoundaryItemStat.DefenseRatio),
+            criticalChancePoints: PassiveBoundaryStat(BoundaryItemStat.CriticalChancePoints),
+            criticalDamagePoints: PassiveBoundaryStat(BoundaryItemStat.CriticalDamagePoints),
+            shieldGainRatio: PassiveBoundaryStat(BoundaryItemStat.ShieldGainRatio));
     }
 
     public float GetNormalDamageMultiplier(ElementType form) => DamageMultiplier(ItemStat.NormalDamage, form);
@@ -270,8 +265,6 @@ public sealed partial class PlayerItemRuntime : MonoBehaviour
     private ElementType CurrentForm => _formProvider != null ? _formProvider() : ElementType.ELEMENT_NONE;
     private float DamageMultiplier(ItemStat stat, ElementType form)
         => Mathf.Max(0f, 1f + Sum(stat, form));
-    private float EffectiveCost(ItemStat stat, float basis, float minimum)
-        => Mathf.Max(minimum, basis + Sum(stat, CurrentForm));
 
     private float Sum(ItemStat stat, ElementType form)
     {
@@ -283,11 +276,6 @@ public sealed partial class PlayerItemRuntime : MonoBehaviour
                     sum += effect.Definition.amount;
         return (float)Math.Max(-float.MaxValue / 4d, Math.Min(float.MaxValue / 4d, sum));
     }
-
-    private static float ValidMinimum(float? value, float fallback)
-        => value.HasValue && ItemEffect.IsFinite(value.Value) && value.Value >= 0f ? value.Value : fallback;
-    private static float ValidPositive(float? value, float fallback)
-        => value.HasValue && ItemEffect.IsFinite(value.Value) && value.Value > 0f ? value.Value : fallback;
 
     private void OnEnable()
     {

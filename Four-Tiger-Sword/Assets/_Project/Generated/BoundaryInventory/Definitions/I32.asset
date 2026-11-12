@@ -17,9 +17,9 @@ MonoBehaviour:
   itemId: I32
   displayName: "\uAC1C\uC804 \uBD09\uC778\uD328"
   description: "\uD45C\uBA74\uC5D0 \uAC78\uC1E0\uB97C \uC2EC\uC740 \uC721\uAC01 \uBD09\uC778\uD328."
-  effectText: "\uC804\uD22C\uC5D0 \uC9C4\uC785\uD558\uBA74 \uCD5C\uB300 HP\uC758
-    6%\uC5D0 \uD574\uB2F9\uD558\uB294 \uBCF4\uD638\uB9C9\uC744 5\uCD08\uAC04 \uC5BB\uB294\uB2E4.
-    \uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 15\uCD08."
+  effectText: "\uD53C\uACA9\uC73C\uB85C HP\uB97C \uC783\uC73C\uBA74 \uCD5C\uB300
+    HP\uC758 6%\uB9CC\uD07C \uBCF4\uD638\uB9C9 (5\uCD08)\n\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04
+    15\uCD08"
   synergyIds:
   - S08
   synergyNames:
@@ -28,14 +28,14 @@ MonoBehaviour:
   primarySynergyName: "\uC218\uD638"
   primarySynergyIcon: {fileID: 21300000, guid: 5e3d96d7f59f2bd4d8fb82741d5dbf87, type: 3}
   element: 0
-  grade: 2
-  purchasePrice: 40
+  grade: 3
+  purchasePrice: 80
   effects: []
   boundaryEffects:
   - effectId: I32
     stat: 8
     amount: 0.06
-    trigger: 3
+    trigger: 2
     family: 0
     element: 0
     eliteOrBossOnly: 0
@@ -55,10 +55,8 @@ MonoBehaviour:
     cooldownSeconds: 15
   icon: {fileID: 21300000, guid: 7ab267dcc79d5e543a518f86663ec8a1, type: 3}
   contentStatus: draft
-  contentRevision: 20261108
+  contentRevision: 20261111
   sourceJson: "{\"id\":\"I32\",\"name\":\"\uAC1C\uC804 \uBD09\uC778\uD328\",\"description\":\"\uD45C\uBA74\uC5D0
-    \uAC78\uC1E0\uB97C \uC2EC\uC740 \uC721\uAC01 \uBD09\uC778\uD328.\",\"effect\":\"\uC804\uD22C\uC5D0
-    \uC9C4\uC785\uD558\uBA74 \uCD5C\uB300 HP\uC758 6%\uC5D0 \uD574\uB2F9\uD558\uB294
-    \uBCF4\uD638\uB9C9\uC744 5\uCD08\uAC04 \uC5BB\uB294\uB2E4. \uC7AC\uC0AC\uC6A9
-    \uB300\uAE30\uC2DC\uAC04 15\uCD08.\",\"synergies\":[\"S08\"],\"primarySynergy\":\"S08\",\"designIntent\":\"\uAD50\uC804
-    \uCD08\uBC18\uC5D0 \uC548\uC804\uD558\uAC8C \uC811\uADFC\uD55C\uB2E4.\",\"origin\":\"new\",\"image\":\"Art/Items/I32.png\"}"
+    \uAC78\uC1E0\uB97C \uC2EC\uC740 \uC721\uAC01 \uBD09\uC778\uD328.\",\"effect\":\"\uD53C\uACA9\uC73C\uB85C
+    HP\uB97C \uC783\uC73C\uBA74 \uCD5C\uB300 HP\uC758 6%\uB9CC\uD07C \uBCF4\uD638\uB9C9
+    (5\uCD08)\\n\uC7AC\uC0AC\uC6A9 \uB300\uAE30\uC2DC\uAC04 15\uCD08\",\"synergies\":[\"S08\"],\"primarySynergy\":\"S08\",\"origin\":\"new\",\"image\":\"Art/Items/I32.png\",\"grade\":3}"

@@ -37,7 +37,7 @@ public sealed partial class RunManager
 
     public bool IsReturningToHub { get; private set; }
     public bool IsUpgradeSaveBlocked { get; private set; }
-    public bool HasPendingUpgradeRewards => _pendingUpgradeRewards.Count > 0;
+    public bool HasPendingUpgradeRewards => _pendingUpgradeRewards.Count > 0 || HasPendingSupplyDepotClear;
     public long StageUpgradeRewardTotal { get; private set; }
     public int DeathUpgradeRewardTotal { get; private set; }
     public int GoldBeforeConversion { get; private set; }
@@ -93,10 +93,12 @@ public sealed partial class RunManager
     {
         _upgradeEndRequested = true;
         _upgradeEndWon = won;
+        _supplyDepotClearRequested = _appliedSupplyDepotTransactionId != null;
         if (!_goldConversionQueued)
         {
             _goldConversionQueued = true;
             var wallet = player != null ? player.GetComponent<PlayerWallet>() : null;
+            wallet?.FinishPendingRoomGold();
             GoldBeforeConversion = wallet != null && wallet.IsInitialized ? wallet.Gold : 0;
             if (GoldBeforeConversion > 0)
                 _pendingUpgradeRewards.Add(new PendingUpgradeReward
@@ -140,6 +142,7 @@ public sealed partial class RunManager
         _grantingUpgradeRewards = true;
         try
         {
+            if (!TryClearAppliedSupplyDepotReceipt(out error)) return false;
             while (_pendingUpgradeRewards.Count > 0)
             {
                 var reward = _pendingUpgradeRewards[0];
@@ -249,6 +252,12 @@ public sealed partial class RunManager
         if (IsReturningToHub || HubReturnTransition.IsActive) return;
         if (State != RunState.Won && State != RunState.Lost && State != RunState.Error) return;
         if (!CanLeaveUpgradeRewards()) return;
+        if (!Application.isPlaying || !Application.CanStreamedLevelBeLoaded("Hub Scene"))
+        {
+            RestoreHubReturn("거점 씬을 불러올 수 없습니다. 빌드 씬 설정을 확인해 주세요.");
+            return;
+        }
+        if (!TrySaveSupplyDepotExit()) return;
         IsReturningToHub = true;
         resultUI?.SetHubReturnInProgress(true);
         if (!HubReturnTransition.TryStart(resultUI != null ? resultUI.PresentationOverlay : null, RestoreHubReturn))
@@ -309,7 +318,11 @@ public sealed partial class RunManager
             && _itemRewardLedger.TryRecord(id, out string receipt))
             DungeonRewardChest.Spawn(this, room, receipt, stageManager.Encounters?.RewardChestPrefab);
         // Reserve the receipt before healing can notify observers or change composition readiness.
-        if (firstClear) player?.Engravings?.NotifyRoomCleared();
+        if (firstClear && player != null)
+        {
+            if (player.TryGetComponent(out PlayerWallet wallet)) wallet.AwardCombatRoomGold();
+            player.Engravings?.NotifyRoomCleared();
+        }
     }
 
     private void UnbindUpgradeRooms()
