@@ -29,6 +29,8 @@ public class EnemyIdleState : IPlayerState
     public void Update()
     {
         if (!_navigation.Available || _enemy.IsKnockbacking) return;
+        // Bosses share this state but own their presentation animations.
+        if (!(_enemy is Boss)) _navigation.SyncAnimation();
         if (_walking)
         {
             _walkTime += _enemy.ActionDeltaTime;

@@ -181,38 +181,41 @@ public static partial class EnemyBrainRegression
         foreach (var fighter in fighters) fighter.CombatLabPassive = true;
     }
 
-    private static async Task ExerciseGroupCounterTiming(RuntimeFixture fixture)
+    private static async Task ExerciseGroupArmoredAttackTiming(RuntimeFixture fixture)
     {
-        var group = CreateGroup(fixture, "Immediate counter",
+        var group = CreateGroup(fixture, "Scheduled armored attack",
             new NormalEnemyAISettings { attackStartInterval = .65f });
         var skill = fixture.New<EnemyBrainProbeSkill>();
         skill.executeRange = 4f;
         var skills = fixture.SkillSet(skill);
+        var armoredSkill = fixture.New<EnemyBrainProbeSkill>();
+        armoredSkill.superArmor = true;
+        armoredSkill.executeRange = 4f;
         fixture.Target.position = fixture.Origin + Vector3.right * 20f;
         var opener = GroupActor(fixture, group, "Opening attack", fixture.Target.position + Vector3.back * 2f, skills, out var openingSight);
-        var counter = GroupActor(fixture, group, "Three-hit counter", fixture.Target.position + Vector3.right * 2f, skills, out var counterSight);
+        var reacting = GroupActor(fixture, group, "Attacker in Hurt", fixture.Target.position + Vector3.right * 2f,
+            fixture.SkillSet(armoredSkill), out var reactingSight);
         var follower = GroupActor(fixture, group, "Following attack", fixture.Target.position + Vector3.left * 2f, skills, out var followingSight);
         var player = GroupDamageSource(fixture, fixture.Target.position);
-        await Until(() => opener.Brain != null && counter.Brain != null && follower.Brain != null,
-            "Group counter fixtures did not initialize.");
+        await Until(() => opener.Brain != null && reacting.Brain != null && follower.Brain != null,
+            "Group armored attack fixtures did not initialize.");
         openingSight.Target = fixture.Target;
-        await Until(() => opener.CurrentAction?.IsActive == true, "The counter fixture's opening attack did not enter.");
-        counterSight.Target = fixture.Target;
+        await Until(() => opener.CurrentAction?.IsActive == true, "The room's opening attack did not enter.");
+        reactingSight.Target = fixture.Target;
         followingSight.Target = fixture.Target;
-        Check(ApplyGroupHit(player, counter).CausedOrdinaryStagger
-            && ApplyGroupHit(player, counter).CausedOrdinaryStagger
-            && ApplyGroupHit(player, counter).CausedOrdinaryStagger,
-            "The counter fixture did not receive three direct staggers.");
-        await Until(() => counter.CurrentAction?.IsActive == true,
-            "The third direct stagger did not start the counter.");
+        reacting.HurtDuration = 2f;
+        Check(ApplyGroupHit(player, reacting).CausedOrdinaryStagger, "The scheduled attacker did not enter Hurt.");
+        Set(reacting, "_attackCooldownTimer", 0f);
+        await Until(() => reacting.CurrentAction?.HasNormalAttackArmor == true,
+            "The due selection did not start the armored attack from Hurt.");
         var opened = (EnemyBrainProbeAction)opener.CurrentAction;
-        var countered = (EnemyBrainProbeAction)counter.CurrentAction;
-        Check(countered.EnteredAt - opened.EnteredAt < group.Settings.attackStartInterval,
-            "The immediate counter had to wait for the ordinary attack interval.");
-        await Until(() => follower.CurrentAction?.IsActive == true, "The follower did not attack after the counter.");
-        Check(((EnemyBrainProbeAction)follower.CurrentAction).EnteredAt - countered.EnteredAt >= .649f,
-            "A counter did not restart the room interval for the next ordinary attack.");
-        opener.CombatLabPassive = counter.CombatLabPassive = follower.CombatLabPassive = true;
+        var armored = (EnemyBrainProbeAction)reacting.CurrentAction;
+        Check(armored.EnteredAt - opened.EnteredAt < group.Settings.attackStartInterval,
+            "The armored attack out of Hurt had to wait for the ordinary attack interval.");
+        await Until(() => follower.CurrentAction?.IsActive == true, "The follower did not attack after the armored attack.");
+        Check(((EnemyBrainProbeAction)follower.CurrentAction).EnteredAt - armored.EnteredAt >= .649f,
+            "An armored attack out of Hurt did not restart the room interval for the next ordinary attack.");
+        opener.CombatLabPassive = reacting.CombatLabPassive = follower.CombatLabPassive = true;
     }
 
     private static async Task ExerciseGroupPositioning(RuntimeFixture fixture)
@@ -419,7 +422,7 @@ public static partial class EnemyBrainRegression
         var root = new GameObject(name);
         SceneManager.MoveGameObjectToScene(root, fixture.Scene);
         var group = root.AddComponent<EnemyCombatGroup>();
-        group.Initialize(settings ?? new NormalEnemyAISettings());
+        group.Initialize(PinLegacyTactics(settings ?? new NormalEnemyAISettings()));
         return group;
     }
 

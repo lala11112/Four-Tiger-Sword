@@ -101,6 +101,12 @@ public class EnemyComboAttack : EnemyAction
                     TickBossPreparation(previousTime, Mathf.Min(_timer, activeEnd), startupStart, e.hitStartTime);
                 }
             }
+            else if (e != null)
+            {
+                // Re-aim between strikes so a single sidestep cannot dodge the whole combo.
+                float startupStart = i == 0 ? 0f : _data.hits[i - 1].hitStartTime + _data.hits[i - 1].hitDuration;
+                TickNormalAim(previousTime, _timer, startupStart, e.hitStartTime);
+            }
             if (e != null) StepForward(i, e, previousTime, Mathf.Min(_timer, _data.attackDuration));
             if (e != null && CrossesHitWindow(previousTime, Mathf.Min(_timer, _data.attackDuration),
                 e.hitStartTime, e.hitDuration))

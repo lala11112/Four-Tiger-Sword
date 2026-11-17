@@ -20,8 +20,15 @@ MonoBehaviour:
   preferredRange: 0
   cooldown: 0
   repeatWeightMultiplier: 0.5
+  superArmor: 1
+  trackTurnSpeed: 240
+  trackLockFraction: 0.6
+  leadTime: 0
   attackSpeed: 1
   staggerLevel: 1
+  playerHitReaction: 0
+  playerDownSeconds: 0.3
+  playerGetUpSeconds: 0.5
   isParryable: 1
   telegraphDuration: 0.4
   SwingAudio:
@@ -44,6 +51,7 @@ MonoBehaviour:
     PitchRange: {x: 0.97, y: 1.03}
   baseDamage: 1
   knockbackForce: 5
+  stepStopDistance: 1.4
   attackDuration: 1.8
   hitBoxShape: 0
   hitBoxRadius: 1.2
@@ -52,6 +60,17 @@ MonoBehaviour:
     hitDuration: 0.1
     damage: 0
     hitBoxOffset: {x: 0, y: 0, z: 1}
+    animationState:
+    animationStartTime: 0
+    stepDistance: 0
+    stepStartTime: 0
+    stepDuration: 0.3
+    overrideReaction: 0
+    knockbackForce: 5
+    staggerLevel: 1
+    knockdown: 0
+    downSeconds: 0.3
+    getUpSeconds: 0.5
     SwingAudio:
       Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
       Accent: {fileID: 0}
@@ -68,6 +87,17 @@ MonoBehaviour:
     hitDuration: 0.1
     damage: 0
     hitBoxOffset: {x: 0, y: 0, z: 1}
+    animationState:
+    animationStartTime: 0
+    stepDistance: 0
+    stepStartTime: 0
+    stepDuration: 0.3
+    overrideReaction: 0
+    knockbackForce: 5
+    staggerLevel: 1
+    knockdown: 0
+    downSeconds: 0.3
+    getUpSeconds: 0.5
     SwingAudio:
       Clip: {fileID: 8300000, guid: 944e5ae8234dcce45b8cc865322e66fa, type: 3}
       Accent: {fileID: 0}

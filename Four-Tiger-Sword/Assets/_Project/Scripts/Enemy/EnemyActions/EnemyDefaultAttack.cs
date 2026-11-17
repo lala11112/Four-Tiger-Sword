@@ -44,6 +44,7 @@ public class EnemyDefaultAttack : EnemyAction
         }
 
         TickBossPreparation(previousTime, _timer, 0f, _data.hitStartTime);
+        TickNormalAim(previousTime, _timer, 0f, _data.hitStartTime);
         if (_timer >= _data.hitStartTime + _data.hitDuration)
             SetBossStage(BossAttackStage.Recovery);
 

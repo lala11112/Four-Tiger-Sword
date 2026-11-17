@@ -38,8 +38,15 @@ public static partial class EnemyBrainRegression
     {
         RuntimeFixture fixture = null;
         string outcome = "passed";
+        // The original contracts below were written for the pre-tactics AI. Pin it while they run.
+        var savedDefault = NormalEnemyAISettings.Default.Copy();
+        PinLegacyTactics(NormalEnemyAISettings.Default);
         try
         {
+            fixture = new RuntimeFixture();
+            await ExerciseTactics(fixture);
+            await fixture.DisposeAsync();
+            fixture = null;
             fixture = new RuntimeFixture();
             await ExercisePerceptionAndGroupCombat(fixture);
             await fixture.DisposeAsync();
@@ -48,13 +55,17 @@ public static partial class EnemyBrainRegression
             await ExerciseGroupAwareness(fixture);
             await ExerciseGroupAttackTiming(fixture);
             await ExerciseGroupAttackQueue(fixture);
-            await ExerciseGroupCounterTiming(fixture);
+            await ExerciseGroupArmoredAttackTiming(fixture);
             await ExerciseGroupPositioning(fixture);
             await ExerciseAuthoredMixedGroup(fixture);
             await fixture.DisposeAsync();
             fixture = null;
             fixture = new RuntimeFixture();
-            await ExerciseCounterattacks(fixture);
+            await ExerciseScheduledAttacks(fixture);
+            await fixture.DisposeAsync();
+            fixture = null;
+            fixture = new RuntimeFixture();
+            await ExerciseArmoredHitVisuals(fixture);
             await fixture.DisposeAsync();
             fixture = null;
             fixture = new RuntimeFixture();
@@ -83,7 +94,12 @@ public static partial class EnemyBrainRegression
                 outcome = "failed during fixture cleanup: " + exception.GetBaseException().Message;
                 Debug.LogException(exception);
             }
-            finally { _status = outcome; _running = false; }
+            finally
+            {
+                RestoreTactics(NormalEnemyAISettings.Default, savedDefault);
+                _status = outcome;
+                _running = false;
+            }
         }
     }
 
@@ -115,10 +131,12 @@ public static partial class EnemyBrainRegression
         await Frames(3);
         Check(attack.Updated == updates && enemy.CurrentAction == attack,
             "A complete local hit stop must stop action updates and action transitions.");
-        await Until(() => enemy.CanAttack, "World-time attack cooldown must expire during a local actor stop.");
+        await Until(() => AttackCooldownRemaining(enemy) <= 0f, "World-time attack cooldown must expire during a local actor stop.");
         Check(attack.Updated == updates, "World-time cooldown must not advance the stopped action timeline.");
         enemy.ActorClock.ClearStops();
         await Until(() => attack.Updated > updates, "Action updates did not resume after local hit stop.");
+        Check(enemy.CurrentAction == attack && PendingAttack(enemy) == null && skill.Actions.Count == 1,
+            "An elapsed selection interval must not replace or reserve an attack during an active attack.");
 
         skill.cooldown = 100f;
         enemy.RecordAttackStarted(skill);
@@ -171,11 +189,14 @@ public static partial class EnemyBrainRegression
         await Until(() => skill.Actions.Count > 0 && skill.Actions[0].IsFinished,
             "A normal action did not finish through its real Update callback.");
         var first = skill.Actions[0];
+        Set(enemy, "_attackCooldownTimer", 0f);
+        sensor.Target = null;
         await Until(() => !first.IsActive && enemy.CurrentAction != first,
             "A naturally completed normal attack did not leave AttackState.");
-        Check(!enemy.CanAttack, "The normal attack exit must start the common attack cooldown.");
+        Check(AttackCooldownRemaining(enemy) <= 0f, "Finishing a normal attack restarted an elapsed selection interval.");
+        sensor.Target = fixture.Target;
         await Until(() => skill.Actions.Count > 1 && skill.Actions[1].Entered == 1,
-            "Normal AI did not resume selecting attacks after its completion cooldown.");
+            "Normal AI did not resume selecting attacks after the active attack completed.");
         enemy.CombatLabPassive = true;
         skill.finishAfterUpdates = -1;
         enemy.ApproachStuckTimeout = .1f;

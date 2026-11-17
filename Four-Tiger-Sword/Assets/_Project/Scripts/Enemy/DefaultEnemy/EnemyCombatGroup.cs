@@ -26,6 +26,11 @@ public sealed class EnemyCombatGroup : MonoBehaviour
     private readonly List<Enemy> _invalidRequests = new();
     private long _requestOrder;
     private float _nextAttackStart = float.NegativeInfinity;
+    private const float SurroundRefreshInterval = .5f;
+    private readonly Dictionary<Enemy, float> _surroundAngles = new();
+    private readonly List<KeyValuePair<Enemy, float>> _surroundScratch = new();
+    private Transform _surroundTarget;
+    private float _nextSurroundRefresh = float.NegativeInfinity;
     public NormalEnemyAISettings Settings { get; private set; } = new NormalEnemyAISettings();
     public int MemberCount => _members.Count;
     public int PendingAttackCount { get { PruneRequests(); return _requests.Count; } }
@@ -137,7 +142,7 @@ public sealed class EnemyCombatGroup : MonoBehaviour
         if (!Available(enemy)) return;
         CancelAttackRequest(enemy);
         ReleasePosition(enemy);
-        // Immediate counters bypass the queue, but delay subsequent ordinary starts.
+        // A scheduled armored escape from Hurt also delays subsequent ordinary starts.
         _nextAttackStart = Mathf.Max(_nextAttackStart, Time.time + Settings.attackStartInterval);
     }
 
@@ -175,6 +180,53 @@ public sealed class EnemyCombatGroup : MonoBehaviour
         if (!ReferenceEquals(owner, null) && _members.TryGetValue(owner, out var member)) member.HasPosition = false;
     }
 
+    /// <summary>
+    /// Direction from the target toward this enemy's share of an evenly spaced ring, so a group
+    /// spreads to the flanks and rear instead of queueing in front. False for a lone fighter.
+    /// </summary>
+    public bool TryGetSurroundDirection(Enemy enemy, Transform target, out Vector3 direction)
+    {
+        direction = default;
+        if (!Settings.surroundEnabled || target == null || !Available(enemy)) return false;
+        // Newcomers join on the next refresh; rebuilding per miss would make a lone fighter rebuild every tick.
+        if (target != _surroundTarget || Time.time >= _nextSurroundRefresh)
+            RebuildSurround(target);
+        if (!_surroundAngles.TryGetValue(enemy, out float angle)) return false;
+        direction = Quaternion.AngleAxis(angle, Vector3.up) * Vector3.forward;
+        return true;
+    }
+
+    private void RebuildSurround(Transform target)
+    {
+        _surroundTarget = target;
+        _nextSurroundRefresh = Time.time + SurroundRefreshInterval;
+        _surroundAngles.Clear();
+        _surroundScratch.Clear();
+        foreach (var pair in _members)
+        {
+            var member = pair.Key;
+            if (!Available(member) || member.DetectedTarget != target) continue;
+            Vector3 offset = member.transform.position - target.position;
+            float angle = offset.x * offset.x + offset.z * offset.z > .001f
+                ? Mathf.Atan2(offset.x, offset.z) * Mathf.Rad2Deg : 0f;
+            _surroundScratch.Add(new KeyValuePair<Enemy, float>(member, angle));
+        }
+        int count = _surroundScratch.Count;
+        if (count < 2) return;
+        _surroundScratch.Sort((a, b) => a.Value.CompareTo(b.Value));
+        float spacing = 360f / count;
+        // Keep the ring where the group already stands: circular mean of each member's offset from its slot.
+        Vector2 sum = Vector2.zero;
+        for (int i = 0; i < count; i++)
+        {
+            float radians = (_surroundScratch[i].Value - i * spacing) * Mathf.Deg2Rad;
+            sum += new Vector2(Mathf.Sin(radians), Mathf.Cos(radians));
+        }
+        float baseAngle = sum.sqrMagnitude > .0001f ? Mathf.Atan2(sum.x, sum.y) * Mathf.Rad2Deg : _surroundScratch[0].Value;
+        for (int i = 0; i < count; i++)
+            _surroundAngles[_surroundScratch[i].Key] = baseAngle + i * spacing;
+    }
+
     private static float Radius(Member member) => member.Agent != null ? Mathf.Max(0f, member.Agent.radius) : .5f;
     private static float GroundDistanceSquared(Vector3 a, Vector3 b)
     { a.y = b.y = 0f; return (a - b).sqrMagnitude; }
@@ -183,6 +235,8 @@ public sealed class EnemyCombatGroup : MonoBehaviour
     {
         _requests.Clear();
         _nextAttackStart = float.NegativeInfinity;
+        _surroundAngles.Clear();
+        _surroundTarget = null;
         foreach (var member in _members.Values)
         { member.HasPosition = false; member.NextSighting = float.NegativeInfinity; }
     }

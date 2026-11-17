@@ -100,7 +100,7 @@ public abstract class EnemyAction
         IsActive = true;
         WasParried = false;
         _telegraphActive = false;
-        _normalAttackArmor = _guardNormalLifetime;
+        _normalAttackArmor = _guardNormalLifetime && SkillData.superArmor;
         if (_guardNormalLifetime && !CanContinueAction)
         {
             _normalAttackArmor = false;
@@ -154,7 +154,12 @@ public abstract class EnemyAction
         EndTelegraph();
     }
 
-    protected void EndNormalAttackArmor() => _normalAttackArmor = false;
+    protected void EndNormalAttackArmor()
+    {
+        if (!_normalAttackArmor) return;
+        _normalAttackArmor = false;
+        _enemy.GetComponent<EnemyArmoredHitReaction>()?.ClearReaction();
+    }
 
     protected void BeginAttackWarning()
     {
@@ -209,6 +214,32 @@ public abstract class EnemyAction
         }
         _enemy.transform.rotation = _bossAimRotation;
         BossStage = currentTime < activeStart ? BossAttackStage.Startup : BossAttackStage.Active;
+    }
+
+    /// <summary>
+    /// Ordinary enemies turn toward the (predicted) target during a strike's startup,
+    /// then commit at trackLockFraction so a late dodge still succeeds.
+    /// Times use the same attack-speed-scaled action timeline as hit windows.
+    /// </summary>
+    protected void TickNormalAim(float previousTime, float currentTime, float startupStart, float activeStart)
+    {
+        if (HasBossPolicy || _enemy is Boss || SkillData.trackTurnSpeed <= 0f || activeStart <= startupStart) return;
+        float lockTime = Mathf.Lerp(startupStart, activeStart, Mathf.Clamp01(SkillData.trackLockFraction));
+        float turnTime = Mathf.Min(currentTime, lockTime) - Mathf.Max(previousTime, startupStart);
+        if (!(turnTime > 0f) || _enemy.DetectedTarget == null) return;
+        Vector3 direction = PredictedTargetPoint() - _enemy.transform.position;
+        direction.y = 0f;
+        if (direction.sqrMagnitude <= .001f) return;
+        _enemy.transform.rotation = Quaternion.RotateTowards(_enemy.transform.rotation,
+            Quaternion.LookRotation(direction), SkillData.trackTurnSpeed * turnTime);
+    }
+
+    protected Vector3 PredictedTargetPoint()
+    {
+        var target = _enemy.DetectedTarget;
+        if (target == null) return _enemy.transform.position + _enemy.transform.forward;
+        if (SkillData.leadTime <= 0f) return target.position;
+        return target.position + Vector3.ProjectOnPlane(_enemy.TargetVelocity, Vector3.up) * SkillData.leadTime;
     }
 
     protected void SetBossStage(BossAttackStage stage)

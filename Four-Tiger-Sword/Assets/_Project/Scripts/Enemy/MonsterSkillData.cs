@@ -30,6 +30,18 @@ public abstract class MonsterSkillData : ScriptableObject
     [Tooltip("직전에 사용한 공격의 선택 가중치 배율")]
     [Range(0.1f, 1f)] public float repeatWeightMultiplier = 0.5f;
 
+    [Header("슈퍼아머 (일반 적)")]
+    [Tooltip("피격 경직 중에도 사거리 안에서 공격을 시작할 수 있습니다. 선딜과 타격 중 일반 경직과 넉백을 막으며, 피해와 포이즈 감소는 적용됩니다.")]
+    public bool superArmor;
+
+    [Header("AI 조준 (일반 적)")]
+    [Tooltip("선딜 동안 플레이어를 따라 도는 속도 (도/초). 0이면 공격 시작 시 한 번만 조준합니다.")]
+    [Min(0f)] public float trackTurnSpeed = 240f;
+    [Tooltip("선딜 중 이 비율 지점에서 조준을 고정합니다. 이후의 회피는 성공합니다. 0 = 시작 시 고정, 1 = 타격 직전까지 추적")]
+    [Range(0f, 1f)] public float trackLockFraction = .6f;
+    [Tooltip("플레이어 이동 속도 기준 예측 시간 (초). 0이면 현재 위치를 조준합니다.")]
+    [Min(0f)] public float leadTime = 0f;
+
     [Header("공격 속도")]
     [Tooltip("공격 애니메이션 재생 속도 및 피격 판정 타이밍 배율. 1.0 = 기본, 2.0 = 2배 빠름")]
     [Min(0.01f)]

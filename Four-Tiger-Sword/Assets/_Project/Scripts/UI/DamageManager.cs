@@ -85,10 +85,6 @@ public static class DamageManager
                 info.StaggerResistLevel, info.IsParryable, info.Source);
             if (result.Applied) ItemDamageContext.CommitOutgoing(result.HealthDamage, result.ShieldDamage);
         }
-        if (result.Applied && result.CausedOrdinaryStagger && info.IsDirectPlayerHit
-            && info.Category != PlayerAttackCategory.Secondary
-            && info.Source is PlayerController && target is Enemy staggeredEnemy)
-            staggeredEnemy.RecordDirectPlayerStagger();
         if (result.Applied && result.HealthDamage + result.ShieldDamage > 0f)
             CombatSfx.Play(info.ImpactSound, impactPosition, info.Source, impact: true);
         return result;

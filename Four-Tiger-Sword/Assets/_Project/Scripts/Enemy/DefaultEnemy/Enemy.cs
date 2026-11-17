@@ -130,7 +130,8 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public bool IsSilenced => GetComponent<StatusEffectHandler>()?.Get<SilenceEffect>() is { IsExpired: false };
     internal bool IsAttackCooldownReady => _attackCooldownTimer <= 0f;
-    public bool CanAttack => !IsSpawning && !EncounterPatrolOnly && !IsKnockbacking && !IsSilenced && IsAttackCooldownReady;
+    public bool CanAttack => !IsSpawning && !EncounterPatrolOnly && !IsKnockbacking && !IsSilenced
+        && (IsAttackCooldownReady || !(this is Boss) && HasSelectedAttack);
     public bool IsAttackFinished => CurrentAction?.IsFinished ?? true;
 
     public Animator Animator { get; private set; }
@@ -146,6 +147,7 @@ public class Enemy : MonoBehaviour, IDamageable
     public void BindAnimator(Animator animator)
     {
         if (animator == null) throw new System.ArgumentNullException(nameof(animator));
+        GetComponent<EnemyArmoredHitReaction>()?.ClearReaction();
         Animator = animator;
         _directionController = null;
         _directionParametersCached = false;
@@ -320,6 +322,9 @@ public class Enemy : MonoBehaviour, IDamageable
             if (_hitFlash == null)
                 _hitFlash = GetComponent<EnemyHitFlash>() ?? gameObject.AddComponent<EnemyHitFlash>();
             _hitFlash.Play();
+            if (!(this is Boss) && EnemyStat.CurrentHp > 0f && !PendingGroggy && !IsGroggy
+                && CurrentAction?.HasNormalAttackArmor == true)
+                EnemyArmoredHitReaction.Play(this, power, isCritical);
         }
         OnDamaged?.Invoke(healthDamage, damageType, isCritical);
 
@@ -354,7 +359,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     internal void BeginSelfDestruct()
     {
-        ClearNormalHitChain();
+        ClearScheduledAttack();
         IsSelfDestructing = true;
         StopKnockback();
     }
@@ -471,9 +476,10 @@ public class Enemy : MonoBehaviour, IDamageable
     private void Die()
     {
         _isDie = true;
+        GetComponent<EnemyArmoredHitReaction>()?.ClearReaction();
         CombatGroup?.ClearIntent(this);
         if (_spawnReveal != null) _spawnReveal.EndSpawnReveal();
-        ClearNormalHitChain();
+        ClearScheduledAttack();
         CombatHitStopService.ReleaseOwner(this);
         ActorClock?.ClearStops();
         StopKnockback();
@@ -483,10 +489,11 @@ public class Enemy : MonoBehaviour, IDamageable
 
     protected virtual void OnDisable()
     {
+        GetComponent<EnemyArmoredHitReaction>()?.ClearReaction();
         _tacticalPositioning?.Reset();
         CombatGroup?.ClearIntent(this);
         if (_spawnReveal != null) _spawnReveal.EndSpawnReveal();
-        ClearNormalHitChain();
+        ClearScheduledAttack();
         CombatHitStopService.ReleaseOwner(this);
         ActorClock?.ClearStops();
         CancelCurrentAction();
@@ -535,6 +542,32 @@ public class Enemy : MonoBehaviour, IDamageable
         }
     }
 
+    /// <summary>Smoothed planar velocity of the sensed target, used by attack lead aiming.</summary>
+    public Vector3 TargetVelocity { get; private set; }
+    private Transform _velocityTarget;
+    private Vector3 _velocitySamplePosition;
+    private float _velocitySampleTime;
+
+    private void TrackTargetVelocity(Transform target)
+    {
+        float now = Time.time;
+        if (target == null || target != _velocityTarget)
+        {
+            TargetVelocity = Vector3.zero;
+            _velocityTarget = target;
+            if (target != null) { _velocitySamplePosition = target.position; _velocitySampleTime = now; }
+            return;
+        }
+        float elapsed = now - _velocitySampleTime;
+        if (elapsed < .02f) return;
+        Vector3 sample = Vector3.ProjectOnPlane(target.position - _velocitySamplePosition, Vector3.up) / elapsed;
+        // Dashes and knockback teleports must not produce absurd leads.
+        sample = Vector3.ClampMagnitude(sample, 20f);
+        TargetVelocity = Vector3.Lerp(TargetVelocity, sample, .5f);
+        _velocitySamplePosition = target.position;
+        _velocitySampleTime = now;
+    }
+
     private void RememberTargetPosition(Vector3 position)
     {
         LastKnownTargetPosition = position;
@@ -546,6 +579,7 @@ public class Enemy : MonoBehaviour, IDamageable
         if (EncounterPatrolOnly) return;
         _sensor?.DetectTarget();
         var target = DetectedTarget;
+        TrackTargetVelocity(target);
         if (target != null)
         {
             RememberTargetPosition(target.position);
@@ -560,7 +594,7 @@ public class Enemy : MonoBehaviour, IDamageable
         if (EncounterPatrolOnly == patrolOnly) return;
         EncounterPatrolOnly = patrolOnly;
         if (!patrolOnly) return;
-        ClearNormalHitChain();
+        ClearScheduledAttack();
         _targetMemoryExpiresAt = float.NegativeInfinity;
         CancelCurrentAction();
         (Brain as NormalEnemyBrain)?.ReturnToPatrol();
@@ -579,6 +613,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public void CancelCurrentAction()
     {
+        ClearScheduledAttack();
         CombatGroup?.ClearIntent(this);
         if (CurrentAction?.IsActive == true) CurrentAction.Exit();
         CurrentAction = null;
@@ -623,24 +658,15 @@ public class Enemy : MonoBehaviour, IDamageable
         return fallback;
     }
 
-    /// <summary>Receives credit only for a confirmed direct player hit that caused this call's stagger.</summary>
-    public void RecordDirectPlayerStagger()
-    {
-        if (!isActiveAndEnabled || this is Boss || IsDead || EnemyStat?.CurrentHp <= 0f
-            || !IsHurt || IsGroggy || PendingGroggy || IsRoot || IsSelfDestructing
-            || CombatLabPassive || EncounterPatrolOnly) return;
-        (Brain as NormalEnemyBrain)?.RecordDirectStagger();
-    }
+    internal void ClearScheduledAttack() => (Brain as NormalEnemyBrain)?.ClearScheduledAttack();
 
-    internal void ClearNormalHitChain() => (Brain as NormalEnemyBrain)?.ClearHitChain();
-
-    internal void StopKnockbackForCounter() => StopKnockback("counter-started");
+    internal void StopKnockbackForArmoredAttack() => StopKnockback("armored-attack-started");
 
     internal void OnPoiseBroken()
     {
         PendingGroggy = true;
         if (this is Boss || IsSelfDestructing) return;
-        ClearNormalHitChain();
+        ClearScheduledAttack();
         // Stop current hit windows immediately. The brain enters groggy on its next safe tick.
         CancelCurrentAction();
     }
@@ -664,7 +690,21 @@ public class Enemy : MonoBehaviour, IDamageable
 
     public void StartAttackCooldown()
     {
-        _attackCooldownTimer = EnemyStat.GetStat(EnemyStatType.AttackCooldown);
+        float cooldown = EnemyStat.GetStat(EnemyStatType.AttackCooldown);
+        if (!KnockbackMotion.IsFinite(cooldown)) cooldown = 0f;
+        cooldown = Mathf.Max(0f, cooldown);
+        // Ordinary enemies vary their rhythm so the next attack cannot be timed by counting.
+        float jitter = this is Boss ? 0f : Mathf.Clamp(AISettings.attackCooldownJitter, 0f, .9f);
+        if (jitter > 0f && cooldown > 0f)
+            cooldown *= UnityEngine.Random.Range(1f - jitter, 1f + jitter);
+        _attackCooldownTimer = cooldown;
+    }
+
+    /// <summary>Shortens the remaining common attack cooldown, never below ready.</summary>
+    internal void ReduceAttackCooldown(float seconds)
+    {
+        if (seconds > 0f && _attackCooldownTimer > 0f)
+            _attackCooldownTimer = Mathf.Max(0f, _attackCooldownTimer - seconds);
     }
 
     public void LockMovement()

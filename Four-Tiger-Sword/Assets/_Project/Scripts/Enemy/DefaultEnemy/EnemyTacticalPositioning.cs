@@ -20,6 +20,8 @@ internal sealed class EnemyTacticalPositioning
     private float _directionHoldUntil;
     private float _nextRepath;
     private bool _followingPath;
+    private bool _strafing;
+    private float _strafeRetryAt;
 
     public EnemyNavigation Navigation { get; }
 
@@ -53,6 +55,8 @@ internal sealed class EnemyTacticalPositioning
         float maxRange = float.PositiveInfinity)
     {
         if (!Navigation.Available || _enemy.IsKnockbacking) return;
+        // Approaches and range keeping always run at full speed.
+        EndStrafe();
         if (skill == null || maxRange < skill.minimumRange)
         {
             if (approach) Investigate(target.position);
@@ -97,6 +101,7 @@ internal sealed class EnemyTacticalPositioning
         if (away.sqrMagnitude < .001f)
             away = Vector3.ProjectOnPlane(-_enemy.transform.forward, Vector3.up);
         away = away.sqrMagnitude > .001f ? away.normalized : Vector3.back;
+        Vector3 basis = SurroundBasis(away, target);
 
         float bestLength = float.PositiveInfinity;
         Vector3 bestDirection = Vector3.zero;
@@ -114,7 +119,7 @@ internal sealed class EnemyTacticalPositioning
 
         foreach (float angle in CandidateAngles)
         {
-            Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * away;
+            Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * basis;
             if (TryCandidate(direction, out var position, out float length) && length < bestLength)
                 SaveCandidate(direction, position, length);
         }
@@ -155,9 +160,80 @@ internal sealed class EnemyTacticalPositioning
         }
     }
 
+    /// <summary>
+    /// Circles the target during attack cooldown. side is +1/-1 around the target;
+    /// inward shortens the ring for a feint. Returns false when no lane is free.
+    /// </summary>
+    public bool Strafe(Transform target, MonsterSkillData skill, ref int side, float inward, bool forceReplan = false)
+    {
+        if (!Navigation.Available || _enemy.IsKnockbacking || target == null || skill == null) return false;
+        if (_target != target || _skill != skill)
+        {
+            Reset();
+            _target = target;
+            _skill = skill;
+        }
+        var agent = Navigation.Agent;
+        float now = _enemy.ActionTime;
+        bool pathBlocked = PathBlocked();
+        bool arrived = !agent.pathPending && (!agent.hasPath || agent.remainingDistance <= agent.stoppingDistance + .05f);
+        if (!forceReplan && _strafing && _followingPath && !pathBlocked && !arrived
+            && (_plannedTargetPosition - target.position).sqrMagnitude < 1f)
+        {
+            _enemy.CombatGroup?.ReservePosition(_enemy, _destination);
+            return true;
+        }
+        if (!forceReplan && _strafing && now < _nextRepath && !pathBlocked) return _followingPath;
+        // After a failed lane search, let range keeping run instead of re-querying every tick.
+        if (!_strafing && now < _strafeRetryAt) return false;
+        _nextRepath = now + _enemy.AISettings.destinationUpdateInterval;
+
+        Vector3 away = Vector3.ProjectOnPlane(_enemy.transform.position - target.position, Vector3.up);
+        if (away.sqrMagnitude < .001f) away = Vector3.ProjectOnPlane(-_enemy.transform.forward, Vector3.up);
+        away = away.sqrMagnitude > .001f ? away.normalized : Vector3.back;
+
+        var settings = _enemy.AISettings;
+        float step = Mathf.Max(5f, settings.strafeAngleStep);
+        // Drift toward the flank this enemy owns in the group's ring before circling around it.
+        if (_enemy.CombatGroup != null && _enemy.CombatGroup.TryGetSurroundDirection(_enemy, target, out var slot))
+        {
+            float toSlot = Vector3.SignedAngle(away, slot, Vector3.up);
+            if (Mathf.Abs(toSlot) > step) side = toSlot > 0f ? 1 : -1;
+        }
+
+        float maxDistance = Mathf.Min(skill.executeRange, skill.engageRange);
+        float preferred = Mathf.Clamp(PreferredRange(skill), skill.minimumRange, Mathf.Max(skill.minimumRange, maxDistance));
+        float radius = Mathf.Max(skill.minimumRange + RangeInset, preferred - Mathf.Max(0f, inward));
+        for (int attempt = 0; attempt < 2; attempt++, side = -side)
+        {
+            Vector3 direction = Quaternion.AngleAxis(side * step, Vector3.up) * away;
+            Vector3 destination = target.position + direction * radius;
+            destination.y = _enemy.transform.position.y;
+            if (!Navigation.TryBuildPath(destination, false, target, _candidatePath, out var position, out _)
+                || Vector3.Distance(position, target.position) < skill.minimumRange
+                || !PositionAvailable(position) || !agent.SetPath(_candidatePath)) continue;
+            _destination = position;
+            _plannedTargetPosition = target.position;
+            _followingPath = true;
+            _enemy.CombatGroup?.ReservePosition(_enemy, position);
+            if (!_strafing)
+            {
+                _strafing = true;
+                _enemy.ActorClock?.SetMovementModifier(this, settings.strafeSpeedMultiplier);
+            }
+            Navigation.Animate(true);
+            return true;
+        }
+        Stop();
+        _strafeRetryAt = now + _enemy.AISettings.destinationUpdateInterval * 2f;
+        _nextRepath = 0f;
+        return false;
+    }
+
     public void Investigate(Vector3 position)
     {
         if (!Navigation.Available || _enemy.IsKnockbacking) return;
+        EndStrafe();
         if (_target != null || _skill != null) Reset();
         float now = _enemy.ActionTime;
         if (now < _nextRepath && !PathBlocked()) return;
@@ -191,11 +267,15 @@ internal sealed class EnemyTacticalPositioning
     }
 
     public void FaceTarget(Transform target)
+        => FaceDirection(target.position - _enemy.transform.position);
+
+    /// <summary>Turns at the combat turn speed; the NavMeshAgent's own angular speed is far slower.</summary>
+    public void FaceDirection(Vector3 direction)
     {
-        Vector3 direction = Vector3.ProjectOnPlane(target.position - _enemy.transform.position, Vector3.up);
+        direction = Vector3.ProjectOnPlane(direction, Vector3.up);
         if (direction.sqrMagnitude <= .001f) return;
         _enemy.transform.rotation = Quaternion.RotateTowards(_enemy.transform.rotation,
-            Quaternion.LookRotation(direction), 360f * _enemy.ActionDeltaTime);
+            Quaternion.LookRotation(direction), _enemy.AISettings.turnSpeed * _enemy.ActionDeltaTime);
     }
 
     public void Reset()
@@ -204,7 +284,7 @@ internal sealed class EnemyTacticalPositioning
         _target = null;
         _skill = null;
         _direction = Vector3.zero;
-        _directionHoldUntil = _nextRepath = 0f;
+        _directionHoldUntil = _nextRepath = _strafeRetryAt = 0f;
     }
 
     private void Stop()
@@ -212,6 +292,27 @@ internal sealed class EnemyTacticalPositioning
         Navigation.Stop();
         _enemy.CombatGroup?.ReleasePosition(_enemy);
         _followingPath = false;
+        EndStrafe();
+    }
+
+    private void EndStrafe()
+    {
+        if (!_strafing) return;
+        _strafing = false;
+        // A strafe leg is not a valid approach path; make the next planner call choose afresh.
+        _followingPath = false;
+        _nextRepath = 0f;
+        _enemy.ActorClock?.RemoveMovementModifier(this);
+    }
+
+    /// <summary>Tilts the approach basis toward the flank slot the group assigned to this enemy.</summary>
+    private Vector3 SurroundBasis(Vector3 away, Transform target)
+    {
+        var group = _enemy.CombatGroup;
+        if (group == null || !group.TryGetSurroundDirection(_enemy, target, out var slot)) return away;
+        float bias = _enemy.AISettings.surroundBias;
+        float signed = Vector3.SignedAngle(away, slot, Vector3.up);
+        return Quaternion.AngleAxis(Mathf.Clamp(signed, -bias, bias), Vector3.up) * away;
     }
 
     private bool PathBlocked() => _followingPath && Navigation.Agent.hasPath && !Navigation.Agent.pathPending

@@ -7,6 +7,7 @@ public class EnemyApproachState : IPlayerState
     private readonly Enemy _enemy;
     private NavMeshAgent _nav;
     private float _previousStoppingDistance;
+    private bool _previousUpdateRotation;
     private float _elapsed;
     private float _stuckTime;
     private float _repathTimer;
@@ -27,6 +28,8 @@ public class EnemyApproachState : IPlayerState
         if (_enemy is not Boss)
         {
             var positioning = _enemy.TacticalPositioning;
+            _previousUpdateRotation = _nav.updateRotation;
+            _enemy.SetNavigationRotation(false);
             positioning.Navigation.RefreshAnimation();
             positioning.Reset();
             var skill = _enemy.CurrentAction?.SkillData;
@@ -51,8 +54,9 @@ public class EnemyApproachState : IPlayerState
     {
         var target = _enemy.DetectedTarget;
         var skill = _enemy.CurrentAction?.SkillData;
-        if (target == null || skill == null) return;
         var positioning = _enemy.TacticalPositioning;
+        positioning.Navigation.SyncAnimation();
+        if (target == null || skill == null) return;
         if (_enemy.IsSilenced || !_enemy.IsSkillReady(skill))
         {
             _enemy.CancelCurrentAction();
@@ -75,6 +79,7 @@ public class EnemyApproachState : IPlayerState
             return;
         }
         positioning.UpdateVisibleTarget(target, skill, true);
+        positioning.FaceTarget(target);
     }
 
     private void UpdateBossApproach()
@@ -129,5 +134,6 @@ public class EnemyApproachState : IPlayerState
         }
         _enemy.CombatGroup?.CancelAttackRequest(_enemy);
         _enemy.TacticalPositioning.Reset();
+        _enemy.SetNavigationRotation(_previousUpdateRotation);
     }
 }

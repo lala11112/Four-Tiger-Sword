@@ -105,14 +105,47 @@ internal sealed class EnemyNavigation
 
     public void RefreshAnimation() => _movingAnimation = null;
 
+    private static readonly int MoveState = Animator.StringToHash("Move");
+    private static readonly int IdleState = Animator.StringToHash("Idle");
+    private const float StartMovingSpeed = .2f, StopMovingSpeed = .08f;
+    private int _crossFadeFrame = -1;
+
+    /// <summary>
+    /// Plays Move or Idle. Verifies the Animator's real state instead of trusting the last request,
+    /// because a crossfade can be dropped (Animator not ready, or toggled back within one fade).
+    /// </summary>
     public void Animate(bool moving)
     {
-        if (_movingAnimation == moving) return;
-        _movingAnimation = moving;
         var animator = _enemy.Animator;
-        string state = moving ? "Move" : "Idle";
-        if (animator != null && animator.isActiveAndEnabled && animator.layerCount > 0
-            && animator.HasState(0, Animator.StringToHash(state)))
-            animator.CrossFade(state, .1f, 0);
+        int state = moving ? MoveState : IdleState;
+        if (animator == null || !animator.isActiveAndEnabled || animator.runtimeAnimatorController == null
+            || animator.layerCount == 0 || !animator.HasState(0, state))
+        {
+            // Nothing was played, so do not remember it as applied.
+            _movingAnimation = null;
+            return;
+        }
+        int playing = animator.IsInTransition(0)
+            ? animator.GetNextAnimatorStateInfo(0).shortNameHash
+            : animator.GetCurrentAnimatorStateInfo(0).shortNameHash;
+        if (playing == state) { _movingAnimation = moving; return; }
+        // A crossfade requested this frame is not visible in the state info until the Animator evaluates.
+        if (_movingAnimation == moving && _crossFadeFrame == Time.frameCount) return;
+        animator.CrossFade(state, .1f, 0);
+        _movingAnimation = moving;
+        _crossFadeFrame = Time.frameCount;
+    }
+
+    /// <summary>
+    /// Locomotion states call this every tick so Move/Idle follows the agent's actual motion,
+    /// including pushes from other agents and paths that end without an explicit stop.
+    /// </summary>
+    public void SyncAnimation()
+    {
+        if (!Available || _enemy.IsKnockbacking) return;
+        bool following = Agent.hasPath && !Agent.isStopped
+            && (Agent.pathPending || Agent.remainingDistance > Agent.stoppingDistance + .05f);
+        float threshold = _movingAnimation == true ? StopMovingSpeed : StartMovingSpeed;
+        Animate(following || Agent.velocity.sqrMagnitude > threshold * threshold);
     }
 }

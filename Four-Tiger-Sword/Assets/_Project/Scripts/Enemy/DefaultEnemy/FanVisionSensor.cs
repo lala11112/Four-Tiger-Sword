@@ -22,6 +22,13 @@ public class FanVisionSensor : MonoBehaviour, IEnemySensor
 
     public Transform DetectedTarget { get; private set; }
 
+    // Only the environment hides the player. Skill effects, UI and actors never do.
+    private static int _nonOccludingLayers = -1;
+    private static int NonOccludingLayers => _nonOccludingLayers >= 0 ? _nonOccludingLayers
+        : _nonOccludingLayers = LayerMask.GetMask("Ignore Raycast", "UI", "Player", "Enemy", "PlayerSkill");
+    // A second, higher sight line so ground bumps and low props do not hide a standing player.
+    private const float UpperSightOffset = .75f;
+
     private void Awake() => _owner = GetComponentInParent<Enemy>();
 
     public bool DetectTarget()
@@ -49,17 +56,26 @@ public class FanVisionSensor : MonoBehaviour, IEnemySensor
         if (!isNearby && !isAlert && flatDirection.sqrMagnitude > 0.001f
             && Vector3.Angle(flatForward, flatDirection) > _halfAngle) return false;
 
-        Vector3 origin = transform.position + Vector3.up * _heightOffset;
-        Vector3 ray = _player.position + Vector3.up * _heightOffset - origin;
+        if (!HasClearSight(_heightOffset) && !HasClearSight(_heightOffset + UpperSightOffset)) return false;
+        DetectedTarget = _player;
+        return true;
+    }
+
+    private bool HasClearSight(float height)
+    {
+        int occlusionMask = _visibilityMask & ~NonOccludingLayers;
+        Vector3 origin = transform.position + Vector3.up * height;
+        Vector3 ray = _player.position + Vector3.up * height - origin;
+        if (ray.sqrMagnitude < .0001f) return true;
         int count = Physics.RaycastNonAlloc(origin, ray.normalized, _visibilityHits,
-            ray.magnitude, _visibilityMask, QueryTriggerInteraction.Ignore);
+            ray.magnitude, occlusionMask, QueryTriggerInteraction.Ignore);
         // A crowd can fill the non-alloc buffer with body colliders. Check all hits in
         // that rare case so neither allies nor an omitted wall produce a false result.
         RaycastHit[] hits = _visibilityHits;
         if (count == hits.Length)
         {
             hits = Physics.RaycastAll(origin, ray.normalized, ray.magnitude,
-                _visibilityMask, QueryTriggerInteraction.Ignore);
+                occlusionMask, QueryTriggerInteraction.Ignore);
             count = hits.Length;
         }
         for (int i = 0; i < count; i++)
@@ -69,7 +85,6 @@ public class FanVisionSensor : MonoBehaviour, IEnemySensor
                 || hit.GetComponentInParent<Enemy>() != null) continue;
             return false;
         }
-        DetectedTarget = _player;
         return true;
     }
 
