@@ -30,7 +30,7 @@ namespace StudioBaekho
             StartCoroutine(Generate(actualSeed));
         }
 
-        public IEnumerator Generate(int seed)
+        public IEnumerator Generate(int seed, BaekhoFixedDungeonLayout fixedLayout = null)
         {
             if (IsGenerating)
             {
@@ -47,7 +47,8 @@ namespace StudioBaekho
                     error = "Generator root must have unit scale and no X/Z tilt.";
                 else if (settings == null || settings.style == null) error = "Dungeon settings and corridor style are required.";
                 else if (!ValidateStyle(settings.style, out error)) { }
-                else if (!BaekhoDungeonPlanner.TryPlan(settings, seed, out plan, out error)) { }
+                else if (fixedLayout != null) fixedLayout.TryCreatePlan(settings, seed, out plan, out error);
+                else BaekhoDungeonPlanner.TryPlan(settings, seed, out plan, out error);
             }
             catch (Exception exception) { error = exception.Message; }
             if (plan == null || !string.IsNullOrEmpty(error))

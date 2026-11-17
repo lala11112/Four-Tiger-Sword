@@ -77,10 +77,11 @@ public sealed partial class RunManager
 
     private void OnUpgradeStageClear()
     {
+        if (IsTutorial) return;
         if (State != RunState.Playing || stageManager == null || !stageManager.IsReady
             || !stageManager.IsCleared || definition == null || CurrentChapterIndex < 0 || CurrentStageIndex < 0
             || !_queuedUpgradeStages.Add((CurrentChapterIndex, CurrentStageIndex))) return;
-        bool boss = CurrentStageIndex == definition.chapters[CurrentChapterIndex].stages.Length - 1;
+        bool boss = definition.IsBossStage(CurrentChapterIndex, CurrentStageIndex);
         _pendingUpgradeRewards.Add(new PendingUpgradeReward
         {
             Id = _upgradeRunId + ":stage:" + CurrentChapterIndex + ":" + CurrentStageIndex,
@@ -93,6 +94,14 @@ public sealed partial class RunManager
     {
         _upgradeEndRequested = true;
         _upgradeEndWon = won;
+        if (IsTutorial)
+        {
+            _tutorialCompletionPending |= won && !TutorialSession.IsReplay;
+            if (won && TutorialSession.IsReplay) TutorialSession.PendingHubOverview = true;
+            if (TrySaveUpgradeRewards(out string tutorialError)) return true;
+            BlockUpgradeSaving(tutorialError);
+            return false;
+        }
         _supplyDepotClearRequested = _appliedSupplyDepotTransactionId != null;
         if (!_goldConversionQueued)
         {
@@ -142,6 +151,13 @@ public sealed partial class RunManager
         _grantingUpgradeRewards = true;
         try
         {
+            if (_tutorialCompletionPending)
+            {
+                int amount = GetComponent<TutorialDirector>()?.definition?.supportStones ?? 120;
+                if (!service.TryCompleteTutorialMap(amount, out error)) return false;
+                _tutorialCompletionPending = false;
+                StageUpgradeRewardTotal = amount;
+            }
             if (!TryClearAppliedSupplyDepotReceipt(out error)) return false;
             while (_pendingUpgradeRewards.Count > 0)
             {
@@ -316,7 +332,14 @@ public sealed partial class RunManager
         var identity = room.GetComponent<BaekhoGeneratedRoom>();
         if (identity != null && identity.role == BaekhoRoomRole.Normal
             && _itemRewardLedger.TryRecord(id, out string receipt))
+        {
+            if (IsTutorial && id == GetComponent<TutorialDirector>()?.definition?.trainingRoomId)
+            {
+                ItemChoices?.ConfigureTutorialReward(receipt, "I01");
+                GetComponent<TutorialDirector>()?.RegisterTrainingReceipt(receipt);
+            }
             DungeonRewardChest.Spawn(this, room, receipt, stageManager.Encounters?.RewardChestPrefab);
+        }
         // Reserve the receipt before healing can notify observers or change composition readiness.
         if (firstClear && player != null)
         {

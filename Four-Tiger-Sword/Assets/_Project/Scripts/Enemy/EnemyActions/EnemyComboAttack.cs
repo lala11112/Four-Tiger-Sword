@@ -48,6 +48,35 @@ public class EnemyComboAttack : EnemyAction
         _nav = enemy != null ? enemy.GetComponent<NavMeshAgent>() : null;
     }
 
+    public override bool TryGetAttackRangeWarning(out AttackRangeWarning warning)
+    {
+        warning = default;
+        if (!CanShowAttackRangeWarning || _data.hits == null) return false;
+
+        // Find the next strike and start filling after the last active hit ends.
+        EnemyHitEvent next = null;
+        float startupStart = 0f;
+        foreach (var hit in _data.hits)
+        {
+            if (hit == null || !(hit.hitDuration > 0f) || !(hit.hitStartTime <= _data.attackDuration)) continue;
+            if (_timer < hit.hitStartTime)
+            {
+                if (next == null || hit.hitStartTime < next.hitStartTime) next = hit;
+                continue;
+            }
+
+            float activeEnd = hit.hitStartTime + hit.hitDuration;
+            if (_timer < activeEnd) return false;
+            startupStart = Mathf.Max(startupStart, activeEnd);
+        }
+
+        if (next == null || !TryGetWarningProgress(_timer, startupStart, next.hitStartTime, out float progress))
+            return false;
+
+        warning = AttackRangeWarning.Circle(GetGroundHitCenter(next.hitBoxOffset), _data.hitBoxRadius, progress);
+        return true;
+    }
+
     public override void Enter()
     {
         _normalArmorEnd = 0f;

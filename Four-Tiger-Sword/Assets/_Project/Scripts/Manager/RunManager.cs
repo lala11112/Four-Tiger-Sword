@@ -65,7 +65,7 @@ public sealed partial class RunManager : MonoBehaviour
         RunSeed = randomizeSeed ? Guid.NewGuid().GetHashCode() : seed;
         _pendingChapter = _pendingStage = 0;
         _hasPending = true;
-        if (!EnsureUpgradeProfile()) yield break;
+        if (!EnsureUpgradeProfile() || !EnsureTutorialLaunch()) yield break;
         BeginPending();
     }
 
@@ -73,6 +73,7 @@ public sealed partial class RunManager : MonoBehaviour
     {
         if (_transition != null || !_hasPending || State == RunState.Won || State == RunState.Lost) return;
         if (!CanLeaveUpgradeRewards()) return;
+        if (!EnsureTutorialLaunch()) return;
         EnsureRunEngravings();
         UnbindUpgradeRooms();
         SuspendPlayerAndCloseShop();
@@ -96,7 +97,9 @@ public sealed partial class RunManager : MonoBehaviour
         var stages = definition.chapters[_pendingChapter].stages;
         int stageSeed = RunDefinitionSO.GetStageSeed(RunSeed, _pendingChapter, _pendingStage);
         int layoutSeed = _attempt == 0 ? stageSeed : RunDefinitionSO.GetStageSeed(stageSeed, _attempt, 0);
-        yield return stageManager.Prepare(stages[_pendingStage], _pendingStage == stages.Length - 1, stageSeed, layoutSeed, player);
+        int? restoredRoom = IsTutorial && TutorialSession.RestoreCheckpoint && TutorialSession.PendingCheckpoint != null
+            ? GetComponent<TutorialDirector>()?.definition?.trainingRoomId : null;
+        yield return stageManager.Prepare(stages[_pendingStage], definition.IsBossStage(_pendingChapter, _pendingStage), stageSeed, layoutSeed, player, restoredRoom);
         if (State != RunState.Preparing) { CancelStagePresentation(); yield break; }
         if (!stageManager.IsReady) { ShowError(stageManager.Error ?? "Stage preparation failed."); yield break; }
         if (player.StatManager.CurrentHp <= 0) { Lose(); yield break; }
@@ -104,13 +107,17 @@ public sealed partial class RunManager : MonoBehaviour
         CurrentStageIndex = _pendingStage;
         CurrentStageSeed = stageSeed;
         EnsureRunItemChoices();
+        Vector3 spawnPosition = stageManager.PlayerSpawnPosition;
+        Quaternion spawnRotation = stageManager.PlayerSpawnRotation;
+        if (!PrepareTutorialPlacement(ref spawnPosition, ref spawnRotation, out string tutorialError))
+        { ShowError(tutorialError); yield break; }
         LastError = null;
         // Keep loading visible while placing the camera and evaluating the player's Idle pose.
         _stageIntroPause = CombatHitStopService.AcquireWorldScale(this, 0f);
         string placementError = null;
         try
         {
-            player.PlaceStageTransition(stageManager.PlayerSpawnPosition, stageManager.PlayerSpawnRotation);
+            player.PlaceStageTransition(spawnPosition, spawnRotation);
             if (!player.PrepareStageIdleForReveal()) placementError = "Player Idle animation is unavailable.";
         }
         catch (Exception error) { placementError = error.Message; }
@@ -280,6 +287,7 @@ public sealed partial class RunManager : MonoBehaviour
     public void ReturnToTitle()
     {
         if (!CanLeaveUpgradeRewards()) return;
+        if (IsTutorial) TutorialSession.Reset();
         CancelStagePresentation();
         SuspendPlayerAndCloseShop();
         CombatHitStopService.SetExternalWorldTimeScale(1f);

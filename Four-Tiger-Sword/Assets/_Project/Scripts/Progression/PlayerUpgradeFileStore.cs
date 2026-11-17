@@ -64,8 +64,12 @@ public sealed class PlayerUpgradeFileStore : IPlayerUpgradeStore
                 if (!Regex.IsMatch(json, "\"" + field + "\"\\s*:"))
                     throw new InvalidDataException("필수 저장 항목이 없습니다: " + field);
             profile = JsonUtility.FromJson<PlayerUpgradeProfile>(json);
-            if (profile != null && profile.version == 2 && !Regex.IsMatch(json, "\"unlockedNodeIds\"\\s*:"))
+            if (profile != null && profile.version >= 2 && !Regex.IsMatch(json, "\"unlockedNodeIds\"\\s*:"))
                 throw new InvalidDataException("필수 저장 항목이 없습니다: unlockedNodeIds");
+            if (profile != null && profile.version >= 3)
+                foreach (string field in new[] { "tutorialVersion", "tutorialStatus", "tutorialHubStep", "tutorialGrantClaimed" })
+                    if (!Regex.IsMatch(json, "\"" + field + "\"\\s*:"))
+                        throw new InvalidDataException("필수 저장 항목이 없습니다: " + field);
             if (profile == null || !profile.Validate(out error))
                 throw new InvalidDataException(error ?? "저장 데이터가 비어 있습니다.");
             if (!profile.TryMigrateRetiredEngravings(out profile))

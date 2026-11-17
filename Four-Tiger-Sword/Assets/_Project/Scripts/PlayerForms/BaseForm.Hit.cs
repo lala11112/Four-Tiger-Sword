@@ -84,6 +84,11 @@ public abstract partial class BaseForm
             if (!result.Applied) continue;
             ConfirmHitFeedback(step, (Component)damageable, result, hitEvent);
             OnDamageDealt(target, result, step, hitEvent);
+            if (_playerController.TutorialCombat is { } tutorial && damageable is Enemy enemy)
+            {
+                if (_currentAction == ActionType.Attack) tutorial.ReportHit(TutorialCombatAction.GroundHit, enemy);
+                else if (_currentAction == ActionType.AirAttack) tutorial.ReportHit(TutorialCombatAction.AirHit, enemy);
+            }
         }
     }
 

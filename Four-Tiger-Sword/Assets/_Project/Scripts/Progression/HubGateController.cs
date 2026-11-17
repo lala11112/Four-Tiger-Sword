@@ -36,6 +36,7 @@ public sealed class HubGateController : MonoBehaviour
         && player.StatManager != null && player.StatManager.CurrentHp > 0f;
     private bool CanControl => isActiveAndEnabled && PlayerAvailable && !IsLoading
         && !player.IsGameplayModalPaused && (world == null || !world.IsModalOpen)
+        && (world == null || world.CanStartExpedition)
         && (workshop == null || !workshop.IsOpen);
 
     public bool IsInRange

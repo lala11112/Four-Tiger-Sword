@@ -16,6 +16,7 @@ public static class RunItemChoiceRegression
         if (Application.isPlaying) throw new InvalidOperationException("Run item-choice checks in Edit Mode.");
         _checks = 0;
         RoomCandidateCounts();
+        RequiredTutorialReward();
         GlobalRerollsAndOneHeldCandidate();
         OwnedSynergiesFollowClaims();
         NoChangeDoesNotConsumeReroll();
@@ -70,6 +71,26 @@ public static class RunItemChoiceRegression
         Check(!f.Service.CanReroll && !f.Service.TryReroll(f.Service.Current.Id)
             && f.Service.RerollsRemaining == 0 && Signature(f.Service.Current) == before,
             "Exhausted global rerolls changed a later stage reward.");
+    }
+
+    private static void RequiredTutorialReward()
+    {
+        using var f = new Fixture("reroll", "hold");
+        f.Service.ConfigureTutorialReward("training", "I01");
+        string receipt = null, itemId = null;
+        int claims = 0;
+        f.Service.RewardClaimed += (claimedReceipt, claimedItem) =>
+        { receipt = claimedReceipt; itemId = claimedItem; claims++; };
+        Check(f.Service.BeginRoomReward("training"), "The tutorial chest did not open.");
+        var session = f.Service.Current;
+        Check(session.IsRequired && session.Candidates.Single().itemId == "I01" && !f.Service.CanSkip
+            && !f.Service.CanHold && !f.Service.CanReroll, "The required item was replaceable or skippable.");
+        Check(!f.Service.TryClaim(session.Id, "I04") && !f.Service.TrySkip(session.Id)
+            && !f.Service.TryReroll(session.Id) && claims == 0, "An invalid action advanced the tutorial chest.");
+        Check(f.Service.TryClaim(session.Id, "I01") && f.Items.Contains("I01") && receipt == "training"
+            && itemId == "I01" && claims == 1, "The required item was not published after ownership was committed.");
+        Check(!f.Service.BeginRoomReward("training") && f.Service.BeginRoomReward("normal")
+            && f.Service.CanSkip && f.Service.CanReroll, "The fixed receipt affected a normal chest or paid twice.");
     }
 
     private static void OwnedSynergiesFollowClaims()

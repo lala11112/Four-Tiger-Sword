@@ -8,6 +8,7 @@ public class EnemySelfDestruct : EnemyAction
     private GameObject _warning;
     private Vector3 _center;
     private Quaternion _rotation;
+    private float _warningGroundY;
     private float _elapsed;
     private bool _previousRootMotion;
     private bool _movementLocked;
@@ -18,6 +19,19 @@ public class EnemySelfDestruct : EnemyAction
         _data = data;
     }
 
+    public override bool TryGetAttackRangeWarning(out AttackRangeWarning warning)
+    {
+        warning = default;
+        if (!CanShowAttackRangeWarning || _exploded
+            || !TryGetWarningProgress(_elapsed, 0f, _data.explosionDelay, out float progress))
+            return false;
+
+        var center = _center;
+        center.y = _warningGroundY;
+        warning = AttackRangeWarning.Circle(center, _data.explosionRadius, progress);
+        return true;
+    }
+
     public override void Enter()
     {
         base.Enter();
@@ -25,6 +39,7 @@ public class EnemySelfDestruct : EnemyAction
         _exploded = false;
         _rotation = _enemy.transform.rotation;
         _center = GetHitCenter(_data.explosionOffset);
+        _warningGroundY = GetAttackGroundY();
         _enemy.LockMovement();
         _movementLocked = true;
         var nav = _enemy.GetComponent<NavMeshAgent>();
@@ -39,7 +54,9 @@ public class EnemySelfDestruct : EnemyAction
             _enemy.Animator.applyRootMotion = false;
             _enemy.Animator.CrossFade(string.IsNullOrEmpty(_data.animName) ? "Move" : _data.animName, 0.1f);
         }
-        if (_data.warningEffectPrefab != null)
+        if (_data.warningEffectPrefab != null
+            && (_enemy is Boss || !_enemy.TryGetComponent(out EnemyAttackRangePresentation presentation)
+                || !presentation.isActiveAndEnabled))
         {
             _warning = Object.Instantiate(_data.warningEffectPrefab,
                 _center + _data.warningEffectOffset, _rotation);

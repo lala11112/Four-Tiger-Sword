@@ -19,9 +19,17 @@ namespace BoundaryZero.SupplyDepot
 
         public bool IsOpen { get; private set; }
         public bool IsDrawing => pendingReceipt != null;
+        private bool drawPermitted = true;
 
         public event Action<bool> OpenChanged;
         public event Action<SupplyDepotReceipt> RewardGranted;
+
+        public void SetDrawPermitted(bool permitted)
+        {
+            if (drawPermitted == permitted) return;
+            drawPermitted = permitted;
+            if (!IsDrawing && isActiveAndEnabled && EnsureView()) Refresh();
+        }
 
         readonly System.Random drawRandom = new System.Random();
         ISupplyDepotAccount account;
@@ -249,11 +257,11 @@ namespace BoundaryZero.SupplyDepot
                     view.ShowRestoredResult(result);
                 }
             }
-            view.Render(account?.PermanentCurrency ?? 0, CanDraw(receipt), false, result);
+            view.Render(account?.PermanentCurrency ?? 0, CanDraw(receipt), false, result, drawPermitted);
         }
 
         bool CanDraw(SupplyDepotReceipt receipt) =>
-            account != null && receipt == null && catalog != null && catalog.price >= 0 &&
+            drawPermitted && account != null && receipt == null && catalog != null && catalog.price >= 0 &&
             account.PermanentCurrency >= catalog.price && HasValidItems();
 
         bool HasValidItems()

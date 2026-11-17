@@ -18,7 +18,7 @@ public sealed partial class RunManager
     private void EnsureRunEngravings()
     {
         if (_engravingsInitialized || player == null || UpgradeService?.IsReady != true) return;
-        _runEngravings = UpgradeService.CreateEngravingSnapshot();
+        _runEngravings = IsTutorial ? EngravingSnapshot.Empty : UpgradeService.CreateEngravingSnapshot();
         PlayerEngravingRuntime.Ensure(player).InitializeRun(_runEngravings);
         _engravingsInitialized = true;
     }

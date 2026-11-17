@@ -1,27 +1,30 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using BoundaryZero.SupplyDepot;
 using UnityEngine;
 
 /// <summary>One persistent progression account shared by the Hub and every newly created run.</summary>
 public sealed class PlayerUpgradeService
 {
-    private static PlayerUpgradeService _instance;
-    public static PlayerUpgradeService Instance => _instance ??= new PlayerUpgradeService(
-        Resources.Load<PlayerUpgradeSettingsSO>("PlayerUpgradeSettings"),
-        new PlayerUpgradeFileStore(Path.Combine(Application.persistentDataPath, "player-upgrades.json")));
+    public const int TutorialUpgradeStep = 0;
+    public const int TutorialEngravingStep = 1;
+    public const int TutorialDepotStep = 2;
+    private const int DefaultTutorialDepotCost = 100;
+    private static PlayerUpgradeService _transient;
+    private static PlayerUpgradeService _testOverride;
+    public static PlayerUpgradeService Instance => _testOverride ?? SaveSlotService.Instance.SelectedAccount
+        ?? (_transient ??= new PlayerUpgradeService(Resources.Load<PlayerUpgradeSettingsSO>("PlayerUpgradeSettings"), new TransientStore()));
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetSession() => _instance = null;
+    private static void ResetSession() => _transient = _testOverride = null;
 
 #if UNITY_EDITOR
     /// <summary>Scope the shared account to an isolated store during Play Mode integration verification.</summary>
     public static IDisposable OverrideForTesting(PlayerUpgradeService service)
     {
         if (service == null) throw new ArgumentNullException(nameof(service));
-        var scope = new TestOverride(_instance, service);
-        _instance = service;
+        var scope = new TestOverride(_testOverride, service);
+        _testOverride = service;
         return scope;
     }
 
@@ -35,14 +38,36 @@ public sealed class PlayerUpgradeService
         {
             if (_disposed) return;
             _disposed = true;
-            if (ReferenceEquals(_instance, _replacement)) _instance = _previous;
+            if (ReferenceEquals(_testOverride, _replacement)) _testOverride = _previous;
         }
     }
 #endif
 
+    private sealed class TransientStore : IPlayerUpgradeStore
+    {
+        private PlayerUpgradeProfile _profile = PlayerUpgradeProfile.New();
+
+        public bool TryLoad(out PlayerUpgradeProfile profile, out string error)
+        {
+            profile = _profile.Copy();
+            error = null;
+            return true;
+        }
+
+        public bool TrySave(PlayerUpgradeProfile profile, out string error)
+        {
+            _profile = profile.Copy();
+            error = null;
+            return true;
+        }
+    }
+
     public PlayerUpgradeSettingsSO Settings { get; }
     public EngravingSettingsSO EngravingSettings { get; }
     public int Balance => _profile?.currency ?? 0;
+    public TutorialProgressStatus TutorialStatus => _profile?.tutorialStatus ?? TutorialProgressStatus.NotStarted;
+    public int TutorialHubStep => _profile?.tutorialHubStep ?? 0;
+    public bool TutorialGrantClaimed => _profile?.tutorialGrantClaimed == true;
     public SupplyDepotReceipt CurrentSupplyDepotReceipt => string.IsNullOrEmpty(_profile?.supplyDepotTransactionId)
         ? null : new SupplyDepotReceipt(_profile.supplyDepotTransactionId, _profile.supplyDepotItemId);
     public bool IsReady { get; private set; }
@@ -111,6 +136,8 @@ public sealed class PlayerUpgradeService
                 return Reject("저장된 강화 단계가 설정된 최대 단계를 초과합니다. 기존 파일은 보존됩니다.", out error);
             if (!loaded.TryMigrateRetiredEngravings(out loaded))
                 return Reject("저장된 각인 또는 선행 조건이 유효하지 않습니다. 기존 파일은 보존됩니다.", out error);
+            loaded = loaded.Copy();
+            loaded.MigrateTutorialProgress();
             var owned = new HashSet<string>(loaded.unlockedNodeIds ?? Array.Empty<string>(), StringComparer.Ordinal);
             foreach (string id in owned)
             {
@@ -118,7 +145,7 @@ public sealed class PlayerUpgradeService
                 if (definition == null || definition.parentId != "origin" && !owned.Contains(definition.parentId))
                     return Reject("저장된 각인 또는 선행 조건이 유효하지 않습니다. 기존 파일은 보존됩니다.", out error);
             }
-            _profile = loaded.Copy();
+            _profile = loaded;
             IsReady = true;
             LastError = null;
             NotifyChanged();
@@ -128,10 +155,99 @@ public sealed class PlayerUpgradeService
         finally { _transactionInProgress = false; }
     }
 
+    public bool TryStartTutorial(out string error)
+    {
+        if (!CanMutate(out error)) return false;
+        if (TutorialStatus == TutorialProgressStatus.InMap) return true;
+        if (TutorialGrantClaimed || (TutorialStatus != TutorialProgressStatus.NotStarted
+            && TutorialStatus != TutorialProgressStatus.Skipped))
+            return Reject("이미 완료한 튜토리얼의 진행 기록을 다시 시작할 수 없습니다.", out error);
+        var next = _profile.Copy();
+        next.tutorialStatus = TutorialProgressStatus.InMap;
+        return Commit(next, null, out error);
+    }
+
+    public bool TrySkipTutorial(out string error)
+    {
+        if (!CanMutate(out error)) return false;
+        if (TutorialStatus == TutorialProgressStatus.Skipped) return true;
+        if (TutorialStatus != TutorialProgressStatus.NotStarted && TutorialStatus != TutorialProgressStatus.InMap
+            && TutorialStatus != TutorialProgressStatus.HubLessons)
+            return Reject("현재 튜토리얼 진행 상태에서는 건너뛸 수 없습니다.", out error);
+        var next = _profile.Copy();
+        next.tutorialStatus = TutorialProgressStatus.Skipped;
+        return Commit(next, null, out error);
+    }
+
+    public bool TryCompleteTutorialMap(int grant, out string error)
+    {
+        if (!CanMutate(out error)) return false;
+        if (TutorialGrantClaimed) return true;
+        if (TutorialStatus != TutorialProgressStatus.InMap || grant < 0)
+            return Reject("튜토리얼 지도 완료 기록이 유효하지 않습니다.", out error);
+        if (grant > int.MaxValue - Balance)
+            return Reject("강화 재화 보유 한도를 초과합니다.", out error);
+        var next = _profile.Copy();
+        next.currency += grant;
+        next.tutorialGrantClaimed = true;
+        next.tutorialStatus = TutorialProgressStatus.HubLessons;
+        return Commit(next, null, out error);
+    }
+
+    public bool IsTutorialWorkshopUpgradeAllowed => TutorialStatus != TutorialProgressStatus.HubLessons
+        || TutorialHubStep == TutorialUpgradeStep && !HasAnyUpgrade;
+
+    public bool CanPurchaseSupplyDepotDuringTutorial => TutorialStatus != TutorialProgressStatus.HubLessons
+        || TutorialHubStep == TutorialDepotStep;
+
+    private bool HasAnyUpgrade => GetLevel(StatType.ST_HP) > 0 || GetLevel(StatType.ST_ATK) > 0
+        || GetLevel(StatType.ST_DEF) > 0;
+
+    private bool HasAnyEngraving => _profile?.unlockedNodeIds is { Length: > 0 };
+
+    public bool CanAcknowledgeTutorialHubStep(int depotCost = DefaultTutorialDepotCost) =>
+        IsReady && TutorialStatus == TutorialProgressStatus.HubLessons && (TutorialHubStep switch
+        {
+            TutorialUpgradeStep => HasAnyUpgrade || Balance < Settings.initialCost,
+            TutorialEngravingStep => HasAnyEngraving || !HasAffordableFirstEngraving(),
+            TutorialDepotStep => CurrentSupplyDepotReceipt != null || Balance < depotCost,
+            _ => false
+        });
+
+    public bool TryAcknowledgeTutorialHubStep(out string error) =>
+        TryAcknowledgeTutorialHubStep(DefaultTutorialDepotCost, out error);
+
+    public bool TryAcknowledgeTutorialHubStep(int depotCost, out string error)
+    {
+        if (!CanMutate(out error)) return false;
+        if (!CanAcknowledgeTutorialHubStep(depotCost))
+            return Reject("현재 거점 실습을 먼저 완료하세요.", out error);
+        var next = _profile.Copy();
+        AdvanceTutorialHubStep(next, TutorialHubStep);
+        return Commit(next, null, out error);
+    }
+
+    private bool HasAffordableFirstEngraving()
+    {
+        foreach (var node in EngravingSettings.nodes)
+            if (node != null && IsFirstEngraving(node) && Balance >= EngravingSettings.Cost(node.id)) return true;
+        return false;
+    }
+
+    private static bool IsFirstEngraving(EngravingNodeDefinition node) => node.tier == 1 && node.parentId == "origin";
+
+    private static void AdvanceTutorialHubStep(PlayerUpgradeProfile next, int step)
+    {
+        if (next.tutorialStatus != TutorialProgressStatus.HubLessons || next.tutorialHubStep != step) return;
+        next.tutorialHubStep++;
+        if (next.tutorialHubStep > TutorialDepotStep) next.tutorialStatus = TutorialProgressStatus.Completed;
+    }
+
     public bool TryUpgrade(StatType stat, out string error)
     {
         error = null;
         if (!CanMutate(out error)) return false;
+        if (!IsTutorialWorkshopUpgradeAllowed) return Reject("현재 거점 실습을 먼저 완료하세요.", out error);
         if (!Supports(stat)) return Reject("강화할 수 없는 능력치입니다.", out error);
         if (GetLevel(stat) >= Settings.maxLevel) return Reject("최대 강화 단계입니다.", out error);
         int cost = GetNextCost(stat);
@@ -141,6 +257,7 @@ public sealed class PlayerUpgradeService
         if (stat == StatType.ST_HP) next.healthLevel++;
         else if (stat == StatType.ST_ATK) next.attackLevel++;
         else next.defenseLevel++;
+        AdvanceTutorialHubStep(next, TutorialUpgradeStep);
         return Commit(next, null, out error);
     }
 
@@ -157,6 +274,9 @@ public sealed class PlayerUpgradeService
             : definition == null ? "존재하지 않는 각인입니다."
             : unlocked ? "이미 해금한 각인입니다."
             : !IsNodeUnlocked(definition.parentId) ? "선행 각인을 먼저 해금하세요."
+            : TutorialStatus == TutorialProgressStatus.HubLessons
+                && (TutorialHubStep != TutorialEngravingStep || HasAnyEngraving || !IsFirstEngraving(definition))
+                ? "현재 거점 실습에서 해금할 수 없는 각인입니다."
             : Balance < cost ? Settings.currencyName + "이(가) 부족합니다." : null;
         return new EngravingPurchaseState(id, definition, unlocked, cost, error);
     }
@@ -172,6 +292,7 @@ public sealed class PlayerUpgradeService
         var ids = new List<string>(next.unlockedNodeIds ?? Array.Empty<string>()) { id };
         ids.Sort(StringComparer.Ordinal);
         next.unlockedNodeIds = ids.ToArray();
+        AdvanceTutorialHubStep(next, TutorialEngravingStep);
         return Commit(next, null, out error);
     }
 
@@ -182,6 +303,7 @@ public sealed class PlayerUpgradeService
     {
         receipt = null;
         if (!CanMutate(out error)) return false;
+        if (!CanPurchaseSupplyDepotDuringTutorial) return Reject("현재 거점 실습을 먼저 완료하세요.", out error);
         if (string.IsNullOrWhiteSpace(itemId) || cost < 0)
             return Reject("보급고 구매 정보가 유효하지 않습니다.", out error);
         if (!string.IsNullOrEmpty(_profile.supplyDepotTransactionId))
@@ -192,6 +314,7 @@ public sealed class PlayerUpgradeService
         next.currency -= cost;
         next.supplyDepotItemId = itemId;
         next.supplyDepotTransactionId = Guid.NewGuid().ToString("N");
+        AdvanceTutorialHubStep(next, TutorialDepotStep);
         if (!Commit(next, null, out error)) return false;
         receipt = CurrentSupplyDepotReceipt;
         return true;

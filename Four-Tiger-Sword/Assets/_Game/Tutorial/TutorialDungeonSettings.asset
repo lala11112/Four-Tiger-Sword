@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 480388ab5bde78e4eafa57e552161ee8, type: 3}
+  m_Name: TutorialDungeonSettings
+  m_EditorClassIdentifier: StudioBaekho.Maps::StudioBaekho.BaekhoDungeonSettings
+  maps:
+  - {fileID: 3038724103049256002, guid: 74460f43967f7d947b814f37b90ecad2, type: 3}
+  - {fileID: 4484193886589011418, guid: 6243304a51bd60e4587bbb0f89048136, type: 3}
+  startRoom: {fileID: 5320505661244611671, guid: 7959572c14e304642947667dfbf91ba6, type: 3}
+  endRoom: {fileID: 6881946897952684032, guid: d962d58c76aff0f41b9643a1887e16bb, type: 3}
+  bossRoom: {fileID: 0}
+  shopRoom: {fileID: 6142813069577824884, guid: 89473b447912f2542bf70e5bbc34d886, type: 3}
+  cornerRoom: {fileID: 0}
+  style: {fileID: 11400000, guid: eb30187bc978f7246b90088d6e66b526, type: 2}
+  mapCount: 5
+  randomizeSeed: 0
+  seed: 12345
+  gridSize: 0.5
+  minimumMapGap: 4
+  maximumConnectionLength: 60
+  corridorWidth: 4
+  minimumDoorWidth: 1
+  placementAttempts: 64
+  layoutAttempts: 8
+  maxSearchNodes: 60000

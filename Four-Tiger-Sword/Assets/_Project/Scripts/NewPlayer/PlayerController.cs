@@ -13,6 +13,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     public FormManager FormManager { get; private set; }
     public StateMachine StateMachine { get; private set; }
     public PlayerStatManager StatManager { get; private set; }
+    internal TutorialCombatReporter TutorialCombat { get; set; }
     public CombatActorClock ActorClock { get; private set; }
     public float ActionDeltaTime => IsGameplayModalPaused ? 0f : ActorClock != null ? ActorClock.DeltaTime : Time.deltaTime;
     public float ActionTimeScale => IsGameplayModalPaused ? 0f : ActorClock != null ? ActorClock.TimeScale : 1f;
@@ -284,6 +285,7 @@ public partial class PlayerController : MonoBehaviour, IDamageable
     public bool CanJump() => !IsStageTransitioning && !IsGameplayModalPaused && (IsGround() || _coyoteTimer > 0f);
     public void ConsumeCoyote() => _coyoteTimer = 0f;
     public void StartDashCooldown() => _dashCooldownTimer = DashCooldown;
+    internal void ResetTutorialDashCooldown() => _dashCooldownTimer = 0f;
 
     public bool IsGround() //자체 isGround. 일반적인 Controller는 바닥으로 Ray하나만 쏴서 한쪽 발이 걸려있어도 떨어지는걸로 판명되어 직접 작성함
     {

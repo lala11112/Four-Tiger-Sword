@@ -18,6 +18,7 @@ public sealed class ShopOfferView : MonoBehaviour
     private string _id;
     private Action<string> _purchase;
     private Color? _normalGradeColor;
+    internal string RenderedId => _id;
 
     public void Configure(UnityEngine.UI.Image image, TMP_Text nameText, TMP_Text body,
         TMP_Text cost, TMP_Text actionText, UnityEngine.UI.Button button)

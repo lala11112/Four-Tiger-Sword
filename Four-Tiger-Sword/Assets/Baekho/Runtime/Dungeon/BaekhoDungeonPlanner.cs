@@ -616,6 +616,9 @@ namespace StudioBaekho
             return true;
         }
 
+        internal static bool ValidateFixedModule(BaekhoMapModule prefab, BaekhoDungeonSettings settings, out string error)
+            => ValidateModule(prefab, false, settings, out _, out error);
+
         private static bool ValidateModule(BaekhoMapModule prefab, bool isCorner, BaekhoDungeonSettings settings,
             out ModuleData data, out string error)
         {

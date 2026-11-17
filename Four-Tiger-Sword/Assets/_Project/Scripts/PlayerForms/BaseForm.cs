@@ -44,6 +44,8 @@ public abstract partial class BaseForm : IForm
     public float SkillCooldownDuration => Mathf.Max(0f, SkillCooldown) * SkillCooldownTimeScale;
     public float UltimateCooldownRemaining => _ultimateCooldownTimer * SkillCooldownTimeScale;
     public float UltimateCooldownDuration => BaseUltimateCooldown * SkillCooldownTimeScale;
+    internal void ResetTutorialSkillCooldown() => _skillCooldownTimer = 0f;
+    internal void ResetTutorialUltimateCooldown() => _ultimateCooldownTimer = 0f;
 
     /// <summary>스킬 동작 데이터가 유효하고 쿨타임이 끝났는지 확인합니다.</summary>
     public bool CanSkill => HasSteps(_weaponActionData?.SkillSteps)

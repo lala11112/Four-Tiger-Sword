@@ -265,7 +265,8 @@ public class StageResultUI : MonoBehaviour
         else PrepareFallbackResultReveal();
         ShowPanel(boundaryOverlay != null ? (won ? "탐사 완료" : "탐사 종료")
             : (won ? "Run complete!" : "Game over"), message);
-        SetButtonLabel(retryButton, "거점으로 돌아가기");
+        SetButtonLabel(retryButton, _runManager != null && _runManager.CanRetryTutorialCheckpoint
+            ? "몬스터방 2 다시 도전" : "거점으로 돌아가기");
         UpdateButtons();
         ClearPanelSelection();
         if (!Application.isPlaying)
@@ -278,6 +279,12 @@ public class StageResultUI : MonoBehaviour
             return;
         }
         if (isActiveAndEnabled) _resultReveal = StartCoroutine(RevealRunResult(_resultVersion));
+    }
+
+    public void ShowTutorialExit()
+    {
+        ShowRunResult(true);
+        ShowPanel("튜토리얼 건너뛰기", "거점으로 이동합니다. 타이틀에서 다시 학습할 수 있습니다.");
     }
 
     public void ShowRewardSaveError(string message)
@@ -359,7 +366,10 @@ public class StageResultUI : MonoBehaviour
         else if (_mode == DisplayMode.Error)
             _runManager.RetryPendingStage();
         else if (_mode == DisplayMode.Result)
-            _runManager.ReturnToHub();
+        {
+            if (_runManager.CanRetryTutorialCheckpoint) _runManager.RetryTutorialCheckpoint();
+            else _runManager.ReturnToHub();
+        }
     }
 
     private void ReturnToMenu()

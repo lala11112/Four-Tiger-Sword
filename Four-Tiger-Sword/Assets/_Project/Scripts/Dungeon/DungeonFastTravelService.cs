@@ -42,6 +42,7 @@ public sealed class DungeonFastTravelService
         _model.ResetMotionHistory();
         var local = _result.root.transform.InverseTransformPoint(position);
         _model.UpdatePosition(new Vector2(local.x, local.z), false);
+        _run.NotifyFastTravelCompleted(roomId);
         return true;
     }
 

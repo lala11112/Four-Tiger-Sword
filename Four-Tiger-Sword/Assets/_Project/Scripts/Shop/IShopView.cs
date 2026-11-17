@@ -64,6 +64,7 @@ public sealed class ShopViewState
     public ShopOwnedItemViewState SelectedOwned;
     public ShopDetailSource DetailSource;
     public bool CanSell, CanFuse;
+    public bool IsTutorial;
     public bool UsesSynergyCatalog;
     public bool CanRefresh, FusionChoiceActive;
     public int RefreshCost, RefreshCount;

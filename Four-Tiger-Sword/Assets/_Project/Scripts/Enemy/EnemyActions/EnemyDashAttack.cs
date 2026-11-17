@@ -29,6 +29,28 @@ public class EnemyDashAttack : EnemyAction
         _nav = enemy.GetComponent<NavMeshAgent>();
     }
 
+    public override bool TryGetAttackRangeWarning(out AttackRangeWarning warning)
+    {
+        warning = default;
+        if (!CanShowAttackRangeWarning || _phase != Phase.Startup
+            || !TryGetWarningProgress(_timer, 0f, _data.startupTime, out float progress))
+            return false;
+
+        Vector3 direction = GetDashDirection();
+        Quaternion hitRotation = HasBossPolicy || direction == Vector3.zero
+            ? _enemy.transform.rotation : Quaternion.LookRotation(direction);
+        Vector3 position = _enemy.transform.position;
+        Vector3 start = position + hitRotation * _data.hitBoxOffset;
+        start.y = GetAttackGroundY();
+        float distance = _data.dashSpeed * _data.dashDuration;
+        Vector3 end = start + direction * distance;
+        end.y = start.y;
+        warning = AttackRangeWarning.Corridor(start, end, _data.hitBoxRadius, progress);
+        return true;
+    }
+
+    private Vector3 GetDashDirection() => HasBossPolicy ? BossAimDirection : GetDirectionToTarget();
+
     public override void Enter()
     {
         _movementUnlocked = true;
@@ -63,7 +85,7 @@ public class EnemyDashAttack : EnemyAction
                 if (_timer >= _data.startupTime)
                 {
                     // telegraphDuration을 startupTime으로 설정하면 베이스 클래스가 이 시점에 자동으로 EndTelegraph() 호출
-                    _dashDirection = HasBossPolicy ? BossAimDirection : GetDirectionToTarget();
+                    _dashDirection = GetDashDirection();
                     _timer = 0f;
                     _phase = Phase.Dash;
                     EndAttackWarning();

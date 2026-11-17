@@ -31,7 +31,7 @@ public abstract class MonsterSkillData : ScriptableObject
     [Range(0.1f, 1f)] public float repeatWeightMultiplier = 0.5f;
 
     [Header("슈퍼아머 (일반 적)")]
-    [Tooltip("피격 경직 중에도 사거리 안에서 공격을 시작할 수 있습니다. 선딜과 타격 중 일반 경직과 넉백을 막으며, 피해와 포이즈 감소는 적용됩니다.")]
+    [Tooltip("피격 회복 후 시작한 공격의 선딜과 타격 중 일반 경직과 넉백을 막습니다. 피해와 포이즈 감소는 적용됩니다.")]
     public bool superArmor;
 
     [Header("AI 조준 (일반 적)")]

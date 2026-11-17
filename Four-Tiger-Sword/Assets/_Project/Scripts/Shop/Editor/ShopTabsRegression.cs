@@ -24,6 +24,7 @@ public static class ShopTabsRegression
         AuthoredViewWiring();
         SharedItemDetails();
         PresenterSelectionAndTransactions();
+        TutorialTransactions();
         return $"Shop tabs: {_checks} checks passed (authored prefab, events, disabled actions, selection, stale ownership and reset).";
     }
 
@@ -234,7 +235,8 @@ public static class ShopTabsRegression
         Check(f.View.Last.SelectedOwned?.Id == "upper" && f.View.Last.FusionSecond == null,
             "An incompatible item must be inspectable but cannot be added.");
         f.Service.SelectItem("b"); f.Service.ToggleFusionMaterial("b");
-        Check(f.View.Last.CanFuse && f.View.Last.FusionSecond?.Id == "b" && f.View.Last.FusionOddsText.Contains("1등급"),
+        Check(f.View.Last.CanFuse && f.View.Last.FusionSecond?.Id == "b"
+            && f.View.Last.FusionOddsText == "★ 100% · 골드 소모 없음",
             "Two eligible materials did not enable fusion and its preview.");
         f.Service.ClearFusionSlot(0);
         Check(f.View.Last.FusionFirst?.Id == "b" && f.View.Last.FusionSecond == null && !f.View.Last.CanFuse,
@@ -268,6 +270,41 @@ public static class ShopTabsRegression
     }
     private static ShopOwnedItemViewState Owned(ShopViewState state, string id)
     { foreach (var item in state.OwnedItems) if (item.Id == id) return item; throw new InvalidOperationException("Missing row: " + id); }
+
+    private static void TutorialTransactions()
+    {
+        using var f = new Fixture(tutorialStock: true);
+        var commits = new List<(TutorialShopPhase phase, string item)>();
+        f.Service.TransactionCommitted += (phase, item) =>
+        {
+            commits.Add((phase, item));
+            f.Service.ConfigureTutorial(phase switch
+            {
+                TutorialShopPhase.Buy => TutorialShopPhase.Sell,
+                TutorialShopPhase.Sell => TutorialShopPhase.Fuse,
+                _ => TutorialShopPhase.Complete
+            });
+        };
+        f.Service.ConfigureTutorial(TutorialShopPhase.Buy);
+        var offers = f.Service.CurrentStock.Offers;
+        Check(offers.Count == 1 && offers[0].Item.itemId == "I04" && f.View.Last.IsTutorial
+            && !f.View.Last.CanRefresh, "Tutorial stock must be fixed and visible.");
+        string offerId = offers[0].Id;
+        Check(f.Service.TryBuy(offerId) == ShopPurchaseResult.InsufficientGold && commits.Count == 0
+            && f.Service.TrySell("a") == ShopSaleResult.Unavailable && f.Items.Contains("a"),
+            "Failed or unrelated trades must not advance Buy.");
+        f.Service.Wallet.AddGold(20);
+        Check(f.Service.TryBuy(offerId) == ShopPurchaseResult.Success && f.Items.Contains("I04")
+            && commits.Count == 1 && commits[0] == (TutorialShopPhase.Buy, "I04"), "Buy did not publish the committed item.");
+        Check(f.Service.TryFuse("a", "b") == ShopFusionResult.Unavailable
+            && f.Service.TrySell("I04") == ShopSaleResult.Success && commits.Count == 2
+            && commits[1] == (TutorialShopPhase.Sell, "I04"), "Sale phase did not allow exactly one sale.");
+        Check(f.Service.TrySell("a") == ShopSaleResult.Unavailable && f.Service.TryFuse("a", "a") != ShopFusionResult.Success
+            && commits.Count == 2, "An extra sale or invalid recipe advanced the fusion lesson.");
+        Check(f.Service.TryFuse("a", "b") == ShopFusionResult.Success && commits.Count == 3
+            && commits[2].phase == TutorialShopPhase.Fuse && f.Items.Contains(commits[2].item)
+            && f.Service.TrySell(commits[2].item) == ShopSaleResult.Unavailable, "Fusion must publish its granted result exactly once.");
+    }
     private static bool HasVisibleGlyph(TMP_Text text)
     {
         text.ForceMeshUpdate(true, true);
@@ -290,7 +327,7 @@ public static class ShopTabsRegression
         public readonly RunManager Run;
         public readonly PlayerItemRuntime Items;
         public readonly CaptureView View = new();
-        public Fixture()
+        public Fixture(bool tutorialStock = false)
         {
             var playerHost = new GameObject("Player"); playerHost.transform.SetParent(_root.transform, false);
             var player = playerHost.AddComponent<PlayerController>();
@@ -302,7 +339,8 @@ public static class ShopTabsRegression
             Items = playerHost.AddComponent<PlayerItemRuntime>(); Items.Catalog = catalog;
             Items.Initialize(stats, () => ElementType.ELEMENT_WATER);
             var a = Item("a", 1, catalog.projectId); var b = Item("b", 1, catalog.projectId);
-            var upper = Item("upper", 2, catalog.projectId); catalog.items = new[] { a, b, upper };
+            var upper = Item("upper", 2, catalog.projectId);
+            catalog.items = tutorialStock ? new[] { a, b, upper, Item("I04", 1, catalog.projectId) } : new[] { a, b, upper };
             Check(Items.TryAddItem("a") && Items.TryAddItem("b") && Items.TryAddItem("upper"), "Presenter inventory setup failed.");
             var stage = _root.AddComponent<StageManager>(); SetProperty(stage, "IsReady", true);
             Run = _root.AddComponent<RunManager>(); Run.player = player; Run.stageManager = stage;

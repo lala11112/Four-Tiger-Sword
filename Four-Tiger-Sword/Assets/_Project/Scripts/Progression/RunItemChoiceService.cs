@@ -7,10 +7,12 @@ public enum RunItemChoiceKind { Room }
 public sealed class RunItemChoiceSession
 {
     public string Id { get; internal set; }
+    public string Receipt { get; internal set; }
     public RunItemChoiceKind Kind { get; internal set; }
     public string HeldId { get; internal set; }
     public int RerollIndex { get; internal set; }
     public bool Resolved { get; internal set; }
+    public bool IsRequired { get; internal set; }
     internal readonly List<ItemDefinition> candidates = new();
     public IReadOnlyList<ItemDefinition> Candidates => candidates.AsReadOnly();
 }
@@ -24,10 +26,12 @@ public sealed class RunItemChoiceService
     private readonly int _seed;
     private readonly Dictionary<string, RunItemChoiceSession> _receipts = new(StringComparer.Ordinal);
     private readonly Queue<RunItemChoiceSession> _pending = new();
+    private readonly Dictionary<string, string> _tutorialRewards = new(StringComparer.Ordinal);
     private bool _busy;
     public int RerollsRemaining { get; private set; }
     public string LastError { get; private set; }
     public event Action Changed;
+    public event Action<string, string> RewardClaimed;
     public event Action OwnedItemsChanged
     {
         add { if (_items != null) _items.OnOwnedItemsChanged += value; }
@@ -49,13 +53,29 @@ public sealed class RunItemChoiceService
     private bool Ready => !_busy && _items != null && _items.IsInitialized && !_items.IsMutationInProgress
         && _items.Catalog != null && _wallet != null && _wallet.IsInitialized
         && _items.GetComponent<PlayerStatManager>() is { CurrentHp: > 0f };
+
+    public void ConfigureTutorialReward(string receipt, string itemId)
+    {
+        if (string.IsNullOrWhiteSpace(receipt) || string.IsNullOrWhiteSpace(itemId))
+            throw new ArgumentException("A tutorial reward requires a receipt and an item ID.");
+        _tutorialRewards[receipt] = itemId;
+    }
+
     public bool BeginRoomReward(string receipt)
     {
         if (string.IsNullOrWhiteSpace(receipt) || !Ready) return false;
         string id = "room:" + receipt;
         if (_receipts.ContainsKey(id)) return false;
-        var session = new RunItemChoiceSession { Id = id, Kind = RunItemChoiceKind.Room };
-        session.candidates.AddRange(Draw(Pool(), CandidateCount, RandomFor(session)));
+        var session = new RunItemChoiceSession { Id = id, Receipt = receipt, Kind = RunItemChoiceKind.Room };
+        var pool = Pool();
+        if (_tutorialRewards.TryGetValue(receipt, out string itemId))
+        {
+            var item = pool.Find(candidate => candidate.itemId == itemId);
+            if (item == null) return Fail("튜토리얼 보상 아이템을 받을 수 없습니다.");
+            session.IsRequired = true;
+            session.candidates.Add(item);
+        }
+        else session.candidates.AddRange(Draw(pool, CandidateCount, RandomFor(session)));
         if (session.candidates.Count == 0)
         {
             // A failed credit leaves the receipt available at the chest for a later attempt.
@@ -89,15 +109,22 @@ public sealed class RunItemChoiceService
             current.Resolved = true; current.HeldId = null; LastError = null;
         }
         finally { _busy = false; }
+        if (RewardClaimed != null)
+            foreach (Action<string, string> observer in RewardClaimed.GetInvocationList())
+            {
+                try { observer(current.Receipt, itemId); }
+                catch (Exception error) { UnityEngine.Debug.LogException(error); }
+            }
         Notify(); return true;
     }
+    public bool CanSkip => Current is { IsRequired: false };
     public bool TrySkip(string sessionId)
     {
         var current = Current;
-        if (!Ready || current == null || current.Id != sessionId) return false;
+        if (!Ready || current == null || current.Id != sessionId || current.IsRequired) return false;
         current.Resolved = true; current.HeldId = null; LastError = null; Notify(); return true;
     }
-    public bool CanHold => _snapshot.Has("hold") && Current != null;
+    public bool CanHold => _snapshot.Has("hold") && Current is { IsRequired: false };
     public bool ToggleHeldCandidate(string sessionId, string itemId)
     {
         var current = Current;
@@ -109,7 +136,7 @@ public sealed class RunItemChoiceService
         get
         {
             var current = Current;
-            if (!Ready || current == null || RerollsRemaining <= 0) return false;
+            if (!Ready || current == null || current.IsRequired || RerollsRemaining <= 0) return false;
             var currentIds = new HashSet<string>(current.candidates.ConvertAll(i => i.itemId), StringComparer.Ordinal);
             return current.candidates.Count > (current.HeldId != null ? 1 : 0) && Pool().Exists(i => !currentIds.Contains(i.itemId));
         }

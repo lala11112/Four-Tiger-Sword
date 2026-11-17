@@ -49,7 +49,10 @@ public class EnemyAttackState : IPlayerState
         if (_enemy.CurrentAction?.IsActive == true)
             _enemy.CurrentAction?.Exit();
 
-        _enemy.Animator.CrossFade("Move", 0.1f);
+        var animator = _enemy.Animator;
+        if (animator != null && animator.isActiveAndEnabled && animator.runtimeAnimatorController != null
+            && animator.layerCount > 0 && animator.HasState(0, Animator.StringToHash("Move")))
+            animator.CrossFade("Move", 0.1f);
         // Normal enemies roll the next decision interval when they select an attack, even in Hurt.
         if (_enemy is Boss) _enemy.StartAttackCooldown();
         _enemy.HasSelectedAttack = false;

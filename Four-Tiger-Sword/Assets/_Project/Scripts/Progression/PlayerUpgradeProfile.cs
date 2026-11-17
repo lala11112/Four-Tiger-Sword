@@ -5,7 +5,8 @@ using System.Collections.Generic;
 [Serializable]
 public sealed class PlayerUpgradeProfile
 {
-    public const int CurrentVersion = 2;
+    public const int CurrentVersion = 3;
+    public const int CurrentTutorialVersion = 1;
     public int version;
     public int currency;
     public int healthLevel;
@@ -14,6 +15,10 @@ public sealed class PlayerUpgradeProfile
     public string[] unlockedNodeIds = Array.Empty<string>();
     public string supplyDepotItemId;
     public string supplyDepotTransactionId;
+    public int tutorialVersion = CurrentTutorialVersion;
+    public TutorialProgressStatus tutorialStatus;
+    public int tutorialHubStep;
+    public bool tutorialGrantClaimed;
 
     public static PlayerUpgradeProfile New() => new PlayerUpgradeProfile { version = CurrentVersion };
     public PlayerUpgradeProfile Copy() => new PlayerUpgradeProfile
@@ -21,8 +26,19 @@ public sealed class PlayerUpgradeProfile
         version = version, currency = currency, healthLevel = healthLevel,
         attackLevel = attackLevel, defenseLevel = defenseLevel,
         unlockedNodeIds = unlockedNodeIds != null ? (string[])unlockedNodeIds.Clone() : Array.Empty<string>(),
-        supplyDepotItemId = supplyDepotItemId, supplyDepotTransactionId = supplyDepotTransactionId
+        supplyDepotItemId = supplyDepotItemId, supplyDepotTransactionId = supplyDepotTransactionId,
+        tutorialVersion = tutorialVersion, tutorialStatus = tutorialStatus,
+        tutorialHubStep = tutorialHubStep, tutorialGrantClaimed = tutorialGrantClaimed
     };
+
+    internal void MigrateTutorialProgress()
+    {
+        if (version >= CurrentVersion) return;
+        tutorialVersion = CurrentTutorialVersion;
+        tutorialStatus = TutorialProgressStatus.NotStarted;
+        tutorialHubStep = 0;
+        tutorialGrantClaimed = false;
+    }
 
     // Migrate retired purchases together with their original costs. The next normal
     // atomic save writes both the filtered IDs and the balance, so a reload cannot pay twice.
@@ -43,11 +59,13 @@ public sealed class PlayerUpgradeProfile
 
     public bool Validate(out string error)
     {
-        error = version != 1 && version != CurrentVersion ? "지원하지 않는 강화 저장 데이터 버전입니다."
+        error = version < 1 || version > CurrentVersion ? "지원하지 않는 강화 저장 데이터 버전입니다."
             : currency < 0 || healthLevel < 0 || attackLevel < 0 || defenseLevel < 0
                 ? "강화 저장 데이터의 잔액 또는 단계가 유효하지 않습니다." : null;
         if (error != null) return false;
-        if (version == 2 && unlockedNodeIds == null) { error = "각인 저장 목록이 없습니다."; return false; }
+        if (version >= 2 && unlockedNodeIds == null) { error = "각인 저장 목록이 없습니다."; return false; }
+        if (version >= 3 && !ValidTutorialProgress())
+        { error = "튜토리얼 진행 기록이 유효하지 않습니다."; return false; }
         bool hasDepotReceipt = !string.IsNullOrEmpty(supplyDepotItemId) || !string.IsNullOrEmpty(supplyDepotTransactionId);
         if (hasDepotReceipt && (string.IsNullOrWhiteSpace(supplyDepotItemId) || string.IsNullOrWhiteSpace(supplyDepotTransactionId)))
         { error = "보급고 구매 기록이 유효하지 않습니다."; return false; }
@@ -56,6 +74,21 @@ public sealed class PlayerUpgradeProfile
             if (string.IsNullOrWhiteSpace(id) || id == "origin" || !unique.Add(id))
             { error = "각인 저장 목록이 중복되거나 유효하지 않습니다."; return false; }
         return true;
+    }
+
+    private bool ValidTutorialProgress()
+    {
+        if (tutorialVersion != CurrentTutorialVersion) return false;
+        return tutorialStatus switch
+        {
+            TutorialProgressStatus.NotStarted or TutorialProgressStatus.InMap
+                => tutorialHubStep == 0 && !tutorialGrantClaimed,
+            TutorialProgressStatus.Skipped => tutorialGrantClaimed ? tutorialHubStep >= 0 && tutorialHubStep < 3
+                : tutorialHubStep == 0,
+            TutorialProgressStatus.HubLessons => tutorialHubStep >= 0 && tutorialHubStep < 3 && tutorialGrantClaimed,
+            TutorialProgressStatus.Completed => tutorialHubStep == 3 && tutorialGrantClaimed,
+            _ => false
+        };
     }
 }
 

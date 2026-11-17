@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public abstract class EnemyAction
 {
@@ -10,6 +11,27 @@ public abstract class EnemyAction
     public bool WasParried { get; private set; }
     public virtual bool SupportsBossPolicy => false;
     public virtual bool AllowsKnockbackDuringBossArmor => false;
+
+    /// <summary>Reads the current ground warning without affecting attack timing or hit detection.</summary>
+    public virtual bool TryGetAttackRangeWarning(out AttackRangeWarning warning)
+    {
+        warning = default;
+        return false;
+    }
+
+    protected bool CanShowAttackRangeWarning => IsActive && !IsFinished && !WasParried
+        && _enemy != null && _enemy.isActiveAndEnabled && !_enemy.IsDead
+        && _enemy.CurrentAction == this && CanContinueAction;
+
+    protected static bool TryGetWarningProgress(float elapsed, float start, float end, out float progress)
+    {
+        progress = 0f;
+        float duration = end - start;
+        if (!(duration > 0f) || float.IsInfinity(duration) || !(elapsed >= start && elapsed < end))
+            return false;
+        progress = (elapsed - start) / duration;
+        return true;
+    }
 
     /// <summary>Per-hit player reaction metadata without replacing this action as the damage source.</summary>
     public virtual bool TryGetPlayerKnockdown(out float downSeconds, out float getUpSeconds)
@@ -141,6 +163,7 @@ public abstract class EnemyAction
     public virtual void Exit()
     {
         EndAttackWarning();
+        HideAttackRangeWarning();
         if (!IsActive) return;
         // 중단된 공격도 패링 시스템에서 완료된 공격으로 취급해야 합니다.
         IsFinished = true;
@@ -181,6 +204,13 @@ public abstract class EnemyAction
         var manager = _attackWarningManager;
         _attackWarningManager = null;
         if (manager != null) manager.HideAttackWarning(this);
+    }
+
+    private void HideAttackRangeWarning()
+    {
+        if (_enemy != null && _enemy.CurrentAction == this
+            && _enemy.TryGetComponent(out EnemyAttackRangePresentation presentation))
+            presentation.Hide();
     }
 
     protected void BeginBossPreparation()
@@ -300,6 +330,23 @@ public abstract class EnemyAction
     protected Vector3 GetHitCenter(Vector3 localOffset)
         => _enemy.transform.position + _enemy.transform.rotation * localOffset;
 
+    protected Vector3 GetGroundHitCenter(Vector3 localOffset)
+    {
+        Vector3 center = GetHitCenter(localOffset);
+        center.y = GetAttackGroundY();
+        return center;
+    }
+
+    protected float GetAttackGroundY()
+    {
+        Transform ownerTransform = _enemy.transform;
+        float y = ownerTransform.position.y;
+        // The navigation agent can place its actor pivot above the floor.
+        if (_enemy.TryGetComponent(out NavMeshAgent agent) && agent.isActiveAndEnabled && agent.isOnNavMesh)
+            y -= agent.baseOffset * Mathf.Abs(ownerTransform.lossyScale.y);
+        return y;
+    }
+
     protected Vector3 GetKnockbackDirection(Collider col)
         => (col.transform.position - _enemy.transform.position).normalized;
 
@@ -325,5 +372,6 @@ public abstract class EnemyAction
         EndAttackWarning();
         EndNormalAttackArmor();
         if (_guardNormalLifetime && IsActive) Exit();
+        else HideAttackRangeWarning();
     }
 }

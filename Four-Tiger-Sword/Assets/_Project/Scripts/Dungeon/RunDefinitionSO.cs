@@ -2,6 +2,15 @@ using System;
 using StudioBaekho;
 using UnityEngine;
 
+public enum RunMode { Campaign, Tutorial }
+
+[Serializable]
+public sealed class DungeonRoomRoster
+{
+    public int roomId;
+    public GameObject[] enemies = Array.Empty<GameObject>();
+}
+
 [Serializable]
 public sealed class StageDefinition
 {
@@ -12,6 +21,8 @@ public sealed class StageDefinition
     public int mapCountVariation = 1;
     [Tooltip("Required only on the last stage of a chapter.")]
     public GameObject bossPrefab;
+    public BaekhoFixedDungeonLayout fixedLayout;
+    public DungeonRoomRoster[] roomRosters = Array.Empty<DungeonRoomRoster>();
 
     public bool Validate(bool bossStage, out string error)
     {
@@ -36,7 +47,35 @@ public sealed class StageDefinition
             error = "Shop Room must use a separate prefab from start, end and boss rooms.";
         else if (bossStage && (bossPrefab.GetComponent<Enemy>() == null || bossPrefab.GetComponent<UnityEngine.AI.NavMeshAgent>() == null))
             error = "Boss Prefab needs Enemy and NavMeshAgent on its root.";
+        else if (fixedLayout != null && (bossStage || mapCountVariation != 0))
+            error = "A fixed layout requires a non-boss stage with zero room-count variation.";
+        else if (fixedLayout != null && !fixedLayout.TryCreatePlan(dungeonSettings, dungeonSettings.seed, out _, out error)) { }
+        else if (!ValidateRoomRosters(out error)) { }
         return error == null;
+    }
+
+    private bool ValidateRoomRosters(out string error)
+    {
+        error = null;
+        if (roomRosters == null || roomRosters.Length == 0) return true;
+        if (fixedLayout == null) { error = "Fixed combat rosters require a fixed layout."; return false; }
+        var seen = new System.Collections.Generic.HashSet<int>();
+        foreach (var roster in roomRosters)
+        {
+            if (roster == null || roster.roomId < 0 || roster.roomId >= fixedLayout.rooms.Length
+                || fixedLayout.rooms[roster.roomId].role != BaekhoRoomRole.Normal || !seen.Add(roster.roomId)
+                || roster.enemies == null || roster.enemies.Length == 0)
+            { error = "Each fixed combat roster requires a distinct ordinary room ID and enemies."; return false; }
+            foreach (var prefab in roster.enemies)
+            {
+                if (prefab == null || !prefab.activeSelf || prefab.scene.IsValid()
+                    || prefab.GetComponent<Enemy>() is not { enabled: true }
+                    || prefab.GetComponent<EnemyStat>() == null
+                    || prefab.GetComponent<UnityEngine.AI.NavMeshAgent>() is not { enabled: true })
+                { error = $"Fixed combat room {roster.roomId} needs active enemy prefab assets."; return false; }
+            }
+        }
+        return true;
     }
 
     private static bool ValidateAnchor(BaekhoMapModule room, int role, out string error)
@@ -94,6 +133,7 @@ public sealed class ChapterDefinition
 [CreateAssetMenu(menuName = "Four Tiger Sword/Run Definition", fileName = "RunDefinition")]
 public sealed class RunDefinitionSO : ScriptableObject
 {
+    public RunMode mode;
     public ChapterDefinition[] chapters = Array.Empty<ChapterDefinition>();
     public int TotalStages
     {
@@ -109,6 +149,9 @@ public sealed class RunDefinitionSO : ScriptableObject
     {
         error = null;
         if (chapters == null || chapters.Length == 0) { error = "Run Definition needs at least one chapter."; return false; }
+        if (mode == RunMode.Tutorial && (chapters.Length != 1 || chapters[0]?.stages?.Length != 1
+            || chapters[0].stages[0]?.fixedLayout == null))
+        { error = "The tutorial needs exactly one fixed stage."; return false; }
         for (int c = 0; c < chapters.Length; c++)
         {
             var stages = chapters[c]?.stages;
@@ -116,12 +159,15 @@ public sealed class RunDefinitionSO : ScriptableObject
             for (int s = 0; s < stages.Length; s++)
             {
                 if (stages[s] == null) { error = $"Stage {c + 1}-{s + 1} is missing."; return false; }
-                if (!stages[s].Validate(s == stages.Length - 1, out string reason))
+                if (!stages[s].Validate(IsBossStage(c, s), out string reason))
                 { error = $"Stage {c + 1}-{s + 1}: {reason}"; return false; }
             }
         }
         return true;
     }
+
+    public bool IsBossStage(int chapter, int stage)
+        => mode == RunMode.Campaign && stage == chapters[chapter].stages.Length - 1;
 
     public bool TryGetNext(int chapter, int stage, out int nextChapter, out int nextStage)
     {

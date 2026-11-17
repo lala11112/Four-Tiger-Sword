@@ -183,8 +183,9 @@ public static partial class EnemyBrainRegression
 
     private static async Task ExerciseGroupArmoredAttackTiming(RuntimeFixture fixture)
     {
+        const float interval = 1.5f;
         var group = CreateGroup(fixture, "Scheduled armored attack",
-            new NormalEnemyAISettings { attackStartInterval = .65f });
+            new NormalEnemyAISettings { attackStartInterval = interval });
         var skill = fixture.New<EnemyBrainProbeSkill>();
         skill.executeRange = 4f;
         var skills = fixture.SkillSet(skill);
@@ -201,20 +202,27 @@ public static partial class EnemyBrainRegression
             "Group armored attack fixtures did not initialize.");
         openingSight.Target = fixture.Target;
         await Until(() => opener.CurrentAction?.IsActive == true, "The room's opening attack did not enter.");
+        var opened = (EnemyBrainProbeAction)opener.CurrentAction;
         reactingSight.Target = fixture.Target;
         followingSight.Target = fixture.Target;
         reacting.HurtDuration = 2f;
         Check(ApplyGroupHit(player, reacting).CausedOrdinaryStagger, "The scheduled attacker did not enter Hurt.");
         Set(reacting, "_attackCooldownTimer", 0f);
-        await Until(() => reacting.CurrentAction?.HasNormalAttackArmor == true,
-            "The due selection did not start the armored attack from Hurt.");
-        var opened = (EnemyBrainProbeAction)opener.CurrentAction;
+        await Until(() => PendingAttack(reacting) == armoredSkill, "The room's reacting enemy never selected its armored skill.");
+        Check(reacting.IsHurt && reacting.CurrentAction == null, "The armored skill started while the enemy was still reacting.");
+        await Until(() => follower.CurrentAction?.IsActive == true, "The ready follower did not attack while the armored skill waited.");
+        var followed = (EnemyBrainProbeAction)follower.CurrentAction;
+        Check(followed.EnteredAt - opened.EnteredAt >= interval - .001f && reacting.IsHurt
+            && reacting.CurrentAction == null && PendingAttack(reacting) == armoredSkill,
+            "Hurt blocked the follower's turn or allowed the reacting enemy to attack.");
+        await Until(() => group.PendingAttackCount > 0 || reacting.CurrentAction?.IsActive == true,
+            "The recovered enemy did not request a room attack slot.");
+        Check(!reacting.IsHurt && !IsHitAnimationPresent(reacting) && reacting.CurrentAction?.IsActive == false,
+            "The armored attack skipped the room interval instead of waiting in the queue.");
+        await Until(() => reacting.CurrentAction?.HasNormalAttackArmor == true, "The recovered enemy never received a room attack slot.");
         var armored = (EnemyBrainProbeAction)reacting.CurrentAction;
-        Check(armored.EnteredAt - opened.EnteredAt < group.Settings.attackStartInterval,
-            "The armored attack out of Hurt had to wait for the ordinary attack interval.");
-        await Until(() => follower.CurrentAction?.IsActive == true, "The follower did not attack after the armored attack.");
-        Check(((EnemyBrainProbeAction)follower.CurrentAction).EnteredAt - armored.EnteredAt >= .649f,
-            "An armored attack out of Hurt did not restart the room interval for the next ordinary attack.");
+        Check(armored.EnteredAt - followed.EnteredAt >= interval - .001f,
+            "The recovered armored attack started before the room interval elapsed.");
         opener.CombatLabPassive = reacting.CombatLabPassive = follower.CombatLabPassive = true;
     }
 

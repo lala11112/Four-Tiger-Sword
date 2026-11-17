@@ -25,6 +25,7 @@ public sealed class HubSupplyDepotInteraction : MonoBehaviour
     private CombatHitStopService.WorldScaleLease _pause;
 
     public bool IsOpen => _pause != null && depot != null && depot.IsOpen;
+    internal SupplyDepotController Controller => depot;
     public Vector3 InteractionPosition => station != null ? station.TransformPoint(localAnchor) : transform.position;
     public bool IsInRange
     {

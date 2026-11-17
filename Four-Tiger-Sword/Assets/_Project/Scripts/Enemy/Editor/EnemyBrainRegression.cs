@@ -228,8 +228,17 @@ public static partial class EnemyBrainRegression
         var bomber = fixture.Actor<Enemy>("Normal self destruct", explosiveSet, out _);
         await Until(() => bomber.Brain != null, "Self-destruct enemy did not initialize.");
         var damage = bomber.TakeDamage(60f, poiseDamage: 0f);
-        Check(damage.Applied && bomber.IsSelfDestructing && bomber.CurrentAction is EnemySelfDestruct,
-            "Crossing the normal self-destruct threshold must select the existing self-destruct action immediately.");
+        Check(damage.Applied && damage.CausedOrdinaryStagger && !bomber.IsSelfDestructing && bomber.CurrentAction == null,
+            "A hit crossing the self-destruct threshold bypassed Hurt.");
+        await Until(() => bomber.stateName == nameof(EnemyHurtState) && IsHitAnimationPresent(bomber),
+            "The self-destruct threshold hit never played its reaction.");
+        await Until(() =>
+        {
+            if (bomber.IsHurt && bomber.IsSelfDestructing)
+                throw new InvalidOperationException("The bomber started its countdown during Hurt.");
+            return bomber.CurrentAction is EnemySelfDestruct && bomber.CurrentAction.IsActive;
+        }, "The self-destruct countdown did not start after Hurt.");
+        Check(!bomber.IsHurt && !IsHitAnimationPresent(bomber), "A self-destruct warning overlapped the Hit animation.");
         var cancelled = bomber.CurrentAction;
         bomber.enabled = false;
         Check(!cancelled.IsActive && bomber.CurrentAction == null && !ParryEventBus.IsTelegraphActive(cancelled),
@@ -237,6 +246,11 @@ public static partial class EnemyBrainRegression
         bomber.enabled = true;
         await Until(() => bomber.CurrentAction is EnemySelfDestruct && bomber.CurrentAction.IsActive
             && bomber.CurrentAction != cancelled, "Reactivation must safely reconstruct the pending self-destruct action.");
+        var resumed = bomber.CurrentAction;
+        float beforeRepeatHit = resumed.AttackTimeline;
+        bomber.TakeDamage(1f, poiseDamage: 0f);
+        await Until(() => resumed.AttackTimeline > beforeRepeatHit, "A hit paused the already active self-destruct countdown.");
+        Check(bomber.CurrentAction == resumed && resumed.IsActive, "A hit replaced the ongoing self-destruct action.");
         Check(bomber.TakeDamage(1000f, poiseDamage: 0f).Killed, "A self-destructing ordinary enemy must remain damageable.");
         await Until(() => bomber.stateName == nameof(EnemyDieState), "Death must override an active self-destruct state.");
     }

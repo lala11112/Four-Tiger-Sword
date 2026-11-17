@@ -45,7 +45,8 @@ public class StageManager : MonoBehaviour
 
     public void ConfigureExitPrefab(StageExit prefab) => exitPrefab = prefab;
 
-    public IEnumerator Prepare(StageDefinition definition, bool bossStage, int stageSeed, int layoutSeed, PlayerController player)
+    public IEnumerator Prepare(StageDefinition definition, bool bossStage, int stageSeed, int layoutSeed, PlayerController player,
+        int? restoredClearedRoomId = null)
     {
         int generation = ++_generation;
         Suspend();
@@ -61,12 +62,15 @@ public class StageManager : MonoBehaviour
         { SetError("Stage requires a StageExitPortal prefab."); yield break; }
         if (definition == null || !definition.Validate(bossStage, out _))
         { SetError(definition == null ? "Stage Definition is missing." : GetValidationError(definition, bossStage)); yield break; }
+        if (restoredClearedRoomId is int roomId && (definition.fixedLayout == null || roomId < 0
+            || roomId >= definition.fixedLayout.rooms.Length || definition.fixedLayout.rooms[roomId].role != BaekhoRoomRole.Normal))
+        { SetError("Checkpoint needs a valid ordinary combat room from the fixed layout."); yield break; }
         if (_runtimeSettings != null) Destroy(_runtimeSettings);
         _runtimeSettings = definition.CreateRuntimeSettings(stageSeed, bossStage);
         generator.settings = _runtimeSettings;
         encounters.catalog = definition.enemyCatalog;
-        encounters.ConfigureStage(bossStage ? definition.bossPrefab : null);
-        yield return generator.Generate(layoutSeed);
+        encounters.ConfigureStage(bossStage ? definition.bossPrefab : null, definition.roomRosters, restoredClearedRoomId);
+        yield return generator.Generate(layoutSeed, definition.fixedLayout);
         if (generation != _generation) yield break;
         var result = generator.LastResult;
         if (result == null || !result.success || result.root != generator.CurrentRoot)

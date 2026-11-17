@@ -9,6 +9,7 @@ public sealed partial class RunManager
     private bool TryApplySupplyDepotItem(out string error)
     {
         error = null;
+        if (IsTutorial) return true;
         if (_appliedSupplyDepotTransactionId != null) return true;
         var receipt = UpgradeService.CurrentSupplyDepotReceipt;
         if (receipt == null) return true;

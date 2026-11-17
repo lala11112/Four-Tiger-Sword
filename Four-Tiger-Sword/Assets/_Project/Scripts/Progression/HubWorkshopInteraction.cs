@@ -23,6 +23,7 @@ public sealed class HubWorkshopInteraction : MonoBehaviour
     private int _closeVersion;
 
     public bool IsOpen => view != null && view.IsOpen;
+    internal HubWorkshopView View => view;
     public Vector3 InteractionPosition => station != null ? station.TransformPoint(localAnchor) : transform.position;
     public bool IsInRange
     {

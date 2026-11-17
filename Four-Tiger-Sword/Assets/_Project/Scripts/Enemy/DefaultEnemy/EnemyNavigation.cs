@@ -118,6 +118,11 @@ internal sealed class EnemyNavigation
     {
         var animator = _enemy.Animator;
         int state = moving ? MoveState : IdleState;
+        // Drone's controller uses Move for both standing and walking; it has no Idle state.
+        // Returning from a reaction must still leave Hit when the agent is stationary.
+        if (!moving && animator != null && animator.isActiveAndEnabled
+            && animator.runtimeAnimatorController != null && animator.layerCount > 0
+            && !animator.HasState(0, IdleState)) state = MoveState;
         if (animator == null || !animator.isActiveAndEnabled || animator.runtimeAnimatorController == null
             || animator.layerCount == 0 || !animator.HasState(0, state))
         {

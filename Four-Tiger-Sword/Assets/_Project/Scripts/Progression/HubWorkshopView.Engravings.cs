@@ -19,6 +19,15 @@ public sealed partial class HubWorkshopView
     public PentaUpgradeView EngravingView => engravingView;
     public GameObject BasicWindow => basicWindow;
 
+    internal RectTransform TutorialTabTarget(WorkshopPage page)
+    {
+        var buttons = page == WorkshopPage.Engravings ? engravingPageButtons : basicPageButtons;
+        if (buttons != null)
+            foreach (var button in buttons)
+                if (button != null && button.gameObject.activeInHierarchy) return button.transform as RectTransform;
+        return null;
+    }
+
     public void ConfigureEngravings(PentaUpgradeView tree, GameObject basic,
         UnityEngine.UI.Button[] basicButtons, UnityEngine.UI.Button[] treeButtons, Sprite normal, Sprite selected)
     {
@@ -122,7 +131,7 @@ public sealed partial class HubWorkshopView
                 DisplayName = state.Definition?.displayName ?? concept.Name,
                 Description = concept.Id == "origin" ? "무료 시작 각인" : state.Definition?.description ?? concept.Description,
                 Availability = availability,
-                CanPurchase = ready && state.CanPurchase && !_purchasing && IsInteractionReady,
+                CanPurchase = ready && state.CanPurchase && !_purchasing && IsInteractionReady && !_tutorialOverview,
                 CostLabel = owned || state.Definition == null ? "—" : $"{currency}  {state.Cost:N0}",
                 StatusText = !ready ? _service?.LastError ?? "각인 설정을 불러올 수 없습니다." : ""
             });
@@ -135,7 +144,8 @@ public sealed partial class HubWorkshopView
 
     private void PurchaseEngraving(string id)
     {
-        if (_purchasing || !IsInteractionReady || _selectedPage != WorkshopPage.Engravings || _service == null) return;
+        if (_purchasing || !IsInteractionReady || _selectedPage != WorkshopPage.Engravings || _service == null
+            || _tutorialOverview) return;
         _purchasing = true;
         _engravingMessage = null;
         Refresh();

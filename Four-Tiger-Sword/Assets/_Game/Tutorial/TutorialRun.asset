@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 341bc29e65f50bf4b960a8ad8450566e, type: 3}
+  m_Name: TutorialRun
+  m_EditorClassIdentifier: Assembly-CSharp::RunDefinitionSO
+  mode: 1
+  chapters:
+  - displayName: "\uD6C8\uB828\uC7A5"
+    stages:
+    - displayName: "\uD6C8\uB828\uC7A5"
+      dungeonSettings: {fileID: 11400000, guid: 1365d074db4912e46a0e3f988bad99c9, type: 2}
+      enemyCatalog: {fileID: 11400000, guid: 293a61d1e717d1542861311e50ee96c3, type: 2}
+      mapCountVariation: 0
+      bossPrefab: {fileID: 0}
+      fixedLayout: {fileID: 11400000, guid: 5bdc73e5ae7aacb4d9e8eea88566223d, type: 2}
+      roomRosters:
+      - roomId: 1
+        enemies:
+        - {fileID: 2552600057017201039, guid: 9c622f250ecf58c439c77f0c5636830a, type: 3}
+      - roomId: 3
+        enemies:
+        - {fileID: 2552600057017201039, guid: 9c622f250ecf58c439c77f0c5636830a, type: 3}
+        - {fileID: 2552600057017201039, guid: 9c622f250ecf58c439c77f0c5636830a, type: 3}
+        - {fileID: 2552600057017201039, guid: 9c622f250ecf58c439c77f0c5636830a, type: 3}

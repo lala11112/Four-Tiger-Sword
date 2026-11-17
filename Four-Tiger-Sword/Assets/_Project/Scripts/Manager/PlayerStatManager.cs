@@ -342,13 +342,15 @@ public class PlayerStatManager : MonoBehaviour
         Action<DamageResult> beforeNotify = null)
     {
         EnsureInitialized();
-        if (GetComponent<PlayerController>()?.IsStageTransitioning == true) return default;
+        var player = GetComponent<PlayerController>();
+        if (player?.IsStageTransitioning == true) return default;
         if (GetComponent<PlayerEngravingRuntime>()?.IsInvulnerable == true) return default;
         if (_currentHp <= 0f || damage < 0f || float.IsNaN(damage) || float.IsInfinity(damage)) return default;
         float hpBefore = _currentHp;
         float absorbed = AbsorbWithShields(Mathf.Max(0f, damage));
         damage = Mathf.Max(0f, damage - absorbed);
-        _currentHp = Mathf.Max(0f, _currentHp - damage);
+        float minimumHp = player?.TutorialCombat?.IsPlayerProtected == true ? Mathf.Min(hpBefore, 1f) : 0f;
+        _currentHp = Mathf.Max(minimumHp, _currentHp - damage);
         float healthDamage = hpBefore - _currentHp;
         bool revived = false;
         if (_currentHp <= 0f && GetComponent<PlayerEngravingRuntime>() is { } engravings

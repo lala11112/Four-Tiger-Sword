@@ -13,6 +13,14 @@ public static partial class EnemyBrainRegression
     private static MonsterSkillData PendingAttack(Enemy enemy)
         => (MonsterSkillData)typeof(NormalEnemyBrain).GetProperty("PendingAttackSkill", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(enemy.Brain);
 
+    private static bool IsHitAnimationPresent(Enemy enemy)
+    {
+        var animator = enemy.Animator;
+        int hit = Animator.StringToHash("Hit");
+        return animator.GetCurrentAnimatorStateInfo(0).shortNameHash == hit
+            || animator.IsInTransition(0) && animator.GetNextAnimatorStateInfo(0).shortNameHash == hit;
+    }
+
     private static async Task ExerciseScheduledAttacks(RuntimeFixture f)
     {
         if (CombatSettings.Active == null)
@@ -58,7 +66,7 @@ public static partial class EnemyBrainRegression
         var enemy = f.Actor<Enemy>("Scheduled armored attack", f.SkillSet(attack), out var sensor);
         await Until(() => enemy.Brain != null, "Scheduled actor never initialized.");
         sensor.Target = player.transform;
-        enemy.HurtDuration = 2f;
+        enemy.HurtDuration = .05f;
         DamageResult Hit(bool direct, float poise = 0f, Vector3 push = default)
             => DamageManager.Apply(new HitInfo(1f, ElementType.ELEMENT_NONE, 0f, 1f, trueDamage: true,
                 source: player, poiseDamage: poise, power: push, isDirectPlayerHit: direct), enemy, enemy.gameObject);
@@ -73,13 +81,23 @@ public static partial class EnemyBrainRegression
         Check(enemy.CurrentAction == null && PendingAttack(enemy) == null && AttackCooldownRemaining(enemy) > 5f,
             "Repeated hits must neither start an attack nor restart the selection clock.");
         Set(enemy, "_attackCooldownTimer", .12f);
-        Check(Hit(true, push: Vector3.right).CausedOrdinaryStagger && enemy.CurrentAction == null,
-            "The damage callback must leave the scheduled start to the brain tick.");
+        Check(Hit(true, push: Vector3.right * .2f).CausedOrdinaryStagger && enemy.CurrentAction == null,
+            "Taking a hit must not execute the scheduled attack.");
+        await Until(() => PendingAttack(enemy) == attack, "The selection interval stopped during Hurt.");
+        Check(enemy.IsHurt && IsHitAnimationPresent(enemy) && enemy.CurrentAction == null
+            && AttackCooldownRemaining(enemy) > 0f && enemy.IsSkillReady(attack),
+            "A due armored attack did not stay pending while the Hit animation was playing.");
+        await Until(() =>
+        {
+            if (enemy.IsHurt && enemy.CurrentAction != null)
+                throw new System.InvalidOperationException("An armored action was prepared or started during Hurt.");
+            return !enemy.IsHurt;
+        }, "The enemy did not complete its Hit animation.");
         await Until(() => enemy.CurrentAction?.HasNormalAttackArmor == true,
-            "An elapsed selection interval did not start the armored attack during Hurt.");
+            "The pending armored attack did not start after Hurt.");
         var armored = enemy.CurrentAction;
-        Check(ParryEventBus.IsTelegraphActive(armored) && !enemy.IsKnockbacking && !enemy.IsHurt,
-            "The armored attack skipped its telegraph or retained the interrupted reaction.");
+        Check(ParryEventBus.IsTelegraphActive(armored) && !enemy.IsKnockbacking && !enemy.IsHurt
+            && !IsHitAnimationPresent(enemy), "The armored attack skipped its telegraph or overlapped the Hit animation.");
         float hp = enemy.EnemyStat.CurrentHp;
         float playerHp = player.StatManager.CurrentHp;
         Check(!Hit(true, 3f, Vector3.right * 5f).CausedOrdinaryStagger && enemy.EnemyStat.CurrentHp < hp
@@ -126,19 +144,22 @@ public static partial class EnemyBrainRegression
         player.transform.position = f.Origin + Vector3.forward * 3.5f;
         sensor.Target = player.transform;
         await Until(() => AttackCooldownRemaining(enemy) > 0f, "An out-of-range selection did not consume its interval.");
-        Check(enemy.CurrentAction == null, "An armored attack started outside its execute range.");
+        Check(enemy.CurrentAction == null && PendingAttack(enemy) == attack,
+            "An armored skill in selection range and outside execute range did not stay pending.");
         attack.minimumRange = 1.5f;
         player.transform.position = f.Origin + Vector3.forward * .8f;
         Set(enemy, "_attackCooldownTimer", 0f);
         await Until(() => AttackCooldownRemaining(enemy) > 0f, "A too-close selection did not consume its interval.");
-        Check(enemy.CurrentAction == null, "An armored attack ignored its minimum range.");
+        Check(enemy.CurrentAction == null && PendingAttack(enemy) == null,
+            "The skill selection ignored its minimum range.");
         attack.minimumRange = 0f;
         attack.cooldown = 10f;
         enemy.RecordAttackStarted(attack);
         player.transform.position = f.Origin + Vector3.forward;
         Set(enemy, "_attackCooldownTimer", 0f);
         await Until(() => AttackCooldownRemaining(enemy) > 0f, "A selection with no ready skill did not consume its interval.");
-        Check(enemy.CurrentAction == null, "An armored attack ignored its individual skill cooldown.");
+        Check(enemy.CurrentAction == null && PendingAttack(enemy) == null,
+            "The skill selection ignored its individual cooldown.");
         var replacement = f.New<MonsterDefaultAttackSO>();
         replacement.animName = "Attack";
         replacement.hitStartTime = .7f;
@@ -185,7 +206,7 @@ public static partial class EnemyBrainRegression
         Hit(true);
         Set(enemy, "_attackCooldownTimer", 0f);
         await Until(() => enemy.CurrentAction?.HasNormalAttackArmor == true && !enemy.IsHurt,
-            "The first hit allowed no armored attack when the selection interval was due.");
+            "The scheduled armored attack did not start after the first hit recovered.");
         var lethal = enemy.CurrentAction;
         enemy.TakeDamage(enemy.EnemyStat.CurrentHp + 1f, poiseDamage: 0f);
         Check(enemy.IsDead && !lethal.IsActive && !lethal.HasNormalAttackArmor && !ParryEventBus.IsTelegraphActive(lethal),
@@ -226,6 +247,7 @@ public static partial class EnemyBrainRegression
             "The replacement started before Hurt ended.");
         await Until(() => enemy.CurrentAction?.IsActive == true, "The selected ordinary attack did not start after Hurt.");
         Check(enemy.CurrentAction.SkillData == replacement && !enemy.CurrentAction.HasNormalAttackArmor
+            && !IsHitAnimationPresent(enemy)
             && enemy.TakeDamage(1f, poiseDamage: 0f).CausedOrdinaryStagger
             && enemy.GetComponent<EnemyArmoredHitReaction>() == null,
             "An ordinary attack started with super armor or could not be interrupted by a hit.");

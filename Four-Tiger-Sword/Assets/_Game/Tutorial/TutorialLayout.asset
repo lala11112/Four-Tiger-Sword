@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36194f5fd12126c46ad5e0394f9c7707, type: 3}
+  m_Name: TutorialLayout
+  m_EditorClassIdentifier: StudioBaekho.Maps::StudioBaekho.BaekhoFixedDungeonLayout
+  rooms:
+  - module: {fileID: 5320505661244611671, guid: 7959572c14e304642947667dfbf91ba6, type: 3}
+    role: 1
+    position: {x: 0, y: 0, z: 0}
+    quarterTurns: 2
+    entranceSocket: 
+    exitSocket: A
+  - module: {fileID: 3038724103049256002, guid: 74460f43967f7d947b814f37b90ecad2, type: 3}
+    role: 0
+    position: {x: -3, y: 0, z: 30}
+    quarterTurns: 0
+    entranceSocket: S1
+    exitSocket: N1
+  - module: {fileID: 6142813069577824884, guid: 89473b447912f2542bf70e5bbc34d886, type: 3}
+    role: 8
+    position: {x: -12, y: 0, z: 60}
+    quarterTurns: 0
+    entranceSocket: A
+    exitSocket: B
+  - module: {fileID: 4484193886589011418, guid: 6243304a51bd60e4587bbb0f89048136, type: 3}
+    role: 0
+    position: {x: -2, y: 0, z: 90}
+    quarterTurns: 0
+    entranceSocket: S1
+    exitSocket: N1
+  - module: {fileID: 6881946897952684032, guid: d962d58c76aff0f41b9643a1887e16bb, type: 3}
+    role: 2
+    position: {x: -12, y: 0, z: 120}
+    quarterTurns: 0
+    entranceSocket: A
+    exitSocket: 

@@ -205,7 +205,8 @@ public sealed class RunItemChoiceView : MonoBehaviour
         const float actionCenter = 708;
         Place((RectTransform)_reroll.transform, actionCenter - 316, 842, 304, 56);
         Place((RectTransform)_skip.transform, showReroll ? actionCenter + 12 : actionCenter - 152, 842, 304, 56);
-        _skip.interactable = !_busy;
+        _skip.gameObject.SetActive(_service.CanSkip);
+        _skip.interactable = !_busy && _service.CanSkip;
         _status.text = _localError ?? _service.LastError ?? string.Empty;
         _status.gameObject.SetActive(!string.IsNullOrWhiteSpace(_status.text));
         Canvas.ForceUpdateCanvases();

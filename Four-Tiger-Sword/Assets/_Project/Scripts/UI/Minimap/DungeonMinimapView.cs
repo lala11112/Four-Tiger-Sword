@@ -47,6 +47,12 @@ public sealed class DungeonMinimapView : MonoBehaviour
     public event Action CloseRequested;
     public void RequestClose() => CloseRequested?.Invoke();
 
+    public RectTransform GetRoomTarget(int roomId)
+    {
+        int index = _model != null ? _model.GetRoomAreaIndex(roomId) : -1;
+        return index >= 0 && index < _areas.Count ? _areas[index].Rect : null;
+    }
+
     private sealed class AreaVisual
     {
         public RectTransform Rect;

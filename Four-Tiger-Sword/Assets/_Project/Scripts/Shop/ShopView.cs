@@ -88,6 +88,41 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
     public bool BuyInventoryExpanded => _buyInventoryExpanded;
     public void ConfigureBoundary(BoundaryControls controls) => boundary = controls;
 
+    public RectTransform GetTutorialTarget(TutorialShopPhase phase)
+    {
+        if (!_visible || _state == null || tabs == null) return null;
+        if (phase == TutorialShopPhase.Complete) return closeButton?.transform as RectTransform;
+        if (phase == TutorialShopPhase.Buy)
+        {
+            if (_state.Tab != ShopTab.Buy) return tabs.BuyTab.transform as RectTransform;
+            if (HasBoundaryLayout && _state.SelectedOffer?.CanBuy == true
+                && _state.DetailSource != ShopDetailSource.Owned) return boundary.DetailAction.transform as RectTransform;
+            return ActiveRow(HasBoundaryLayout ? _stockRows : _rows);
+        }
+        if (phase == TutorialShopPhase.Sell)
+        {
+            if (_state.Tab != ShopTab.Sell) return tabs.SellTab.transform as RectTransform;
+            if (_state.CanSell) return (HasBoundaryLayout ? boundary.DetailAction : tabs.SellButton).transform as RectTransform;
+            return ActiveRow(HasBoundaryLayout ? _ownedRows : _rows);
+        }
+        if (phase == TutorialShopPhase.Fuse)
+        {
+            if (_state.Tab != ShopTab.Fuse) return tabs.FuseTab.transform as RectTransform;
+            if (_state.CanFuse) return tabs.FuseButton.transform as RectTransform;
+            if (HasBoundaryLayout && _state.SelectedOwned is { CanAddMaterial: true, IsMaterial: false })
+                return boundary.DetailAction.transform as RectTransform;
+            return ActiveRow(HasBoundaryLayout ? _ownedRows : _rows, _state.FusionFirst?.Id);
+        }
+        return null;
+    }
+
+    private static RectTransform ActiveRow(List<ShopOfferView> rows, string excludedId = null)
+    {
+        foreach (var row in rows)
+            if (row.gameObject.activeInHierarchy && row.RenderedId != excludedId) return row.transform as RectTransform;
+        return null;
+    }
+
     public void Configure(GameObject panelRoot, GameObject prompt, TMP_Text gold, TMP_Text hp,
         TMP_Text feedback, Transform content, ShopOfferView row, UnityEngine.UI.Button close)
     { panel = panelRoot; interactionPrompt = prompt; balance = gold; health = hp; message = feedback; offersRoot = content; offerPrefab = row; closeButton = close; }
@@ -155,6 +190,7 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
     public void Render(ShopViewState state)
     {
         if (HasBoundaryLayout) { RenderBoundary(state); return; }
+        _state = state;
         bool opening = state.Visible && !_visible;
         bool changedTab = _visible && state.Tab != _lastTab;
         SetVisibility(state.Visible);
@@ -492,6 +528,8 @@ public sealed class ShopView : MonoBehaviour, IShopView, IShopLayoutView, IAnima
 
     private void RenderProgression(ShopViewState state)
     {
+        if (HasBoundaryLayout && state.IsTutorial)
+            boundary.ServicePanel.gameObject.SetActive(false);
         if (HasBoundaryLayout && _refreshButton == null)
         {
             _refreshButton = Instantiate(boundary.HealingButton, boundary.ServicePanel);

@@ -19,9 +19,12 @@ public sealed class DungeonEncounterGate : MonoBehaviour
     private float _height;
     private float _closedInnerDepth;
     private bool _initialized;
+    private bool _encounterLocked;
+    private bool _tutorialBlocked;
 
     public bool IsLocked { get; private set; }
     public GameObject DoorRoot => _doorRoot;
+    public string SocketId { get; private set; }
 
     public void Initialize(BaekhoMapConnection socket, float clearWidth, GameObject doorPrefab)
     {
@@ -38,6 +41,7 @@ public sealed class DungeonEncounterGate : MonoBehaviour
 
         transform.SetPositionAndRotation(socket.transform.position, socket.transform.rotation);
         transform.localScale = Vector3.one;
+        SocketId = socket.id;
         float openingWidth = Mathf.Min(clearWidth, socket.width);
         _halfWidth = openingWidth * 0.5f;
         _height = socket.height;
@@ -82,19 +86,32 @@ public sealed class DungeonEncounterGate : MonoBehaviour
     public void Lock()
     {
         if (!_initialized) return;
-        IsLocked = true;
-        _blocker.enabled = true;
-        _obstacle.enabled = true;
-        _door.Close();
+        _encounterLocked = true;
+        RefreshLock();
     }
 
     public void Open(bool immediate = false)
     {
-        IsLocked = false;
-        if (_blocker != null) _blocker.enabled = false;
-        if (_obstacle != null) _obstacle.enabled = false;
+        _encounterLocked = false;
+        RefreshLock(immediate);
+    }
+
+    /// <summary>A tutorial requirement and an active fight each own their part of the same gate.</summary>
+    public void SetTutorialBlocked(bool blocked)
+    {
+        if (!_initialized || _tutorialBlocked == blocked) return;
+        _tutorialBlocked = blocked;
+        RefreshLock(immediate: blocked);
+    }
+
+    private void RefreshLock(bool immediate = false)
+    {
+        IsLocked = _encounterLocked || _tutorialBlocked;
+        if (_blocker != null) _blocker.enabled = IsLocked;
+        if (_obstacle != null) _obstacle.enabled = IsLocked;
         if (_door == null) return;
-        if (immediate) _door.SetOpenImmediate(true);
+        if (immediate) _door.SetOpenImmediate(!IsLocked);
+        else if (IsLocked) _door.Close();
         else _door.Open();
     }
 
@@ -126,12 +143,18 @@ public sealed class DungeonEncounterGate : MonoBehaviour
 
     public void Dispose()
     {
-        Open(true);
+        ResetLock();
         _initialized = false;
     }
 
-    private void OnDisable() => Open(true);
-    private void OnDestroy() => Open(true);
+    private void OnDisable() => ResetLock();
+    private void OnDestroy() => ResetLock();
+
+    private void ResetLock()
+    {
+        _tutorialBlocked = false;
+        Open(true);
+    }
 
     private Vector3 GetWallAlignedDoorPosition(BaekhoMapConnection socket)
     {

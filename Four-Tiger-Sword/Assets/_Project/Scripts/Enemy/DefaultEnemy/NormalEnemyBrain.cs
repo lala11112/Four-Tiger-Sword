@@ -3,7 +3,9 @@ using UnityEngine;
 /// <summary>Normal-enemy patrol, target pursuit and attack selection.</summary>
 public sealed class NormalEnemyBrain : EnemyBrainBase
 {
-    private EnemyAttackState _attack;
+    private static readonly int HitState = Animator.StringToHash("Hit");
+    private static readonly int IdleStateHash = Animator.StringToHash("Idle");
+    private static readonly int MoveStateHash = Animator.StringToHash("Move");
     public NormalEnemyBrain(Enemy owner) : base(owner) { }
 
     // A decision may wait through Hurt without becoming an active action or consuming skill cooldown.
@@ -56,6 +58,21 @@ public sealed class NormalEnemyBrain : EnemyBrainBase
         && !Owner.IsGroggy && !Owner.PendingGroggy && !Owner.IsRoot && !Owner.IsSelfDestructing
         && !Owner.CombatLabPassive && !Owner.EncounterPatrolOnly && !Owner.IsSilenced;
 
+    // A higher-priority reaction can interrupt Hurt, leaving its pose to blend out on return.
+    // Keep selecting on the world clock, but never start a new attack over that remaining pose.
+    private bool IsHitAnimationActive
+    {
+        get
+        {
+            var animator = Owner.Animator;
+            return animator != null && animator.isActiveAndEnabled
+                && animator.runtimeAnimatorController != null && animator.layerCount > 0
+                && (animator.HasState(0, IdleStateHash) || animator.HasState(0, MoveStateHash))
+                && (animator.GetCurrentAnimatorStateInfo(0).shortNameHash == HitState
+                    || animator.IsInTransition(0) && animator.GetNextAnimatorStateInfo(0).shortNameHash == HitState);
+        }
+    }
+
     private void TickAttackSelection()
     {
         if (!CanSelectAttack || Owner.CurrentAction != null || Owner.HasSelectedAttack) return;
@@ -71,12 +88,11 @@ public sealed class NormalEnemyBrain : EnemyBrainBase
             PendingAttackSkill = Owner.SelectAttackSkill();
             Owner.StartAttackCooldown();
         }
-        TryStartArmoredAttackFromHurt();
     }
 
     internal bool TryPrepareScheduledAttack()
     {
-        if (!CanSelectAttack || Owner.IsHurt || Owner.IsKnockbacking
+        if (!CanSelectAttack || Owner.IsHurt || Owner.IsKnockbacking || IsHitAnimationActive
             || Owner.CurrentAction != null || Owner.HasSelectedAttack) return false;
         var skill = PendingAttackSkill;
         var target = Owner.DetectedTarget;
@@ -85,36 +101,11 @@ public sealed class NormalEnemyBrain : EnemyBrainBase
         if (Owner.GetAttackSelectionWeight(skill, Vector3.Distance(Owner.transform.position, target.position)) <= 0f)
             return false;
         var action = skill.CreateAction(Owner);
-        if (action == null || !CanSelectAttack || Owner.IsHurt || Owner.DetectedTarget != target) return false;
+        if (action == null || !CanSelectAttack || Owner.IsHurt || IsHitAnimationActive || Owner.DetectedTarget != target) return false;
         Owner.CurrentAction = action;
         Owner.HasSelectedAttack = true;
         return true;
     }
-
-    private void TryStartArmoredAttackFromHurt()
-    {
-        var skill = PendingAttackSkill;
-        if (skill == null || !skill.superArmor || !CanSelectAttack || !IsEligibleHurt()) return;
-        var target = Owner.DetectedTarget;
-        if (target == null) return;
-        float distance = Vector3.Distance(Owner.transform.position, target.position);
-        if (distance > skill.executeRange || Owner.GetAttackSelectionWeight(skill, distance) <= 0f) return;
-        ClearScheduledAttack();
-        var action = skill.CreateAction(Owner);
-        // Constructors and callbacks may change the owner. Recheck before releasing the reaction.
-        if (action == null || !CanSelectAttack || !IsEligibleHurt() || Owner.DetectedTarget != target) return;
-        distance = Vector3.Distance(Owner.transform.position, target.position);
-        if (distance > skill.executeRange || Owner.GetAttackSelectionWeight(skill, distance) <= 0f) return;
-        Owner.StopKnockbackForArmoredAttack();
-        Owner.CurrentAction = action;
-        Owner.HasSelectedAttack = true;
-        Machine.ChangeState(_attack);
-    }
-
-    private bool IsEligibleHurt() => Machine.CurrentState is EnemyHurtState
-        && Owner.isActiveAndEnabled && Owner.IsHurt && !Owner.IsDead && !Owner.IsGroggy
-        && !Owner.PendingGroggy && !Owner.IsRoot && !Owner.IsSelfDestructing
-        && !Owner.CombatLabPassive && !Owner.EncounterPatrolOnly;
 
     public override void SetPassive(bool passive)
     {
@@ -136,7 +127,8 @@ public sealed class NormalEnemyBrain : EnemyBrainBase
     }
 
     public override bool TryStartSelfDestruct()
-        => !Owner.EncounterPatrolOnly && base.TryStartSelfDestruct();
+        => !Owner.EncounterPatrolOnly && !Owner.IsHurt && !Owner.IsGroggy && !Owner.PendingGroggy
+            && !Owner.IsRoot && !Owner.IsKnockbacking && !IsHitAnimationActive && base.TryStartSelfDestruct();
 
     protected override void BuildBehavior()
     {
@@ -145,7 +137,6 @@ public sealed class NormalEnemyBrain : EnemyBrainBase
         var combatIdle = new EnemyCombatIdleState(Owner);
         var approach = new EnemyApproachState(Owner);
         var attack = new EnemyAttackState(Owner);
-        _attack = attack;
         IdleState = idle;
         ReturnState = trace;
 
@@ -162,7 +153,7 @@ public sealed class NormalEnemyBrain : EnemyBrainBase
 
     private bool TryStartAttack()
     {
-        if (!Owner.IsInExecuteRange || !Owner.CanAttack || Owner.CurrentAction == null
+        if (Owner.IsHurt || IsHitAnimationActive || !Owner.IsInExecuteRange || !Owner.CanAttack || Owner.CurrentAction == null
             || !Owner.IsSkillReady(Owner.CurrentAction.SkillData))
         {
             Owner.CombatGroup?.CancelAttackRequest(Owner);

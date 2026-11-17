@@ -26,12 +26,15 @@ public sealed class HubWorldController : MonoBehaviour
     private PlayerUpgradeService _upgrades;
     private CombatHitStopService.WorldScaleLease _codexPause;
     private HubCodexInteraction _codexOwner;
+    private TutorialHubDirector _tutorial;
     private readonly List<CinemachineInputAxisController> _cameraInputs = new();
 
     public bool IsModalOpen => _modalOpen || _codexPause != null || _statsModalOpen;
     public bool IsCodexOpen => _codex != null && _codex.IsOpen;
     public bool IsPauseMenuOpen => _pauseMenu != null && _pauseMenu.IsOpen;
     public PlayerController PauseMenuPlayer => player != null ? player : GetComponentInChildren<PlayerController>();
+    internal bool CanStartExpedition => _tutorial == null || _tutorial.CanStartExpedition;
+    internal void ClosePauseAfterTutorial() => _pauseMenu?.Resume();
     internal bool CanShowPlayerStats => isActiveAndEnabled && !_modalOpen && _codexPause == null;
 
     private bool HasCatalog => itemCatalog != null && inventoryArt != null;
@@ -45,6 +48,7 @@ public sealed class HubWorldController : MonoBehaviour
         _hud = new HubFieldHud(transform, inventoryArt);
         _pauseMenu = PauseMenuPresenter.Ensure(this);
         _playerStats = PlayerStatsPresenter.Ensure(this);
+        _tutorial = TutorialHubDirector.Ensure(this, PlayerUpgradeService.Instance);
     }
 
     private void OnEnable()

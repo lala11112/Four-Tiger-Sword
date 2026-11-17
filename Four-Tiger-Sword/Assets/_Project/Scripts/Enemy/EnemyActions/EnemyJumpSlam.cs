@@ -31,6 +31,29 @@ public class EnemyJumpSlam : EnemyAction
         _nav = enemy.GetComponent<NavMeshAgent>();
     }
 
+    public override bool TryGetAttackRangeWarning(out AttackRangeWarning warning)
+    {
+        warning = default;
+        if (!CanShowAttackRangeWarning || _nav == null || (_phase != Phase.Startup && _phase != Phase.Jump))
+            return false;
+
+        bool airborne = _phase == Phase.Jump;
+        float startup = Mathf.Max(0f, _data.startupTime);
+        float elapsed = airborne ? startup + _timer : _timer;
+        if (!TryGetWarningProgress(elapsed, 0f, startup + Mathf.Max(0f, _data.jumpDuration), out float progress))
+            return false;
+
+        Vector3 start = airborne ? _jumpStartPos : _enemy.transform.position;
+        Vector3 target = airborne ? _jumpTargetPos : GetJumpTarget(start);
+        TryResolveNavigationPosition(target, start, out Vector3 ground);
+        TryGetJumpRotation(start, target, out Quaternion rotation);
+        Quaternion yaw = Quaternion.Euler(0f, rotation.eulerAngles.y, 0f);
+        Vector3 center = ground + yaw * _data.hitBoxOffset;
+        center.y = ground.y;
+        warning = AttackRangeWarning.Circle(center, _data.slamRadius, progress);
+        return true;
+    }
+
     public override void Enter()
     {
         _movementUnlocked = true;
@@ -115,24 +138,27 @@ public class EnemyJumpSlam : EnemyAction
         _jumpStartPos = _enemy.transform.position;
 
         // 도약 시점의 플레이어 위치를 목표로 고정 (이후 플레이어가 움직여도 방향 불변)
-        if (HasBossPolicy)
-        {
-            Vector3 target = BossAimPoint;
-            _jumpTargetPos = new Vector3(target.x, _jumpStartPos.y, target.z);
-        }
-        else if (_enemy.DetectedTarget != null)
-        {
-            Vector3 t = _enemy.DetectedTarget.position;
-            _jumpTargetPos = new Vector3(t.x, _jumpStartPos.y, t.z);
-        }
-        else
-        {
-            _jumpTargetPos = _jumpStartPos + _enemy.transform.forward * 3f;
-        }
+        _jumpTargetPos = GetJumpTarget(_jumpStartPos);
 
         // 공중 이동 중 NavMesh 간섭 차단
         _navigationDisabledForJump = true;
         _nav.enabled = false;
+    }
+
+    private Vector3 GetJumpTarget(Vector3 start)
+    {
+        if (HasBossPolicy)
+        {
+            Vector3 target = BossAimPoint;
+            return new Vector3(target.x, start.y, target.z);
+        }
+        if (_enemy.DetectedTarget != null)
+        {
+            Vector3 target = _enemy.DetectedTarget.position;
+            return new Vector3(target.x, start.y, target.z);
+        }
+
+        return start + _enemy.transform.forward * 3f;
     }
 
     // ── 포물선 이동 ──────────────────────────────────────────────────────────
@@ -148,9 +174,16 @@ public class EnemyJumpSlam : EnemyAction
         _enemy.transform.position = new Vector3(flat.x, _jumpStartPos.y + height, flat.z);
 
         // 낙하 방향으로 적 회전 (선택)
-        Vector3 moveDir = (_jumpTargetPos - _jumpStartPos).normalized;
-        if (!HasBossPolicy && moveDir != Vector3.zero)
-            _enemy.transform.rotation = Quaternion.LookRotation(moveDir);
+        if (TryGetJumpRotation(_jumpStartPos, _jumpTargetPos, out Quaternion rotation))
+            _enemy.transform.rotation = rotation;
+    }
+
+    private bool TryGetJumpRotation(Vector3 start, Vector3 target, out Quaternion rotation)
+    {
+        Vector3 moveDir = (target - start).normalized;
+        bool changesRotation = !HasBossPolicy && moveDir != Vector3.zero;
+        rotation = changesRotation ? Quaternion.LookRotation(moveDir) : _enemy.transform.rotation;
+        return changesRotation;
     }
 
     // ── 착지 + 충격 판정 ────────────────────────────────────────────────────
@@ -178,19 +211,25 @@ public class EnemyJumpSlam : EnemyAction
     {
         _navigationDisabledForJump = false;
         // 공중에서 중단된 경우 먼저 지면을 찾은 뒤 에이전트를 켭니다.
-        var filter = new NavMeshQueryFilter { agentTypeID = _nav.agentTypeID, areaMask = _nav.areaMask };
-        float searchRadius = Mathf.Max(2f, _data.jumpHeight + 1f);
-        if (!NavMesh.SamplePosition(desiredPosition, out var hit, searchRadius, filter)
-            && !NavMesh.SamplePosition(_jumpStartPos, out hit, searchRadius, filter))
+        bool hasPosition = TryResolveNavigationPosition(desiredPosition, _jumpStartPos, out Vector3 position);
+        _enemy.transform.position = position;
+        _nav.enabled = true;
+        if (!hasPosition)
         {
-            _enemy.transform.position = _jumpStartPos;
-            _nav.enabled = true;
             Debug.LogWarning($"{_enemy.name}: 점프 복귀 위치의 NavMesh를 찾지 못했습니다.", _enemy);
             return;
         }
-        _enemy.transform.position = hit.position;
-        _nav.enabled = true;
-        _nav.Warp(hit.position);
+        _nav.Warp(position);
+    }
+
+    private bool TryResolveNavigationPosition(Vector3 desired, Vector3 fallback, out Vector3 position)
+    {
+        var filter = new NavMeshQueryFilter { agentTypeID = _nav.agentTypeID, areaMask = _nav.areaMask };
+        float searchRadius = Mathf.Max(2f, _data.jumpHeight + 1f);
+        bool found = NavMesh.SamplePosition(desired, out var hit, searchRadius, filter)
+            || NavMesh.SamplePosition(fallback, out hit, searchRadius, filter);
+        position = found ? hit.position : fallback;
+        return found;
     }
 
     private void ExecuteSlam()

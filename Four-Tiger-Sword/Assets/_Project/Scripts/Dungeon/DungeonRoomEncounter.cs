@@ -36,6 +36,7 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
     private readonly List<DungeonEncounterMember> _members = new();
     private readonly HashSet<DungeonEncounterMember> _alive = new();
     private readonly List<DungeonEncounterGate> _gates = new();
+    private readonly Dictionary<int, DungeonEncounterGate> _gatesBySocket = new();
     private readonly List<DungeonEncounterMember> _removed = new();
     private readonly List<List<GameObject>> _waves = new();
     private DungeonEncounterDirector _director;
@@ -55,7 +56,8 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
     private bool HasMoreWaves => CurrentWaveNumber < _waves.Count;
 
     public void Initialize(DungeonEncounterDirector director, BaekhoMapModule module,
-        Dictionary<int, float> usedSockets, int seed, GameObject bossPrefab = null, int bossExitSocketIndex = -1)
+        Dictionary<int, float> usedSockets, int seed, GameObject bossPrefab = null, int bossExitSocketIndex = -1,
+        GameObject[] fixedEnemies = null, bool restoredCleared = false)
     {
         if (_director != null) return;
         _director = director;
@@ -66,6 +68,17 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
         _isBoss = identity != null && (identity.role & BaekhoRoomRole.Boss) != 0;
         try
         {
+            if (restoredCleared)
+            {
+                if (identity == null || identity.role != BaekhoRoomRole.Normal)
+                    throw new InvalidOperationException("Only an ordinary combat room can be restored as cleared.");
+                RemainingBudget = 0;
+                CreateGates(module, usedSockets, director.doorPrefab, -1);
+                WasEntered = true;
+                State = DungeonEncounterState.Cleared;
+                return;
+            }
+
             // Authored enemy markers or a copied encounter budget must never turn a shop into combat.
             if (identity != null && (identity.role & BaekhoRoomRole.Shop) != 0)
             {
@@ -91,7 +104,13 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
             foreach (var marker in module.GetComponentsInChildren<BaekhoGameplayMarker>(true))
                 if (marker.kind == "enemy") { hasMarkers = true; break; }
             if (module.encounterBudget < 0) throw new InvalidOperationException("Encounter budget cannot be negative.");
-            if (!_isBoss && hasMarkers && module.encounterBudget > 0)
+            if (!_isBoss && fixedEnemies is { Length: > 0 })
+            {
+                _waves.Add(new List<GameObject>(fixedEnemies));
+                WaveSummary = $"1차 [{string.Join(", ", Array.ConvertAll(fixedEnemies, item => item.name))}]";
+                RemainingBudget = 0;
+            }
+            else if (!_isBoss && hasMarkers && module.encounterBudget > 0)
             {
                 if (director.catalog == null) throw new InvalidOperationException("Dungeon enemy catalog is missing.");
                 int[] costs = director.catalog.GetValidatedCosts();
@@ -231,10 +250,14 @@ public sealed class DungeonRoomEncounter : MonoBehaviour
             var gate = gateObject.AddComponent<DungeonEncounterGate>();
             _gates.Add(gate);
             gate.Initialize(socket, Mathf.Min(socket.width, pair.Value), prefab);
+            _gatesBySocket.Add(pair.Key, gate);
             // Keep the route to the end room closed even before the boss encounter begins.
             if (pair.Key == lockedSocketIndex) gate.Lock();
         }
     }
+
+    public DungeonEncounterGate GetGate(int socketIndex)
+        => _gatesBySocket.TryGetValue(socketIndex, out var gate) ? gate : null;
 
     public bool BeginEncounter()
     {

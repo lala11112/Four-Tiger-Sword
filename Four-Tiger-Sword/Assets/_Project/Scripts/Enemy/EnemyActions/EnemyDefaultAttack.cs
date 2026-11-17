@@ -16,6 +16,29 @@ public class EnemyDefaultAttack : EnemyAction
         _data = data;
     }
 
+    public override bool TryGetAttackRangeWarning(out AttackRangeWarning warning)
+    {
+        warning = default;
+        if (!CanShowAttackRangeWarning || !(_data.hitDuration > 0f) || _data.hitStartTime > _data.attackDuration
+            || !TryGetWarningProgress(_timer, 0f, _data.hitStartTime, out float progress))
+            return false;
+
+        Vector3 center = GetGroundHitCenter(_data.hitBoxOffset);
+        switch (_data.hitBoxShape)
+        {
+            case HitBoxShape.Sphere:
+            case HitBoxShape.Capsule:
+                warning = AttackRangeWarning.Circle(center, _data.hitBoxRadius, progress);
+                return true;
+            case HitBoxShape.Box:
+                warning = AttackRangeWarning.Box(center, Quaternion.Euler(0f, _enemy.transform.eulerAngles.y, 0f),
+                    new Vector2(_data.hitBoxSize.x, _data.hitBoxSize.z), progress);
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public override void Enter()
     {
         base.Enter();

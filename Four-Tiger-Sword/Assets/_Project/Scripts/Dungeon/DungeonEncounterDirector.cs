@@ -40,6 +40,8 @@ public sealed class DungeonEncounterDirector : MonoBehaviour
     private Coroutine _preparation;
     private float _nextPlayerSearch;
     private GameObject _bossPrefab;
+    private DungeonRoomRoster[] _roomRosters;
+    private int? _restoredClearedRoomId;
     private string _preparationError;
     private bool _suspended;
     private PlayerController _boundPlayer;
@@ -64,7 +66,12 @@ public sealed class DungeonEncounterDirector : MonoBehaviour
     }
 
     /// <summary>Set before generating a stage; null selects ordinary encounters only.</summary>
-    public void ConfigureStage(GameObject bossPrefab) => _bossPrefab = bossPrefab;
+    public void ConfigureStage(GameObject bossPrefab, DungeonRoomRoster[] roomRosters = null, int? restoredClearedRoomId = null)
+    {
+        _bossPrefab = bossPrefab;
+        _roomRosters = roomRosters;
+        _restoredClearedRoomId = restoredClearedRoomId;
+    }
 
     /// <summary>A warp must not be interpreted as a swept crossing of unrelated room entrances.</summary>
     public void ResetPlayerMotionHistory()
@@ -142,7 +149,12 @@ public sealed class DungeonEncounterDirector : MonoBehaviour
                     if (link.fromMapId == id && link.toMapId == result.plan.endMapId) bossExitSocket = link.fromSocketIndex;
                     if (link.toMapId == id && link.fromMapId == result.plan.endMapId) bossExitSocket = link.toSocketIndex;
                 }
-                encounter.Initialize(this, module, used[id], seed, _bossPrefab, bossExitSocket);
+                GameObject[] enemies = null;
+                if (_roomRosters != null)
+                    foreach (var roster in _roomRosters)
+                        if (roster.roomId == id) { enemies = roster.enemies; break; }
+                encounter.Initialize(this, module, used[id], seed, _bossPrefab, bossExitSocket,
+                    enemies, restoredCleared: _restoredClearedRoomId == id);
                 if (_suspended) encounter.SuspendEncounter();
             }
             catch (Exception exception)

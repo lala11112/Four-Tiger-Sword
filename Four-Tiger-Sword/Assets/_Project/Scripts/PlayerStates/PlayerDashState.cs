@@ -45,6 +45,7 @@ public class PlayerDashState : IPlayerState
                 : _playerController.BackstepAnimationName;
             if (!TryPlayAnimation(animationName)) TryPlayAnimation("Idle");
         }
+        _playerController.TutorialCombat?.Report(TutorialCombatAction.Dash);
     }
 
     private bool TryPlayAnimation(string stateName)

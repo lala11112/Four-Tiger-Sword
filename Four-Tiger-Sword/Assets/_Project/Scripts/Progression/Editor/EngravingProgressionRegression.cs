@@ -140,9 +140,10 @@ public static class EngravingProgressionRegression
         Check(File.ReadAllText(files.Path) == legacy && !File.Exists(files.Path + ".bak"), "Read does not rewrite legacy save");
         Check(service.TryUnlockNode("atk", out _), "First purchase migrates V1 atomically");
         var store = new PlayerUpgradeFileStore(files.Path);
-        Check(store.TryLoad(out var migrated, out _) && migrated.version == 2 && migrated.currency == 77
+        Check(store.TryLoad(out var migrated, out _) && migrated.version == PlayerUpgradeProfile.CurrentVersion && migrated.currency == 77
             && migrated.healthLevel == 2 && migrated.attackLevel == 3 && migrated.defenseLevel == 4
-            && migrated.unlockedNodeIds.Length == 1 && migrated.unlockedNodeIds[0] == "atk", "V2 migration preserves every field");
+            && migrated.unlockedNodeIds.Length == 1 && migrated.unlockedNodeIds[0] == "atk"
+            && migrated.tutorialStatus == TutorialProgressStatus.NotStarted, "Migration preserves every field");
         Check(File.ReadAllText(files.Path + ".bak") == legacy, "Migration retains original V1 backup");
         File.Delete(files.Path + ".bak");
         File.WriteAllText(files.Path, "{\"version\":2,\"currency\":77,\"healthLevel\":2,\"attackLevel\":3,\"defenseLevel\":4}");

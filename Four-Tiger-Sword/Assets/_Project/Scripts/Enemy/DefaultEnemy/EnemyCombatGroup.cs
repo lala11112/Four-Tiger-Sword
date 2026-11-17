@@ -142,7 +142,7 @@ public sealed class EnemyCombatGroup : MonoBehaviour
         if (!Available(enemy)) return;
         CancelAttackRequest(enemy);
         ReleasePosition(enemy);
-        // A scheduled armored escape from Hurt also delays subsequent ordinary starts.
+        // Every started action delays the next member's attack by the room interval.
         _nextAttackStart = Mathf.Max(_nextAttackStart, Time.time + Settings.attackStartInterval);
     }
 

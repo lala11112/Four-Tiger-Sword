@@ -55,10 +55,13 @@ public sealed class ShopStock
     private readonly ItemCatalog _catalog;
     private readonly int _stageSeed;
     private readonly float _discount;
+    private readonly bool _allowRefresh;
 
-    private ShopStock(List<ShopOffer> offers, ItemCatalog catalog, int stageSeed, int slots, EngravingSnapshot engraving)
+    private ShopStock(List<ShopOffer> offers, ItemCatalog catalog, int stageSeed, int slots, EngravingSnapshot engraving,
+        bool allowRefresh = true)
     {
         _offers = offers; Offers = offers.AsReadOnly(); _catalog = catalog; _stageSeed = stageSeed;
+        _allowRefresh = allowRefresh;
         ItemSlotCount = slots; _discount = engraving.Amount("discount");
         RefreshCost = (int)Math.Ceiling(engraving.BaseRefreshCost * (1d - engraving.Amount("refresh")));
     }
@@ -100,9 +103,18 @@ public sealed class ShopStock
         return new ShopStock(offers, catalog, stageSeed, (int)Math.Min(int.MaxValue, requested), engraving);
     }
 
+    public static ShopStock CreateFixed(ItemCatalog catalog, string itemId, int stageSeed)
+    {
+        if (catalog == null) throw new ArgumentNullException(nameof(catalog));
+        var item = catalog.Find(itemId);
+        if (!ValidCandidate(item, catalog)) throw new ArgumentException("The fixed shop item is invalid.", nameof(itemId));
+        return new ShopStock(new List<ShopOffer> { new ShopOffer(item) }, catalog, stageSeed, 1,
+            EngravingSnapshot.Empty, false);
+    }
+
     public bool CanRefresh(PlayerItemRuntime items)
     {
-        if (_purchaseInProgress || items == null || items.Catalog != _catalog) return false;
+        if (!_allowRefresh || _purchaseInProgress || items == null || items.Catalog != _catalog) return false;
         var candidates = RefreshCandidates(items);
         if (candidates.Count == 0) return false;
         int current = 0;

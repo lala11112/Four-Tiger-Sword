@@ -37,6 +37,7 @@ public sealed partial class HubWorkshopView : MonoBehaviour
     private UIModalMotion _motion;
     private CanvasGroup _interaction;
     private bool _closing;
+    private bool _tutorialOverview;
     private int _motionVersion;
     public event Action CloseRequested;
     public bool IsOpen => isActiveAndEnabled && references?.panel != null && references.panel.activeInHierarchy;
@@ -44,6 +45,13 @@ public sealed partial class HubWorkshopView : MonoBehaviour
     public StatType SelectedStat { get; private set; } = StatType.ST_HP;
     public References UI => references;
     public Entry[] Entries => entries;
+
+    internal void SetTutorialOverview(bool overview)
+    {
+        if (_tutorialOverview == overview) return;
+        _tutorialOverview = overview;
+        Refresh();
+    }
 
     public void Configure(References ui, Entry[] rows)
     {
@@ -216,6 +224,7 @@ public sealed partial class HubWorkshopView : MonoBehaviour
         float gain = !ready ? 0f : SelectedStat == StatType.ST_HP ? settings.healthPerLevel
             : SelectedStat == StatType.ST_ATK ? settings.attackPerLevel : settings.defensePerLevel;
         bool affordable = ready && !capped && _service.Balance >= cost;
+        bool canPurchase = !_tutorialOverview && ready && _service.IsTutorialWorkshopUpgradeAllowed;
         Set(references.currentLevel, ready ? $"Lv. {level:00}" : "—");
         Set(references.nextLevel, !ready ? "—" : capped ? "최대 단계" : $"Lv. {level + 1:00}");
         Set(references.currentBonus, ready ? Bonus(_service.GetBonusRatio(SelectedStat)) : "—");
@@ -223,9 +232,10 @@ public sealed partial class HubWorkshopView : MonoBehaviour
         Set(references.gain, ready ? Bonus(gain) : "—");
         Set(references.balanceAfter, affordable ? $"{currency}  {_service.Balance - cost:N0}" : "—");
         Set(references.cost, !ready ? "—" : capped ? "강화 완료" : $"{currency}  {cost:N0}");
-        if (references.purchaseButton != null) references.purchaseButton.interactable = affordable && !_purchasing;
+        if (references.purchaseButton != null) references.purchaseButton.interactable = canPurchase && affordable && !_purchasing;
         if (references.closeButton != null) references.closeButton.interactable = !_purchasing;
-        Set(references.purchaseLabel, !ready ? "이용 불가" : capped ? "최대 단계" : !affordable ? currency + " 부족" : "강화하기");
+        Set(references.purchaseLabel, !ready ? "이용 불가" : capped ? "최대 단계" : !canPurchase ? "안내 중"
+            : !affordable ? currency + " 부족" : "강화하기");
         string status = !ready ? validationError ?? _service?.LastError ?? "강화 데이터를 불러올 수 없습니다."
             : _message ?? _service.LastError ?? "";
         if (references.status != null)
@@ -257,7 +267,8 @@ public sealed partial class HubWorkshopView : MonoBehaviour
 
     private void Purchase()
     {
-        if (_purchasing || !IsInteractionReady || _service == null) return;
+        if (_purchasing || !IsInteractionReady || _service == null || _tutorialOverview
+            || !_service.IsTutorialWorkshopUpgradeAllowed) return;
         _purchasing = true;
         Refresh();
         try

@@ -17,7 +17,7 @@ public class Enemy : MonoBehaviour, IDamageable
     public float KnockbackMaxDistance => EnemyStat.KnockbackMaxDistance;
 
     [Header("피격 설정")]
-    [Min(0f), Tooltip("마지막 피격 후 행동을 멈추는 시간 (초)")]
+    [Min(0f), Tooltip("마지막 피격 후 최소 경직 시간 (초). 일반 적은 피격 모션 한 회와 넉백, 복귀 전환까지 끝난 뒤 행동합니다.")]
     public float HurtDuration = 0.5f;
     public uint HurtVersion { get; private set; }
 
@@ -52,6 +52,7 @@ public class Enemy : MonoBehaviour, IDamageable
     public EnemyRank Rank => this is Boss ? EnemyRank.Boss : enemyRank;
     public ItemDeathContext DeathContext { get; private set; }
     public bool EncounterPatrolOnly { get; private set; }
+    internal TutorialCombatReporter TutorialTrainingProtection { get; set; }
     internal Vector3 PatrolOrigin { get; private set; }
     public virtual MonsterSkillDataSO ActiveSkillSet => EnemyStat?.MonsterSkillData;
     private bool _combatLabPassive;
@@ -218,6 +219,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     protected virtual void OnEnable()
     {
+        if (Application.isPlaying) EnemyAttackRangePresentation.Ensure(this);
         // Reinforcements can be enabled during another object's Update and render before their Start.
         if (!_spawnRevealAttempted)
         {
@@ -258,7 +260,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void SetDirectionAnimation(float x, float y)
     {
-        if (Animator == null) return;
+        if (Animator == null || !Animator.isActiveAndEnabled || Animator.runtimeAnimatorController == null) return;
         if (!_directionParametersCached || _directionController != Animator.runtimeAnimatorController)
         {
             _directionParametersCached = true;
@@ -302,7 +304,8 @@ public class Enemy : MonoBehaviour, IDamageable
             HurtVersion++;
         }
 
-        EnemyStat.CurrentHp = Mathf.Max(0f, EnemyStat.CurrentHp - damage);
+        float minimumHp = TutorialTrainingProtection != null ? Mathf.Min(hpBefore, 1f) : 0f;
+        EnemyStat.CurrentHp = Mathf.Max(minimumHp, EnemyStat.CurrentHp - damage);
         float healthDamage = hpBefore - EnemyStat.CurrentHp;
         if (!(this is Boss) && healthDamage > 0f && hitContext.IsDirectPlayerHit && hitContext.Player != null)
         {
@@ -328,7 +331,7 @@ public class Enemy : MonoBehaviour, IDamageable
         }
         OnDamaged?.Invoke(healthDamage, damageType, isCritical);
 
-        if (EnemyStat.CurrentHp > 0f) TryStartSelfDestruct();
+        if (EnemyStat.CurrentHp > 0f && TutorialTrainingProtection == null) TryStartSelfDestruct();
 
         // Preserve the enemy's existing equal-level reaction rule; super armor resists displacement.
         if (power != Vector3.zero && CanReceiveKnockback(staggerResistLevel) && !IsSelfDestructing && EnemyStat.CurrentHp > 0f)
@@ -659,8 +662,6 @@ public class Enemy : MonoBehaviour, IDamageable
     }
 
     internal void ClearScheduledAttack() => (Brain as NormalEnemyBrain)?.ClearScheduledAttack();
-
-    internal void StopKnockbackForArmoredAttack() => StopKnockback("armored-attack-started");
 
     internal void OnPoiseBroken()
     {

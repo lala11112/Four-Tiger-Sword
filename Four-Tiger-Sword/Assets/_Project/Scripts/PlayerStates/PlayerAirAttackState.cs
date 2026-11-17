@@ -55,7 +55,9 @@ public class PlayerAirAttackState : IPlayerState
             if (isComplete || _playerController.FormManager.CurrentForm is BaseForm form
                 && form.IsCurrentActionExecutionComplete)
                 RestoreCollision();
+            bool finished = isComplete && !IsComplete;
             IsComplete = isComplete;
+            if (finished) _playerController.TutorialCombat?.Report(TutorialCombatAction.AirLanded);
         }
     }
 

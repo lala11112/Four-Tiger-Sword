@@ -24,7 +24,9 @@ public static class PlayerUpgradeRegression
         PermanentStatsAndExistingEffects();
         ExplicitBindingAndFreshPlayer();
         AtomicFilesAndCorruptData();
-        string result = $"Player upgrades: 8 regression scenarios passed; {_checks} checks.";
+        TutorialLessonTransactions();
+        TutorialExistingProfileAndFallback();
+        string result = $"Player upgrades: 10 regression scenarios passed; {_checks} checks.";
         Debug.Log(result);
         return result;
     }
@@ -246,6 +248,91 @@ public static class PlayerUpgradeRegression
 
     private static void Near(float actual, float expected, string message)
         => Check(!float.IsNaN(actual) && Mathf.Abs(actual - expected) < .001f, $"{message}: {actual} != {expected}");
+
+    private static void TutorialLessonTransactions()
+    {
+        using var f = new Fixture();
+        var service = f.Service;
+        Check(service.TrySkipTutorial(out _) && service.TutorialStatus == TutorialProgressStatus.Skipped
+            && service.TryStartTutorial(out _) && service.TutorialStatus == TutorialProgressStatus.InMap,
+            "A profile that skipped the tutorial can start it later.");
+        f.Store.FailSaves = true;
+        Check(!service.TryCompleteTutorialMap(120, out _) && service.Balance == 0
+            && !service.TutorialGrantClaimed && service.TutorialStatus == TutorialProgressStatus.InMap,
+            "Tutorial clear reward and progress must remain unchanged after a failed save.");
+        f.Store.FailSaves = false;
+        Check(service.TryCompleteTutorialMap(120, out _) && service.Balance == 120
+            && service.TutorialGrantClaimed && service.TutorialStatus == TutorialProgressStatus.HubLessons,
+            "Tutorial clear reward and Hub progress must save in the same transaction.");
+
+        service = new PlayerUpgradeService(f.Settings, f.Store);
+        Check(service.TryCompleteTutorialMap(120, out _) && service.Balance == 120 && service.TutorialHubStep == 0,
+            "Reload and replay must not duplicate the starter grant.");
+        Check(!service.TryUnlockNode("atk", out _) && !service.TryPurchaseSupplyDepot("I01", 100, out _, out _)
+            && !service.TryAcknowledgeTutorialHubStep(out _) && service.Balance == 120,
+            "The first lesson must not allow other purchases or bypass an available upgrade.");
+        f.Store.FailSaves = true;
+        Check(!service.TryUpgrade(StatType.ST_HP, out _) && service.TutorialHubStep == 0 && service.Balance == 120
+            && service.GetLevel(StatType.ST_HP) == 0, "Failed upgrade must not commit its lesson.");
+        f.Store.FailSaves = false;
+        Check(service.TryUpgrade(StatType.ST_HP, out _) && service.TutorialHubStep == 1 && service.Balance == 110
+            && !service.TryUpgrade(StatType.ST_ATK, out _) && !service.TryUnlockNode("reroll", out _),
+            "A saved upgrade advances one lesson and restricts the tree lesson to first-tier nodes.");
+        service = new PlayerUpgradeService(f.Settings, f.Store);
+        Check(service.TutorialHubStep == 1 && service.TryUnlockNode("atk", out _) && service.TutorialHubStep == 2
+            && service.Balance == 100 && !service.TryUnlockNode("crit", out _), "A saved first-tier engraving advances to the depot.");
+        f.Store.FailSaves = true;
+        Check(!service.TryPurchaseSupplyDepot("I01", 100, out _, out _) && service.CurrentSupplyDepotReceipt == null
+            && service.TutorialHubStep == 2 && service.Balance == 100, "Failed depot purchase preserves the final lesson.");
+        f.Store.FailSaves = false;
+        Check(service.TryPurchaseSupplyDepot("I01", 100, out var receipt, out _), "Depot purchase must succeed with the starter balance.");
+        service = new PlayerUpgradeService(f.Settings, f.Store);
+        Check(service.TutorialStatus == TutorialProgressStatus.Completed && service.TutorialHubStep == 3
+            && service.Balance == 0 && service.CurrentSupplyDepotReceipt?.transactionId == receipt.transactionId,
+            "Completed tutorial and the paid next-run item must persist together.");
+    }
+
+    private static void TutorialExistingProfileAndFallback()
+    {
+        using var f = new Fixture();
+        f.Store.Profile.version = 2;
+        f.Store.Profile.healthLevel = 2;
+        f.Store.Profile.unlockedNodeIds = new[] { "hp" };
+        f.Store.Profile.supplyDepotItemId = "I04";
+        f.Store.Profile.supplyDepotTransactionId = "paid-item";
+        var service = new PlayerUpgradeService(f.Settings, f.Store);
+        Check(service.IsReady && service.TutorialStatus == TutorialProgressStatus.NotStarted
+            && service.GetLevel(StatType.ST_HP) == 2 && service.IsNodeUnlocked("hp")
+            && service.CurrentSupplyDepotReceipt?.transactionId == "paid-item", "V2 progress and receipt must survive loading.");
+        Check(service.TryStartTutorial(out _) && f.Store.Profile.version == PlayerUpgradeProfile.CurrentVersion
+            && service.TryCompleteTutorialMap(120, out _), "V2 progress migrates on the first tutorial write.");
+        for (int step = 0; step < 3; step++)
+            Check(service.TutorialHubStep == step && service.TryAcknowledgeTutorialHubStep(out _),
+                "A previously used Hub feature should be acknowledged without buying it again.");
+        Check(service.TutorialStatus == TutorialProgressStatus.Completed && service.Balance == 120
+            && service.CurrentSupplyDepotReceipt?.transactionId == "paid-item", "Acknowledgements must preserve the balance and paid item.");
+
+        var shortfall = new PlayerUpgradeService(f.Settings, new MemoryStore());
+        Check(shortfall.TryStartTutorial(out _) && shortfall.TryCompleteTutorialMap(9, out _), "Create a shortfall fixture.");
+        for (int step = 0; step < 3; step++)
+            Check(shortfall.TryAcknowledgeTutorialHubStep(out _), "Low balance must allow completing the lesson with an overview.");
+        Check(shortfall.Balance == 9 && shortfall.TutorialStatus == TutorialProgressStatus.Completed,
+            "Low balance overview does not spend any currency.");
+
+        var skippedStore = new MemoryStore();
+        var skipped = new PlayerUpgradeService(f.Settings, skippedStore);
+        Check(skipped.TryStartTutorial(out _) && skipped.TryCompleteTutorialMap(120, out _)
+            && skipped.TryUpgrade(StatType.ST_ATK, out _), "Enter the second Hub lesson with a committed upgrade.");
+        skippedStore.FailSaves = true;
+        Check(!skipped.TrySkipTutorial(out _) && skipped.TutorialStatus == TutorialProgressStatus.HubLessons
+            && skipped.TutorialHubStep == 1, "A failed skip save must keep the active Hub lesson.");
+        skippedStore.FailSaves = false;
+        Check(skipped.TrySkipTutorial(out _), "Retrying the Hub skip should persist it.");
+        skipped = new PlayerUpgradeService(f.Settings, skippedStore);
+        Check(skipped.TutorialStatus == TutorialProgressStatus.Skipped && skipped.TutorialGrantClaimed
+            && skipped.Balance == 110 && skipped.TutorialHubStep == 1 && skipped.GetLevel(StatType.ST_ATK) == 1
+            && !skipped.TryStartTutorial(out _), "Skipping must preserve committed rewards and prevent a second starter grant.");
+    }
 
     private static void Check(bool success, string message)
     {

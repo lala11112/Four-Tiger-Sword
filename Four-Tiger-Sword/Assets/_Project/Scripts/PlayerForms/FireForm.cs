@@ -81,6 +81,7 @@ public class FireForm : BaseForm, IToggleUltimateForm
         _skillLifeSteal = Mathf.Max(_normalLifeSteal, Mathf.Clamp01(_fireData.FireUltimateSkillLifeStealPercent / 100f));
         if (_attackSpeedBonus > 0f)
             _playerController.StatManager.AddModifier(StatType.ST_ATK_SPD, 0f, _attackSpeedBonus);
+        _playerController.TutorialCombat?.Report(TutorialCombatAction.Ultimate);
     }
     // The ultimate enables a combat stance, then returns control to normal attacks immediately.
     public override void UpdateUltimate(out bool isComplete) => isComplete = true;

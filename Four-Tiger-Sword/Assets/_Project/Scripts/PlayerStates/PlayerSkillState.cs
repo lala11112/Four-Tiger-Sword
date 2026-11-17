@@ -20,6 +20,7 @@ public class PlayerSkillState : IPlayerState
         IsComplete = false;
         _playerController.Input.SkillBuffer.Consume();
         _form.BeginSkill();
+        _playerController.TutorialCombat?.Report(TutorialCombatAction.Skill);
     }
 
     public void Update()

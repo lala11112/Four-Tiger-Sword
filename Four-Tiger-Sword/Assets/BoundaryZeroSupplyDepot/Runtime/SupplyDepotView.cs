@@ -101,6 +101,7 @@ namespace BoundaryZero.SupplyDepot
         public event Action SkipRequested;
         public event Action CloseRequested;
         public event Action ReopenRequested;
+        public RectTransform DrawTarget => elements?.draw?.transform as RectTransform;
 
 #if UNITY_EDITOR
         public void AssignEditorElements(Elements references) => elements = references;
@@ -153,13 +154,13 @@ namespace BoundaryZero.SupplyDepot
             elements.reopenContainer.SetActive(!open && showReopenButton);
         }
 
-        public void Render(int balance, bool canDraw, bool drawing, SupplyDepotItem result)
+        public void Render(int balance, bool canDraw, bool drawing, SupplyDepotItem result, bool drawPermitted = true)
         {
             bool hasResult = result != null && !drawing;
             elements.balance.text = balance.ToString("N0", NumberFormat);
             elements.draw.interactable = canDraw && !drawing && !hasResult;
             elements.drawLabel.text = drawing ? "추첨 중" :
-                hasResult ? "보급 완료" : canDraw ? "보급 받기" : "재화 부족";
+                hasResult ? "보급 완료" : !drawPermitted ? "안내 중" : canDraw ? "보급 받기" : "재화 부족";
             elements.stageLabel.text = drawing ? "보급품 추첨 중" : hasResult ? "보급품 확정" : "무작위 보급";
             elements.drawLabel.color = elements.draw.interactable ? Color.white : Quiet;
             elements.drawSlash.color = elements.draw.interactable
